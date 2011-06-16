@@ -31,7 +31,7 @@ Requirements
         * tracking/comprehensive
         * gender G
         * between ages A1 and A2
-        * province P
+        * province P or all provinces
     * filled quota include participants who have completed an interview
     ? what about follow up interviews?
     ? how does this affect the CATI calling queue?
