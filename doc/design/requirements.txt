@@ -7,24 +7,39 @@ Requirements
     * CLSA id (UID)
     * first name
     * last name
-    * hin
+    ? HIN (highly sensitive: may need to be in a separate data-space)
     * status (permanent condition)
-    * standard/comprehensive
+    * cohort: tracking/comprehensive
+    * email address
+    * default DCS/CATI site (see more details below)
+    * overriding DCS/CATI site
     * date of birth
     * gender
-    * other demographics ???
+    ? other demographics
+      - no others identified by Kimberley
     * note listing
   1.2. operations
     * activate/deactivate
     * add
     * edit
-    * list
+    * list (including quotas, see 1.3)
     * view
     * archive (delete)
+  1.3. quotas
+    * restricting "wanted" participants based on cohort, gender, age bracket and province
+      - define N participants needed for:
+        * tracking/comprehensive
+        * gender G
+        * between ages A1 and A2
+        * province P
+    * filled quota include participants who have completed an interview
+    ? what about follow up interviews?
+    ? how does this affect the CATI calling queue?
+
 2. Contact Database
 -------------------
-  2.1 addresses
-    2.1.1 participant addresses
+  2.1. participant contact information
+    2.1.1 addresses
       2.1.1.1. schema
         * up to two address lines
         * city
@@ -41,8 +56,23 @@ Requirements
         * list
         * view
         * delete
-    2.1.2 alternate addresses
+    2.1.2. phone numbers
       2.1.2.1. schema
+        * type/origin (home, work, mobile, etc)
+        * number
+        * associated address
+        * rank
+        * note
+      2.1.2.2. operations
+        * activate/deactivate
+        * add
+        * edit
+        * list
+        * view
+        * delete
+  2.2. alternate contact information
+    2.2.1. addresses
+      2.2.1.1. schema
         * association
         * first name
         * last name
@@ -52,21 +82,6 @@ Requirements
         * country (Canada or US only)
         * postal/zip code
         * note
-      2.1.2.2. operations
-        * activate/deactivate
-        * add
-        * edit
-        * list
-        * view
-        * delete
-  2.2 phone numbers
-    2.2.1 participant phone numbers
-      2.2.1.1. schema
-        * type/origin (home, work, mobile, etc)
-        * number
-        * associated address
-        * rank
-        * note
       2.2.1.2. operations
         * activate/deactivate
         * add
@@ -74,7 +89,7 @@ Requirements
         * list
         * view
         * delete
-    2.2.2 alternate addresses
+    2.2.2. phone numbers
       2.2.2.1. schema
         * type/origin (home, work, mobile, etc)
         * number
@@ -87,6 +102,42 @@ Requirements
         * list
         * view
         * delete
+  2.3. proxy contact information
+    2.3.1. addresses
+      2.3.1.1. schema
+        * association
+        * first name
+        * last name
+        * up to two address lines
+        * city
+        * province/state
+        * country (Canada or US only)
+        * postal/zip code
+        * note
+      2.3.1.2. operations
+        * activate/deactivate
+        * link to participant's address
+        * add
+        * edit
+        * list
+        * view
+        * delete
+    2.3.2. phone numbers
+      2.3.2.1. schema
+        * type/origin (home, work, mobile, etc)
+        * number
+        * associated address
+        * note
+      2.3.2.2. operations
+        * activate/deactivate
+        * link to participant's phone number
+        * add
+        * edit
+        * list
+        * view
+        * delete
+
+
 3. Note listings
 ----------------
   3.1. scope
@@ -101,6 +152,8 @@ Requirements
     * edit
     * delete
     * conversation list
+
+
 4. Auditing
 -----------
   4.1. scope
@@ -110,23 +163,30 @@ Requirements
     * undo
     * redo
     * history
+
+
 5. Reporting
 ------------
   5.1. scope
     Reports can be performed on all participants, addresses and phone numbers.
   5.2. operations
-    5.2.1. restricted listing based on:
+    5.2.1. information (totals) based on:
       * full or partial match: first name
       * full or partial match: last name
       * status (permanent condition)
       * standard/comprehensive
       * full or partial match, before or after: date of birth
+      * age (in years)
       * gender
-      * other demographics ???
+      * province
+      ? other demographics
     5.2.2. other reports ???
+
 
 Assumptions/Questions
 ---------------------
-* The PRM is not responsible for tracking participant's activities in other systems.
-  For instance, determining the last time a participant was called for an interview is the
-  reponsibility of the CATI.
+  * The PRM is not responsible for tracking participant's activities in other systems.
+    For instance, determining the last time a participant was called for an interview is the
+    responsibility of the CATI.
+  * Is the PRM responsible for DCS appointments?  In-home interview appointments?  If so what is involved?
+  * How is a participant's "default" DCS site determined?  For CATI sites is it based on province?  What about Alberta? (UVic/Manitoba split)
