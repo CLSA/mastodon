@@ -7,7 +7,10 @@ Requirements
     * CLSA id (UID)
     * first name
     * last name
-    ? HIN (highly sensitive: may need to be in a separate data-space)
+    ? HIN
+      - highly sensitive: may need to be in a separate data-space
+      - where to store?
+      - track activity (asked or not, refused, etc)
     * status (permanent condition)
     * cohort: tracking/comprehensive
     * email address
@@ -17,6 +20,10 @@ Requirements
     * gender
     ? other demographics
       - no others identified by Kimberley
+    ? consent information
+      - track history?
+      - tracking/comprehensive differences?
+      - include as restriction in reporting and/or quotas?
     * note listing
   1.2. operations
     * activate/deactivate
@@ -190,3 +197,4 @@ Assumptions/Questions
     responsibility of the CATI.
   * Is the PRM responsible for DCS appointments?  In-home interview appointments?  If so what is involved?
   * How is a participant's "default" DCS site determined?  For CATI sites is it based on province?  What about Alberta? (UVic/Manitoba split)
+  * How are data-sources to be handled?  Is a system required for users to import batch groups of participants?
