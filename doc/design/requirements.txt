@@ -7,10 +7,10 @@ Requirements
     * CLSA id (UID)
     * first name
     * last name
-    ? HIN
-      - highly sensitive: may need to be in a separate data-space
-      - where to store?
+    * HIN
+      - highly sensitive: needs to be in a separate application-space
       - track activity (asked or not, refused, etc)
+      - read access only verifies HIN status (recorded, refused, not asked)
     * status (permanent condition)
     * baseline eligibility
     * source (statscan, ministry, RDD)
@@ -46,8 +46,7 @@ Requirements
         * between ages A1 and A2
         * province P or all provinces
     * filled quota include participants who have completed an interview
-    * CATI/DCS quotas will be managed by the PRM administrator who feeds them participants
-      in batches/groups
+
 
 2. Consent Database
 -------------------
@@ -66,6 +65,7 @@ Requirements
     2.2.2. comprehensive
       * bio samples
 
+
 3. Status Date Database
 -----------------------
   3.1. schema
@@ -73,18 +73,18 @@ Requirements
     * date
   3.2. event types
     3.2.1. Comprehensive
-      - consent to contact (signature associated)
-      - recruitment (phone call which schedules in-home interview)
-      - in-home interview started
-      - in-home interview finished (DCS called, appointment made)
-      - DCS interview started
-      - DCS interview finished
-      - payment tendered for DCS interview
+      * consent to contact (signature associated)
+      * recruitment (phone call which schedules in-home interview)
+      * in-home interview started
+      * in-home interview finished (DCS called, appointment made)
+      * DCS interview started
+      * DCS interview finished
+      * payment tendered for DCS interview
     3.2.2. Tracking
-      - consent to contact (signature associated)
-      - consent form mailed out
-      - telephone interview start date
-      - telephone interview finished date
+      * consent to contact (signature associated)
+      * consent form mailed out
+      * telephone interview start date
+      * telephone interview finished date
 
 
 4. Contact Database
@@ -162,13 +162,22 @@ Requirements
 
 5. Appointments
 ---------------
-  5.1. TODO
+  5.1. scope
+    * CATI, DCS and in-home interviews
+  5.2. schema
+    * datetime
+    * type (DCS or in-home)
+    * status (upcoming, in progress, completed, missed)
+  5.3. load
+    * limit appointments based on available "slots"
+    * supervisors can create shift templates (anticipated load-allowance)
+    * supervisors can create shifts (known load-allowance)
 
 
 6. Note listings
 ----------------
   6.1. scope
-    Note listings will be available for every participant.
+    * Note listings will be available for every participant.
   6.2. schema
     * date/time
     * user
@@ -181,24 +190,32 @@ Requirements
     * conversation list
 
 
-7. Auditing
+7. Participant Samples
+----------------------
+  * samples are groups of participants which are assigned to the CATI or CAPI for processing
+  * once assigned the participants are available for data collection, appointments
+  * comprehensive and tracking participants cannot be part of the same group
+  * participants can belong to more than one sample
+
+
+8. Auditing
 -----------
-  7.1. scope
-    Auditing will be performed on all data.
-  7.2. operations
+  8.1. scope
+    * Auditing will be performed on all data.
+  8.2. operations
     * automatic auditing (edits, deletes)
-  7.3. reporting
+  8.3. reporting
     * no reporting will be necessary for the initial version
-  7.4. control
+  8.4. control
     * no undo/redo management will be necessary for the initial version
 
 
-8. Reporting
+9. Reporting
 ------------
-  8.1. scope
-    Reports can be performed on all participants, addresses and phone numbers.
-  8.2. operations
-    8.2.1. information (totals) based on:
+  9.1. scope
+    * Reports can be performed on all participants, addresses and phone numbers.
+  9.2. operations
+    9.2.1. information (totals) based on:
       * full or partial match: first name
       * full or partial match: last name
       * status (permanent condition)
@@ -207,12 +224,4 @@ Requirements
       * age (in years)
       * gender
       * province
-      ? other demographics
-    8.2.2. other reports ???
-
-
-Assumptions/Questions
----------------------
-  * Is the PRM responsible for DCS appointments?  In-home interview appointments?  If so what is involved?
-  * How is a participant's "default" DCS site determined?  For CATI sites is it based on province?  What about Alberta? (UVic/Manitoba split)
-  * How are data-sources to be handled?  Is a system required for users to import batch groups of participants?
+    9.2.2. other reports TBD
