@@ -183,11 +183,16 @@ Requirements
     * user
     * sticky
     * text
+    * attention
   6.3. operations
     * add
     * edit
     * delete
     * conversation list
+  6.4. attention
+    * operators can mark notes as attention to supervisor
+    * supervisors may list all notes marked for attention
+    * supervisors may un-mark note attention status
 
 
 7. Participant Samples
