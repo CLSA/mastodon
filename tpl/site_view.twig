@@ -1,0 +1,17 @@
+{##
+ # site_view.twig
+ # 
+ # View site details.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_view.twig for parameters
+ #}
+{% extends "base_view.twig" %}
+
+{% block record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import include_list %}
+  {{ include_list( 'access', access_list|default(false), true ) }}
+  {{ include_list( 'activity', activity_list|default(false), true ) }}
+
+{% endblock record %}

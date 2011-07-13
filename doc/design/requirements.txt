@@ -170,8 +170,6 @@ Requirements
     * status (upcoming, in progress, completed, missed)
   5.3. load
     * limit appointments based on available "slots"
-    * supervisors can create shift templates (anticipated load-allowance)
-    * supervisors can create shifts (known load-allowance)
 
 
 6. Note listings

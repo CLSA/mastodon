@@ -1,0 +1,24 @@
+{##
+ # self_status.twig
+ # 
+ # Shows status details.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ #}
+{% extends "widget.twig" %}
+
+{% block javascript %}
+
+  <script type="text/javascript">
+    $( function() {
+      $( "#{{ widget.full }}_icons" ).children().tooltip();
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block widget %}
+
+  <span id="{{ widget.full }}_icons" class="status_icons ui-widget ui-state-default ui-corner-all">
+  </span>
+
+{% endblock widget %}

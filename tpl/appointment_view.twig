@@ -1,0 +1,24 @@
+{##
+ # appointment_view.twig
+ # 
+ # View appointment details.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_view.twig for parameters
+ #}
+{% extends "base_view.twig" %}
+
+{% block record %}
+  
+  {{ parent() }}
+  {% from 'macros.twig' import include_calendar %}
+  {{ include_calendar( 'site', site_calendar|default(false), true ) }}
+
+{% endblock record %}
+
+{% block post_record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import confirm_buttons %}
+  {{ confirm_buttons( slot, widget.full, '', 'Back', 'right', true ) }}
+
+{% endblock post_record %}

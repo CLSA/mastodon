@@ -1,0 +1,116 @@
+{##
+ # self_shortcuts.twig
+ # 
+ # Creates a list of shortcuts which are meant to be used under any circumstance.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @param boolean navigation Whether to include the navigation buttons
+ # @param boolean refresh Whether to include the refresh button
+ # @param boolean home Whether to include the home button
+ #}
+{% extends "widget.twig" %}
+
+{% block javascript %}
+
+  <script type="text/javascript">
+    $( function() {
+      // make button icons
+      {% if calculator %}
+        $( "#{{ widget.full }}_calculator" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-calculator"
+          }
+        } ).click( function() {
+          $( "#calculator_slot" ).dialog( {
+            title: "Calculator",
+            modal: false,
+            width: 225,
+            height: 320,
+            autoOpen: true
+          } );
+          slot_load( "calculator", "self", "calculator" );
+        } );
+      {% endif %}
+      
+      {% if navigation %}
+        $( "#{{ widget.full }}_prev" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-arrowthick-1-w" }
+        } ).click( function() {
+          slot_prev( "main" );
+        } );
+        $( "#{{ widget.full }}_next" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-arrowthick-1-e"
+          }
+        } ).click( function() {
+          slot_next( "main" );
+        } ).parent().buttonset();
+      {% endif %}
+      
+      {% if refresh %}
+        $( "#{{ widget.full }}_refresh" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-arrowrefresh-1-e"
+          }
+        } ).click( function() {
+          slot_refresh( "status" );
+          slot_refresh( "shortcuts" );
+          slot_refresh( "main" );
+        } );
+      {% endif %}
+      
+      {% if home %}
+        $( "#{{ widget.full }}_home" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-home"
+          }
+        } ).click( function() {
+          slot_load( "main", "self", "home" );
+        } );
+      {% endif %}
+
+        $( "#{{ widget.full }}_font_down" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-minus"
+          }
+        } ).click( function() {
+        } ).fontscale( "body", "down" );
+
+        $( "#{{ widget.full }}_font_up" ).button( {
+          text: false,
+          icons: {
+            primary: "ui-icon-plus"
+          }
+        } ).click( function() {
+        } ).fontscale( "body", "up" ).parent().buttonset();
+
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block widget %}
+
+  <span>
+    {% if calculator %}<button id="{{ widget.full }}_calculator">calculator</button>{% endif %}
+    {% if navigation %}
+      <span>
+        <button id="{{ widget.full }}_prev">back</button>
+        <button id="{{ widget.full }}_next">forward</button>
+      </span>
+    {% endif %}
+    {% if refresh %}<button id="{{ widget.full }}_refresh">refresh</button>{% endif %}
+    {% if home %}<button id="{{ widget.full }}_home">home</button>{% endif %}
+    <span>
+      <button id="{{ widget.full }}_font_down">smaller font</button>
+      <button id="{{ widget.full }}_font_up">larger font</button>
+    </span>
+  </span>
+
+{% endblock widget %}

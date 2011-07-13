@@ -1,0 +1,43 @@
+{##
+ # user_view.twig
+ # 
+ # View user details.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_view.twig for parameters
+ #}
+{% extends "base_view.twig" %}
+
+{% block javascript %}
+  
+  {{ parent() }}
+  {% if reset_password %}
+    <script type="text/javascript">
+      $( function() {
+        $( "#{{ widget.full }}_password" ).click( function() {
+          confirm_dialog(
+            "Reset Password",
+            "Are you sure you wish to reset this user's password?",
+            function() { ajax_push( 'user', 'reset_password', { "id": {{ id }} } ); }
+          );
+        } );
+      } );
+    </script>
+  {% endif %}
+
+{% endblock javascript %}
+
+
+{% block record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import include_list %}
+  {% if reset_password %}
+    <div class="spacer">
+      <button id="{{ widget.full }}_password">Reset Password</button>
+    </div>
+    <div id="{{ widget.full }}_slot" />
+  {% endif %}
+  {{ include_list( 'access', access_list|default(false), true ) }}
+  {{ include_list( 'activity', activity_list|default(false), true ) }}
+
+{% endblock record %}
