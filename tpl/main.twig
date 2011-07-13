@@ -10,7 +10,7 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <title>Sabretooth</title>
+  <title>Mastodon</title>
   <script type="text/javascript"></script>
   <link href="{{ constant('JQUERY_UI_URL') }}/css{{ jquery_ui_css_path }}" rel="stylesheet" />
   <link href="{{ constant('JQUERY_FULLCALENDAR_CSS_URL') }}" rel="stylesheet" />
@@ -80,27 +80,25 @@
         onExtClose: function() {}
       } );
     
-      {% if not is_operator %}
-        // setup the left extruder
-        $( "#left_extruder" ).buildMbExtruder( {
-          position: "left",
-          positionFixed: true,
-          width: 200,
-          sensibility: 500,
-          extruderOpacity: 1,
-          autoCloseTime: 0,
-          hidePanelsOnClose: true,
-          onExtOpen: function() {},
-          onExtContentLoad: function() {},
-          onExtClose: function() {}
-        } );
-      {% endif %}
+      // setup the left extruder
+      $( "#left_extruder" ).buildMbExtruder( {
+        position: "left",
+        positionFixed: true,
+        width: 200,
+        sensibility: 500,
+        extruderOpacity: 1,
+        autoCloseTime: 0,
+        hidePanelsOnClose: true,
+        onExtOpen: function() {},
+        onExtContentLoad: function() {},
+        onExtClose: function() {}
+      } );
   
       // refresh all slots
       slot_refresh( "status" );
       slot_refresh( "shortcuts" );
       slot_refresh( "settings" );
-      {% if not is_operator %}slot_refresh( "menu" );{% endif %}
+      slot_refresh( "menu" );
       slot_refresh( "main" );
 
       // apply jquery-ui theme to the extruders

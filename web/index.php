@@ -55,7 +55,6 @@ try
   // Since there is no main widget we need set up the template variables here
   $version = business\setting_manager::self()->get_setting( 'version', 'JQUERY_UI' );
   $variables = array( 'jquery_ui_css_path' => '/'.$theme.'/jquery-ui-'.$version.'.custom.css',
-                      'is_operator' => 'operator' == $session->get_role()->name,
                       'reset_password' => $reset_password );
   
   $result_array['output'] = $twig_template->render( $variables );

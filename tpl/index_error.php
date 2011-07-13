@@ -1,9 +1,7 @@
 <?php
-use sabretooth\log, sabretooth\util;
-
 if( !isset( $result_array ) || !is_array( $result_array ) )
 {
-  $code = util::convert_number_to_code( SYSTEM_BASE_ERROR_NUMBER );
+  $code = mastodon\util::convert_number_to_code( SYSTEM_BASE_ERROR_NUMBER );
   $result_array = array( 'error_type' => 'System',
                          'error_code' => $code,
                          'error_message' => '' );
@@ -22,7 +20,7 @@ $code = substr( $result_array['error_type'], 0, 1 ).'.'.$result_array['error_cod
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <title>Sabretooth</title>
+  <title>Mastodon</title>
   <link href="css/main.css" rel="stylesheet" />
   <style type="text/css">
     body { margin: 10px; }
