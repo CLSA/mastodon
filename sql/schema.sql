@@ -13,9 +13,23 @@ CREATE  TABLE IF NOT EXISTS `site` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
+  `type` ENUM('comprehensive', 'tracking') NOT NULL ,
   `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name` (`name` ASC) )
+  UNIQUE INDEX `uq_name_type` (`name` ASC, `type` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `person`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `person` ;
+
+CREATE  TABLE IF NOT EXISTS `person` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
 
@@ -28,23 +42,38 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
   `active` TINYINT(1)  NOT NULL DEFAULT true ,
-  `uid` VARCHAR(45) NULL COMMENT 'External unique ID' ,
+  `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
+  `source` ENUM('statscan','ministry','rdd') NOT NULL ,
+  `cohort` ENUM('comprehensive','tracking') NOT NULL ,
+  `site_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'If not null then force all calls to this participant to the site.' ,
   `first_name` VARCHAR(45) NOT NULL ,
   `last_name` VARCHAR(45) NOT NULL ,
-  `language` ENUM('en','fr') NULL DEFAULT NULL ,
-  `hin` VARCHAR(45) NULL DEFAULT NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `date_of_birth` DATE NULL ,
+  `eligible` TINYINT(1)  NOT NULL ,
   `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','other') NULL DEFAULT NULL ,
-  `site_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'If not null then force all calls to this participant to the site.' ,
+  `language` ENUM('en','fr') NULL DEFAULT NULL ,
+  `no_in_home` TINYINT(1)  NOT NULL DEFAULT false ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
+  `email` VARCHAR(255) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_site_id` (`site_id` ASC) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,
   INDEX `dk_prior_contact_date` (`prior_contact_date` ASC) ,
+  UNIQUE INDEX `uq_uid` (`uid` ASC) ,
+  INDEX `dk_uid` (`uid` ASC) ,
+  INDEX `fk_person_id` (`person_id` ASC) ,
   CONSTRAINT `fk_participant_site`
     FOREIGN KEY (`site_id` )
     REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_person`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -188,30 +217,30 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `participant_note`
+-- Table `person_note`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `participant_note` ;
+DROP TABLE IF EXISTS `person_note` ;
 
-CREATE  TABLE IF NOT EXISTS `participant_note` (
+CREATE  TABLE IF NOT EXISTS `person_note` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `participant_id` INT UNSIGNED NOT NULL ,
   `sticky` TINYINT(1)  NOT NULL DEFAULT false ,
   `datetime` DATETIME NOT NULL ,
   `note` TEXT NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
-  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_person_id` (`person_id` ASC) ,
   CONSTRAINT `fk_participant_note_user`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_note_participant`
-    FOREIGN KEY (`participant_id` )
-    REFERENCES `participant` (`id` )
+  CONSTRAINT `fk_participant_note_person`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -276,8 +305,8 @@ CREATE  TABLE IF NOT EXISTS `setting` (
   `description` TEXT NULL ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `uq_category_name` (`category` ASC, `name` ASC) ,
-  INDEX `category` (`category` ASC) ,
-  INDEX `name` (`name` ASC) )
+  INDEX `dk_category` (`category` ASC) ,
+  INDEX `dk_name` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -291,11 +320,12 @@ CREATE  TABLE IF NOT EXISTS `appointment` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
+  `type` ENUM('home','site') NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `reached` TINYINT(1)  NULL DEFAULT NULL COMMENT 'If the appointment was met, whether the participant was reached.' ,
+  `met` TINYINT(1)  NOT NULL COMMENT 'If the appointment was met, whether the participant was reached.' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
-  INDEX `dk_reached` (`reached` ASC) ,
+  INDEX `dk_met` (`met` ASC) ,
   CONSTRAINT `fk_appointment_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
@@ -320,12 +350,12 @@ CREATE  TABLE IF NOT EXISTS `setting_value` (
   INDEX `fk_site_id` (`site_id` ASC) ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `uq_setting_id_site_id` (`setting_id` ASC, `site_id` ASC) ,
-  CONSTRAINT `fk_setting_value_setting_id`
+  CONSTRAINT `fk_setting_value_setting`
     FOREIGN KEY (`setting_id` )
     REFERENCES `setting` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_setting_value_site_id`
+  CONSTRAINT `fk_setting_value_site`
     FOREIGN KEY (`site_id` )
     REFERENCES `site` (`id` )
     ON DELETE NO ACTION
@@ -351,7 +381,7 @@ CREATE  TABLE IF NOT EXISTS `region` (
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `uq_name` (`name` ASC) ,
   UNIQUE INDEX `uq_abbreviation` (`abbreviation` ASC) ,
-  CONSTRAINT `fk_region_site_id`
+  CONSTRAINT `fk_region_site`
     FOREIGN KEY (`site_id` )
     REFERENCES `site` (`id` )
     ON DELETE NO ACTION
@@ -368,7 +398,7 @@ CREATE  TABLE IF NOT EXISTS `address` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
-  `participant_id` INT UNSIGNED NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
   `active` TINYINT(1)  NOT NULL DEFAULT true ,
   `rank` INT NOT NULL ,
   `address1` VARCHAR(512) NOT NULL ,
@@ -390,16 +420,16 @@ CREATE  TABLE IF NOT EXISTS `address` (
   `december` TINYINT(1)  NOT NULL DEFAULT true ,
   `note` TEXT NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `fk_region_id` (`region_id` ASC) ,
-  CONSTRAINT `fk_address_participant_id`
-    FOREIGN KEY (`participant_id` )
-    REFERENCES `participant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_address_region_id`
+  INDEX `fk_person_id` (`person_id` ASC) ,
+  CONSTRAINT `fk_address_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_address_person`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -414,7 +444,7 @@ CREATE  TABLE IF NOT EXISTS `phone` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
-  `participant_id` INT UNSIGNED NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
   `address_id` INT UNSIGNED NULL DEFAULT NULL ,
   `active` TINYINT(1)  NOT NULL DEFAULT true ,
   `rank` INT NOT NULL ,
@@ -422,25 +452,224 @@ CREATE  TABLE IF NOT EXISTS `phone` (
   `number` VARCHAR(45) NOT NULL ,
   `note` TEXT NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `fk_address_id` (`address_id` ASC) ,
-  CONSTRAINT `fk_phone_participant_id`
-    FOREIGN KEY (`participant_id` )
-    REFERENCES `participant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_phone_address_id`
+  INDEX `fk_person_id` (`person_id` ASC) ,
+  CONSTRAINT `fk_phone_address`
     FOREIGN KEY (`address_id` )
     REFERENCES `address` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_phone_person`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Placeholder table for view `participant_first_address`
+-- Table `quota`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `participant_first_address` (`participant_id` INT, `address_id` INT);
+DROP TABLE IF EXISTS `quota` ;
+
+CREATE  TABLE IF NOT EXISTS `quota` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `region_id` INT UNSIGNED NOT NULL ,
+  `cohort` ENUM('comprehensive','tracking') NOT NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `age_bracket` ENUM('45-55','55-65','65-75','75-85') NOT NULL ,
+  `population` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_region_id` (`region_id` ASC) ,
+  CONSTRAINT `fk_quota_region`
+    FOREIGN KEY (`region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hin`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `hin` ;
+
+CREATE  TABLE IF NOT EXISTS `hin` (
+  `uid` VARCHAR(45) NOT NULL ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `access` TINYINT(1)  NULL DEFAULT NULL ,
+  `code` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`uid`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `status`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `status` ;
+
+CREATE  TABLE IF NOT EXISTS `status` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `datetime` DATETIME NOT NULL ,
+  `event` ENUM('TBD') NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  CONSTRAINT `fk_status_participant`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `alternate`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `alternate` ;
+
+CREATE  TABLE IF NOT EXISTS `alternate` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `alternate` TINYINT(1)  NOT NULL ,
+  `informant` TINYINT(1)  NOT NULL ,
+  `proxy` TINYINT(1)  NOT NULL ,
+  `first_name` VARCHAR(45) NOT NULL ,
+  `last_name` VARCHAR(45) NOT NULL ,
+  `association` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_person_id` (`person_id` ASC) ,
+  CONSTRAINT `fk_alternate_participant`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_alternate_person`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `sample`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `sample` ;
+
+CREATE  TABLE IF NOT EXISTS `sample` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` VARCHAR(45) NOT NULL ,
+  `create_timestamp` VARCHAR(45) NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `active` VARCHAR(45) NOT NULL DEFAULT 'false' COMMENT 'Samples of participants which are actively being contacted.' ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `sample_has_participant`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `sample_has_participant` ;
+
+CREATE  TABLE IF NOT EXISTS `sample_has_participant` (
+  `sample_id` INT UNSIGNED NOT NULL ,
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `update_timestamp` VARCHAR(45) NOT NULL ,
+  `create_timestamp` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`sample_id`, `participant_id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_sample_id` (`sample_id` ASC) ,
+  CONSTRAINT `fk_sample_has_participant_sample`
+    FOREIGN KEY (`sample_id` )
+    REFERENCES `sample` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_sample_has_participant_participant`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `shift_template`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `shift_template` ;
+
+CREATE  TABLE IF NOT EXISTS `shift_template` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `start_time` TIME NOT NULL ,
+  `end_time` TIME NOT NULL ,
+  `start_date` DATE NOT NULL ,
+  `end_date` DATE NULL ,
+  `operators` INT UNSIGNED NOT NULL ,
+  `repeat_type` ENUM('weekly','day of month','day of week') NOT NULL DEFAULT 'weekly' ,
+  `repeat_every` INT NOT NULL DEFAULT 1 ,
+  `monday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `friday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `sunday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `site_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  CONSTRAINT `fk_shift_template_site`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `shift`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `shift` ;
+
+CREATE  TABLE IF NOT EXISTS `shift` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `site_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `start_datetime` DATETIME NOT NULL ,
+  `end_datetime` DATETIME NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  CONSTRAINT `fk_shift_site`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_shift_user`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Placeholder table for view `person_first_address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `person_first_address` (`person_id` INT, `address_id` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `participant_last_consent`
@@ -448,23 +677,43 @@ CREATE TABLE IF NOT EXISTS `participant_first_address` (`participant_id` INT, `a
 CREATE TABLE IF NOT EXISTS `participant_last_consent` (`participant_id` INT, `consent_id` INT);
 
 -- -----------------------------------------------------
+-- Placeholder table for view `person_primary_address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `person_primary_address` (`person_id` INT, `address_id` INT);
+
+-- -----------------------------------------------------
 -- Placeholder table for view `participant_primary_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `participant_primary_address` (`participant_id` INT, `address_id` INT);
 
 -- -----------------------------------------------------
--- View `participant_first_address`
+-- Placeholder table for view `alternate_primary_address`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `participant_first_address` ;
-DROP TABLE IF EXISTS `participant_first_address`;
-CREATE  OR REPLACE VIEW `participant_first_address` AS
-SELECT participant_id, id AS address_id
+CREATE TABLE IF NOT EXISTS `alternate_primary_address` (`alternate_id` INT, `address_id` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `participant_first_address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `participant_first_address` (`participant_id` INT, `address_id` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `alternate_first_address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `alternate_first_address` (`alternate_id` INT, `address_id` INT);
+
+-- -----------------------------------------------------
+-- View `person_first_address`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `person_first_address` ;
+DROP TABLE IF EXISTS `person_first_address`;
+CREATE  OR REPLACE VIEW `person_first_address` AS
+SELECT person_id, id AS address_id
 FROM address AS t1
 WHERE t1.rank = (
   SELECT MIN( t2.rank )
   FROM address AS t2
   WHERE t2.active
-  AND t1.participant_id = t2.participant_id
+  AND t1.person_id = t2.person_id
   AND CASE MONTH( CURRENT_DATE() )
         WHEN 1 THEN t2.january
         WHEN 2 THEN t2.february
@@ -479,7 +728,7 @@ WHERE t1.rank = (
         WHEN 11 THEN t2.november
         WHEN 12 THEN t2.december
         ELSE 0 END = 1
-  GROUP BY t2.participant_id );
+  GROUP BY t2.person_id );
 
 -- -----------------------------------------------------
 -- View `participant_last_consent`
@@ -496,12 +745,12 @@ WHERE t1.date = (
   GROUP BY t2.participant_id );
 
 -- -----------------------------------------------------
--- View `participant_primary_address`
+-- View `person_primary_address`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `participant_primary_address` ;
-DROP TABLE IF EXISTS `participant_primary_address`;
-CREATE  OR REPLACE VIEW `participant_primary_address` AS
-SELECT participant_id, id AS address_id
+DROP VIEW IF EXISTS `person_primary_address` ;
+DROP TABLE IF EXISTS `person_primary_address`;
+CREATE  OR REPLACE VIEW `person_primary_address` AS
+SELECT person_id, id AS address_id
 FROM address AS t1
 WHERE t1.rank = (
   SELECT MIN( t2.rank )
@@ -509,8 +758,48 @@ WHERE t1.rank = (
   WHERE t2.region_id = region.id
   AND t2.active
   AND region.site_id IS NOT NULL
-  AND t1.participant_id = t2.participant_id
-  GROUP BY t2.participant_id );
+  AND t1.person_id = t2.person_id
+  GROUP BY t2.person_id );
+
+-- -----------------------------------------------------
+-- View `participant_primary_address`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `participant_primary_address` ;
+DROP TABLE IF EXISTS `participant_primary_address`;
+CREATE  OR REPLACE VIEW `participant_primary_address` AS
+SELECT participant.id AS participant_id, address_id
+FROM person_primary_address, participant
+WHERE person_primary_address.person_id = participant.person_id;
+
+-- -----------------------------------------------------
+-- View `alternate_primary_address`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `alternate_primary_address` ;
+DROP TABLE IF EXISTS `alternate_primary_address`;
+CREATE  OR REPLACE VIEW `alternate_primary_address` AS
+SELECT alternate.id AS alternate_id, address_id
+FROM person_primary_address, alternate
+WHERE person_primary_address.person_id = alternate.person_id;
+
+-- -----------------------------------------------------
+-- View `participant_first_address`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `participant_first_address` ;
+DROP TABLE IF EXISTS `participant_first_address`;
+CREATE  OR REPLACE VIEW `participant_first_address` AS
+SELECT participant.id AS participant_id, address_id
+FROM person_first_address, participant
+WHERE person_first_address.person_id = participant.person_id;
+
+-- -----------------------------------------------------
+-- View `alternate_first_address`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `alternate_first_address` ;
+DROP TABLE IF EXISTS `alternate_first_address`;
+CREATE  OR REPLACE VIEW `alternate_first_address` AS
+SELECT alternate.id AS alternate_id, address_id
+FROM person_first_address, alternate
+WHERE person_first_address.person_id = alternate.person_id;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

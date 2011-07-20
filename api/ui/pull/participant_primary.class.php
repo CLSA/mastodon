@@ -29,16 +29,6 @@ class participant_primary extends base_primary
    */
   public function __construct( $args )
   {
-    // if the id is "assignment", then fetch the participant id based on the current assignment
-    if( isset( $args['id'] ) && 'assignment' == $args['id'] )
-    {
-      $db_assignment = bus\session::self()->get_current_assignment();
-      if( is_null( $db_assignment ) )
-        throw new exc\runtime(
-          'Cannot get the current participant, there is no active assignment.', __METHOD__ );
-      $args['id'] = $db_participant = $db_assignment->get_interview()->get_participant()->id;
-    }
-
     parent::__construct( 'participant', $args );
   }
 

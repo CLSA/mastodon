@@ -38,7 +38,6 @@ class participant_view extends base_view
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
-    $this->add_item( 'hin', 'string', 'Health Insurance Number' );
     $this->add_item( 'status', 'enum', 'Condition' );
     $this->add_item( 'site_id', 'enum', 'Prefered Site' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
@@ -93,14 +92,14 @@ class participant_view extends base_view
 
     try
     {
-      // create the assignment sub-list widget
-      $this->assignment_list = new assignment_list( $args );
-      $this->assignment_list->set_parent( $this );
-      $this->assignment_list->set_heading( 'Assignment history' );
+      // create the alternate sub-list widget
+      $this->alternate_list = new alternate_list( $args );
+      $this->alternate_list->set_parent( $this );
+      $this->alternate_list->set_heading( 'Alternate contacts' );
     }
     catch( exc\permission $e )
     {
-      $this->assignment_list = NULL;
+      $this->alternate_list = NULL;
     }
   }
 
@@ -130,7 +129,6 @@ class participant_view extends base_view
     $this->set_item( 'first_name', $this->get_record()->first_name );
     $this->set_item( 'last_name', $this->get_record()->last_name );
     $this->set_item( 'language', $this->get_record()->language, false, $languages );
-    $this->set_item( 'hin', $this->get_record()->hin );
     $this->set_item( 'status', $this->get_record()->status, false, $statuses );
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'prior_contact_date', $this->get_record()->prior_contact_date, false );
@@ -161,76 +159,46 @@ class participant_view extends base_view
       $this->set_variable( 'consent_list', $this->consent_list->get_variables() );
     }
 
-    if( !is_null( $this->assignment_list ) )
+    if( !is_null( $this->alternate_list ) )
     {
-      $this->assignment_list->finish();
-      $this->set_variable( 'assignment_list', $this->assignment_list->get_variables() );
+      $this->alternate_list->finish();
+      $this->set_variable( 'alternate_list', $this->alternate_list->get_variables() );
     }
   }
   
   /**
-   * Overrides the assignment list widget's method.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return int
-   * @assignment protected
-   */
-  public function determine_assignment_count( $modifier = NULL )
-  {
-    if( NULL == $modifier ) $modifier = new db\modifier();
-    $modifier->where( 'interview.participant_id', '=', $this->get_record()->id );
-    return db\assignment::count( $modifier );
-  }
-
-  /**
-   * Overrides the assignment list widget's method.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return array( record )
-   * @assignment protected
-   */
-  public function determine_assignment_list( $modifier = NULL )
-  {
-    if( NULL == $modifier ) $modifier = new db\modifier();
-    $modifier->where( 'interview.participant_id', '=', $this->get_record()->id );
-    return db\assignment::select( $modifier );
-  }
-
-  /**
-   * The participant list widget.
+   * The address list widget.
    * @var address_list
    * @access protected
    */
   protected $address_list = NULL;
   
   /**
-   * The participant list widget.
+   * The phone list widget.
    * @var phone_list
    * @access protected
    */
   protected $phone_list = NULL;
   
   /**
-   * The participant list widget.
+   * The appointment list widget.
    * @var appointment_list
    * @access protected
    */
   protected $appointment_list = NULL;
   
   /**
-   * The participant list widget.
+   * The consent list widget.
    * @var consent_list
    * @access protected
    */
   protected $consent_list = NULL;
   
   /**
-   * The participant list widget.
-   * @var assignment_list
+   * The alternate contact person list widget.
+   * @var alternate_list
    * @access protected
    */
-  protected $assignment_list = NULL;
+  protected $alternate_list = NULL;
 }
 ?>

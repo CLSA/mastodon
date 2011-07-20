@@ -52,7 +52,6 @@ class appointment_list extends site_restricted_list
     {
       $modifier = new db\modifier();
       $modifier->where( 'participant_id', '=', $this->parent->get_record()->id );
-      $modifier->where( 'assignment_id', '=', NULL );
       $this->addable = 0 == db\appointment::count( $modifier );
     }
 

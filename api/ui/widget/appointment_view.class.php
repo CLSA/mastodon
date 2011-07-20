@@ -37,7 +37,6 @@ class appointment_view extends base_appointment_view
       'Select a specific phone number to call for the appointment, or leave this field blank if '.
       'any of the participant\'s phone numbers can be called.' );
     $this->add_item( 'datetime', 'datetime', 'Date' );
-    $this->add_item( 'assignment.user', 'constant', 'Assigned to' );
     $this->add_item( 'state', 'constant', 'State',
       '(One of upcoming, assignable, missed, assigned, in progress, complete or incomplete)' );
   }
@@ -50,10 +49,6 @@ class appointment_view extends base_appointment_view
    */
   public function finish()
   {
-    // don't allow editing if the appointment has been assigned
-    $db_assignment = $this->get_record()->get_assignment();
-    $this->editable = is_null( $db_assignment );
-
     parent::finish();
 
     $db_participant = new db\participant( $this->get_record()->participant_id );
@@ -93,23 +88,6 @@ class appointment_view extends base_appointment_view
     foreach( $db_participant->get_phone_list( $modifier ) as $db_phone )
       $phones[$db_phone->id] = $db_phone->rank.". ".$db_phone->number;
     
-    if( !is_null( $db_assignment ) )
-    {
-      $this->set_item( 'assignment.user', $db_assignment->get_user()->name, false );
-
-      $this->add_item( 'assignment.start_datetime', 'constant', 'Started' );
-      $this->set_item( 'assignment.start_datetime',
-        util::get_formatted_time( $db_assignment->start_datetime ), false );
-      
-      $this->add_item( 'assignment.end_datetime', 'constant', 'Finished' );
-      $this->set_item( 'assignment.end_datetime',
-        util::get_formatted_time( $db_assignment->end_datetime ), false );
-    }
-    else
-    {
-      $this->set_item( 'assignment.user', 'unassigned', false );
-    }
-
     // set the view's items
     $this->set_item( 'phone_id', $this->get_record()->phone_id, false, $phones );
     $this->set_item( 'datetime', $this->get_record()->datetime, true );

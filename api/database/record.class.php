@@ -475,7 +475,7 @@ abstract class record extends \mastodon\base_object
    * relationships.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $record_type The type of record.
-   * @param modifier $modifier A modifier to apply to the count.
+   * @param modifier $modifier A modifier to apply to the list or count.
    * @param boolean $inverted Whether to invert the count (count records NOT in the joining table).
    * @param boolean $count If true then this method returns the count instead of list of records.
    * @return array( record ) | int

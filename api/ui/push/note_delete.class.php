@@ -40,11 +40,9 @@ class note_delete extends \mastodon\ui\push
    */
   public function finish()
   {
-    // make sure there is a valid note category
     $category = $this->get_argument( 'category' );
-    $id = $this->get_argument( 'id' );
-    $note_class = '\\mastodon\\database\\'.$category.'_note';
-    $db_note = new $note_class( $id );
+    $category_class = '\\mastodon\\database\\'.$category;
+    $db_note = $category_class::get_note( $this->get_argument( 'id' ) );
     $db_note->delete();
   }
 }

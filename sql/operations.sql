@@ -35,6 +35,30 @@ VALUES( "widget", "address", "list", true, "Lists a participant's address entrie
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "address", "primary", true, "Retrieves base address information." );
 
+-- alternate
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "alternate", "delete", true, "Removes an alternate contact person from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "alternate", "edit", true, "Edits an alternate contact person's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "alternate", "new", true, "Add a new alternate contact person to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "add", true, "View a form for creating a new alternate contact person." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "view", true, "View an alternate contact person's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "list", true, "List alternate contact persons in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "add_address", true, "A form to create a new address entry to add to an alternate contact person." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "alternate", "delete_address", true, "Remove an alternate contact person's address entry." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "add_phone", true, "A form to create a new phone entry to add to an alternate contact person." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "alternate", "delete_phone", true, "Remove an alternate contact person's phone entry." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "alternate", "primary", true, "Retrieves base alternate contact person information." );
+
 -- appointment
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "appointment", "delete", true, "Removes a participant's appointment from the system." );

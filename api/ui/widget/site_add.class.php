@@ -34,6 +34,7 @@ class site_add extends base_view
     
     // define all columns defining this record
     $this->add_item( 'name', 'string', 'Name' );
+    $this->add_item( 'type', 'enum', 'Type' );
     $this->add_item( 'timezone', 'enum', 'Time Zone' );
   }
 
@@ -48,11 +49,14 @@ class site_add extends base_view
     parent::finish();
     
     // create enum arrays
+    $types = db\site::get_enum_values( 'type' );
+    $types = array_combine( $types, $types );
     $timezones = db\site::get_enum_values( 'timezone' );
     $timezones = array_combine( $timezones, $timezones );
 
     // set the view's items
     $this->set_item( 'name', '', true );
+    $this->set_item( 'type', key( $types ), true, $types );
     $this->set_item( 'timezone', key( $timezones ), true, $timezones );
 
     $this->finish_setting_items();

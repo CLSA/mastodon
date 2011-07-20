@@ -40,11 +40,9 @@ class note_edit extends \mastodon\ui\push
    */
   public function finish()
   {
-    // make sure there is a valid note category
     $category = $this->get_argument( 'category' );
-    $id = $this->get_argument( 'id' );
-    $note_class = '\\mastodon\\database\\'.$category.'_note';
-    $db_note = new $note_class( $id );
+    $category_class = '\\mastodon\\database\\'.$category;
+    $db_note = $category_class::get_note( $this->get_argument( 'id' ) );
     
     $sticky = $this->get_argument( 'sticky', NULL );
     if( !is_null( $sticky ) ) $db_note->sticky = 'true' == $sticky;

@@ -17,8 +17,72 @@ use mastodon\exception as exc;
  *
  * @package mastodon\database
  */
-class participant extends has_note
+class participant extends person
 {
+  /**
+   * Override get_address_list()
+   * 
+   * Since addresses are related to the person table and not the participant
+   * table this method allows for direct access to the addresses.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param modifier $modifier A modifier to apply to the list
+   * @return array( record )
+   * @access public
+   */
+  public function get_address_list( $modifier = NULL )
+  {
+    return $this->get_person()->get_address_list( $modifier );
+  }
+  
+  /**
+   * Override get_address_count()
+   * 
+   * Since addresses are related to the person table and not the participant
+   * table this method allows for direct access to the addresses.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param modifier $modifier A modifier to apply to the count
+   * @return array( record )
+   * @access public
+   */
+  public function get_address_count( $modifier = NULL )
+  {
+    return $this->get_person()->get_address_count( $modifier );
+  }
+
+  /**
+   * Override get_phone_list()
+   * 
+   * Since phones are related to the person table and not the participant
+   * table this method allows for direct access to the phones.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param modifier $modifier A modifier to apply to the list
+   * @return array( record )
+   * @access public
+   */
+  public function get_phone_list( $modifier = NULL )
+  {
+    return $this->get_person()->get_phone_list( $modifier );
+  }
+  
+  /**
+   * Override get_phone_count()
+   * 
+   * Since phones are related to the person table and not the participant
+   * table this method allows for direct access to the phones.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param modifier $modifier A modifier to apply to the count
+   * @return array( record )
+   * @access public
+   */
+  public function get_phone_count( $modifier = NULL )
+  {
+    return $this->get_person()->get_phone_count( $modifier );
+  }
+
   /**
    * Identical to the parent's select method but restrict to a particular site.
    * 
@@ -86,12 +150,12 @@ class participant extends has_note
   }
   
   /**
-   * Get the participant's current defining consent
+   * Get the participant's last consent
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return consent
    * @access public
    */
-  public function get_current_consent()
+  public function get_last_consent()
   {
     // check the primary key value
     if( is_null( $this->id ) )
@@ -99,19 +163,14 @@ class participant extends has_note
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
-    
-    $modifier = new modifier();
-    $modifier->where( 'participant_id', '=', $this->id );
-    $modifier->where( 'event', 'in', array( 'verbal accept',
-                                            'verbal deny',
-                                            'written accept',
-                                            'written deny',
-                                            'retract' ) );
-    $modifier->order_desc( 'date' );
-    $modifier->limit( 1 );
-    $consent_list = consent::select( $modifier );
 
-    return 0 == count( $consent_list ) ? NULL : current( $consent_list );
+    // need custom SQL
+    $consent_id = static::db()->get_one(
+      sprintf( 'SELECT consent_id '.
+               'FROM participant_last_consent '.
+               'WHERE participant_id = %s',
+               database::format_string( $this->id ) ) );
+    return $consent_id ? new consent( $consent_id ) : NULL;
   }
 
   /**
