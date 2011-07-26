@@ -139,6 +139,10 @@ VALUES( "widget", "participant", "add_phone", true, "A form to create a new phon
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete_phone", true, "Remove a participant's phone entry." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "add_alternate", true, "A form to create a new alternate contact to add to a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "participant", "delete_alternate", true, "Remove a participant's alternate contact." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "primary", true, "Retrieves base participant information." );
 
 -- phone

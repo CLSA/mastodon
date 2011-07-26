@@ -1,0 +1,17 @@
+{##
+ # alternate_view.twig
+ # 
+ # View alternate details.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_view.twig for parameters
+ #}
+{% extends "base_view.twig" %}
+
+{% block record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import include_list %}
+  {{ include_list( 'address', address_list|default(false), true ) }}
+  {{ include_list( 'phone', phone_list|default(false), true ) }}
+
+{% endblock record %}
