@@ -49,7 +49,7 @@ class setting_manager extends \mastodon\singleton
     // have the audit settings mirror the main db, if necessary
     foreach( $this->static_settings[ 'audit_db' ] as $key => $value )
     {
-      if( false === $value )
+      if( false === $value && 'enabled' != $key )
         $this->static_settings[ 'audit_db' ][ $key ] =
           $this->static_settings[ 'db' ][ $key ];
     }
