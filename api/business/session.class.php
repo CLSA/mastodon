@@ -520,7 +520,7 @@ final class session extends \mastodon\singleton
         $_SESSION['slot'][$slot]['stack']['widgets'][$index-1]['name'] : NULL, 0, COOKIE_PATH );
 
       setcookie( 'slot__'.$slot.'__next', $this->slot_has_next( $slot ) ?
-        $_SESSION['slot'][$slot]['stack']['widgets'][$index+1]['name'] : NULL, 0, COOKIE_PATH )
+        $_SESSION['slot'][$slot]['stack']['widgets'][$index+1]['name'] : NULL, 0, COOKIE_PATH );
     }
   }
   
