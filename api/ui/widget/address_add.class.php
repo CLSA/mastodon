@@ -33,7 +33,7 @@ class address_add extends base_view
     parent::__construct( 'address', 'add', $args );
 
     // add items to the view
-    $this->add_item( 'participant_id', 'hidden' );
+    $this->add_item( 'person_id', 'hidden' );
     $this->add_item( 'active', 'boolean', 'Active' );
     $this->add_item( 'rank', 'enum', 'Rank' );
     $this->add_item( 'address1', 'string', 'Address1' );
@@ -69,9 +69,11 @@ class address_add extends base_view
     $this->set_variable( 'december', true );
 
     // this widget must have a parent, and it's subject must be a participant
-    if( is_null( $this->parent ) || 'participant' != $this->parent->get_subject() )
+    $subject = $this->parent->get_subject();
+    if( is_null( $this->parent ) || ( 'participant' != $subject && 'alternate' != $subject ) )
       throw new exc\runtime(
-        'Address widget must have a parent with participant as the subject.', __METHOD__ );
+        'Address widget must have a parent with participant or alternate as the subject.',
+        __METHOD__ );
     
     // create enum arrays
     $num_addresss = $this->parent->get_record()->get_address_count();
@@ -87,7 +89,7 @@ class address_add extends base_view
     reset( $regions );
 
     // set the view's items
-    $this->set_item( 'participant_id', $this->parent->get_record()->id );
+    $this->set_item( 'person_id', $this->parent->get_record()->get_person()->id );
     $this->set_item( 'active', true, true );
     $this->set_item( 'rank', $last_rank_key, true, $ranks );
     $this->set_item( 'address1', '' );

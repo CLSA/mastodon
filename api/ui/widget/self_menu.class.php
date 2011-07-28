@@ -70,6 +70,7 @@ class self_menu extends \mastodon\ui\widget
     
     $exclude = array(
       'address',
+      'alternate',
       'appointment',
       'consent',
       'operation',

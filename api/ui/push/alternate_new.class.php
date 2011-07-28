@@ -34,6 +34,8 @@ class alternate_new extends base_new
 
   /**
    * Executes the push.
+   * Since creating a new alternate requires first creating a new person this method overrides
+   * its parent method without calling (which is the usual behaviour).
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access public
    */
@@ -48,9 +50,54 @@ class alternate_new extends base_new
     if( !array_key_exists( 'association', $columns ) || 0 == strlen( $columns['association'] ) )
       throw new exc\notice( 'The alternate\'s association cannot be left blank.', __METHOD__ );
     
-    // TODO: need to create the person record and link its ID
+    foreach( $columns as $column => $value ) $this->get_record()->$column = $value;
 
-    parent::finish();
+    try
+    {
+      // create a person record and like the new record to it
+      $db_person = new db\person();
+      $db_person->save();
+      $this->get_record()->person_id = $db_person->id;
+      $this->get_record()->save();
+    }
+    catch( db\base_exception $e )
+    {
+      // failed to create alternate, delete the person record
+      if( !is_null( $db_person->id ) ) $db_person->delete();
+
+      if( 'database' == $e->get_type() )
+      {
+        if( $e->is_duplicate_entry() )
+        {
+          throw new exc\notice(
+            'Unable to create the new '.$this->get_subject().' because it is not unique.',
+            __METHOD__, $e );
+        }
+        else if( $e->is_missing_data() )
+        {
+          $matches = array();
+          $found = preg_match( "/Column '[^']+'/", $e->get_raw_message(), $matches );
+  
+          if( $found )
+          {
+            $message = sprintf(
+              'You must specify "%s" in order to create a new %s.',
+              substr( $matches[0], 8, -1 ),
+              $this->get_subject() );
+          }
+          else
+          {
+            $message = sprintf(
+              'Unable to create the new %s, not all mandatory fields have been filled out.',
+              $this->get_subect() );
+          }
+  
+          throw new exc\notice( $message, __METHOD__, $e );
+        }
+
+        throw $e;
+      }
+    }
   }
 }
 ?>

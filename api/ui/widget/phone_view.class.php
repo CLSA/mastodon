@@ -51,11 +51,11 @@ class phone_view extends base_view
   {
     parent::finish();
     
-    $db_participant = $this->get_record()->get_participant();
+    $db_person = $this->get_record()->get_person();
 
     // create enum arrays
     $modifier = new db\modifier();
-    $modifier->where( 'participant_id', '=', $db_participant->id );
+    $modifier->where( 'person_id', '=', $db_person->id );
     $modifier->order( 'rank' );
     $addresses = array();
     foreach( db\address::select( $modifier ) as $db_address )
@@ -68,7 +68,7 @@ class phone_view extends base_view
         $db_region->country );
     }
 
-    $num_phones = $db_participant->get_phone_count();
+    $num_phones = $db_person->get_phone_count();
     $ranks = array();
     for( $rank = 1; $rank <= $num_phones; $rank++ ) $ranks[] = $rank;
     $ranks = array_combine( $ranks, $ranks );

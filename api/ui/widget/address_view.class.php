@@ -68,7 +68,7 @@ class address_view extends base_view
     $this->set_variable( 'december', $this->get_record()->december );
 
     // create enum arrays
-    $num_addresss = $this->get_record()->get_participant()->get_address_count();
+    $num_addresss = $this->get_record()->get_person()->get_address_count();
     $ranks = array();
     for( $rank = 1; $rank <= $num_addresss; $rank++ ) $ranks[] = $rank;
     $ranks = array_combine( $ranks, $ranks );

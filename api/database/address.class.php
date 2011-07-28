@@ -71,6 +71,6 @@ class address extends has_rank
    * @access protected
    * @static
    */
-  protected static $rank_parent = 'participant';
+  protected static $rank_parent = 'person';
 }
 ?>

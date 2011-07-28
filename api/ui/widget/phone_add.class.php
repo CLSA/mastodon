@@ -33,7 +33,7 @@ class phone_add extends base_view
     parent::__construct( 'phone', 'add', $args );
     
     // add items to the view
-    $this->add_item( 'participant_id', 'hidden' );
+    $this->add_item( 'person_id', 'hidden' );
     $this->add_item( 'address_id', 'enum', 'Associated address' );
     $this->add_item( 'active', 'boolean', 'Active' );
     $this->add_item( 'rank', 'enum', 'Rank' );
@@ -53,13 +53,15 @@ class phone_add extends base_view
     parent::finish();
     
     // this widget must have a parent, and it's subject must be a participant
-    if( is_null( $this->parent ) || 'participant' != $this->parent->get_subject() )
+    $subject = $this->parent->get_subject();
+    if( is_null( $this->parent ) || ( 'participant' != $subject && 'alternate' != $subject ) )
       throw new exc\runtime(
-        'Phone widget must have a parent with participant as the subject.', __METHOD__ );
+        'Phone widget must have a parent with participant or alternate as the subject.',
+        __METHOD__ );
 
     // create enum arrays
     $modifier = new db\modifier();
-    $modifier->where( 'participant_id', '=', $this->parent->get_record()->id ); 
+    $modifier->where( 'person_id', '=', $this->parent->get_record()->get_person()->id ); 
     $modifier->order( 'rank' );
     $addresses = array();
     foreach( db\address::select( $modifier ) as $db_address )
@@ -82,7 +84,7 @@ class phone_add extends base_view
     $types = array_combine( $types, $types );
 
     // set the view's items
-    $this->set_item( 'participant_id', $this->parent->get_record()->id );
+    $this->set_item( 'person_id', $this->parent->get_record()->get_person()->id );
     $this->set_item( 'address_id', '', false, $addresses );
     $this->set_item( 'active', true, true );
     $this->set_item( 'rank', $last_rank_key, true, $ranks );

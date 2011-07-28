@@ -33,24 +33,21 @@ class phone_new extends base_new
   }
 
   /**
-   * Overrides the parent method to make sure the number isn't blank and is a valid number.
+   * Overrides the parent method to make sure the number isn't blank and is a valid number
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @throws exception\notice
    * @access public
    */
   public function finish()
   {
-    // make sure the datetime column isn't blank
     $columns = $this->get_argument( 'columns' );
-    if( !array_key_exists( 'number', $columns ) )
-      throw new exc\notice( 'The number cannot be left blank.', __METHOD__ );
-
-    // validate the phone number
+    $number = $columns['number'];
+    
+    // validate the number
     if( 10 != strlen( preg_replace( '/[^0-9]/', '', $columns['number'] ) ) )
       throw new exc\notice(
         'Phone numbers must have exactly 10 digits.', __METHOD__ );
 
-    // no errors, go ahead and make the change
     parent::finish();
   }
 }

@@ -49,7 +49,6 @@ class address_new extends base_new
       throw new exc\notice(
         'Postal codes must be in "A1A 1A1" format, zip codes in "01234" format.', __METHOD__ );
 
-    // no errors, go ahead and make the change
     parent::finish();
   }
 }
