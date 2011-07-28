@@ -1,4 +1,4 @@
-<?ihp
+<?php
 /**
  * database.class.php
  * For now see {@link connect} for the current hack/solution.
