@@ -34,7 +34,7 @@ final class session extends \mastodon\singleton
   {
     // WARNING!  When we construct the session we haven't finished setting up the system yet, so
     // don't use the log class in this method!
-    
+
     // the first argument is the settings array from an .ini file
     $setting_manager = setting_manager::self( $arguments[0] );
     

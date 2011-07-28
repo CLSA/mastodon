@@ -112,6 +112,6 @@ else
     business\session::self()->get_database()->fail_transaction();
 
   // Since the error may have been caused by the template engine, output using a php template
-  include TPL_PATH.'/index_error.php';
+  include 'error.php';
 }
 ?>
