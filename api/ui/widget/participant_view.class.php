@@ -37,9 +37,16 @@ class participant_view extends base_view
     $this->add_item( 'uid', 'string', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
+    $this->add_item( 'source', 'enum', 'Source' );
+    $this->add_item( 'cohort', 'constant', 'Cohort' );
+    $this->add_item( 'gender', 'enum', 'Gender' );
+    $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
-    $this->add_item( 'status', 'enum', 'Condition' );
+    $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'site_id', 'enum', 'Prefered Site' );
+    $this->add_item( 'status', 'enum', 'Condition' );
+    $this->add_item( 'eligible', 'boolean', 'Eligible' );
+    $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
     
     try
@@ -114,23 +121,37 @@ class participant_view extends base_view
     parent::finish();
 
     // create enum arrays
+    $sources = db\participant::get_enum_values( 'source' );
+    $sources = array_combine( $sources, $sources );
+    $genders = db\participant::get_enum_values( 'gender' );
+    $genders = array_combine( $genders, $genders );
     $languages = db\participant::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
     $statuses = db\participant::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
+
     $sites = array();
-    foreach( db\site::select() as $db_site ) $sites[$db_site->id] = $db_site->name;
+    $modifier = new db\modifier();
+    $modifier->where( 'cohort', '=', $this->get_record()->cohort );
+    foreach( db\site::select( $modifier ) as $db_site ) $sites[$db_site->id] = $db_site->name;
     $db_site = $this->get_record()->get_site();
     $site_id = is_null( $db_site ) ? '' : $db_site->id;
     
     // set the view's items
     $this->set_item( 'active', $this->get_record()->active, true );
-    $this->set_item( 'uid', $this->get_record()->uid, false );
+    $this->set_item( 'uid', $this->get_record()->uid, true );
     $this->set_item( 'first_name', $this->get_record()->first_name );
     $this->set_item( 'last_name', $this->get_record()->last_name );
+    $this->set_item( 'source', $this->get_record()->source, true, $sources );
+    $this->set_item( 'cohort', $this->get_record()->cohort );
+    $this->set_item( 'gender', $this->get_record()->gender, true, $genders );
+    $this->set_item( 'date_of_birth', $this->get_record()->date_of_birth );
     $this->set_item( 'language', $this->get_record()->language, false, $languages );
-    $this->set_item( 'status', $this->get_record()->status, false, $statuses );
+    $this->set_item( 'email', $this->get_record()->email, false );
     $this->set_item( 'site_id', $site_id, false, $sites );
+    $this->set_item( 'status', $this->get_record()->status, false, $statuses );
+    $this->set_item( 'eligible', $this->get_record()->eligible, true );
+    $this->set_item( 'no_in_home', $this->get_record()->no_in_home, true );
     $this->set_item( 'prior_contact_date', $this->get_record()->prior_contact_date, false );
 
     $this->finish_setting_items();

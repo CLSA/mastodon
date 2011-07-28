@@ -33,7 +33,7 @@ class site_list extends base_list_widget
     parent::__construct( 'site', $args );
     
     $this->add_column( 'name', 'string', 'Name', true );
-    $this->add_column( 'type', 'string', 'Type', true );
+    $this->add_column( 'cohort', 'string', 'Type', true );
     $this->add_column( 'users', 'number', 'Users', false );
     $this->add_column( 'last', 'fuzzy', 'Last activity', false );
   }
@@ -57,7 +57,7 @@ class site_list extends base_list_widget
 
       $this->add_row( $record->id,
         array( 'name' => $record->name,
-               'type' => $record->type,
+               'cohort' => $record->cohort,
                'users' => $record->get_user_count(),
                'last' => $last ) );
     }

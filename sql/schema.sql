@@ -13,10 +13,10 @@ CREATE  TABLE IF NOT EXISTS `site` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
-  `type` ENUM('comprehensive', 'tracking') NOT NULL ,
+  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
   `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name_type` (`name` ASC, `type` ASC) )
+  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
 ENGINE = InnoDB;
 
 

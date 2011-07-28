@@ -34,7 +34,7 @@ class site_view extends base_view
     
     // create an associative array with everything we want to display about the site
     $this->add_item( 'name', 'string', 'Name' );
-    $this->add_item( 'type', 'enum', 'Type' );
+    $this->add_item( 'cohort', 'enum', 'Type' );
     $this->add_item( 'timezone', 'enum', 'Time Zone' );
     $this->add_item( 'users', 'constant', 'Number of users' );
     $this->add_item( 'last_activity', 'constant', 'Last activity' );
@@ -75,14 +75,14 @@ class site_view extends base_view
     parent::finish();
     
     // create enum arrays
-    $types = db\site::get_enum_values( 'type' );
-    $types = array_combine( $types, $types );
+    $cohorts = db\site::get_enum_values( 'cohort' );
+    $cohorts = array_combine( $cohorts, $cohorts );
     $timezones = db\site::get_enum_values( 'timezone' );
     $timezones = array_combine( $timezones, $timezones );
 
     // set the view's items
     $this->set_item( 'name', $this->get_record()->name, true );
-    $this->set_item( 'type', $this->get_record()->type, true, $types );
+    $this->set_item( 'cohort', $this->get_record()->cohort, true, $cohorts );
     $this->set_item( 'timezone', $this->get_record()->timezone, true, $timezones );
     $this->set_item( 'users', $this->get_record()->get_user_count() );
 

@@ -52,7 +52,7 @@ class self_settings extends \mastodon\ui\widget
     $sites = array();
     foreach( $db_user->get_site_list() as $db_site )
       $sites[ $db_site->id ] =
-        $db_site->name.' ('.( 'tracking' == $db_site->type ? 'track' : 'comp' ).')';
+        $db_site->name.' ('.( 'tracking' == $db_site->cohort ? 'track' : 'comp' ).')';
 
     $roles = array();
     $modifier = new db\modifier();
