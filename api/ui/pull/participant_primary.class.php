@@ -29,6 +29,16 @@ class participant_primary extends base_primary
    */
   public function __construct( $args )
   {
+    // if the uid is provided instead of the id  then fetch the participant id based on the uid
+    if( isset( $args['uid'] ) )
+    {
+      $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
+
+      if( is_null( $db_participant ) )
+        throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+      $args['id'] = $db_participant->id;
+    }
+
     parent::__construct( 'participant', $args );
   }
 
