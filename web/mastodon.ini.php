@@ -23,24 +23,31 @@ $SETTINGS[ 'general' ][ 'development_mode' ] = false;
 $script = $_SERVER['SCRIPT_NAME'];
 if( false !== strpos( $script, 'slot/index.php' ) )
 {
-  $SETTINGS[ 'path' ][ 'COOKIE' ] = substr( $_SERVER['SCRIPT_NAME'], 0, -14 );
+  $base_url = substr( $_SERVER['SCRIPT_NAME'], 0, -15 );
   $SETTINGS[ 'general' ][ 'operation_type' ] = 'widget';
 }
 else if( false !== strpos( $script, 'pull.php' ) )
 {
-  $SETTINGS[ 'path' ][ 'COOKIE' ] = substr( $_SERVER['SCRIPT_NAME'], 0, -8 );
+  $base_url = substr( $_SERVER['SCRIPT_NAME'], 0, -9 );
   $SETTINGS[ 'general' ][ 'operation_type' ] = 'pull';
 }
 else if( false !== strpos( $script, 'push.php' ) )
 {
-  $SETTINGS[ 'path' ][ 'COOKIE' ] = substr( $_SERVER['SCRIPT_NAME'], 0, -8 );
+  $base_url = substr( $_SERVER['SCRIPT_NAME'], 0, -9 );
   $SETTINGS[ 'general' ][ 'operation_type' ] = 'push';
 }
 else
 {
-  $SETTINGS[ 'path' ][ 'COOKIE' ] = substr( $_SERVER['SCRIPT_NAME'], 0, -9 );
+  $base_url = substr( $_SERVER['SCRIPT_NAME'], 0, -10 );
   $SETTINGS[ 'general' ][ 'operation_type' ] = 'index';
 }
+
+$SETTINGS[ 'url' ][ 'MASTODON' ] = 'http'.
+                                   ( 'on' == $_SERVER["HTTPS"] ? 's' : '' ).
+                                   '://'.$_SERVER["HTTP_HOST"].$base_url;
+$SETTINGS[ 'path' ][ 'COOKIE' ] = $base_url.'/';
+unset( $script );
+unset( $base_url );
 
 // the location of mastodon internal path
 $SETTINGS[ 'path' ][ 'MASTODON' ] = '/usr/local/lib/mastodon';

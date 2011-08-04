@@ -39,6 +39,7 @@ $SETTINGS[ 'path' ][ 'API' ] = $SETTINGS[ 'path' ][ 'MASTODON' ].'/api';
 $SETTINGS[ 'path' ][ 'DOC' ] = $SETTINGS[ 'path' ][ 'MASTODON' ].'/doc';
 $SETTINGS[ 'path' ][ 'SQL' ] = $SETTINGS[ 'path' ][ 'MASTODON' ].'/sql';
 $SETTINGS[ 'path' ][ 'TPL' ] = $SETTINGS[ 'path' ][ 'MASTODON' ].'/tpl';
+$SETTINGS[ 'path' ][ 'WEB' ] = $SETTINGS[ 'path' ][ 'MASTODON' ].'/web';
 
 foreach( $SETTINGS[ 'path' ] as $path_name => $path_value ) define( $path_name.'_PATH', $path_value );
 foreach( $SETTINGS[ 'url' ] as $path_name => $path_value ) define( $path_name.'_URL', $path_value );
@@ -50,7 +51,8 @@ include_file( API_PATH.'/autoloader.class.php' );
 // registers an autoloader so classes don't have to be included manually
 autoloader::register();
 
-// set up the session
+// set up the logger and session
+log::self();
 $session = business\session::self( $SETTINGS );
 $session->initialize();
 ?>
