@@ -30,6 +30,18 @@ class self_set_site extends \mastodon\ui\push
    */
   public function __construct( $args )
   {
+    // if the name and cohort is provided instead of the id then fetch the site id
+    if( isset( $args['name'] ) && isset( $args['cohort'] ) )
+    {
+      $modifier = new db\modifier();
+      $modifier->where( 'name', '=', $args['name'] );
+      $modifier->where( 'cohort', '=', $args['cohort'] );
+      $db_site = current( db\site::select( $modifier ) );
+      if( !$db_site ) throw new exc\argument( 'args', $args, __METHOD__ );
+      
+      $args['id'] = $db_site->id;
+    }
+
     parent::__construct( 'self', 'set_site', $args );
   }
   

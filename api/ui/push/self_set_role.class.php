@@ -30,6 +30,14 @@ class self_set_role extends \mastodon\ui\push
    */
   public function __construct( $args )
   {
+    // if the name is provided instead of the id then fetch the role id
+    if( isset( $args['name'] ) )
+    {
+      $db_site = db\role::get_unique_record( 'name', $args['name'] );
+      if( !$db_site ) throw new exc\argument( 'name', $args['name'], __METHOD__ );
+      $args['id'] = $db_site->id;
+    }
+
     parent::__construct( 'self', 'set_role', $args );
   }
   

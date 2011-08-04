@@ -64,6 +64,20 @@ class participant_primary extends base_primary
       $data['region'] = $db_address->get_region()->name;
       $data['postcode'] = $db_address->postcode;
     }
+    
+    // add the hin information
+    $hin_info = $this->get_record()->get_hin_information();
+    
+    if( count( $hin_info ) )
+    {
+      $data['hin_access'] = $hin_info['access'];
+      $data['hin_missing'] = !$hin_info['missing'];
+    }
+    else
+    {
+      $data['hin_access'] = false;
+      $data['hin_missing'] = true;
+    }
 
     return $data;
   }

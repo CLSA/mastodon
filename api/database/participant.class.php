@@ -180,5 +180,28 @@ class participant extends person
 
     return $db_site;
   }
+
+  /**
+   * Get this participant's HIN information.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return array( 'access', 'missing' )
+   * @access public
+   */
+  public function get_hin_information()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query participant with no id.' );
+      return NULL;
+    }
+    
+    // need custom SQL
+    $sql = ' SELECT access, code IS NULL AS missing'.
+           ' FROM hin'.
+           ' WHERE uid = '.database::format_string( $this->uid );
+
+    return static::db()->get_row( $sql );
+  }
 }
 ?>
