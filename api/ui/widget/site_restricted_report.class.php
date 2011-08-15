@@ -84,7 +84,7 @@ abstract class site_restricted_report extends base_report
   public static function may_restrict()
   {
     $role_name = bus\session::self()->get_role()->name;
-    return 'administrator' == $role_name || 'technician' == $role_name;
+    return 'administrator' == $role_name;
   }
 }
 ?>
