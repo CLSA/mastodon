@@ -42,7 +42,7 @@ class user_delete_access extends base_delete_record
       $access_mod->where( 'site.name', '=', $args['site'] );
       $access_mod->where( 'site.cohort', '=', $args['cohort'] );
       $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_user ) throw exc\argument( 'args', $args, __METHOD__ );
+      if( !$db_access ) throw exc\argument( 'args', $args, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }
 
