@@ -29,6 +29,13 @@ class user_edit extends base_edit
    */
   public function __construct( $args )
   {
+    if( isset( $args['user'] ) )
+    { // replace the argument "user" with that user's id
+      $db_user = db\user::get_unique_record( 'name', $args['user'] );
+      if( !$db_user ) throw exc\argument( 'user', $args['user'], __METHOD__ );
+      $args['id'] = $db_user->id;
+    }
+
     parent::__construct( 'user', $args );
   }
 }

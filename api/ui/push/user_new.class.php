@@ -38,6 +38,25 @@ class user_new extends base_new
       unset( $args['columns']['role_id'] );
       unset( $args['columns']['site_id'] );
     }
+    else if( isset( $args['columns'] ) &&
+             isset( $args['columns']['role'] ) &&
+             isset( $args['columns']['site'] ) && isset( $args['columns']['cohort'] ) )
+    {
+      $site_mod = new db\modifier();
+      $site_mod->where( 'name', '=', $args['columns']['site'] );
+      $site_mod->where( 'cohort', '=', $args['columns']['cohort'] );
+      $db_site = current( db\site::select( $site_mod ) );
+      if( !$db_site ) throw exc\argument( 'args', $args['columns']['site'], __METHOD__ );
+
+      $db_role = db\role::get_unique_record( 'name', $args['columns']['role'] );
+      if( !$db_role ) throw exc\argument( 'role', $args['columns']['role'], __METHOD__ );
+
+      $this->role_id = $db_role->id;
+      $this->site_id = $db_site->id;
+      unset( $args['columns']['role'] );
+      unset( $args['columns']['site'] );
+      unset( $args['columns']['cohort'] );
+    }
 
     parent::__construct( 'user', $args );
   }
