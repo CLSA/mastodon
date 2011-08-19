@@ -422,6 +422,7 @@ CREATE  TABLE IF NOT EXISTS `address` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_region_id` (`region_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
+  UNIQUE INDEX `uq_person_id_rank` (`person_id` ASC, `rank` ASC) ,
   CONSTRAINT `fk_address_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
@@ -454,10 +455,11 @@ CREATE  TABLE IF NOT EXISTS `phone` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_address_id` (`address_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
+  UNIQUE INDEX `uq_person_id_rank` (`person_id` ASC, `rank` ASC) ,
   CONSTRAINT `fk_phone_address`
     FOREIGN KEY (`address_id` )
     REFERENCES `address` (`id` )
-    ON DELETE NO ACTION
+    ON DELETE SET NULL
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_phone_person`
     FOREIGN KEY (`person_id` )
