@@ -30,11 +30,19 @@ class self_set_role extends \mastodon\ui\push
    */
   public function __construct( $args )
   {
-    // if the name is provided instead of the id then fetch the role id
-    if( isset( $args['name'] ) )
+    if( array_key_exists( 'noid', $args ) )
     {
-      $db_site = db\role::get_unique_record( 'name', $args['name'] );
-      if( !$db_site ) throw new exc\argument( 'name', $args['name'], __METHOD__ );
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+      
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'role.name', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+
+      $db_site = db\role::get_unique_record( 'name', $noid['role.name'] );
+      if( !$db_site ) throw new exc\argument( 'name', $noid['role.name'], __METHOD__ );
       $args['id'] = $db_site->id;
     }
 

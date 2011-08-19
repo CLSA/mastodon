@@ -28,29 +28,39 @@ class user_new_access extends base_new_record
    */
   public function __construct( $args )
   {
-    if( isset( $args['user'] ) )
-    { // replace the argument "user" with that user's id
-      $db_user = db\user::get_unique_record( 'name', $args['user'] );
-      if( !$db_user ) throw exc\argument( 'user', $args['user'], __METHOD__ );
-      $args['id'] = $db_user->id;
-    }
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
 
-    if( isset( $args['role_name_list'] ) && isset( $args['site_name_list'] ) )
-    { // replace the arguments "role_name_list" and "site_name_list" with arrays containing ids
-      foreach( $args['role_name_list'] as $index => $role_name )
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'user.name', $noid ) ||
+          !array_key_exists( 'role_name_list', $noid ) ||
+          !is_array( $noid['role_name_list'] ) ||
+          !array_key_exists( 'site_name_list', $noid ) ||
+          !is_array( $noid['site_name_list'] ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+
+      $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
+      if( !$db_user ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $args['id'] = $db_user->id;
+
+      // replace the arguments "role_name_list" and "site_name_list" with arrays containing ids
+      foreach( $noid['role_name_list'] as $role_name )
       {
         $db_role = db\role::get_unique_record( 'name', $role_name );
-        if( !$db_role ) throw exc\argument( 'role_name_list['.$index.']', $role_name, __METHOD__ );
+        if( !$db_role ) throw exc\argument( 'role_name_list', $noid['role_name_list'], __METHOD__ );
         $args['role_id_list'][] = $db_role->id;
       }
 
-      foreach( $args['site_name_list'] as $index => $site )
+      foreach( $noid['site_name_list'] as $site )
       {
-        $site_mod = new db\modifier();
-        $site_mod->where( 'name', '=', $site['name'] );
-        $site_mod->where( 'cohort', '=', $site['cohort'] );
-        $db_site = current( db\site::select( $site_mod ) );
-        if( !$db_site ) throw exc\argument( 'site_name_list['.$index.']', $site, __METHOD__ );
+        $db_site = db\site::get_unique_record( 
+          array( 'name', 'cohort' ), 
+          array( $site['name'], $site['cohort'] ) );
+        if( !$db_site ) throw exc\argument( 'site_name_list', $noid['site_name_list'], __METHOD__ );
         $args['site_id_list'][] = $db_site->id;
       }
     }

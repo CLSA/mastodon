@@ -31,14 +31,22 @@ class self_set_site extends \mastodon\ui\push
   public function __construct( $args )
   {
     // if the name and cohort is provided instead of the id then fetch the site id
-    if( isset( $args['name'] ) && isset( $args['cohort'] ) )
+    if( array_key_exists( 'noid', $args ) )
     {
-      $modifier = new db\modifier();
-      $modifier->where( 'name', '=', $args['name'] );
-      $modifier->where( 'cohort', '=', $args['cohort'] );
-      $db_site = current( db\site::select( $modifier ) );
-      if( !$db_site ) throw new exc\argument( 'args', $args, __METHOD__ );
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
       
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'site.name', $noid ) ||
+          !array_key_exists( 'site.cohort', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $db_site = db\site::get_unique_record(
+        array( 'name', 'cohort' ),
+        array( $noid['site.name'], $noid['site.cohort'] ) );
+
+      if( !$db_site ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $args['id'] = $db_site->id;
     }
 

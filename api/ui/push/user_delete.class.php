@@ -28,10 +28,19 @@ class user_delete extends base_delete
    */
   public function __construct( $args )
   {
-    if( isset( $args['user'] ) )
-    { // replace the argument "user" with that user's id
-      $db_user = db\user::get_unique_record( 'name', $args['user'] );
-      if( !$db_user ) throw exc\argument( 'user', $args['user'], __METHOD__ );
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'user.name', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+
+      $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
+      if( !$db_user ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
     }
 

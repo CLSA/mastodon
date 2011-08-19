@@ -29,33 +29,28 @@ class user_new extends base_new
    */
   public function __construct( $args )
   {
-    // remove the role id from the columns and use it to create the user's initial role
-    if( isset( $args['columns'] ) &&
-        isset( $args['columns']['role_id'] ) && isset( $args['columns']['site_id'] ) )
+    if( array_key_exists( 'noid', $args ) )
     {
-      $this->role_id = $args['columns']['role_id'];
-      $this->site_id = $args['columns']['site_id'];
-      unset( $args['columns']['role_id'] );
-      unset( $args['columns']['site_id'] );
-    }
-    else if( isset( $args['columns'] ) &&
-             isset( $args['columns']['role'] ) &&
-             isset( $args['columns']['site'] ) && isset( $args['columns']['cohort'] ) )
-    {
-      $site_mod = new db\modifier();
-      $site_mod->where( 'name', '=', $args['columns']['site'] );
-      $site_mod->where( 'cohort', '=', $args['columns']['cohort'] );
-      $db_site = current( db\site::select( $site_mod ) );
-      if( !$db_site ) throw exc\argument( 'args', $args['columns']['site'], __METHOD__ );
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
 
-      $db_role = db\role::get_unique_record( 'name', $args['columns']['role'] );
-      if( !$db_role ) throw exc\argument( 'role', $args['columns']['role'], __METHOD__ );
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'role.name', $noid ) ||
+          !array_key_exists( 'site.name', $noid ) ||
+          !array_key_exists( 'site.cohort', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
 
+      $db_role = db\role::get_unique_record( 'name', $noid['role.name'] );
+      if( !$db_role ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $this->role_id = $db_role->id;
+
+      $db_site = db\site::get_unique_record(
+        array( 'name', 'cohort' ),
+        array( $noid['site.name'], $noid['site.cohort'] ) );
+      if( !$db_site ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $this->site_id = $db_site->id;
-      unset( $args['columns']['role'] );
-      unset( $args['columns']['site'] );
-      unset( $args['columns']['cohort'] );
     }
 
     parent::__construct( 'user', $args );

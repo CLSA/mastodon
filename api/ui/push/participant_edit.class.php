@@ -29,6 +29,22 @@ class participant_edit extends base_edit
    */
   public function __construct( $args )
   {
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'participant.uid', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+      
+      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw exc\argument( 'noid', $noid, __METHOD__ );
+      $args['id'] = $db_participant->id;
+    }
+
     parent::__construct( 'participant', $args );
   }
 }

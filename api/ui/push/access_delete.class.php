@@ -28,16 +28,27 @@ class access_delete extends base_delete
    */
   public function __construct( $args )
   {
-    if( isset( $args['user'] ) && isset( $args['role'] ) &&
-        isset( $args['site'] ) && isset( $args['cohort'] ) )
-    { // replace the arguments user, role, site and cohort with an access id
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'user.name', $noid ) ||
+          !array_key_exists( 'role.name', $noid ) ||
+          !array_key_exists( 'site.name', $noid ) ||
+          !array_key_exists( 'site.cohort', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+      
       $access_mod = new db\modifier();
-      $access_mod->where( 'user.name', '=', $args['user'] );
-      $access_mod->where( 'role.name', '=', $args['role'] );
-      $access_mod->where( 'site.name', '=', $args['site'] );
-      $access_mod->where( 'site.cohort', '=', $args['cohort'] );
+      $access_mod->where( 'user.name', '=', $noid['user.name'] );
+      $access_mod->where( 'role.name', '=', $noid['role.name'] );
+      $access_mod->where( 'site.name', '=', $noid['site.name'] );
+      $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
       $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw exc\argument( 'args', $args, __METHOD__ );
+      if( !$db_access ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $args['id'] = $db_access->id;
     }
 
