@@ -83,12 +83,6 @@ class self_menu extends \mastodon\ui\widget
           'heading' => util::pluralize( str_replace( '_', ' ', $db_widget->subject ) ),
           'subject' => $db_widget->subject,
           'name' => $db_widget->name );
-      
-      // insert the participant tree after participant list
-      if( 'participant' == $db_widget->subject )
-        $lists[] = array( 'heading' => 'Participant Tree',
-                          'subject' => 'participant',
-                          'name' => 'tree' );
     }
 
     // get all report widgets that the user has access to
