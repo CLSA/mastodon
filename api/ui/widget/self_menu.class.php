@@ -45,21 +45,6 @@ class self_menu extends \mastodon\ui\widget
 
     $db_role = bus\session::self()->get_role();
 
-    // get all calendar widgets that the user has access to
-    $calendars = array();
-
-    $modifier = new db\modifier();
-    $modifier->where( 'operation.type', '=', 'widget' );
-    $modifier->where( 'operation.name', '=', 'calendar' );
-    $widgets = $db_role->get_operation_list( $modifier );
-    
-    foreach( $widgets as $db_widget )
-    {
-      $calendars[] = array( 'heading' => str_replace( '_', ' ', $db_widget->subject ),
-                            'subject' => $db_widget->subject,
-                            'name' => $db_widget->name );
-    }
-
     // get all list widgets that the user has access to
     $lists = array();
 
@@ -71,7 +56,6 @@ class self_menu extends \mastodon\ui\widget
     $exclude = array(
       'address',
       'alternate',
-      'appointment',
       'consent',
       'operation',
       'phone' );
@@ -100,7 +84,6 @@ class self_menu extends \mastodon\ui\widget
                           'name' => $db_widget->name );
     }
 
-    $this->set_variable( 'calendars', $calendars );
     $this->set_variable( 'lists', $lists );
     $this->set_variable( 'reports', $reports );
   }
