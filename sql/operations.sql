@@ -65,7 +65,7 @@ VALUES( "push", "consent", "delete", true, "Removes a participant's consent entr
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent", "edit", true, "Edits the details of a participant's consent entry." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "consent", "new", true, "Creates new consent enry for a participant." );
+VALUES( "push", "consent", "new", true, "Creates new consent entry for a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "consent", "add", true, "View a form for creating new consent entry for a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
