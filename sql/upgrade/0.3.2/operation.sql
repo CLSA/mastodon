@@ -8,3 +8,7 @@ OR subject LIKE '%calendar%'
 OR name LIKE '%calendar%'
 OR subject LIKE '%shift%'
 OR name LIKE '%shift%';
+
+-- add in the timezone calculator
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "self", "timezone_calculator", false, "A timezone calculator widget." );

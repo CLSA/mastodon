@@ -31,6 +31,7 @@ class self_shortcuts extends \mastodon\ui\widget
   public function __construct( $args )
   {
     parent::__construct( 'self', 'shortcuts', $args );
+    $this->show_heading( false );
   }
 
   /**
@@ -44,6 +45,7 @@ class self_shortcuts extends \mastodon\ui\widget
     parent::finish();
     
     $this->set_variable( 'calculator', true );
+    $this->set_variable( 'timezone_calculator', true );
     $this->set_variable( 'navigation', 'operator' != bus\session::self()->get_role()->name );
     $this->set_variable( 'refresh', true );
     $this->set_variable( 'home', false );
