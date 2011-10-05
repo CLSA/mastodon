@@ -43,6 +43,11 @@ class self_status extends \mastodon\ui\widget
   public function finish()
   {
     parent::finish();
+
+    $datetime_obj = util::get_datetime_object();
+    $this->set_variable( 'timezone_name', $datetime_obj->format( 'T' ) );
+    $this->set_variable( 'timezone_offset',
+      util::get_timezone_object()->getOffset( $datetime_obj ) );
   }
 }
 ?>
