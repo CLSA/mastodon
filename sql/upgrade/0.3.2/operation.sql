@@ -10,5 +10,5 @@ OR subject LIKE '%shift%'
 OR name LIKE '%shift%';
 
 -- add in the timezone calculator
-INSERT INTO operation( type, subject, name, restricted, description )
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "self", "timezone_calculator", false, "A timezone calculator widget." );
