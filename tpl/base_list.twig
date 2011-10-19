@@ -461,7 +461,7 @@
             {% set item_to = item_from + rows|count - 1 %}
             Viewing: {{ item_from }} to {{ item_to }} of {{ number_of_items }}
           {% else %}
-            No {{ widget.subjects }} found.
+            No {{ widget.subject_names }} found.
           {% endif %}
 
           {% if items_per_page < number_of_items %}
