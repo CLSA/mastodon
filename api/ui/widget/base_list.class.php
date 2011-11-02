@@ -1,6 +1,6 @@
 <?php
 /**
- * base_list_widget.class.php
+ * base_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -24,7 +24,7 @@ use mastodon\exception as exc;
  * @abstract
  * @package mastodon\ui
  */
-abstract class base_list_widget extends \mastodon\ui\widget
+abstract class base_list extends \mastodon\ui\widget
 {
   /**
    * Constructor

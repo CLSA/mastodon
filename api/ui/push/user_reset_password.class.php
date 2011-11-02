@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class user_reset_password extends base_record_push
+class user_reset_password extends base_record
 {
   /**
    * Constructor.

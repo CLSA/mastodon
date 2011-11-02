@@ -1,6 +1,6 @@
 <?php
 /**
- * base_record_pull.class.php
+ * base_record.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -19,7 +19,7 @@ use mastodon\exception as exc;
  * @abstract
  * @package mastodon\ui
  */
-abstract class base_record_pull
+abstract class base_record
   extends \mastodon\ui\pull
   implements \mastodon\ui\contains_record
 {
