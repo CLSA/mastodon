@@ -64,12 +64,5 @@ class self_set_password extends \mastodon\ui\push
 
     $ldap_manager->set_user_password( $db_user->name, $new );
   }
-  
-  /**
-   * The name of the password to set.
-   * @var string
-   * @access protected
-   */
-  protected $password_name = NULL;
 }
 ?>
