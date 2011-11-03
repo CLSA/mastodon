@@ -10,16 +10,22 @@
 {% block javascript %}
   
   {{ parent() }}
-  {% if reset_password %}
+  {% if reset_password or set_password %}
     <script type="text/javascript">
       $( function() {
-        $( "#{{ widget.full }}_password" ).click( function() {
-          confirm_dialog(
-            "Reset Password",
-            "Are you sure you wish to reset this user's password?",
-            function() { ajax_push( 'user', 'reset_password', { "id": {{ id }} } ); }
-          );
-        } );
+        {% if reset_password %}
+          $( "#{{ widget.full }}__reset_password" ).click( function() {
+            confirm_dialog(
+              "Reset Password",
+              "Are you sure you wish to reset this user's password?",
+              function() { ajax_push( 'user', 'reset_password', { "id": {{ id }} } ); }
+            );
+          } );
+        {% endif %}
+
+        {% if set_password %}
+          // TODO: implement set-password
+        {% endif %}
       } );
     </script>
   {% endif %}
@@ -31,9 +37,14 @@
 
   {{ parent() }}
   {% from 'macros.twig' import include_list %}
-  {% if reset_password %}
+  {% if reset_password or set_password %}
     <div class="spacer">
-      <button id="{{ widget.full }}_password">Reset Password</button>
+      {% if reset_password %}
+        <button id="{{ widget.full }}__reset_password">Reset Password</button>
+      {% endif %}
+      {% if set_password %}
+        <button id="{{ widget.full }}__set_password">Set Password</button>
+      {% endif %}
     </div>
     <div id="{{ widget.full }}_slot" />
   {% endif %}

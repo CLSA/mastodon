@@ -89,14 +89,15 @@ class user_view extends base_view
     
     $role_name = bus\session::self()->get_role()->name;
 
-    $is_operator = $this->get_record()->has_access(
-                     bus\session::self()->get_site(),
-                     db\role::get_unique_record( 'name', 'operator' ) );
-
-    // only show reset password button if current user is an administrator or supervisor
+    // only show reset and/or set password buttons if current user is allowed
     $this->set_variable( 'reset_password',
+      $this->reset_password &&
       bus\session::self()->is_allowed(
         db\operation::get_operation( 'push', 'user', 'reset_password' ) ) );
+    $this->set_variable( 'set_password',
+      $this->set_password &&
+      bus\session::self()->is_allowed(
+        db\operation::get_operation( 'push', 'user', 'set_password' ) ) );
 
     if( !is_null( $this->access_list ) )
     {
@@ -181,6 +182,28 @@ class user_view extends base_view
 
     return $this->get_record()->get_activity_list( $modifier );
   }
+  
+  /**
+   * Sets whether to include the reset-password button (if the user has permission)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param boolean $enable
+   * @access public
+   */
+  public function allow_reset_password( $enable )
+  {
+    $this->reset_password = $enable;
+  }
+
+  /**
+   * Sets whether to include the set-password button (if the user has permission)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param boolean $enable
+   * @access public
+   */
+  public function allow_set_password( $enable )
+  {
+    $this->set_password = $enable;
+  }
 
   /**
    * The access list widget.
@@ -195,5 +218,19 @@ class user_view extends base_view
    * @access protected
    */
   protected $activity_list = NULL;
+  
+  /**
+   * Whether to include functionality to reset the user's password
+   * @var boolean
+   * @access protected
+   */
+  protected $reset_password = true;
+  
+  /**
+   * Whether to include functionality to set the user's password
+   * @var boolean
+   * @access protected
+   */
+  protected $set_password = false;
 }
 ?>
