@@ -75,18 +75,6 @@ class participant_view extends base_view
 
     try
     {
-      // create the appointment sub-list widget
-      $this->appointment_list = new appointment_list( $args );
-      $this->appointment_list->set_parent( $this );
-      $this->appointment_list->set_heading( 'Appointments' );
-    }
-    catch( exc\permission $e )
-    {
-      $this->appointment_list = NULL;
-    }
-
-    try
-    {
       // create the consent sub-list widget
       $this->consent_list = new consent_list( $args );
       $this->consent_list->set_parent( $this );
@@ -168,12 +156,6 @@ class participant_view extends base_view
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
 
-    if( !is_null( $this->appointment_list ) )
-    {
-      $this->appointment_list->finish();
-      $this->set_variable( 'appointment_list', $this->appointment_list->get_variables() );
-    }
-
     if( !is_null( $this->consent_list ) )
     {
       $this->consent_list->finish();
@@ -200,13 +182,6 @@ class participant_view extends base_view
    * @access protected
    */
   protected $phone_list = NULL;
-  
-  /**
-   * The appointment list widget.
-   * @var appointment_list
-   * @access protected
-   */
-  protected $appointment_list = NULL;
   
   /**
    * The consent list widget.

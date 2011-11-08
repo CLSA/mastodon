@@ -1,6 +1,6 @@
 <?php
 /**
- * self_status.class.php
+ * self_timezone_calculator.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -14,11 +14,11 @@ use mastodon\database as db;
 use mastodon\exception as exc;
 
 /**
- * widget self status
+ * widget self timezone_calculator
  * 
  * @package mastodon\ui
  */
-class self_status extends \mastodon\ui\widget
+class self_timezone_calculator extends \mastodon\ui\widget
 {
   /**
    * Constructor
@@ -30,12 +30,12 @@ class self_status extends \mastodon\ui\widget
    */
   public function __construct( $args )
   {
-    parent::__construct( 'self', 'status', $args );
+    parent::__construct( 'self', 'timezone_calculator', $args );
     $this->show_heading( false );
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Define which timezones should be included in the tool
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access public
@@ -44,10 +44,20 @@ class self_status extends \mastodon\ui\widget
   {
     parent::finish();
 
+    // get all timezones from the site table
+    $current_timezone = bus\session::self()->get_site()->timezone;
     $datetime_obj = util::get_datetime_object();
-    $this->set_variable( 'timezone_name', $datetime_obj->format( 'T' ) );
-    $this->set_variable( 'timezone_offset',
-      util::get_timezone_object()->getOffset( $datetime_obj ) );
+    $timezone_list = array();
+    foreach( db\site::get_enum_values( 'timezone' ) as $timezone )
+    {
+      $timezone_obj = new \DateTimeZone( $timezone );
+      $timezone_list[ preg_replace( '/\W/', '_', $timezone ) ] = array(
+        'name' => $timezone,
+        'offset' => $timezone_obj->getOffset( $datetime_obj ),
+        'current' => $timezone == $current_timezone );
+    }
+
+    $this->set_variable( 'timezone_list', $timezone_list );
   }
 }
 ?>

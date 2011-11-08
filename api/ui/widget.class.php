@@ -47,35 +47,42 @@ abstract class widget extends operation
    */
   public function finish()
   {
-    $widget_variable = array( 'subject' => $this->get_subject(),
-                              'subjects' => util::pluralize( $this->get_subject() ),
-                              'name' => $this->get_name(),
-                              'full' => $this->get_full_name(),
-                              'compound' => $this->get_full_name() );
+    $widget_variable = array(
+      'subject' => $this->get_subject(),
+      'subject_name' => str_replace( '_', ' ', $this->get_subject() ),
+      'subject_names' => util::pluralize( str_replace( '_', ' ', $this->get_subject() ) ),
+      'name' => $this->get_name(),
+      'full' => $this->get_full_name(),
+      'compound' => $this->get_full_name() );
 
     if( $this->parent )
     {
       $widget_variable['compound'] = $this->parent->get_full_name().'_'.$this->get_full_name();
       $this->set_variable( 'parent',
-        array( 'exists' => true,
-               'id' => $this->parent->get_record()->id,
-               'subject' => $this->parent->get_subject(),
-               'subjects' => util::pluralize( $this->parent->get_subject() ),
-               'name' => $this->parent->get_name(),
-               'full' => $this->parent->get_full_name() ) );
+        array(
+          'exists' => true,
+          'id' => $this->parent->get_record()->id,
+          'subject' => $this->parent->get_subject(),
+          'subject_name' => str_replace( '_', ' ', $this->parent->get_subject() ),
+          'subject_names' =>
+            util::pluralize( str_replace( '_', ' ', $this->parent->get_subject() ) ),
+          'name' => $this->parent->get_name(),
+          'full' => $this->parent->get_full_name() ) );
     }
     else
     {
       $this->set_variable( 'parent',
         array( 'exists' => false,
                'subject' => '',
-               'subjects' => '',
+               'subject_name' => '',
+               'subject_names' => '',
                'name' => '',
                'full' => '' ) );
     }
 
     $this->set_variable( 'widget', $widget_variable );
-    $this->set_variable( 'widget_heading', $this->heading );
+    $this->set_variable( 'widget_heading', $this->get_heading() );
+    $this->set_variable( 'show_heading', $this->show_heading );
   }
 
   /**
@@ -165,29 +172,16 @@ abstract class widget extends operation
   }
   
   /**
-   * Get the widget's heading.
+   * Set whether or not to show the heading.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param bool $show
    * @access public
    */
-  public function get_heading() { return $this->heading; }
-
-  /**
-   * Set the widget's heading.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param string $heading
-   * @access public
-   */
-  public function set_heading( $heading )
+  public function show_heading( $show )
   {
-    $this->heading = ucwords( $heading );
+    $this->show_heading = $show;
   }
-
-  /**
-   * The widget's heading.
-   * @var string
-   * @access protected
-   */
-  private $heading = '';
 
   /**
    * The parent widget if this widget is embedded in another widget.
@@ -202,5 +196,12 @@ abstract class widget extends operation
    * @access private
    */
   private $variables = array();
+  
+  /**
+   * Determine whether or not to show the heading at the top of the widget
+   * @var boolean
+   * @access private
+   */
+  private $show_heading = true;
 }
 ?>

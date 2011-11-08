@@ -311,30 +311,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `appointment`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `appointment` ;
-
-CREATE  TABLE IF NOT EXISTS `appointment` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `participant_id` INT UNSIGNED NOT NULL ,
-  `type` ENUM('home','site') NOT NULL ,
-  `datetime` DATETIME NOT NULL ,
-  `met` TINYINT(1)  NOT NULL COMMENT 'If the appointment was met, whether the participant was reached.' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_participant_id` (`participant_id` ASC) ,
-  INDEX `dk_met` (`met` ASC) ,
-  CONSTRAINT `fk_appointment_participant`
-    FOREIGN KEY (`participant_id` )
-    REFERENCES `participant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `setting_value`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `setting_value` ;
@@ -600,69 +576,6 @@ CREATE  TABLE IF NOT EXISTS `sample_has_participant` (
   CONSTRAINT `fk_sample_has_participant_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `shift_template`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `shift_template` ;
-
-CREATE  TABLE IF NOT EXISTS `shift_template` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `start_time` TIME NOT NULL ,
-  `end_time` TIME NOT NULL ,
-  `start_date` DATE NOT NULL ,
-  `end_date` DATE NULL ,
-  `operators` INT UNSIGNED NOT NULL ,
-  `repeat_type` ENUM('weekly','day of month','day of week') NOT NULL DEFAULT 'weekly' ,
-  `repeat_every` INT NOT NULL DEFAULT 1 ,
-  `monday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `tuesday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `wednesday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `thursday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `friday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `saturday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `sunday` TINYINT(1)  NOT NULL DEFAULT false ,
-  `site_id` INT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  CONSTRAINT `fk_shift_template_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `shift`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `shift` ;
-
-CREATE  TABLE IF NOT EXISTS `shift` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `site_id` INT UNSIGNED NOT NULL ,
-  `user_id` INT UNSIGNED NOT NULL ,
-  `start_datetime` DATETIME NOT NULL ,
-  `end_datetime` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  INDEX `fk_user_id` (`user_id` ASC) ,
-  CONSTRAINT `fk_shift_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_shift_user`
-    FOREIGN KEY (`user_id` )
-    REFERENCES `user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

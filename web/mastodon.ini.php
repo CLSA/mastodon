@@ -14,7 +14,7 @@ namespace mastodon;
 global $SETTINGS;
 
 // tagged version
-$SETTINGS[ 'general' ][ 'version' ] = '0.2.4';
+$SETTINGS[ 'general' ][ 'version' ] = '1.0.0';
 
 // always leave as false when running as production server
 $SETTINGS[ 'general' ][ 'development_mode' ] = false;
@@ -97,15 +97,11 @@ $SETTINGS[ 'url' ][ 'JQUERY_TOOLTIP_JS' ] =
   $SETTINGS[ 'url' ][ 'JQUERY_PLUGINS' ].'/tooltip.js';
 $SETTINGS[ 'url' ][ 'JQUERY_JSTREE_JS' ] =
   $SETTINGS[ 'url' ][ 'JQUERY_PLUGINS' ].'/jsTree.js';
-$SETTINGS[ 'url' ][ 'JQUERY_FULLCALENDAR_JS' ] =
-  $SETTINGS[ 'url' ][ 'JQUERY_PLUGINS' ].'/fullcalendar.js';
 $SETTINGS[ 'url' ][ 'JQUERY_FONTSCALE_JS' ] =
   $SETTINGS[ 'url' ][ 'JQUERY_PLUGINS' ].'/fontscale.js';
 
 // css files
 $SETTINGS[ 'url' ][ 'JQUERY_UI_THEMES' ] = $SETTINGS[ 'url' ][ 'JQUERY_UI' ].'/css';
-$SETTINGS[ 'url' ][ 'JQUERY_FULLCALENDAR_CSS' ] =
-  $SETTINGS[ 'url' ][ 'JQUERY_PLUGINS' ].'/fullcalendar.css';
 
 // the location of log files
 $SETTINGS[ 'path' ][ 'LOG_FILE' ] = '/var/local/mastodon/log';

@@ -59,33 +59,13 @@ VALUES( "push", "alternate", "delete_phone", true, "Remove an alternate contact 
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "alternate", "primary", true, "Retrieves base alternate contact person information." );
 
--- appointment
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "appointment", "delete", true, "Removes a participant's appointment from the system." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "appointment", "edit", true, "Edits the details of a participant's appointment." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "appointment", "new", true, "Creates new appointment enry for a participant." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "appointment", "add", true, "View a form for creating new appointments for a participant." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "appointment", "view", true, "View the details of a participant's particular appointment." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "appointment", "list", true, "Lists a participant's appointments." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "appointment", "calendar", true, "Shows appointments in a calendar format." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "appointment", "feed", true, "Retrieves a list of appointments for a given time-span." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "appointment", "primary", true, "Retrieves base appointment information." );
-
 -- consent
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent", "delete", true, "Removes a participant's consent entry from the system." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent", "edit", true, "Edits the details of a participant's consent entry." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "consent", "new", true, "Creates new consent enry for a participant." );
+VALUES( "push", "consent", "new", true, "Creates new consent entry for a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "consent", "add", true, "View a form for creating new consent entry for a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -122,10 +102,6 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "view", true, "View a participant's details." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "list", true, "List participants in the system." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "participant", "add_appointment", true, "A form to create a new appointment to add to a participant." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "participant", "delete_appointment", true, "Remove a participant's appointment." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_consent", true, "A form to create a new consent entry to add to a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -203,6 +179,8 @@ VALUES( "push", "self", "set_password", false, "Changes the user's password." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "self", "calculator", false, "A calculator widget." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "self", "timezone_calculator", false, "A timezone calculator widget." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "self", "set_site", false, "Change the current user's active site." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "self", "set_role", false, "Change the current user's active role." );
@@ -238,8 +216,6 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "site", "new_access", true, "Grant access to a site." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "site", "delete_access", true, "Remove accesss from a site." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "site", "feed", true, "Retrieves a list of site free appointment times for a given time-span." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "site", "primary", true, "Retrieves base site information." );
 
