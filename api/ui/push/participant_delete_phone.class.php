@@ -47,7 +47,7 @@ class participant_delete_phone extends base_delete_record
       $db_phone = db\phone::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['phone.rank'] ) );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_phone ) throw new exc\argument( 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_phone->id;
     }
 

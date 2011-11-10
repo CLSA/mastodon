@@ -29,6 +29,31 @@ class phone_new extends base_new
    */
   public function __construct( $args )
   {
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'participant.uid', $noid ) )
+        throw new exc\argument( 'noid', $noid, __METHOD__ );
+      
+      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $args['columns']['person_id'] = $db_participant->person_id;
+      
+      if( array_key_exists( 'address.rank', $noid ) )
+      {
+        $db_address = db\address::get_unique_record(
+          array( 'person_id', 'rank' ),
+          array( $db_participant->person_id, $noid['address.rank'] ) );
+        if( !$db_address ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+        $args['columns']['address_id'] = $db_address->id;
+      }
+    }
+
     parent::__construct( 'phone', $args );
   }
 
