@@ -43,12 +43,12 @@ class participant_view extends base_view
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
-    $this->add_item( 'site_id', 'enum', 'Prefered Site' );
+    $this->add_item( 'site_id', 'enum', 'Preferred Site' );
     $this->add_item( 'status', 'enum', 'Condition' );
     $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
-    
+
     try
     {
       // create the address sub-list widget
