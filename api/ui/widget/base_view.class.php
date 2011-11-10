@@ -74,7 +74,7 @@ abstract class base_view extends base_record
     $this->set_variable( 'removable', $this->removable );
     $this->set_variable( 'addable', $this->addable );
 
-    // keep track of now many of these widgets have been finished
+    // keep track of how many of these widgets have been finished
     self::$base_view_count++;
     $this->set_variable( 'base_view_count', self::$base_view_count );
   }
@@ -108,7 +108,7 @@ abstract class base_view extends base_record
   }
 
   /**
-   * Sets and item's value and additional data.
+   * Sets an item's value and additional data.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $item_id The item's id, can be one of the record's column names.
    * @param mixed $value The item's value.
