@@ -28,3 +28,8 @@ INSERT IGNORE INTO role_has_operation
      operation_id = ( SELECT id FROM operation WHERE
        type = "push" AND subject = "user" AND name = "set_password" );
 
+-- need to add this because of a change in sabretooth (pull/participant_withdraw)
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "operator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent" AND name = "delete" );
