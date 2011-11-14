@@ -219,7 +219,9 @@
         var sort_column = $(this).parent( "th" ).attr("id");
         var args = new Object();
         {% if parent.exists %}
-          args.{{ parent.full }} = { "id": {{ parent.id }} };
+          {% if parent.id|default(false) %}
+            args.{{ parent.full }} = { "id": {{ parent.id }} };
+          {% endif %}
           args.{{ widget.full }} = {
             "sort_column": sort_column,
             "sort_desc": "{{ sort_column }}" == sort_column ? {{ sort_desc ? 0 : 1 }} : 0
@@ -231,9 +233,12 @@
           slot_load( {{ slot }}, "{{ widget.subject }}", "{{ widget.name }}", args );
         {% endif %}
       } );
+
+      $header_buttons_restrictable = $( "button.{{ widget.full }}_restrictable" );
+      $header_buttons_restrictable.noContext();
     
-      // right-clicking a header button adds a new restriction
-      $header_buttons.rightClick( function( event ) {
+      // right-clicking a restrictable header button adds a new restriction
+      $header_buttons_restrictable.rightClick( function( event ) {
         var column = $(this).parent( "th" ).attr( "id" );
         var column_name = $(this).button().text();
         $( "#{{ widget.compound }}__restrict_dialog_label" ).html( column_name );
@@ -246,6 +251,16 @@
             return false;
           }
         } );
+      } );
+
+      $header_buttons_unrestrictable = $( "button.{{ widget.full }}_unrestrictable" );
+      $header_buttons_unrestrictable.noContext();
+
+      $header_buttons_unrestrictable.rightClick( function( event ) {
+        error_dialog(
+          "Error",
+          "<p>This column cannot be restricted.</p>"
+        );
       } );
       
       // left-clicking a restriction button removes it
@@ -262,7 +277,9 @@
         
         var args = new Object();
         {% if parent.exists %}
-          args.{{ parent.full }} = { "id": {{ parent.id }} };
+          {% if parent.id|default(false) %}
+            args.{{ parent.full }} = { "id": {{ parent.id }} };
+          {% endif %}
           args.{{ widget.full }} = { "restrictions": restrictions };
           slot_load( {{ slot }}, "{{ parent.subject }}", "{{ parent.name }}", args, true );
         {% else %}
@@ -295,7 +312,9 @@
     
             var args = new Object();
             {% if parent.exists %}
-              args.{{ parent.full }} = { "id": {{ parent.id }} };
+              {% if parent.id|default(false) %}
+                args.{{ parent.full }} = { "id": {{ parent.id }} };
+              {% endif %}
               args.{{ widget.full }} = { "restrictions": restrictions };
               slot_load( {{ slot }}, "{{ parent.subject }}", "{{ parent.name }}", args, true );
             {% else %}
@@ -316,7 +335,9 @@
         $( "#{{ widget.full }}_page_prev" ).click( function() {
           var args = new Object();
           {% if parent.exists %}
-            args.{{ parent.full }} = { "id": {{ parent.id }} };
+            {% if parent.id|default(false) %}
+              args.{{ parent.full }} = { "id": {{ parent.id }} };
+            {% endif %}
             args.{{ widget.full }} = { "page": {{ page - 1 }} };
             slot_load( {{ slot }}, "{{ parent.subject }}", "{{ parent.name }}", args, true );
           {% else %}
@@ -329,7 +350,9 @@
         $( "#{{ widget.full }}_page_next" ).click( function() {
           var args = new Object();
           {% if parent.exists %}
-            args.{{ parent.full }} = { "id": {{ parent.id }} };
+            {% if parent.id|default(false) %}
+              args.{{ parent.full }} = { "id": {{ parent.id }} };
+            {% endif %}
             args.{{ widget.full }} = { "page": {{ page + 1 }} };
             slot_load( {{ slot }}, "{{ parent.subject }}", "{{ parent.name }}", args, true );
           {% else %}
@@ -383,6 +406,11 @@
           {% if column.sortable|default(false) %}
             <th id="{{ column_id }}" style="vertical-align:top;">
               <button class="{{ widget.full }}_sortable
+                {% if column.restrictable|default(false) %}
+                  {{ widget.full }}_restrictable
+                {% else %}
+                  {{ widget.full }}_unrestrictable
+                {% endif %}  
                 {% if column_id == sort_column %}
                   {{ widget.full }}_sorted{{ sort_desc ? '_desc' : '' }}
                 {% else %}
