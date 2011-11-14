@@ -43,7 +43,6 @@ abstract class base_list extends \mastodon\ui\widget
     $this->page = $this->get_argument( 'page', $this->page );
     $this->sort_column = $this->get_argument( 'sort_column', $this->sort_column );
     $this->sort_desc = 0 != $this->get_argument( 'sort_desc', $this->sort_desc );
-    $this->set_heading( ucfirst( $subject ).' list' );
     $this->restrictions = $this->get_argument( 'restrictions', $this->restrictions );
     
     // determine properties based on the current user's permissions
@@ -526,8 +525,8 @@ abstract class base_list extends \mastodon\ui\widget
    *   'heading' => the name to display in in the column header
    * The following are optional:
    *   'sortable' => whether or not the list can be sorted by the column
+   *   'restrictable' => whether or not a sortable list can be restricted to particular values
    *   'align' => Which way to align the column
-   *   'restrictable' => whether a sortable list can be sorted by restriction
    * This member can only be set in the {@link add_column} and {@link remove_column} functions.
    * @var array
    * @access private
