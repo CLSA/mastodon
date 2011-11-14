@@ -3,23 +3,23 @@
  * base_list.class.php
  * 
  * @author Dean Inglis <inglisd@mcmaster.ca>
- * @package sabretooth\ui
+ * @package mastodon\ui
  * @filesource
  */
 
-namespace sabretooth\ui\pull;
-use sabretooth\log, sabretooth\util;
-use sabretooth\business as bus;
-use sabretooth\database as db;
-use sabretooth\exception as exc;
+namespace mastodon\ui\pull;
+use mastodon\log, mastodon\util;
+use mastodon\business as bus;
+use mastodon\database as db;
+use mastodon\exception as exc;
 
 /**
  * Base class for all list pull operations.
  * 
  * @abstract
- * @package sabretooth\ui
+ * @package mastodon\ui
  */
-abstract class base_list extends \sabretooth\ui\pull
+abstract class base_list extends \mastodon\ui\pull
 {
   /**
    * Constructor
@@ -46,7 +46,7 @@ abstract class base_list extends \sabretooth\ui\pull
     foreach( $this->restrictions as $restrict )
       $modifier->where( $restrict['column'], $restrict['operator'], $restrict['value'] );
 
-    $class_name = '\\sabretooth\\database\\'.$this->get_subject();
+    $class_name = '\\mastodon\\database\\'.$this->get_subject();
     $list = array();
     foreach( $class_name::select( $modifier ) as $record )
     {

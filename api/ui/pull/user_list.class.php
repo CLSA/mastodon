@@ -3,21 +3,21 @@
  * user_list.class.php
  * 
  * @author Dean Inglis <inglisd@mcmaster.ca>
- * @package sabretooth\ui
+ * @package mastodon\ui
  * @filesource
  */
 
-namespace sabretooth\ui\pull;
-use sabretooth\log, sabretooth\util;
-use sabretooth\business as bus;
-use sabretooth\database as db;
-use sabretooth\exception as exc;
+namespace mastodon\ui\pull;
+use mastodon\log, mastodon\util;
+use mastodon\business as bus;
+use mastodon\database as db;
+use mastodon\exception as exc;
 
 /**
  * Class for user list pull operations.
  * 
  * @abstract
- * @package sabretooth\ui
+ * @package mastodon\ui
  */
 class user_list extends base_list
 {
