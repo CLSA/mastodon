@@ -63,7 +63,7 @@ abstract class site_restricted_list extends base_list
 
     if( static::may_restrict() )
     {
-      // if this is an admin, give them a list of sites to choose from
+      // if this is a top tier role, give them a list of sites to choose from
       // (for lists with no parent only!)
       if( is_null( $this->parent ) )
       {
@@ -134,12 +134,11 @@ abstract class site_restricted_list extends base_list
    */
   public static function may_restrict()
   {
-    $role_name = bus\session::self()->get_role()->name;
-    return 'administrator' == $role_name;
+    return 3 == bus\session::self()->get_role()->tier;
   }
 
   /**
-   * The site to restrict to (for all but administrators this is automatically set
+   * The site to restrict to.
    * to the current site).
    * @var database\site
    * @access private
