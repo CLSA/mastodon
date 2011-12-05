@@ -53,30 +53,79 @@ class participant_primary extends base_primary
   {
     $data = parent::finish();
 
-    // add the primary address
-    $db_address = $this->get_record()->get_primary_address();
-    if( !is_null( $db_address ) )
+    // add full participant information if requested
+    if( $this->get_argument( 'full', false ) )
     {
-      $data['street'] = is_null( $db_address->address2 )
-                      ? $db_address->address1
-                      : $db_address->address1.', '.$db_address->address2;
-      $data['city'] = $db_address->city;
-      $data['region'] = $db_address->get_region()->name;
-      $data['postcode'] = $db_address->postcode;
-    }
-    
-    // add the hin information
-    $hin_info = $this->get_record()->get_hin_information();
-    
-    if( count( $hin_info ) )
-    {
-      $data['hin_access'] = $hin_info['access'];
-      $data['hin_missing'] = !$hin_info['missing'];
+      // add the participant's address list
+      $data['address_list'] = array();
+      foreach( $this->get_record()->get_address_list() as $db_address )
+      {
+        $item = array();
+        foreach( $db_address->get_column_names() as $column )
+        {
+          if( 'person_id' == $column ) {} // do nothing
+          else if( 'region_id' == $column )
+            $item['region_abbreviation'] = $db_address->get_region()->abbreviation;
+          else $item[$column] = $db_address->$column;
+        }
+        $data['address_list'][] = $item;
+      }
+
+      // add the participant's phone list
+      $data['phone_list'] = array();
+      foreach( $this->get_record()->get_phone_list() as $db_phone )
+      {
+        $item = array();
+        foreach( $db_phone->get_column_names() as $column )
+        {
+          if( 'person_id' == $column ) {} // do nothing
+          else if( 'address_id' == $column && !is_null( $db_phone->address_id ) )
+            $item['address_rank'] = $db_phone->get_address()->rank;
+          else $item[$column] = $db_phone->$column;
+        }
+        $data['phone_list'][] = $item;
+      }
+
+      // add the participant's consent list
+      $data['consent_list'] = array();
+      foreach( $this->get_record()->get_consent_list() as $db_consent )
+      {
+        $item = array();
+        foreach( $db_consent->get_column_names() as $column )
+        {
+          if( 'participant_id' == $column ) {} // do nothing
+          else $item[$column] = $db_consent->$column;
+        }
+        $data['consent_list'][] = $item;
+      }
     }
     else
     {
-      $data['hin_access'] = false;
-      $data['hin_missing'] = true;
+      // add the primary address
+      $db_address = $this->get_record()->get_primary_address();
+      if( !is_null( $db_address ) )
+      {
+        $data['street'] = is_null( $db_address->address2 )
+                        ? $db_address->address1
+                        : $db_address->address1.', '.$db_address->address2;
+        $data['city'] = $db_address->city;
+        $data['region'] = $db_address->get_region()->name;
+        $data['postcode'] = $db_address->postcode;
+      }
+      
+      // add the hin information
+      $hin_info = $this->get_record()->get_hin_information();
+      
+      if( count( $hin_info ) )
+      {
+        $data['hin_access'] = $hin_info['access'];
+        $data['hin_missing'] = !$hin_info['missing'];
+      }
+      else
+      {
+        $data['hin_access'] = false;
+        $data['hin_missing'] = true;
+      }
     }
 
     return $data;
