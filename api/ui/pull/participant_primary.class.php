@@ -53,6 +53,11 @@ class participant_primary extends base_primary
   {
     $data = parent::finish();
 
+    // restrict by cohort, if asked to
+    $cohort = $this->get_argument( 'cohort', false );
+    if( $cohort && $cohort != $this->get_record()->cohort )
+      throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
     {
