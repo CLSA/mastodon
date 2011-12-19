@@ -99,6 +99,11 @@ class participant_add extends base_view
     $this->finish_setting_items();
   }
 
+  /**
+   * The unique identifier to assign to the participant, or null if none are available.
+   * @var string
+   * @access protected
+   */
   protected $new_uid = NULL;
 }
 ?>

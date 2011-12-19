@@ -112,6 +112,13 @@ class participant extends person
     return static::db()->get_row( $sql );
   }
 
+  /**
+   * Get a random UID from the pool of unassigned UIDs.  If the pool is empty this returns NULL.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @static
+   * @access public
+   */
   public static function get_new_uid()
   {
     $new_uid = NULL;
