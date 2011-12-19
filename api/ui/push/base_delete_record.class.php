@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-abstract class base_delete_record extends base_record_push
+abstract class base_delete_record extends base_record
 {
   /**
    * Constructor.

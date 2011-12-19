@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-abstract class site_restricted_list extends base_list_widget
+abstract class site_restricted_list extends base_list
 {
   /**
    * Constructor

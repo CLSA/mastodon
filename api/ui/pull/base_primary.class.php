@@ -19,7 +19,7 @@ use mastodon\exception as exc;
  * @abstract
  * @package mastodon\ui
  */
-abstract class base_primary extends base_record_pull
+abstract class base_primary extends base_record
 {
   /**
    * Constructor
