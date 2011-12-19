@@ -31,10 +31,12 @@ class participant_add extends base_view
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'add', $args );
+
+    $this->new_uid = db\participant::get_new_uid();
     
     // define all columns defining this record
     $this->add_item( 'active', 'boolean', 'Active' );
-    $this->add_item( 'uid', 'string', 'Unique ID' );
+    $this->add_item( 'uid', is_null( $this->new_uid ) ? 'string' : 'hidden', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
     $this->add_item( 'source', 'enum', 'Source' );
@@ -78,7 +80,7 @@ class participant_add extends base_view
 
     // set the view's items
     $this->set_item( 'active', true, true );
-    $this->set_item( 'uid', '', true );
+    $this->set_item( 'uid', is_null( $this->new_uid ) ? '' : $this->new_uid, true );
     $this->set_item( 'first_name', '', true );
     $this->set_item( 'last_name', '', true );
     $this->set_item( 'source', key( $sources ), true, $sources );
@@ -96,5 +98,7 @@ class participant_add extends base_view
 
     $this->finish_setting_items();
   }
+
+  protected $new_uid = NULL;
 }
 ?>

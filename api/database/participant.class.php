@@ -111,5 +111,22 @@ class participant extends person
 
     return static::db()->get_row( $sql );
   }
+
+  public static function get_new_uid()
+  {
+    $new_uid = NULL;
+
+    // Get a random UID by selecting a random number between the min and max ID and finding
+    // the first record who's id is greater or equal to that random number (since some may
+    // get deleted)
+    $row = static::db()->get_row( 'SELECT MIN( id ) AS min, MAX( id ) AS max FROM unique_identifier_pool' );
+    if( count( $row ) )
+    {
+      $new_uid = static::db()->get_one(
+        'SELECT uid FROM unique_identifier_pool WHERE id >= '.rand( $row['min'], $row['max'] ) );
+    }
+
+    return $new_uid;
+  }
 }
 ?>

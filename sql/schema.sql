@@ -4,23 +4,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
 
 
 -- -----------------------------------------------------
--- Table `site`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `site` ;
-
-CREATE  TABLE IF NOT EXISTS `site` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
-  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `person`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `person` ;
@@ -148,6 +131,23 @@ CREATE  TABLE IF NOT EXISTS `role_has_operation` (
     REFERENCES `operation` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `site`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `site` ;
+
+CREATE  TABLE IF NOT EXISTS `site` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
+  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
 ENGINE = InnoDB;
 
 
@@ -575,6 +575,21 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `unique_identifier_pool`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `unique_identifier_pool` ;
+
+CREATE  TABLE IF NOT EXISTS `unique_identifier_pool` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `uid` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uid_UNIQUE` (`uid` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Placeholder table for view `person_first_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `person_first_address` (`person_id` INT, `address_id` INT);
@@ -708,6 +723,19 @@ CREATE  OR REPLACE VIEW `alternate_first_address` AS
 SELECT alternate.id AS alternate_id, address_id
 FROM person_first_address, alternate
 WHERE person_first_address.person_id = alternate.person_id;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS `remove_uid_from_pool` $$
+  CREATE TRIGGER remove_uid_from_pool BEFORE
+  INSERT ON participant
+  FOR EACH ROW BEGIN
+    DELETE FROM unique_identifier_pool WHERE uid = new.uid;
+  END;
+$$
+
+
+DELIMITER ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
