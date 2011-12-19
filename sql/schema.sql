@@ -47,7 +47,6 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
   `source` ENUM('statscan','ministry','rdd') NOT NULL ,
   `cohort` ENUM('comprehensive','tracking') NOT NULL ,
-  `site_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'If not null then force all calls to this participant to the site.' ,
   `first_name` VARCHAR(45) NOT NULL ,
   `last_name` VARCHAR(45) NOT NULL ,
   `gender` ENUM('male','female') NOT NULL ,
@@ -59,18 +58,12 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,
   INDEX `dk_prior_contact_date` (`prior_contact_date` ASC) ,
   UNIQUE INDEX `uq_uid` (`uid` ASC) ,
   INDEX `dk_uid` (`uid` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
-  CONSTRAINT `fk_participant_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT `fk_participant_person`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )

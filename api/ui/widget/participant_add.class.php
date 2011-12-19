@@ -43,7 +43,6 @@ class participant_add extends base_view
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
-    $this->add_item( 'site_id', 'enum', 'Preferred Site' );
     $this->add_item( 'status', 'enum', 'Condition' );
     $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
@@ -88,7 +87,6 @@ class participant_add extends base_view
     $this->set_item( 'date_of_birth', '' );
     $this->set_item( 'language', '', false, $languages );
     $this->set_item( 'email', '' );
-    $this->set_item( 'site_id', '', false, $sites );
     $this->set_item( 'status', '', false, $statuses );
     $this->set_item( 'eligible', true, true );
     $this->set_item( 'no_in_home', false, true );
