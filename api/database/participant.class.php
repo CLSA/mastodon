@@ -135,5 +135,17 @@ class participant extends person
 
     return $new_uid;
   }
+
+  /**
+   * Get the number of UIDs available in the pool of unassigned UIDs.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return int
+   * @static
+   * @access public
+   */
+  public static function get_uid_pool_count()
+  {
+    return static::db()->get_one( 'SELECT COUNT(*) FROM unique_identifier_pool' );
+  }
 }
 ?>

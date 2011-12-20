@@ -3,3 +3,5 @@
 --
 
 SOURCE unique_identifier_pool.sql
+SOURCE operation.sql
+SOURCE role_has_operation.sql

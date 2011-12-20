@@ -1,0 +1,55 @@
+{##
+ # participant_import.twig
+ # 
+ # Form to import participants with Mastodon.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see widget.twig for parameters
+ #}
+{% extends "widget.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      // update button
+      $( "#{{ widget.compound }}__import" ).click( function () {
+        $( this ).find( "span" ).html( 'Importing...' );
+        if( ajax_push( 'participant', 'import' ) ) slot_refresh( {{ slot }} );
+        $( this ).find( "span" ).html( 'Import' );
+      } );
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block widget %}
+  <div class="spacer">
+    The following list is depending on the QUEXF OCR system.  Once participants are imported
+    they will be assigned a UID from the available pool and removed from QUEXF.  Participants
+    will only be imported if there are UIDs available in the pool, otherwise they are ignored.
+  </div>
+  <div id="{{ widget.full }}__results">
+    <table style="width:34%; margin-left:33%; margin-right:33%">
+      <tr>
+        <td class="heading">Participants ready for import</td>
+        <td>{{ participant_count }}</td>
+      </tr>
+      <tr>
+        <td class="heading">Participants with invalid or missing information</td>
+        <td>{{ invalid_participant_count }}</td>
+      </tr>
+      <tr>
+        <td class="heading">Participants to be imported</td>
+        <td>{{ valid_participant_count }}</td>
+      </tr>
+      <tr>
+        <td class="heading">Size of unique identifier pool</td>
+        <td>{{ pool_size }}</td>
+      </tr>
+    </table>
+    <div style="text-align: right">
+      <button id="{{ widget.full }}__import" style="width:120px">Import</button>
+    </div>
+  </div>
+{% endblock widget %}
