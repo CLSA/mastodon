@@ -20,7 +20,7 @@ use mastodon\exception as exc;
  * Arguments must include 'role'.
  * @package mastodon\ui
  */
-class self_set_role extends \mastodon\ui\push
+class self_set_role extends \cenozo\ui\push\self_set_role
 {
   /**
    * Constructor.
@@ -46,28 +46,7 @@ class self_set_role extends \mastodon\ui\push
       $args['id'] = $db_site->id;
     }
 
-    parent::__construct( 'self', 'set_role', $args );
-  }
-  
-  /**
-   * Executes the push.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\runtime
-   * @access public
-   */
-  public function finish()
-  {
-    try
-    {
-      $db_role = new db\role( $this->get_argument( 'id' ) );
-    }
-    catch( exc\runtime $e )
-    {
-      throw new exc\argument( 'id', $this->get_argument( 'id' ), __METHOD__, $e );
-    }
-    
-    $session = bus\session::self();
-    $session->set_site_and_role( $session->get_site(), $db_role );
+    parent::__construct( $args );
   }
 }
 ?>

@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class user_delete_access extends base_delete_record
+class user_delete_access extends \cenozo\ui\push\user_delete_access
 {
   /**
    * Constructor.
@@ -57,7 +57,7 @@ class user_delete_access extends base_delete_record
       $args['remove_id'] = $db_access->id;
     }
 
-    parent::__construct( 'user', 'access', $args );
+    parent::__construct( $args );
   }
 }
 ?>

@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class site_new_access extends base_new_record
+class site_new_access extends \cenozo\ui\push\site_new_access
 {
   /**
    * Constructor.
@@ -66,20 +66,7 @@ class site_new_access extends base_new_record
       }
     }
 
-    parent::__construct( 'site', 'access', $args );
-  }
-
-  /**
-   * Executes the push.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
-  {
-    foreach( $this->get_argument( 'role_id_list' ) as $role_id )
-    {
-      $this->get_record()->add_access( $this->get_argument( 'user_id_list' ), $role_id );
-    }
+    parent::__construct( $args );
   }
 }
 ?>

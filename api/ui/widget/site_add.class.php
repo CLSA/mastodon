@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class site_add extends base_view
+class site_add extends \cenozo\ui\widget\site_add
 {
   /**
    * Constructor
@@ -30,12 +30,10 @@ class site_add extends base_view
    */
   public function __construct( $args )
   {
-    parent::__construct( 'site', 'add', $args );
+    parent::__construct( $args );
     
     // define all columns defining this record
-    $this->add_item( 'name', 'string', 'Name' );
     $this->add_item( 'cohort', 'enum', 'Type' );
-    $this->add_item( 'timezone', 'enum', 'Time Zone' );
   }
 
   /**
@@ -46,20 +44,14 @@ class site_add extends base_view
    */
   public function finish()
   {
-    parent::finish();
-    
     // create enum arrays
     $cohorts = db\site::get_enum_values( 'cohort' );
     $cohorts = array_combine( $cohorts, $cohorts );
-    $timezones = db\site::get_enum_values( 'timezone' );
-    $timezones = array_combine( $timezones, $timezones );
 
     // set the view's items
-    $this->set_item( 'name', '', true );
     $this->set_item( 'cohort', key( $cohorts ), true, $cohorts );
-    $this->set_item( 'timezone', key( $timezones ), true, $timezones );
 
-    $this->finish_setting_items();
+    parent::finish();
   }
 }
 ?>

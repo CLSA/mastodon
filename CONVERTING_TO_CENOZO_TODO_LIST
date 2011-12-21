@@ -1,0 +1,4 @@
+1. Continue going through sql/ tpl/ and web/ (convert db)
+2. Convert to use of new lib class.
+3. Update all namespaces at top of files.
+4. Mastodon: remove role names from code, replace with teir.

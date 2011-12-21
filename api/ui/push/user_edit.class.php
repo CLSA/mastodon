@@ -19,7 +19,7 @@ use mastodon\exception as exc;
  * Edit a user.
  * @package mastodon\ui
  */
-class user_edit extends base_edit
+class user_edit extends \cenozo\ui\push\user_edit
 {
   /**
    * Constructor.
@@ -45,7 +45,7 @@ class user_edit extends base_edit
       $args['id'] = $db_user->id;
     }
 
-    parent::__construct( 'user', $args );
+    parent::__construct( $args );
   }
 }
 ?>

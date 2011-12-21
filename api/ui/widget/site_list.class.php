@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class site_list extends base_list
+class site_list extends \cenozo\ui\widget\base_list
 {
   /**
    * Constructor
