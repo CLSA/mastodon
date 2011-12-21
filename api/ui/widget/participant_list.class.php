@@ -18,7 +18,7 @@ use mastodon\exception as exc;
  * 
  * @package mastodon\ui
  */
-class participant_list extends site_restricted_list
+class participant_list extends base_list
 {
   /**
    * Constructor
@@ -64,36 +64,6 @@ class participant_list extends site_restricted_list
     }
 
     $this->finish_setting_rows();
-  }
-
-  /**
-   * Overrides the parent class method to restrict participant list based on user's role
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return int
-   * @access protected
-   */
-  protected function determine_record_count( $modifier = NULL )
-  {
-    return is_null( $this->db_restrict_site )
-         ? parent::determine_record_count( $modifier )
-         : db\participant::count_for_site( $this->db_restrict_site, $modifier );
-  }
-  
-  /**
-   * Overrides the parent class method to restrict participant list based on user's role
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return array( record )
-   * @access protected
-   */
-  protected function determine_record_list( $modifier = NULL )
-  {
-    return is_null( $this->db_restrict_site )
-         ? parent::determine_record_list( $modifier )
-         : db\participant::select_for_site( $this->db_restrict_site, $modifier );
   }
 }
 ?>

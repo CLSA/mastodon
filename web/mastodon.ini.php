@@ -52,6 +52,9 @@ unset( $base_url );
 // the location of mastodon internal path
 $SETTINGS[ 'path' ][ 'MASTODON' ] = '/usr/local/lib/mastodon';
 
+// the location of quexf for participant import (set to NULL to disable importing)
+$SETTINGS[ 'path' ][ 'QUEXF' ] = NULL;
+
 // the location of libraries
 $SETTINGS[ 'path' ][ 'ADODB' ] = '/usr/local/lib/adodb';
 $SETTINGS[ 'path' ][ 'JS' ] = 'js';

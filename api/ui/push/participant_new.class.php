@@ -46,17 +46,6 @@ class participant_new extends base_new
     if( !array_key_exists( 'last_name', $columns ) || 0 == strlen( $columns['last_name'] ) )
       throw new exc\notice( 'The participant\'s last name cannot be left blank.', __METHOD__ );
 
-    // check if the site is a tracking or comprehensive site and ensure the
-    // specified cohort for the participant is appropriate
-    if( 0 < strlen( $columns['site_id'] ) )
-    {
-      $db_site = new db\site( $columns['site_id'] );
-      if( $db_site->cohort != $columns['cohort'] )
-        throw new exc\notice(
-          'The participant\'s cohort: '.$columns['cohort'].
-          ' must match the preferred site\'s cohort: '.$db_site->cohort, __METHOD__ );
-    }
-
     if( 0 == $columns['person_id'] )
     {
       $db_person = new db\person();

@@ -31,10 +31,12 @@ class participant_add extends base_view
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'add', $args );
+
+    $this->new_uid = db\participant::get_new_uid();
     
     // define all columns defining this record
     $this->add_item( 'active', 'boolean', 'Active' );
-    $this->add_item( 'uid', 'string', 'Unique ID' );
+    $this->add_item( 'uid', is_null( $this->new_uid ) ? 'string' : 'hidden', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
     $this->add_item( 'source', 'enum', 'Source' );
@@ -43,7 +45,6 @@ class participant_add extends base_view
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
-    $this->add_item( 'site_id', 'enum', 'Preferred Site' );
     $this->add_item( 'status', 'enum', 'Condition' );
     $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
@@ -79,7 +80,7 @@ class participant_add extends base_view
 
     // set the view's items
     $this->set_item( 'active', true, true );
-    $this->set_item( 'uid', '', true );
+    $this->set_item( 'uid', is_null( $this->new_uid ) ? '' : $this->new_uid, true );
     $this->set_item( 'first_name', '', true );
     $this->set_item( 'last_name', '', true );
     $this->set_item( 'source', key( $sources ), true, $sources );
@@ -88,7 +89,6 @@ class participant_add extends base_view
     $this->set_item( 'date_of_birth', '' );
     $this->set_item( 'language', '', false, $languages );
     $this->set_item( 'email', '' );
-    $this->set_item( 'site_id', '', false, $sites );
     $this->set_item( 'status', '', false, $statuses );
     $this->set_item( 'eligible', true, true );
     $this->set_item( 'no_in_home', false, true );
@@ -98,5 +98,12 @@ class participant_add extends base_view
 
     $this->finish_setting_items();
   }
+
+  /**
+   * The unique identifier to assign to the participant, or null if none are available.
+   * @var string
+   * @access protected
+   */
+  protected $new_uid = NULL;
 }
 ?>
