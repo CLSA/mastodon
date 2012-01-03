@@ -33,7 +33,7 @@ final class session extends \cenozo\business\session
     // don't initialize more than once
     if( $this->initialized ) return;
 
-    $setting_manager = setting_manager::self();
+    $setting_manager = lib::create( 'business\setting_manager' );
 
     // create the databases
     $this->database = lib::create( 'database\database',
