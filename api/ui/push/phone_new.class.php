@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Create a new phone.
  * @package mastodon\ui
  */
-class phone_new extends base_new
+class phone_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.

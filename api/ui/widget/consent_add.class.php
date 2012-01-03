@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_add extends base_view
+class consent_add extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor

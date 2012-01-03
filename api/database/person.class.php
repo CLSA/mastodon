@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class person extends has_note
+class person extends \cenozo\database\has_note
 {
   /**
    * Override get_address_list()

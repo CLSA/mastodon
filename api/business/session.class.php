@@ -31,18 +31,12 @@ final class session extends \cenozo\business\session
   public function initialize()
   {
     // don't initialize more than once
-    if( $this->initialized ) return;
+    if( $this->is_initialized() ) return;
+
+    parent::initialize();
 
     $setting_manager = lib::create( 'business\setting_manager' );
-
-    // create the databases
-    $this->database = lib::create( 'database\database',
-      $setting_manager->get_setting( 'db', 'driver' ),
-      $setting_manager->get_setting( 'db', 'server' ),
-      $setting_manager->get_setting( 'db', 'username' ),
-      $setting_manager->get_setting( 'db', 'password' ),
-      $setting_manager->get_setting( 'db', 'database' ),
-      $setting_manager->get_setting( 'db', 'prefix' ) );
+    // create audit database, if necessary
     if( $setting_manager->get_setting( 'audit_db', 'enabled' ) )
     {
       // If not set then the audit database settings use the same as the standard db,
@@ -55,14 +49,6 @@ final class session extends \cenozo\business\session
         $setting_manager->get_setting( 'audit_db', 'database' ),
         $setting_manager->get_setting( 'audit_db', 'prefix' ) );
     }
-
-    // determine the user (setting the user will also set the site and role)
-    $user_name = $_SERVER[ 'PHP_AUTH_USER' ];
-    $this->set_user( db\user::get_unique_record( 'name', $user_name ) );
-    if( NULL == $this->user )
-      throw lib::create( 'exception\runtime', 'User "'.$user_name.'" not found.', __METHOD__ );
-
-    $this->initialized = true;
   }
 
   /**

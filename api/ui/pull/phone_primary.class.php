@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class phone_primary extends base_primary
+class phone_primary extends \cenozo\ui\pull\base_primary
 {
   /**
    * Constructor

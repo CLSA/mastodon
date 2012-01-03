@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class participant_delete_consent extends base_delete_record
+class participant_delete_consent extends \cenozo\ui\push\base_delete_record
 {
   /**
    * Constructor.

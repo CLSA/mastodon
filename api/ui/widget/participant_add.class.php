@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class participant_add extends base_view
+class participant_add extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor

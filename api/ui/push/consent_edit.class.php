@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a consent.
  * @package mastodon\ui
  */
-class consent_edit extends base_edit
+class consent_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.

@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class phone extends has_rank
+class phone extends \cenozo\database\has_rank
 {
   /**
    * The type of record which the record has a rank for.

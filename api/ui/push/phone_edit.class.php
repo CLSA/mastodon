@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a phone.
  * @package mastodon\ui
  */
-class phone_edit extends base_edit
+class phone_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.

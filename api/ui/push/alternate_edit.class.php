@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a alternate.
  * @package mastodon\ui
  */
-class alternate_edit extends base_edit
+class alternate_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.

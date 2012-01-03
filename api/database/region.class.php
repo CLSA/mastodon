@@ -15,5 +15,5 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class region extends record {}
+class region extends \cenozo\database\record {}
 ?>

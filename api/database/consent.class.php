@@ -15,5 +15,5 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class consent extends record {}
+class consent extends \cenozo\database\record {}
 ?>

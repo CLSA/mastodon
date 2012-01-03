@@ -15,5 +15,5 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class status extends record {}
+class status extends \cenozo\database\record {}
 ?>

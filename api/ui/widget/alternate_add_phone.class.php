@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class alternate_add_phone extends base_add_record
+class alternate_add_phone extends \cenozo\ui\widget\base_add_record
 {
   /**
    * Constructor

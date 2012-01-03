@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class address_delete extends base_delete
+class address_delete extends \cenozo\ui\push\base_delete
 {
   /**
    * Constructor.

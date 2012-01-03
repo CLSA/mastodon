@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Create a new consent.
  * @package mastodon\ui
  */
-class consent_new extends base_new
+class consent_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.

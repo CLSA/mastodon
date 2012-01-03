@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Create a new alternate.
  * @package mastodon\ui
  */
-class alternate_new extends base_new
+class alternate_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.

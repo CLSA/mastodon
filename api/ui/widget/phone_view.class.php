@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class phone_view extends base_view
+class phone_view extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor

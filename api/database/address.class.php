@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class address extends has_rank
+class address extends \cenozo\database\has_rank
 {
   /**
    * Determines the difference in hours between the user's timezone and the address's timezone

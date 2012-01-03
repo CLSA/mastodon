@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * @abstract
  * @package mastodon\ui
  */
-abstract class base_list_record extends base_record
+abstract class base_list_record extends \cenozo\ui\pull\base_record
 {
   /**
    * Constructor

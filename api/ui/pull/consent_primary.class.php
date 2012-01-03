@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_primary extends base_primary
+class consent_primary extends \cenozo\ui\pull\base_primary
 {
   /**
    * Constructor

@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class alternate_delete_phone extends base_delete_record
+class alternate_delete_phone extends \cenozo\ui\push\base_delete_record
 {
   /**
    * Constructor.
