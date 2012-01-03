@@ -3,17 +3,17 @@
  * setting_manager.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodong\business
+ * @package mastodon\business
  * @filesource
  */
 
-namespace mastodong\business;
-use cenozo\lib, cenozo\log, mastodong\util;
+namespace mastodon\business;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Manages software settings
  * 
- * @package mastodong\business
+ * @package mastodon\business
  */
 class setting_manager extends \cenozo\business\setting_manager
 {
