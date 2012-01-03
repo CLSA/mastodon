@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class participant_list_consent extends base_list_record
+class participant_list_consent extends \cenozo\ui\pull\base_list_record
 {
   /**
    * Constructor
