@@ -40,7 +40,7 @@ class participant extends person
                'FROM participant_last_consent '.
                'WHERE participant_id = %s',
                database::format_string( $this->id ) ) );
-    return $consent_id ? new consent( $consent_id ) : NULL;
+    return $consent_id ? lib::create( 'database\consent', $consent_id ) : NULL;
   }
 
   /**
@@ -62,7 +62,7 @@ class participant extends person
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_primary_address WHERE participant_id = %s',
                database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**
@@ -86,7 +86,7 @@ class participant extends person
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_first_address WHERE participant_id = %s',
                database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**

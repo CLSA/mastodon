@@ -38,7 +38,7 @@ class participant_edit extends base_edit
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw exc\argument( 'noid', $noid, __METHOD__ );

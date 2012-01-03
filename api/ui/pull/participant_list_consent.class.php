@@ -35,7 +35,7 @@ class participant_list_consent extends base_list_record
       $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
 
       if( is_null( $db_participant ) )
-        throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+        throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
       $args['id'] = $db_participant->id;
     }
 

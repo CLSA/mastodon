@@ -40,7 +40,7 @@ class operator_begin_break extends \mastodon\ui\push
   public function finish()
   {
     $session = bus\session::self();
-    $db_away_time = new db\away_time();
+    $db_away_time = lib::create( 'database\away_time' );
     $db_away_time->user_id = $session->get_user()->id;
     $db_away_time->save();
   }

@@ -40,15 +40,15 @@ class access_delete extends \cenozo\ui\push\access_delete
           !array_key_exists( 'role.name', $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $access_mod = new db\modifier();
+      $access_mod = lib::create( 'database\modifier' );
       $access_mod->where( 'user.name', '=', $noid['user.name'] );
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
       $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_access->id;
     }
 

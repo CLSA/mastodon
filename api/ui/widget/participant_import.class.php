@@ -43,7 +43,7 @@ class participant_import extends \mastodon\ui\widget
   {
     parent::finish();
 
-    $quexf_manager = new bus\quexf_manager();
+    $quexf_manager = lib::create( 'business\quexf_manager' );
 
     $this->set_variable(
       'participant_count', $quexf_manager->get_participant_count() );

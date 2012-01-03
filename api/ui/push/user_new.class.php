@@ -40,16 +40,16 @@ class user_new extends \cenozo\ui\push\user_new
           !array_key_exists( 'role.name', $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_role = db\role::get_unique_record( 'name', $noid['role.name'] );
-      if( !$db_role ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_role ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $this->role_id = $db_role->id;
 
       $db_site = db\site::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
-      if( !$db_site ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $this->site_id = $db_site->id;
     }
 

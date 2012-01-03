@@ -32,9 +32,7 @@ abstract class base_list_record extends base_record
   {
     $this->child = $child;
     parent::__construct( $subject, 'list_'.$this->child, $args );
-
-    $class_name = '\\mastodon\\database\\'.$this->get_subject();
-    $this->set_record( new $class_name( $this->get_argument( 'id', NULL ) ) );
+    $this->set_record( lib::create( 'database\\'.$this->get_subject(), $this->get_argument( 'id', NULL ) ) );
   }
 
   /**

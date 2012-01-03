@@ -43,7 +43,7 @@ class alternate_view extends base_view
     try
     {
       // create the address sub-list widget
-      $this->address_list = new address_list( $args );
+      $this->address_list = lib::create( 'ui\widget\address_list', $args );
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
@@ -55,7 +55,7 @@ class alternate_view extends base_view
     try
     {
       // create the phone sub-list widget
-      $this->phone_list = new phone_list( $args );
+      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }

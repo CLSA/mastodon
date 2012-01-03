@@ -40,16 +40,16 @@ class consent_edit extends base_edit
           !array_key_exists( 'participant.uid', $noid ) ||
           !array_key_exists( 'consent.event', $noid ) ||
           !array_key_exists( 'consent.date', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
-      $consent_mod = new db\modifier();
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+      $consent_mod = lib::create( 'database\modifier' );
       $consent_mod->where( 'participant_id', '=', $db_participant->id );
       $consent_mod->where( 'event', '=', $noid['consent.event'] );
       $consent_mod->where( 'date', '=', $noid['consent.date'] );
       $consent_list = db\consent::select( $consent_mod );
-      if( 0 == count( $consent_list ) ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( 0 == count( $consent_list ) ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $db_consent = current( $consent_list );
       $args['id'] = $db_consent->id;      
     }

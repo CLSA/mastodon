@@ -41,12 +41,12 @@ class self_set_site extends \cenozo\ui\push\self_set_site
       if( !is_array( $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $db_site = db\site::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
 
-      if( !$db_site ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_site->id;
     }
 

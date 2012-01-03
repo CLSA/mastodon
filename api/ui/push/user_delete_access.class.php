@@ -40,14 +40,14 @@ class user_delete_access extends \cenozo\ui\push\user_delete_access
           !array_key_exists( 'role.name', $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
-      if( !$db_user ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
 
       // replace the arguments role, site and cohort with an access id
-      $access_mod = new db\modifier();
+      $access_mod = lib::create( 'database\modifier' );
       $access_mod->where( 'user_id', '=', $db_user->id );
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );

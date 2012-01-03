@@ -39,7 +39,7 @@ class participant_import extends \mastodon\ui\push
    */
   public function finish()
   {
-    $quexf_manager = new bus\quexf_manager();
+    $quexf_manager = lib::create( 'business\quexf_manager' );
     $quexf_manager->import();
   }
 }

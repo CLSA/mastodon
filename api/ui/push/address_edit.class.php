@@ -39,20 +39,20 @@ class address_edit extends base_edit
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) ||
           !array_key_exists( 'address.rank', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $db_address = db\address::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['address.rank'] ) );
-      if( !$db_address ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_address ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_address->id;
 
       if( array_key_exists( 'region.abbreviation', $noid ) )
       {
         $db_region = db\region::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
-        if( !$db_region ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+        if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
         $args['columns']['region_id'] = $db_region->id;
       }
     }
@@ -76,7 +76,7 @@ class address_edit extends base_edit
       $postcode = $columns['postcode'];
       if( !preg_match( '/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/', $postcode ) && // postal code
           !preg_match( '/^[0-9]{5}$/', $postcode ) )  // zip code
-        throw new exc\notice(
+        throw lib::create( 'exception\notice',
           'Postal codes must be in "A1A 1A1" format, zip codes in "01234" format.', __METHOD__ );
     }
 

@@ -42,12 +42,12 @@ class site_new_access extends \cenozo\ui\push\site_new_access
           !is_array( $noid['role_name_list'] ) ||
           !array_key_exists( 'user_name_list', $noid ) ||
           !is_array( $noid['user_name_list'] ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_site = db\site::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
-      if( !$db_site ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_site->id;
 
       // replace the arguments "role_name_list" and "user_name_list" with arrays containing ids

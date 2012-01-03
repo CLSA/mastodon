@@ -42,13 +42,13 @@ class participant_new extends base_new
     // make sure the name column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'first_name', $columns ) || 0 == strlen( $columns['first_name'] ) )
-      throw new exc\notice( 'The participant\'s first name cannot be left blank.', __METHOD__ );
+      throw lib::create( 'exception\notice', 'The participant\'s first name cannot be left blank.', __METHOD__ );
     if( !array_key_exists( 'last_name', $columns ) || 0 == strlen( $columns['last_name'] ) )
-      throw new exc\notice( 'The participant\'s last name cannot be left blank.', __METHOD__ );
+      throw lib::create( 'exception\notice', 'The participant\'s last name cannot be left blank.', __METHOD__ );
 
     if( 0 == $columns['person_id'] )
     {
-      $db_person = new db\person();
+      $db_person = lib::create( 'database\person' );
       $db_person->save();
       // direct access to the parent operation class's protected arguments ivar
       // is necessary in this isolated case since a person id is required

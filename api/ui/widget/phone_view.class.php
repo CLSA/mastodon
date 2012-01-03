@@ -54,7 +54,7 @@ class phone_view extends base_view
     $db_person = $this->get_record()->get_person();
 
     // create enum arrays
-    $modifier = new db\modifier();
+    $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'person_id', '=', $db_person->id );
     $modifier->order( 'rank' );
     $addresses = array();

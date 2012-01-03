@@ -42,7 +42,7 @@ class operator_end_break extends \mastodon\ui\push
     $db_user = bus\session::self()->get_user();
 
     // find this user's open break and record the end time
-    $modifier = new db\modifier();
+    $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'end_datetime', '=', NULL );
     $away_time_list = $db_user->get_away_time_list( $modifier );
     

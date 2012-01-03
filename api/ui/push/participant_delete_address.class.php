@@ -38,16 +38,16 @@ class participant_delete_address extends base_delete_record
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) ||
           !array_key_exists( 'address.rank', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_participant->id;
 
       $db_address = db\address::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['address.rank'] ) );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_address->id;
     }
 

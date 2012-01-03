@@ -41,10 +41,10 @@ class user_new_access extends \cenozo\ui\push\user_new_access
           !is_array( $noid['role_name_list'] ) ||
           !array_key_exists( 'site_name_list', $noid ) ||
           !is_array( $noid['site_name_list'] ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
-      if( !$db_user ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
 
       // replace the arguments "role_name_list" and "site_name_list" with arrays containing ids

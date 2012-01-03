@@ -38,10 +38,10 @@ class phone_new extends base_new
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['person_id'] = $db_participant->person_id;
       
       if( array_key_exists( 'address.rank', $noid ) )
@@ -49,7 +49,7 @@ class phone_new extends base_new
         $db_address = db\address::get_unique_record(
           array( 'person_id', 'rank' ),
           array( $db_participant->person_id, $noid['address.rank'] ) );
-        if( !$db_address ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+        if( !$db_address ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
         $args['columns']['address_id'] = $db_address->id;
       }
     }
@@ -70,7 +70,7 @@ class phone_new extends base_new
     
     // validate the number
     if( 10 != strlen( preg_replace( '/[^0-9]/', '', $columns['number'] ) ) )
-      throw new exc\notice(
+      throw lib::create( 'exception\notice',
         'Phone numbers must have exactly 10 digits.', __METHOD__ );
 
     parent::finish();

@@ -35,7 +35,7 @@ class participant_primary extends base_primary
       $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
 
       if( is_null( $db_participant ) )
-        throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+        throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
       $args['id'] = $db_participant->id;
     }
 
@@ -56,7 +56,7 @@ class participant_primary extends base_primary
     // restrict by cohort, if asked to
     $cohort = $this->get_argument( 'cohort', false );
     if( $cohort && $cohort != $this->get_record()->cohort )
-      throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+      throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )

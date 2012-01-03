@@ -93,7 +93,7 @@ class participant_add extends base_view
     $this->set_item( 'eligible', true, true );
     $this->set_item( 'no_in_home', false, true );
     $this->set_item( 'prior_contact_date', '' );
-    // this particular entry is filled in during the push in particpant_new finish()
+    // this particular entry is filled in during the push in particpant_lib::create( 'ui\widget\finish' )
     $this->set_item( 'person_id', 0 );
 
     $this->finish_setting_items();
