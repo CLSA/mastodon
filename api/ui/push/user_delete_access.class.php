@@ -50,7 +50,7 @@ class user_delete_access extends \cenozo\ui\push\user_delete_access
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
       $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }
 

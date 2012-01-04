@@ -51,7 +51,7 @@ class site_delete_access extends \cenozo\ui\push\site_delete_access
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'user.name', '=', $noid['user.name'] );
       $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }
 

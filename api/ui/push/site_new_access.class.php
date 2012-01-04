@@ -51,14 +51,14 @@ class site_new_access extends \cenozo\ui\push\site_new_access
       foreach( $noid['role_name_list'] as $role_name )
       {
         $db_role = db\role::get_unique_record( 'name', $role_name );
-        if( !$db_role ) throw exc\argument( 'role_name_list', $noid['role_name_list'], __METHOD__ );
+        if( !$db_role ) throw lib::create( 'exception\argument', 'role_name_list', $noid['role_name_list'], __METHOD__ );
         $args['role_id_list'][] = $db_role->id;
       }
 
       foreach( $noid['user_name_list'] as $user_name )
       {
         $db_user = db\user::get_unique_record( 'name', $user_name );
-        if( !$db_user ) throw exc\argument( 'user_name_list', $noid['user_name_list'], __METHOD__ );
+        if( !$db_user ) throw lib::create( 'exception\argument', 'user_name_list', $noid['user_name_list'], __METHOD__ );
         $args['user_id_list'][] = $db_user->id;
       }
     }

@@ -48,7 +48,7 @@ class user_new_access extends \cenozo\ui\push\user_new_access
       foreach( $noid['role_name_list'] as $role_name )
       {
         $db_role = db\role::get_unique_record( 'name', $role_name );
-        if( !$db_role ) throw exc\argument( 'role_name_list', $noid['role_name_list'], __METHOD__ );
+        if( !$db_role ) throw lib::create( 'exception\argument', 'role_name_list', $noid['role_name_list'], __METHOD__ );
         $args['role_id_list'][] = $db_role->id;
       }
 
@@ -57,7 +57,7 @@ class user_new_access extends \cenozo\ui\push\user_new_access
         $db_site = db\site::get_unique_record( 
           array( 'name', 'cohort' ), 
           array( $site['name'], $site['cohort'] ) );
-        if( !$db_site ) throw exc\argument( 'site_name_list', $noid['site_name_list'], __METHOD__ );
+        if( !$db_site ) throw lib::create( 'exception\argument', 'site_name_list', $noid['site_name_list'], __METHOD__ );
         $args['site_id_list'][] = $db_site->id;
       }
     }

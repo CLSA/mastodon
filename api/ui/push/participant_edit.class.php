@@ -38,7 +38,7 @@ class participant_edit extends \cenozo\ui\push\base_edit
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
       $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_participant->id;
     }
 
