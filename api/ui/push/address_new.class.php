@@ -36,14 +36,16 @@ class address_new extends \cenozo\ui\push\base_new
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+
+      $participant_class_name = lib::get_class_name( 'database\participant' ); 
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['person_id'] = $db_participant->person_id;
       
       if( array_key_exists( 'region.abbreviation', $noid ) )
       {
-        $db_region = db\region::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
+        $region_class_name = lib::get_class_name( 'database\region' );
+        $db_region = $region_class_name::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
         if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
         $args['columns']['region_id'] = $db_region->id;
       }

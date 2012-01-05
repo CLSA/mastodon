@@ -41,7 +41,8 @@ class site_new_access extends \cenozo\ui\push\site_new_access
           !is_array( $noid['user_name_list'] ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_site = db\site::get_unique_record(
+      $class_name = lib::get_class_name( 'database\site' );
+      $db_site = $site_class_name::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
       if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
@@ -50,14 +51,16 @@ class site_new_access extends \cenozo\ui\push\site_new_access
       // replace the arguments "role_name_list" and "user_name_list" with arrays containing ids
       foreach( $noid['role_name_list'] as $role_name )
       {
-        $db_role = db\role::get_unique_record( 'name', $role_name );
+        $class_name = lib::get_class_name( 'database\role' );
+        $db_role = $role_class_name::get_unique_record( 'name', $role_name );
         if( !$db_role ) throw lib::create( 'exception\argument', 'role_name_list', $noid['role_name_list'], __METHOD__ );
         $args['role_id_list'][] = $db_role->id;
       }
 
       foreach( $noid['user_name_list'] as $user_name )
       {
-        $db_user = db\user::get_unique_record( 'name', $user_name );
+        $class_name = lib::get_class_name( 'database\user' );
+        $db_user = $user_class_name::get_unique_record( 'name', $user_name );
         if( !$db_user ) throw lib::create( 'exception\argument', 'user_name_list', $noid['user_name_list'], __METHOD__ );
         $args['user_id_list'][] = $db_user->id;
       }

@@ -37,7 +37,8 @@ class consent_new extends \cenozo\ui\push\base_new
           !array_key_exists( 'participant.uid', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['participant_id'] = $db_participant->id;
     }
@@ -56,7 +57,6 @@ class consent_new extends \cenozo\ui\push\base_new
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
       throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
-
     parent::finish();
   }
 }

@@ -42,7 +42,8 @@ class site_add extends \cenozo\ui\widget\site_add
   public function finish()
   {
     // create enum arrays
-    $cohorts = db\site::get_enum_values( 'cohort' );
+    $class_name = lib::get_class_name( 'database\site' );
+    $cohorts = $class_name::get_enum_values( 'cohort' );
     $cohorts = array_combine( $cohorts, $cohorts );
 
     // set the view's items

@@ -38,7 +38,8 @@ class self_set_role extends \cenozo\ui\push\self_set_role
           !array_key_exists( 'role.name', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_site = db\role::get_unique_record( 'name', $noid['role.name'] );
+      $class_name = lib::get_class_name( 'database\role' );
+      $db_site = $class_name::get_unique_record( 'name', $noid['role.name'] );
       if( !$db_site ) throw lib::create( 'exception\argument', 'name', $noid['role.name'], __METHOD__ );
       $args['id'] = $db_site->id;
     }

@@ -37,11 +37,13 @@ class participant_delete_address extends \cenozo\ui\push\base_delete_record
           !array_key_exists( 'address.rank', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_participant->id;
 
-      $db_address = db\address::get_unique_record(
+      $address_class_name = lib::get_class_name( 'database\address' );
+      $db_address = $address_class_name::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['address.rank'] ) );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );

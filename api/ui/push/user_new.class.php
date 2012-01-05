@@ -39,11 +39,13 @@ class user_new extends \cenozo\ui\push\user_new
           !array_key_exists( 'site.cohort', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_role = db\role::get_unique_record( 'name', $noid['role.name'] );
+      $role_class_name = lib::get_class_name( 'database\role' );
+      $db_role = $role_class_name::get_unique_record( 'name', $noid['role.name'] );
       if( !$db_role ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $this->role_id = $db_role->id;
 
-      $db_site = db\site::get_unique_record(
+      $site_class_name = lib::get_class_name( 'database\participant' );
+      $db_site = $site_class_name::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
       if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );

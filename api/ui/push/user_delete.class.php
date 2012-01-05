@@ -36,7 +36,8 @@ class user_delete extends \cenozo\ui\push\user_delete
           !array_key_exists( 'user.name', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
+      $class_name = lib::get_class_name( 'database\user' );
+      $db_user = $class_name::get_unique_record( 'name', $noid['user.name'] );
       if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
     }

@@ -57,7 +57,7 @@ class alternate_new extends \cenozo\ui\push\base_new
       $this->get_record()->person_id = $db_person->id;
       $this->get_record()->save();
     }
-    catch( db\base_exception $e )
+    catch( \cenozo\exception\base_exception $e )
     {
       // failed to create alternate, delete the person record
       if( !is_null( $db_person->id ) ) $db_person->delete();
