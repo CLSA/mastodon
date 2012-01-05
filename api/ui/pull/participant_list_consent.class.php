@@ -29,7 +29,8 @@ class participant_list_consent extends \cenozo\ui\pull\base_list_record
     // if the uid is provided instead of the id then fetch the participant id based on the uid
     if( isset( $args['uid'] ) )
     {
-      $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $args['uid'] );
 
       if( is_null( $db_participant ) )
         throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );

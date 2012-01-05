@@ -44,7 +44,9 @@ class access_delete extends \cenozo\ui\push\access_delete
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
-      $db_access = current( db\access::select( $access_mod ) );
+
+      $class_name = lib::get_class_name( 'database\access' );
+      $db_access = current( $class_name::select( $access_mod ) );
       if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_access->id;
     }

@@ -46,7 +46,8 @@ class consent_view extends \cenozo\ui\widget\base_view
     parent::finish();
 
     // create enum arrays
-    $events = db\consent::get_enum_values( 'event' );
+    $class_name = lib::get_class_name( 'database\consent' );
+    $events = $class_name::get_enum_values( 'event' );
     $events = array_combine( $events, $events );
 
     // set the view's items

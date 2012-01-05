@@ -39,7 +39,8 @@ class user_delete_access extends \cenozo\ui\push\user_delete_access
           !array_key_exists( 'site.cohort', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
+      $user_class_name = lib::get_class_name( 'database\user' );
+      $db_user = $user_class_name::get_unique_record( 'name', $noid['user.name'] );
       if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
 
@@ -49,7 +50,9 @@ class user_delete_access extends \cenozo\ui\push\user_delete_access
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
-      $db_access = current( db\access::select( $access_mod ) );
+
+      $access_class_name = lib::get_class_name( 'database\access' );
+      $db_access = current( $access_class_name::select( $access_mod ) );
       if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }

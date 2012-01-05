@@ -44,7 +44,7 @@ class alternate_view extends \cenozo\ui\widget\base_view
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->address_list = NULL;
     }
@@ -56,7 +56,7 @@ class alternate_view extends \cenozo\ui\widget\base_view
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->phone_list = NULL;
     }

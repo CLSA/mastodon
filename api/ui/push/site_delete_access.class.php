@@ -39,7 +39,8 @@ class site_delete_access extends \cenozo\ui\push\site_delete_access
           !array_key_exists( 'site.cohort', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_site = db\site::get_unique_record(
+      $site_class_name = lib::get_class_name( 'database\site' );
+      $db_site = $site_class_name::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
       if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
@@ -50,7 +51,9 @@ class site_delete_access extends \cenozo\ui\push\site_delete_access
       $access_mod->where( 'site_id', '=', $db_site->id );
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'user.name', '=', $noid['user.name'] );
-      $db_access = current( db\access::select( $access_mod ) );
+
+      $access_class_name = lib::get_class_name( 'database\access' );
+      $db_access = current( $access_class_name::select( $access_mod ) );
       if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }
