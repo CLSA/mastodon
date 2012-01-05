@@ -61,7 +61,7 @@ class participant_add extends \cenozo\ui\widget\base_view
     parent::finish();
     
     // create enum arrays
-    $particpant_class_name = lib::get_class_name( 'database\participant' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
     $languages = $participant_class_name::get_enum_values( 'language' );
