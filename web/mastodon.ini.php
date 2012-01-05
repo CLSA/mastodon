@@ -14,7 +14,7 @@ namespace mastodon;
 global $SETTINGS;
 
 // tagged version
-$SETTINGS[ 'general' ][ 'version' ] = '1.0.1';
+$SETTINGS[ 'general' ][ 'version' ] = '1.0.1a';
 
 // always leave as false when running as production server
 $SETTINGS[ 'general' ][ 'development_mode' ] = false;
