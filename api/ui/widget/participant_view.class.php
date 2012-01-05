@@ -52,7 +52,7 @@ class participant_view extends \cenozo\ui\widget\base_view
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->address_list = NULL;
     }
@@ -64,7 +64,7 @@ class participant_view extends \cenozo\ui\widget\base_view
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->phone_list = NULL;
     }
@@ -76,7 +76,7 @@ class participant_view extends \cenozo\ui\widget\base_view
       $this->consent_list->set_parent( $this );
       $this->consent_list->set_heading( 'Consent information' );
     }
-    catch( exc\permission $e )
+    catch( \cenzo\exception\permission $e )
     {
       $this->consent_list = NULL;
     }
@@ -88,7 +88,7 @@ class participant_view extends \cenozo\ui\widget\base_view
       $this->alternate_list->set_parent( $this );
       $this->alternate_list->set_heading( 'Alternate contacts' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->alternate_list = NULL;
     }
@@ -105,13 +105,14 @@ class participant_view extends \cenozo\ui\widget\base_view
     parent::finish();
 
     // create enum arrays
-    $sources = db\participant::get_enum_values( 'source' );
+    $class_name = lib::get_class_name( 'database\participant' );
+    $sources = $class_name::get_enum_values( 'source' );
     $sources = array_combine( $sources, $sources );
-    $genders = db\participant::get_enum_values( 'gender' );
+    $genders = $class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
-    $languages = db\participant::get_enum_values( 'language' );
+    $languages = $class_name::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
-    $statuses = db\participant::get_enum_values( 'status' );
+    $statuses = $class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
 
     // set the view's items

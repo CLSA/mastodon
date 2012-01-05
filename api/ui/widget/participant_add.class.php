@@ -29,7 +29,8 @@ class participant_add extends \cenozo\ui\widget\base_view
   {
     parent::__construct( 'participant', 'add', $args );
 
-    $this->new_uid = db\participant::get_new_uid();
+    $class_name = lib::get_class_name( 'database\participant' );
+    $this->new_uid = $class_name::get_new_uid();
     
     // define all columns defining this record
     $this->add_item( 'active', 'boolean', 'Active' );
@@ -60,19 +61,21 @@ class participant_add extends \cenozo\ui\widget\base_view
     parent::finish();
     
     // create enum arrays
-    $genders = db\participant::get_enum_values( 'gender' );
+    $particpant_class_name = lib::get_class_name( 'database\participant' );
+    $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
-    $languages = db\participant::get_enum_values( 'language' );
+    $languages = $participant_class_name::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
-    $statuses = db\participant::get_enum_values( 'status' );
+    $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
-    $cohorts = db\participant::get_enum_values( 'cohort' );
+    $cohorts = $participant_class_name::get_enum_values( 'cohort' );
     $cohorts = array_combine( $cohorts, $cohorts );
-    $sources = db\participant::get_enum_values( 'source' );
+    $sources = $participant_class_name::get_enum_values( 'source' );
     $sources = array_combine( $sources, $sources );
     
     $sites = array();
-    foreach( db\site::select() as $db_site ) 
+    $site_class_name = lib::get_class_name( 'database\site' );
+    foreach( $site_class_name::select() as $db_site ) 
       $sites[$db_site->id] = sprintf( '%s (%s)', $db_site->name, $db_site->cohort );
 
     // set the view's items

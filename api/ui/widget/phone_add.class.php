@@ -61,7 +61,8 @@ class phone_add extends \cenozo\ui\widget\base_view
     $modifier->where( 'person_id', '=', $this->parent->get_record()->get_person()->id ); 
     $modifier->order( 'rank' );
     $addresses = array();
-    foreach( db\address::select( $modifier ) as $db_address )
+    $address_class_name = lib::get_class_name( 'database\address' );
+    foreach( $address_class_name::select( $modifier ) as $db_address )
     {
       $db_region = $db_address->get_region();
       $addresses[$db_address->id] = sprintf( '%d. %s, %s, %s',
@@ -77,7 +78,8 @@ class phone_add extends \cenozo\ui\widget\base_view
     end( $ranks );
     $last_rank_key = key( $ranks );
     reset( $ranks );
-    $types = db\phone::get_enum_values( 'type' );
+    $phone_class_name = lib::get_class_name( 'database\phone' );
+    $types = $phone_class_name::get_enum_values( 'type' );
     $types = array_combine( $types, $types );
 
     // set the view's items

@@ -48,8 +48,10 @@ class participant_import extends \mastodon\ui\widget
       'invalid_participant_count', $quexf_manager->get_invalid_participant_count() );
     $this->set_variable(
       'valid_participant_count', $quexf_manager->get_valid_participant_count() );
+    
+    $class_name = lib::get_class_name( 'database\participant' );
     $this->set_variable(
-      'pool_size', db\participant::get_uid_pool_count() );
+      'pool_size', $class_name::get_uid_pool_count() );
   }
 }
 ?>

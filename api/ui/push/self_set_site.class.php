@@ -39,7 +39,9 @@ class self_set_site extends \cenozo\ui\push\self_set_site
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $db_site = db\site::get_unique_record(
+
+      $class_name = lib::get_class_name( 'database\site' );  
+      $db_site = $class_name::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
 

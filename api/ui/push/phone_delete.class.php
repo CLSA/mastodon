@@ -37,9 +37,12 @@ class phone_delete extends \cenozo\ui\push\base_delete
           !array_key_exists( 'phone.rank', $noid ) )
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $db_phone = db\phone::get_unique_record(
+
+      $phone_class_name = lib::get_class_name( 'database\phone' );
+      $db_phone = $phone_class_name::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['phone.rank'] ) );
       if( !$db_phone ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );

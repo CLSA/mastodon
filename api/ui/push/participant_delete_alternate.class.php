@@ -47,7 +47,7 @@ class participant_delete_alternate extends \cenozo\ui\push\base_delete_record
     {
       $db_person->delete();
     }
-    catch( exc\database $e )
+    catch( \cenozo\exception\database $e )
     { // help describe exceptions to the user
       if( $e->is_constrained() )
       {
