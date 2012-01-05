@@ -5,3 +5,4 @@
 SOURCE operation.sql
 SOURCE role.sql
 SOURCE role_has_operation.sql
+SOURCE status.sql
