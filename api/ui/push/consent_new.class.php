@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: consent new
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Create a new consent.
  * @package mastodon\ui
  */
-class consent_new extends base_new
+class consent_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.
@@ -38,10 +35,11 @@ class consent_new extends base_new
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['participant_id'] = $db_participant->id;
     }
 
@@ -58,8 +56,7 @@ class consent_new extends base_new
     // make sure the date column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
-      throw new exc\notice( 'The date cannot be left blank.', __METHOD__ );
-
+      throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
     parent::finish();
   }
 }

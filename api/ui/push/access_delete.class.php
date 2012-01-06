@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: access delete
  * 
  * @package mastodon\ui
  */
-class access_delete extends base_delete
+class access_delete extends \cenozo\ui\push\access_delete
 {
   /**
    * Constructor.
@@ -40,19 +37,21 @@ class access_delete extends base_delete
           !array_key_exists( 'role.name', $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $access_mod = new db\modifier();
+      $access_mod = lib::create( 'database\modifier' );
       $access_mod->where( 'user.name', '=', $noid['user.name'] );
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
-      $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+
+      $class_name = lib::get_class_name( 'database\access' );
+      $db_access = current( $class_name::select( $access_mod ) );
+      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_access->id;
     }
 
-    parent::__construct( 'access', $args );
+    parent::__construct( $args );
   }
 }
 ?>

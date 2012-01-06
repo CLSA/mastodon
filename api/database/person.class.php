@@ -8,16 +8,14 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * A base class for all records which have a one-to-one relationship to `person`
  *
  * @package mastodon\database
  */
-class person extends has_note
+class person extends \cenozo\database\has_note
 {
   /**
    * Override get_address_list()
@@ -132,8 +130,8 @@ class person extends has_note
    */
   public function get_note_count( $modifier = NULL )
   {
-    $note_class_name = '\\mastodon\\database\\person_note';
-    if ( is_null( $modifier ) ) $modifier = new modifier();
+    $note_class_name = lib::get_class_name( 'database\person_note' );
+    if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'person_id', '=', $this->id );
     return $note_class_name::count( $modifier );
   }
@@ -147,8 +145,8 @@ class person extends has_note
    */
   public function get_note_list( $modifier = NULL )
   {
-    $note_class_name = '\\mastodon\\database\\person_note';
-    if ( is_null( $modifier ) ) $modifier = new modifier();
+    $note_class_name = lib::get_class_name( 'database\person_note' );
+    if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'person_id', '=', $this->id );
     $modifier->order( 'sticky', true );
     $modifier->order( 'datetime' );
@@ -165,8 +163,7 @@ class person extends has_note
   public function add_note( $user, $note )
   {
     $date_obj = util::get_datetime_object();
-    $note_class_name = '\\mastodon\\database\\person_note';
-    $db_note = new $note_class_name();
+    $db_note = lib::create( 'database\person_note' );
     $db_note->user_id = $user->id;
     $db_note->person_id = $this->id;
     $db_note->datetime = $date_obj->format( 'Y-m-d H:i:s' );
@@ -184,7 +181,7 @@ class person extends has_note
    */
   public static function get_note( $id = NULL )
   {
-    return new person_note( $id );
+    return lib::create( 'database\person_note', $id );
   }
 }
 ?>

@@ -8,16 +8,14 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * address: record
  *
  * @package mastodon\database
  */
-class address extends has_rank
+class address extends \cenozo\database\has_rank
 {
   /**
    * Determines the difference in hours between the user's timezone and the address's timezone

@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: address edit
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Edit a address.
  * @package mastodon\ui
  */
-class address_edit extends base_edit
+class address_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.
@@ -39,20 +36,24 @@ class address_edit extends base_edit
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) ||
           !array_key_exists( 'address.rank', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
-      $db_address = db\address::get_unique_record(
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+
+      $address_class_name = lib::get_class_name( 'database\address' );
+      $db_address = $address_class_name::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['address.rank'] ) );
-      if( !$db_address ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_address ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_address->id;
 
       if( array_key_exists( 'region.abbreviation', $noid ) )
       {
-        $db_region = db\region::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
-        if( !$db_region ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+        $region_class_name = lib::get_class_name( 'database\region' );
+        $db_region = $region_class_name::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
+        if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
         $args['columns']['region_id'] = $db_region->id;
       }
     }
@@ -76,7 +77,7 @@ class address_edit extends base_edit
       $postcode = $columns['postcode'];
       if( !preg_match( '/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/', $postcode ) && // postal code
           !preg_match( '/^[0-9]{5}$/', $postcode ) )  // zip code
-        throw new exc\notice(
+        throw lib::create( 'exception\notice',
           'Postal codes must be in "A1A 1A1" format, zip codes in "01234" format.', __METHOD__ );
     }
 

@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\pull;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: alternate primary
  * 
  * @package mastodon\ui
  */
-class alternate_primary extends base_primary
+class alternate_primary extends \cenozo\ui\pull\base_primary
 {
   /**
    * Constructor

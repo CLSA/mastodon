@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant import
@@ -39,7 +36,7 @@ class participant_import extends \mastodon\ui\push
    */
   public function finish()
   {
-    $quexf_manager = new bus\quexf_manager();
+    $quexf_manager = lib::create( 'business\quexf_manager' );
     $quexf_manager->import();
   }
 }

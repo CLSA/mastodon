@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\pull;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: consent primary
  * 
  * @package mastodon\ui
  */
-class consent_primary extends base_primary
+class consent_primary extends \cenozo\ui\pull\base_primary
 {
   /**
    * Constructor

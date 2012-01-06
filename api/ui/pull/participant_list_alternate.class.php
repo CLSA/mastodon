@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\pull;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: participant list alternate
  * 
  * @package mastodon\ui
  */
-class participant_list_alternate extends base_list_record
+class participant_list_alternate extends \cenozo\ui\pull\base_list_record
 {
   /**
    * Constructor
@@ -32,10 +29,11 @@ class participant_list_alternate extends base_list_record
     // if the uid is provided instead of the id then fetch the participant id based on the uid
     if( isset( $args['uid'] ) )
     {
-      $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $args['uid'] );
 
       if( is_null( $db_participant ) )
-        throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+        throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
       $args['id'] = $db_participant->id;
     }
 

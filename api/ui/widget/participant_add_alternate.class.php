@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget participant add_alternate
  * 
  * @package mastodon\ui
  */
-class participant_add_alternate extends base_add_record
+class participant_add_alternate extends \cenozo\ui\widget\base_add_record
 {
   /**
    * Constructor

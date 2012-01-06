@@ -8,9 +8,7 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * participant: record
@@ -33,14 +31,16 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
+    
+    $database_class_name = lib::get_class_name( 'database\database' );
 
     // need custom SQL
     $consent_id = static::db()->get_one(
       sprintf( 'SELECT consent_id '.
                'FROM participant_last_consent '.
                'WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $consent_id ? new consent( $consent_id ) : NULL;
+               $database_class_name::format_string( $this->id ) ) );
+    return $consent_id ? lib::create( 'database\consent', $consent_id ) : NULL;
   }
 
   /**
@@ -58,11 +58,13 @@ class participant extends person
       return NULL;
     }
     
+    $database_class_name = lib::get_class_name( 'database\database' );
+    
     // need custom SQL
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_primary_address WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
+               $database_class_name::format_string( $this->id ) ) );
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**
@@ -81,12 +83,14 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
-    
+
+    $database_class_name = lib::get_class_name( 'database\database' );
+
     // need custom SQL
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_first_address WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
+               $database_class_name::format_string( $this->id ) ) );
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**
@@ -103,11 +107,13 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
-    
+   
+    $database_class_name = lib::get_class_name( 'database\database' );
+
     // need custom SQL
     $sql = ' SELECT access, code IS NULL AS missing'.
            ' FROM hin'.
-           ' WHERE uid = '.database::format_string( $this->uid );
+           ' WHERE uid = '.$database_class_name::format_string( $this->uid );
 
     return static::db()->get_row( $sql );
   }

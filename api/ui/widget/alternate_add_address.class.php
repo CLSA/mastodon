@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget alternate add_address
  * 
  * @package mastodon\ui
  */
-class alternate_add_address extends base_add_record
+class alternate_add_address extends \cenozo\ui\widget\base_add_record
 {
   /**
    * Constructor

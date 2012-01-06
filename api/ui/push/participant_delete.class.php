@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant delete
  * 
  * @package mastodon\ui
  */
-class participant_delete extends base_delete
+class participant_delete extends \cenozo\ui\push\base_delete
 {
   /**
    * Constructor.

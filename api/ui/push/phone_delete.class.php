@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: phone delete
  * 
  * @package mastodon\ui
  */
-class phone_delete extends base_delete
+class phone_delete extends \cenozo\ui\push\base_delete
 {
   /**
    * Constructor.
@@ -38,14 +35,17 @@ class phone_delete extends base_delete
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) ||
           !array_key_exists( 'phone.rank', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
-      $db_phone = db\phone::get_unique_record(
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+
+      $phone_class_name = lib::get_class_name( 'database\phone' );
+      $db_phone = $phone_class_name::get_unique_record(
         array( 'person_id', 'rank' ),
         array( $db_participant->person_id, $noid['phone.rank'] ) );
-      if( !$db_phone ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      if( !$db_phone ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_phone->id;
     }
 

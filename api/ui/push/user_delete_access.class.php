@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: user delete_access
  * 
  * @package mastodon\ui
  */
-class user_delete_access extends base_delete_record
+class user_delete_access extends \cenozo\ui\push\user_delete_access
 {
   /**
    * Constructor.
@@ -40,24 +37,27 @@ class user_delete_access extends base_delete_record
           !array_key_exists( 'role.name', $noid ) ||
           !array_key_exists( 'site.name', $noid ) ||
           !array_key_exists( 'site.cohort', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_user = db\user::get_unique_record( 'name', $noid['user.name'] );
-      if( !$db_user ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $user_class_name = lib::get_class_name( 'database\user' );
+      $db_user = $user_class_name::get_unique_record( 'name', $noid['user.name'] );
+      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_user->id;
 
       // replace the arguments role, site and cohort with an access id
-      $access_mod = new db\modifier();
+      $access_mod = lib::create( 'database\modifier' );
       $access_mod->where( 'user_id', '=', $db_user->id );
       $access_mod->where( 'role.name', '=', $noid['role.name'] );
       $access_mod->where( 'site.name', '=', $noid['site.name'] );
       $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
-      $db_access = current( db\access::select( $access_mod ) );
-      if( !$db_access ) throw exc\argument( 'noid', $noid, __METHOD__ );
+
+      $access_class_name = lib::get_class_name( 'database\access' );
+      $db_access = current( $access_class_name::select( $access_mod ) );
+      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['remove_id'] = $db_access->id;
     }
 
-    parent::__construct( 'user', 'access', $args );
+    parent::__construct( $args );
   }
 }
 ?>
