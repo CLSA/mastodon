@@ -44,7 +44,7 @@ class user_new extends \cenozo\ui\push\user_new
       if( !$db_role ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $this->role_id = $db_role->id;
 
-      $site_class_name = lib::get_class_name( 'database\participant' );
+      $site_class_name = lib::get_class_name( 'database\site' );
       $db_site = $site_class_name::get_unique_record(
         array( 'name', 'cohort' ),
         array( $noid['site.name'], $noid['site.cohort'] ) );
