@@ -62,6 +62,11 @@ class participant_primary extends \cenozo\ui\pull\base_primary
     if( $cohort && $cohort != $this->get_record()->cohort )
       throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
 
+    // convert source_id to source (name)
+    $data['source_name'] = is_null( $data['source_id'] )
+                         ? NULL
+                         : $this->get_record()->get_source()->name;
+
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
     {

@@ -34,7 +34,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'uid', 'constant', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
-    $this->add_item( 'source', 'enum', 'Source' );
+    $this->add_item( 'source_id', 'enum', 'Source' );
     $this->add_item( 'cohort', 'constant', 'Cohort' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
@@ -105,14 +105,17 @@ class participant_view extends \cenozo\ui\widget\base_view
     parent::finish();
 
     // create enum arrays
-    $class_name = lib::get_class_name( 'database\participant' );
-    $sources = $class_name::get_enum_values( 'source' );
-    $sources = array_combine( $sources, $sources );
-    $genders = $class_name::get_enum_values( 'gender' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $source_class_name = lib::get_class_name( 'database\source' );
+
+    $sources = array();
+    foreach( $source_class_name::select() as $db_source )
+      $sources[$db_source->id] = $db_source->name;
+    $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
-    $languages = $class_name::get_enum_values( 'language' );
+    $languages = $participant_class_name::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
-    $statuses = $class_name::get_enum_values( 'status' );
+    $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
 
     // set the view's items
@@ -120,7 +123,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'uid', $this->get_record()->uid, true );
     $this->set_item( 'first_name', $this->get_record()->first_name );
     $this->set_item( 'last_name', $this->get_record()->last_name );
-    $this->set_item( 'source', $this->get_record()->source, true, $sources );
+    $this->set_item( 'source_id', $this->get_record()->source_id, false, $sources );
     $this->set_item( 'cohort', $this->get_record()->cohort );
     $this->set_item( 'gender', $this->get_record()->gender, true, $genders );
     $this->set_item( 'date_of_birth', $this->get_record()->date_of_birth );
