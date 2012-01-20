@@ -14,7 +14,7 @@ CREATE PROCEDURE patch_activity()
       AND COLUMN_NAME = "error_code" );
      IF @test = 0 THEN
        ALTER TABLE activity
-       ADD COLUMN error_code VARCHAR(20) NOT NULL DEFAULT '(incomplete)' AFTER elapsed;
+       ADD COLUMN error_code VARCHAR(20) NULL DEFAULT '(incomplete)' COMMENT 'NULL if no error occurred.';
      END IF;
   END //
 DELIMITER ;

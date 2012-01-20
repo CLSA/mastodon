@@ -301,7 +301,7 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('consent to contact received') NULL ,
+  `event` ENUM('consent to contact received') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   CONSTRAINT `fk_status_participant`
