@@ -60,6 +60,8 @@ INSERT INTO access ( user_id, role_id, site_id )
 SELECT user.id AS user_id, role.id AS role_id, site.id AS site_id
 FROM user, role, site;
 
+INSERT INTO source( name ) VALUES ( "statscan" ), ( "ministry" ), ( "rdd" );
+
 LOAD DATA LOCAL INFILE "./persons.csv"
 INTO TABLE person
 FIELDS TERMINATED BY "," ENCLOSED BY '"';
