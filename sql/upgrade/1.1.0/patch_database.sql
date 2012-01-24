@@ -2,6 +2,7 @@
 -- Patch to upgrade database to version 1.1.0
 --
 
+SOURCE availability.sql
 SOURCE source.sql
 SOURCE activity.sql
 SOURCE operation.sql

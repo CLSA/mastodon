@@ -1,6 +1,6 @@
 <?php
 /**
- * self_menu.class.php
+ * participant_add_availability.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -11,31 +11,24 @@ namespace mastodon\ui\widget;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * widget self menu
+ * widget participant add_availability
  * 
  * @package mastodon\ui
  */
-class self_menu extends \cenozo\ui\widget\self_menu
+class participant_add_availability extends \cenozo\ui\widget\base_add_record
 {
   /**
    * Constructor
    * 
    * Defines all variables which need to be set for the associated template.
    * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $name The name of the availability.
    * @param array $args An associative array of arguments to be processed by the widget
    * @access public
    */
   public function __construct( $args )
   {
-    parent::__construct( $args );
-
-    $exclude = array(
-      'address',
-      'alternate',
-      'availability',
-      'consent',
-      'phone' );
-    $this->exclude_widget_list = array_merge( $this->exclude_widget_list, $exclude );
+    parent::__construct( 'participant', 'availability', $args );
   }
 }
 ?>

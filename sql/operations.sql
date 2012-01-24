@@ -43,6 +43,22 @@ VALUES( "push", "alternate", "delete_phone", true, "Remove an alternate contact 
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "alternate", "primary", true, "Retrieves base alternate contact person information." );
 
+-- availability
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "availability", "delete", true, "Removes a participant's availability entry from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "availability", "edit", true, "Edits the details of a participant's availability entry." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "availability", "new", true, "Creates new availability entry for a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "availability", "add", true, "View a form for creating new availability entry for a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "availability", "view", true, "View the details of a participant's particular availability entry." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "availability", "list", true, "Lists a participant's availability entries." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "availability", "primary", true, "Retrieves base availability information." );
+
 -- consent
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent", "delete", true, "Removes a participant's consent entry from the system." );
@@ -72,6 +88,10 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "view", true, "View a participant's details." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "list", true, "List participants in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "add_availability", true, "A form to create a new availability entry to add to a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "participant", "delete_availability", true, "Remove a participant's availability entry." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_consent", true, "A form to create a new consent entry to add to a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )

@@ -71,6 +71,18 @@ class participant_view extends \cenozo\ui\widget\base_view
 
     try
     {
+      // create the availability sub-list widget
+      $this->availability_list = lib::create( 'ui\widget\availability_list', $args );
+      $this->availability_list->set_parent( $this );
+      $this->availability_list->set_heading( 'Availability' );
+    }
+    catch( \cenozo\exception\permission $e )
+    {
+      $this->availability_list = NULL;
+    }
+
+    try
+    {
       // create the consent sub-list widget
       $this->consent_list = lib::create( 'ui\widget\consent_list', $args );
       $this->consent_list->set_parent( $this );
@@ -148,6 +160,12 @@ class participant_view extends \cenozo\ui\widget\base_view
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
 
+    if( !is_null( $this->availability_list ) )
+    {
+      $this->availability_list->finish();
+      $this->set_variable( 'availability_list', $this->availability_list->get_variables() );
+    }
+
     if( !is_null( $this->consent_list ) )
     {
       $this->consent_list->finish();
@@ -174,6 +192,13 @@ class participant_view extends \cenozo\ui\widget\base_view
    * @access protected
    */
   protected $phone_list = NULL;
+  
+  /**
+   * The availability list widget.
+   * @var availability_list
+   * @access protected
+   */
+  protected $availability_list = NULL;
   
   /**
    * The consent list widget.
