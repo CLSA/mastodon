@@ -34,21 +34,31 @@ final class session extends \cenozo\business\session
     if( $this->is_initialized() ) return;
 
     parent::initialize();
+  }
 
-    $setting_manager = lib::create( 'business\setting_manager' );
-    // create audit database, if necessary
-    if( $setting_manager->get_setting( 'audit_db', 'enabled' ) )
+  /**
+   * Get the quexf database.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database
+   * @access public
+   */
+  public function get_quexf_database()
+  {
+    // create the database if it doesn't exist yet
+    if( is_null( $this->quexf_database ) )
     {
-      // If not set then the audit database settings use the same as the standard db,
-      // with the exception of the prefix
-      $this->audit_database = lib::create( 'database\database',
-        $setting_manager->get_setting( 'audit_db', 'driver' ),
-        $setting_manager->get_setting( 'audit_db', 'server' ),
-        $setting_manager->get_setting( 'audit_db', 'username' ),
-        $setting_manager->get_setting( 'audit_db', 'password' ),
-        $setting_manager->get_setting( 'audit_db', 'database' ),
-        $setting_manager->get_setting( 'audit_db', 'prefix' ) );
+      $setting_manager = lib::create( 'business\setting_manager' );
+      $this->quexf_database = lib::create( 'database\database',
+        $setting_manager->get_setting( 'quexf_db', 'driver' ),
+        $setting_manager->get_setting( 'quexf_db', 'server' ),
+        $setting_manager->get_setting( 'quexf_db', 'username' ),
+        $setting_manager->get_setting( 'quexf_db', 'password' ),
+        $setting_manager->get_setting( 'quexf_db', 'database' ),
+        $setting_manager->get_setting( 'quexf_db', 'prefix' ) );
     }
+
+    return $this->quexf_database;
   }
 
   /**
@@ -60,8 +70,31 @@ final class session extends \cenozo\business\session
    */
   public function get_audit_database()
   {
+    // create the database if it doesn't exist yet
+    if( is_null( $this->audit_database ) )
+    {
+      $setting_manager = lib::create( 'business\setting_manager' );
+      if( $setting_manager->get_setting( 'audit_db', 'enabled' ) )
+      {
+        $this->audit_database = lib::create( 'database\database',
+          $setting_manager->get_setting( 'audit_db', 'driver' ),
+          $setting_manager->get_setting( 'audit_db', 'server' ),
+          $setting_manager->get_setting( 'audit_db', 'username' ),
+          $setting_manager->get_setting( 'audit_db', 'password' ),
+          $setting_manager->get_setting( 'audit_db', 'database' ),
+          $setting_manager->get_setting( 'audit_db', 'prefix' ) );
+      }
+    }
+
     return $this->audit_database;
   }
+
+  /**
+   * The quexf database object.
+   * @var database
+   * @access private
+   */
+  private $quexf_database = NULL;
 
   /**
    * The audit database object.

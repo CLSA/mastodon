@@ -63,6 +63,9 @@ class participant_list extends \cenozo\ui\widget\base_list
     }
 
     $this->finish_setting_rows();
+
+    $quexf_manager = lib::create( 'business\quexf_manager', QUEXF_CONTACT_PATH );
+    $this->set_variable( 'import', $quexf_manager->is_enabled() );
   }
 }
 ?>

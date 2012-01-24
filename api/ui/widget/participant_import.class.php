@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class participant_import extends \mastodon\ui\widget
+class participant_import extends \cenozo\ui\widget
 {
   /**
    * Constructor
@@ -40,7 +40,7 @@ class participant_import extends \mastodon\ui\widget
   {
     parent::finish();
 
-    $quexf_manager = lib::create( 'business\quexf_manager' );
+    $quexf_manager = lib::create( 'business\quexf_manager', QUEXF_PATH );
 
     $this->set_variable(
       'participant_count', $quexf_manager->get_participant_count() );

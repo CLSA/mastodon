@@ -38,6 +38,27 @@ class setting_manager extends \cenozo\business\setting_manager
 
     $this->static_settings['audit_db'] = $static_settings['audit_db'];
 
+    // get the survey database settings from the quexf config file
+    if( !is_null( QUEXF_PATH ) )
+    {   
+      $file = QUEXF_PATH.'/config_vars.php';
+      if( !file_exists( $file ) )
+        throw lib::create( 'exception\runtime',
+          'Cannot find quexf config_vars.php file.', __METHOD__ );
+
+      include $file;
+      $this->static_settings['quexf'] =
+        array( 'processed_contact_path' => $m_processed_contact_path,
+               'processed_consent_path' => $m_processed_consent_path );
+      $this->static_settings['quexf_db'] =
+        array( 'driver' => 'mysqlt',
+               'server' => $db_host,
+               'username' => $db_user,
+               'password' => $db_pass,
+               'database' => $db_name,
+               'prefix' => '' );
+    }
+
     // have the audit settings mirror the main database, if necessary
     foreach( $this->static_settings['audit_db'] as $key => $value )
     {
