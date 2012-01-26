@@ -37,7 +37,7 @@ class participant_import extends \cenozo\ui\push
   public function finish()
   {
     $quexf_manager = lib::create( 'business\quexf_manager', QUEXF_PATH );
-    $quexf_manager->import();
+    $quexf_manager->import_contact_data();
   }
 }
 ?>
