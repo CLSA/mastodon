@@ -255,6 +255,13 @@ SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "alternate" AND name = "delete_phone" );
 
+-- ALL reports
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id
+FROM role, operation
+WHERE role.name = "administrator"
+AND operation.name = "report";
+
 
 -- -----------------------------------------------------
 -- -----------------------------------------------------

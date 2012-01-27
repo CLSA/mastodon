@@ -137,4 +137,10 @@ VALUES( "widget", "phone", "list", true, "Lists a participant's phone entries." 
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "phone", "primary", true, "Retrieves base phone information." );
 
+-- reports
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
+
 COMMIT;

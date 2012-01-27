@@ -25,3 +25,9 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_availability", true, "A form to create a new availability entry to add to a participant." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete_availability", true, "Remove a participant's availability entry." );
+
+-- reports
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
