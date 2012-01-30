@@ -11,21 +11,25 @@
 
 {% block javascript %}
   {{ parent() }}
-  <script type="text/javascript">
-    $( function() {
-      $( "#{{ widget.full }}_import" ).click( function() {
-        slot_load( {{ slot }}, "participant", "import" );
+  {% if import %}
+    <script type="text/javascript">
+      $( function() {
+        $( "#{{ widget.full }}_import" ).click( function() {
+          slot_load( {{ slot }}, "participant", "import" );
+        } );
       } );
-    } );
-  </script>
+    </script>
+  {% endif %}
 {% endblock javascript %}
 
 {% block widget %}
-  <div style="padding-top: 4px; padding-bottom: 4px;">
-    <span class="spacer">
-      <button id="{{ widget.full }}_import">Import Participants</button>
-    </span>
-  </div>
+  {% if import %}
+    <div style="padding-top: 4px; padding-bottom: 4px;">
+      <span class="spacer">
+        <button id="{{ widget.full }}_import">Import Participants</button>
+      </span>
+    </div>
+  {% endif %}
   {{ parent() }}
 {% endblock widget %}
 

@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Syncs participant information between Sabretooth and Mastodon
  * @package mastodon\ui
  */
-class participant_import extends \mastodon\ui\push
+class participant_import extends \cenozo\ui\push
 {
   /**
    * Constructor.
@@ -36,8 +36,8 @@ class participant_import extends \mastodon\ui\push
    */
   public function finish()
   {
-    $quexf_manager = lib::create( 'business\quexf_manager' );
-    $quexf_manager->import();
+    $quexf_manager = lib::create( 'business\quexf_manager', QUEXF_PATH );
+    $quexf_manager->import_contact_data();
   }
 }
 ?>

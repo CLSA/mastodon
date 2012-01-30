@@ -67,5 +67,18 @@ class user_new_access extends \cenozo\ui\push\user_new_access
 
     parent::__construct( $args );
   }
+
+  /**
+   * Executes the push.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function finish()
+  {
+    foreach( $this->get_argument( 'role_id_list' ) as $role_id )
+    {
+      $this->get_record()->add_access( $this->get_argument( 'site_id_list' ), $role_id );
+    }
+  }
 }
 ?>

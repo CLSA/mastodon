@@ -19,6 +19,15 @@ $SETTINGS['general']['development_mode'] = false;
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
+// the location of QUEXF for participant contact and consent updates
+$SETTINGS['path']['QUEXF'] = NULL;
+
+// the location to store processed contact form PDF files
+$SETTINGS['path']['CONTACT_FORM'] = '/var/local/sabretooth/contact';
+
+// the location to store processed consent form PDF files
+$SETTINGS['path']['CONSENT_FORM'] = '/var/local/sabretooth/consent';
+
 // database settings
 $SETTINGS['db']['driver'] = 'mysql';
 $SETTINGS['db']['server'] = 'localhost';

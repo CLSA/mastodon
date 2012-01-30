@@ -37,7 +37,7 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->add_item( 'uid', is_null( $this->new_uid ) ? 'string' : 'hidden', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
-    $this->add_item( 'source', 'enum', 'Source' );
+    $this->add_item( 'source_id', 'enum', 'Source' );
     $this->add_item( 'cohort', 'enum', 'Cohort' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
@@ -62,6 +62,11 @@ class participant_add extends \cenozo\ui\widget\base_view
     
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $source_class_name = lib::get_class_name( 'database\source' );
+
+    $sources = array();
+    foreach( $source_class_name::select() as $db_source )
+      $sources[$db_source->id] = $db_source->name;
     $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
     $languages = $participant_class_name::get_enum_values( 'language' );
@@ -83,7 +88,7 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'uid', is_null( $this->new_uid ) ? '' : $this->new_uid, true );
     $this->set_item( 'first_name', '', true );
     $this->set_item( 'last_name', '', true );
-    $this->set_item( 'source', key( $sources ), true, $sources );
+    $this->set_item( 'source_id', key( $sources ), false, $sources );
     $this->set_item( 'cohort', key( $cohorts ), true, $cohorts );
     $this->set_item( 'gender', key( $genders ), true, $genders );
     $this->set_item( 'date_of_birth', '' );

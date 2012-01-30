@@ -119,6 +119,80 @@ class participant extends person
   }
 
   /**
+   * Get a list of all participants who have or do not have a particular event.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return array( database\participant )
+   * @param string $event One of status.event enum types.
+   * @param boolean $missing Set to false to return participants with the event, true for those
+   *                without it.
+   * @param modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
+  public static function select_for_event(
+    $event, $missing = false, $modifier = NULL, $count = false )
+  {
+    $database_class_name = lib::get_class_name( 'database\database' );
+
+    // we need to build custom sql for this query
+    $sql = sprintf(
+      'SELECT DISTINCT participant.id '.
+      'FROM participant, status '.
+      'WHERE participant.id = status.participant_id '.
+      'AND status.event = %s ',
+      $database_class_name::format_string( $event ) );
+
+    if( $missing )
+    {
+      // determine the inverse (missing events) by using a sub-select
+      $sql = sprintf(
+        ( $count ? 'SELECT COUNT(*) ' : 'SELECT id ' ).
+        'FROM participant '.
+        'WHERE id NOT IN ( %s ) ',
+        $sql );
+    }
+    else
+    {
+      // add in the COUNT function if we are counting
+      if( $count ) preg_replace( '/DISTINCT id/', 'COUNT( DISTINCT id )', $sql );
+    }
+
+    // add in the modifier if it exists
+    if( !is_null( $modifier ) ) $sql .= $modifier->get_sql( true );
+
+    if( $count )
+    {
+      return intval( static::db()->get_one( $sql ) );
+    }
+    else
+    {
+      $id_list = static::db()->get_col( $sql );
+      $records = array();
+      foreach( $id_list as $id ) $records[] = new static( $id );
+      return $records;
+    }
+  }
+
+  /**
+   * Count all participants who have or do not have a particular event.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $event One of status.event enum types.
+   * @param boolean $missing Set to false to return participants with the event, true for those
+   *                without it.
+   * @param modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
+  public static function count_for_event( $event, $missing = false, $modifier = NULL )
+  {
+    return static::select_for_event( $event, $missing, $modifier, true );
+  }
+
+  /**
    * Get a random UID from the pool of unassigned UIDs.  If the pool is empty this returns NULL.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return string

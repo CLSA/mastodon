@@ -17,6 +17,21 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `source`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `source` ;
+
+CREATE  TABLE IF NOT EXISTS `source` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `participant`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `participant` ;
@@ -28,7 +43,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `person_id` INT UNSIGNED NOT NULL ,
   `active` TINYINT(1)  NOT NULL DEFAULT true ,
   `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
-  `source` ENUM('statscan','ministry','rdd') NOT NULL ,
+  `source_id` INT UNSIGNED NULL DEFAULT NULL ,
   `cohort` ENUM('comprehensive','tracking') NOT NULL ,
   `first_name` VARCHAR(45) NOT NULL ,
   `last_name` VARCHAR(45) NOT NULL ,
@@ -47,9 +62,15 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   UNIQUE INDEX `uq_uid` (`uid` ASC) ,
   INDEX `dk_uid` (`uid` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
-  CONSTRAINT `fk_participant_person`
+  INDEX `fk_source_id` (`source_id` ASC) ,
+  CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_source_id`
+    FOREIGN KEY (`source_id` )
+    REFERENCES `source` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -280,9 +301,10 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('TBD') NULL ,
+  `event` ENUM('consent to contact received','package mailed') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_event` (`event` ASC) ,
   CONSTRAINT `fk_status_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
@@ -336,6 +358,35 @@ CREATE  TABLE IF NOT EXISTS `unique_identifier_pool` (
   `uid` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `uid_UNIQUE` (`uid` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `availability`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `availability` ;
+
+CREATE  TABLE IF NOT EXISTS `availability` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `monday` TINYINT(1) NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1) NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1) NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1) NOT NULL DEFAULT false ,
+  `friday` TINYINT(1) NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1) NOT NULL DEFAULT false ,
+  `sunday` TINYINT(1) NOT NULL DEFAULT false ,
+  `start_time` TIME NOT NULL ,
+  `end_time` TIME NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  CONSTRAINT `fk_availability_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -477,7 +528,9 @@ WHERE person_first_address.person_id = alternate.person_id;
 DELIMITER $$
 
 DROP TRIGGER IF EXISTS `remove_uid_from_pool` $$
-  CREATE TRIGGER remove_uid_from_pool BEFORE
+
+
+CREATE TRIGGER remove_uid_from_pool BEFORE
   INSERT ON participant
   FOR EACH ROW BEGIN
     DELETE FROM unique_identifier_pool WHERE uid = new.uid;
