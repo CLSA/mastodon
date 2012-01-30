@@ -23,10 +23,10 @@ $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 $SETTINGS['path']['QUEXF'] = NULL;
 
 // the location to store processed contact form PDF files
-$SETTINGS['path']['CONTACT_FORM'] = '/var/local/sabretooth/contact';
+$SETTINGS['path']['CONTACT_FORM'] = '/var/local/mastodon/contact';
 
 // the location to store processed consent form PDF files
-$SETTINGS['path']['CONSENT_FORM'] = '/var/local/sabretooth/consent';
+$SETTINGS['path']['CONSENT_FORM'] = '/var/local/mastodon/consent';
 
 // database settings
 $SETTINGS['db']['driver'] = 'mysql';

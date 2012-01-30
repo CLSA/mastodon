@@ -26,6 +26,12 @@ VALUES( "widget", "participant", "add_availability", true, "A form to create a n
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete_availability", true, "Remove a participant's availability entry." );
 
+-- download forms
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "contact_form", "download", true, "Downloads a participant's scanned contact form." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "consent_form", "download", true, "Downloads a participant's scanned consent form." );
+
 -- reports
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );

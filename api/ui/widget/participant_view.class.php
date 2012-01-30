@@ -148,6 +148,11 @@ class participant_view extends \cenozo\ui\widget\base_view
 
     $this->finish_setting_items();
 
+    $this->set_variable(
+      'contact_form_available', is_file( $this->get_record()->get_contact_form_file_name() ) );
+    $this->set_variable(
+      'consent_form_available', is_file( $this->get_record()->get_consent_form_file_name() ) );
+
     if( !is_null( $this->address_list ) )
     {
       $this->address_list->finish();
