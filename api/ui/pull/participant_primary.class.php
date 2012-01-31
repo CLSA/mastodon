@@ -132,12 +132,12 @@ class participant_primary extends \cenozo\ui\pull\base_primary
       
       if( count( $hin_info ) )
       {
-        $data['hin_access'] = $hin_info['access'];
-        $data['hin_missing'] = !$hin_info['missing'];
+        $data['hin_access'] = $hin_info['access'] ? 1 : 0;
+        $data['hin_missing'] = $hin_info['missing'];
       }
       else
       {
-        $data['hin_access'] = false;
+        $data['hin_access'] = -1; // -1 means there is no access information
         $data['hin_missing'] = true;
       }
     }
