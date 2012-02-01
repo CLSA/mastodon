@@ -13,9 +13,9 @@ CREATE PROCEDURE patch_status()
         AND TABLE_NAME = "status"
         AND COLUMN_NAME = "event"
         AND COLUMN_KEY = "" );
-     IF @test = 1 THEN
-       ALTER TABLE status ADD INDEX dk_event (event ASC);
-     END IF;
+    IF @test = 1 THEN
+      ALTER TABLE status ADD INDEX dk_event (event ASC);
+    END IF;
   END //
 DELIMITER ;
 
