@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS `availability` (
   `end_time` TIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_start_time` (`start_time` ASC) ,
+  INDEX `dk_end_time` (`end_time` ASC) ,
   CONSTRAINT `fk_availability_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )

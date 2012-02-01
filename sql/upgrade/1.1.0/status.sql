@@ -1,6 +1,8 @@
--- add the new event key to status
+-- add the new event and datetime keys to status
 -- we need to create a procedure which only alters the status table if the
--- event key is missing
+-- event or datetime keys are missing
+-- NOTE: information_schema doesn't seem to like TABLE_NAME = "status", so
+--       TABLE_NAME LIKE "status" is used instead
 DROP PROCEDURE IF EXISTS patch_status;
 DELIMITER //
 CREATE PROCEDURE patch_status()
@@ -10,11 +12,21 @@ CREATE PROCEDURE patch_status()
       ( SELECT COUNT(*)
         FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
-        AND TABLE_NAME = "status"
+        AND TABLE_NAME LIKE "status"
         AND COLUMN_NAME = "event"
         AND COLUMN_KEY = "" );
     IF @test = 1 THEN
       ALTER TABLE status ADD INDEX dk_event (event ASC);
+    END IF;
+    SET @test =
+      ( SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+        AND TABLE_NAME LIKE "status"
+        AND COLUMN_NAME = "datetime"
+        AND COLUMN_KEY = "" );
+    IF @test = 1 THEN
+      ALTER TABLE status ADD INDEX dk_datetime (datetime ASC);
     END IF;
   END //
 DELIMITER ;

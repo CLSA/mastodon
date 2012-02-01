@@ -108,6 +108,8 @@ CREATE  TABLE IF NOT EXISTS `consent` (
   `note` TEXT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_event` (`event` ASC) ,
+  INDEX `dk_date` (`date` ASC) ,
   CONSTRAINT `fk_consent_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
@@ -133,6 +135,7 @@ CREATE  TABLE IF NOT EXISTS `person_note` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
+  INDEX `dk_sticky_datetime` (`sticky` ASC, `datetime` ASC) ,
   CONSTRAINT `fk_participant_note_person`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
@@ -205,6 +208,8 @@ CREATE  TABLE IF NOT EXISTS `address` (
   INDEX `fk_region_id` (`region_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
   UNIQUE INDEX `uq_person_id_rank` (`person_id` ASC, `rank` ASC) ,
+  INDEX `dk_city` (`city` ASC) ,
+  INDEX `dk_postcode` (`postcode` ASC) ,
   CONSTRAINT `fk_address_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
@@ -305,6 +310,7 @@ CREATE  TABLE IF NOT EXISTS `status` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `dk_event` (`event` ASC) ,
+  INDEX `dk_datetime` (`datetime` ASC) ,
   CONSTRAINT `fk_status_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
@@ -382,6 +388,8 @@ CREATE  TABLE IF NOT EXISTS `availability` (
   `end_time` TIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_start_time` (`start_time` ASC) ,
+  INDEX `dk_end_time` (`end_time` ASC) ,
   CONSTRAINT `fk_availability_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
