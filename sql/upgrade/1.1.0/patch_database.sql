@@ -15,3 +15,4 @@ SOURCE unique_identifier_pool.sql
 SOURCE participant.sql
 SOURCE status.sql
 SOURCE user.sql
+SOURCE system_message.sql
