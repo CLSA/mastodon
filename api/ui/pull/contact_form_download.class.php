@@ -31,7 +31,7 @@ class contact_form_download extends \cenozo\ui\pull\base_download
     // determine the file to upload to the user
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $db_participant = lib::create( 'database\participant', $this->get_argument( 'id' ) );
-    $this->set_file_name( $db_participant->get_consent_form_file_name() );
+    $this->set_file_name( $db_participant->get_contact_form_file_name() );
   }
 }
 ?>
