@@ -239,7 +239,8 @@ class quexf_manager extends \cenozo\singleton
 
       // create entries into the phone table
       $rank = 1;
-      if( !is_null( $db_quexf_person->home_phone ) )
+      if( !is_null( $db_quexf_person->home_phone ) &&
+          preg_match( '/[0-9]{3}-[0-9]{3}-[0-9]{4}/', $db_quexf_person->home_phone ) )
       {
         $db_home_phone = lib::create( 'database\phone' );
         $db_home_phone->person_id = $db_person->id;
@@ -251,7 +252,8 @@ class quexf_manager extends \cenozo\singleton
         $db_home_phone->save();
         $rank++;
       }
-      if( !is_null( $db_quexf_person->cell_phone ) )
+      if( !is_null( $db_quexf_person->cell_phone ) &&
+          preg_match( '/[0-9]{3}-[0-9]{3}-[0-9]{4}/', $db_quexf_person->cell_phone ) )
       {
         $db_cell_phone = lib::create( 'database\phone' );
         $db_cell_phone->person_id = $db_person->id;
@@ -455,13 +457,13 @@ class quexf_manager extends \cenozo\singleton
     // (
     $modifier->where_bracket( true );
     $modifier->where( 'home_phone', '!=', NULL );
-    $modifier->where( 'home_phone', '!=', '' );
+    $modifier->where( 'home_phone', 'LIKE', '___-___-____' );
     // )
     $modifier->where_bracket( false );
     // OR (
     $modifier->where_bracket( true, true );
     $modifier->where( 'cell_phone', '!=', NULL );
-    $modifier->where( 'cell_phone', '!=', '' );
+    $modifier->where( 'cell_phone', 'LIKE', '___-___-____' );
     // )
     $modifier->where_bracket( false );
     // )
