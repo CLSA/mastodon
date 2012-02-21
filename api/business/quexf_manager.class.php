@@ -176,7 +176,6 @@ class quexf_manager extends \cenozo\singleton
       {
         $time_diff_interval = new \DateInterval( sprintf( 'PT%dM', -round( 60 * $time_diff ) ) );
         $time_diff_interval->invert = true;
-        log::debug( $db_quexf_person->id );
       }
 
       // make sure there is a uid available
