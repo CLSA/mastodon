@@ -37,7 +37,7 @@ final class session extends \cenozo\business\session
       $site_class_name = lib::get_class_name( 'database\site' );
       $db_site = $site_class_name::get_unique_record(
         array( 'cohort', 'name' ),
-        explode( '////', $request_site_name ) );
+        explode( '////', $site_name ) );
 
       $role_class_name = lib::get_class_name( 'database\role' );
       $db_role = $role_class_name::get_unique_record( 'name', $role_name );
