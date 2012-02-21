@@ -35,18 +35,12 @@ final class session extends \cenozo\business\session
     {
       // override the parent method since sites have a cohort as well as a name
       $site_class_name = lib::get_class_name( 'database\site' );
-      $db_site = $site_class_name::get_unique_record(
+      $this->requested_site = $site_class_name::get_unique_record(
         array( 'cohort', 'name' ),
         explode( '////', $site_name ) );
 
       $role_class_name = lib::get_class_name( 'database\role' );
-      $db_role = $role_class_name::get_unique_record( 'name', $role_name );
-
-      if( !is_null( $db_site ) && !is_null( $db_role ) )
-      {
-        $_SESSION['current_site_id'] = $db_site->id;
-        $_SESSION['current_role_id'] = $db_role->id;
-      }
+      $this->requested_role = $role_class_name::get_unique_record( 'name', $role_name );
     }
   }
   
