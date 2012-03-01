@@ -307,7 +307,7 @@ class quexf_manager extends \cenozo\singleton
         $db_cell_phone->person_id = $db_person->id;
         $db_cell_phone->active = true;
         $db_cell_phone->rank = $rank;
-        $db_cell_phone->type = 'cell';
+        $db_cell_phone->type = 'mobile';
         $db_cell_phone->number = $db_quexf_person->cell_phone;
         $db_cell_phone->save();
         $rank++;
