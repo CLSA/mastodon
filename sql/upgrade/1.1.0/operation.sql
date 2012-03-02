@@ -1,3 +1,47 @@
+-- add the new indeces to the type, subject and name columns
+-- we need to create a procedure which only alters the operation table if these
+-- indeces are missing
+DROP PROCEDURE IF EXISTS patch_operation;
+DELIMITER //
+CREATE PROCEDURE patch_operation()
+  BEGIN
+    DECLARE test INT;
+    SET @test =
+      ( SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "operation"
+      AND COLUMN_NAME = "type"
+      AND COLUMN_KEY = "" );
+    IF @test = 1 THEN
+      ALTER TABLE operation
+      ADD INDEX dk_type (type ASC);
+    END IF;
+    SET @test =
+      ( SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "operation"
+      AND COLUMN_NAME = "subject"
+      AND COLUMN_KEY = "" );
+    IF @test = 1 THEN
+      ALTER TABLE operation
+      ADD INDEX dk_subject (subject ASC);
+    END IF;
+    SET @test =
+      ( SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "operation"
+      AND COLUMN_NAME = "name"
+      AND COLUMN_KEY = "" );
+    IF @test = 1 THEN
+      ALTER TABLE operation
+      ADD INDEX dk_name (name ASC);
+    END IF;
+  END //
+DELIMITER ;
+
 -- participant import
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "import", true, "A form to import participants into the system." );
@@ -25,6 +69,12 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_availability", true, "A form to create a new availability entry to add to a participant." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete_availability", true, "Remove a participant's availability entry." );
+
+-- download forms
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "contact_form", "download", true, "Downloads a participant's scanned contact form." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "consent_form", "download", true, "Downloads a participant's scanned consent form." );
 
 -- reports
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )

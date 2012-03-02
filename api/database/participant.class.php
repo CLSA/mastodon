@@ -119,6 +119,30 @@ class participant extends person
   }
 
   /**
+   * Returns the path to the participant's contact form.
+   * Note, this method will return a path whether the file exists or not.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_contact_form_file_name()
+  {
+    return sprintf( '%s/%s.pdf', CONTACT_FORM_PATH, $this->uid );
+  }
+
+  /**
+   * Returns the path to the participant's consent form.
+   * Note, this method will return a path whether the file exists or not.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_consent_form_file_name()
+  {
+    return sprintf( '%s/%s.pdf', CONSENT_FORM_PATH, $this->uid );
+  }
+
+  /**
    * Get a list of all participants who have or do not have a particular event.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return array( database\participant )

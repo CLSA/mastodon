@@ -40,6 +40,8 @@ class quexf_manager extends \cenozo\singleton
                          'count' => 0 ),
       'postcode' => array( 'title' => 'Participants without a valid postcode',
                            'count' => 0 ),
+      'duplicate' => array( 'title' => 'Participants which already exist',
+                           'count' => 0 ),
       'form' => array( 'title' => 'Participants with a missing contact form',
                        'count' => 0 ) );
   }
@@ -70,6 +72,7 @@ class quexf_manager extends \cenozo\singleton
     if( is_null( $this->participant_count_list['total']['count'] ) )
     {
       $quexf_person_class_name = lib::get_class_name( 'database\quexf\person' );
+      $participant_class_name = lib::get_class_name( 'database\participant' );
       $region_class_name = lib::get_class_name( 'database\region' );
 
       $setting_manager = lib::create( 'business\setting_manager' );
@@ -90,6 +93,7 @@ class quexf_manager extends \cenozo\singleton
       {
         $valid = true;
 
+        // make sure the address is in Canada
         $db_region = $region_class_name::get_unique_record(
           'abbreviation', $db_quexf_person->province );
         if( is_null( $db_region ) || 'Canada' != $db_region->country )
@@ -97,14 +101,16 @@ class quexf_manager extends \cenozo\singleton
           $this->participant_count_list['region']['count']++;
           $valid = false;
         }
-  
+
+        // make sure the contact form exists
         $contact_form_path = $form_path.'/'.$db_quexf_person->new_name;
         if( !is_file( $contact_form_path ) )
         {
           $this->participant_count_list['form']['count']++;
           $valid = false;
         }
-  
+
+        // make sure the address is valid
         $db_address->address1 = $db_quexf_person->address;
         $db_address->city = $db_quexf_person->city;
         $db_address->region_id = $db_region->id;
@@ -113,6 +119,29 @@ class quexf_manager extends \cenozo\singleton
         {
           $this->participant_count_list['postcode']['count']++;
           $valid = false;
+        }
+
+        // make sure the participant isn't a duplicate
+        $found = false;
+        $participant_mod = lib::create( 'database\modifier' );
+        $participant_mod->where( 'first_name', '=', $db_quexf_person->first_name );
+        $participant_mod->where( 'last_name', '=', $db_quexf_person->last_name );
+        foreach( $participant_class_name::select( $participant_mod ) as $db_participant )
+        { // first and last name matches, check phone numbers
+          foreach( $db_participant->get_phone_list() as $db_phone )
+          {
+            if( preg_replace( '/[^0-9]/', '', $db_phone->number ) ==
+                preg_replace( '/[^0-9]/', '', $db_quexf_person->home_phone ) ||
+                preg_replace( '/[^0-9]/', '', $db_phone->number ) ==
+                preg_replace( '/[^0-9]/', '', $db_quexf_person->cell_phone ) )
+            {
+              $found = true;
+              $this->participant_count_list['duplicate']['count']++;
+              $valid = false;
+            }
+            if( $found ) break;
+          }
+          if( $found ) break;
         }
 
         if( $valid )
@@ -166,6 +195,26 @@ class quexf_manager extends \cenozo\singleton
       $db_address->postcode = $db_quexf_person->postal_code;
       if( !$db_address->is_valid() ) continue;
 
+      // make sure the entry isn't a duplicate
+      $found = false;
+      $participant_mod = lib::create( 'database\modifier' );
+      $participant_mod->where( 'first_name', '=', $db_quexf_person->first_name );
+      $participant_mod->where( 'last_name', '=', $db_quexf_person->last_name );
+      foreach( $participant_class_name::select( $participant_mod ) as $db_participant )
+      { // first and last name matches, check phone numbers
+        foreach( $db_participant->get_phone_list() as $db_phone )
+        {
+          if( preg_replace( '/[^0-9]/', '', $db_phone->number ) ==
+              preg_replace( '/[^0-9]/', '', $db_quexf_person->home_phone ) ||
+              preg_replace( '/[^0-9]/', '', $db_phone->number ) ==
+              preg_replace( '/[^0-9]/', '', $db_quexf_person->cell_phone ) )
+            $found = true;
+          if( $found ) break;
+        }
+        if( $found ) break;
+      }
+      if( $found ) continue;
+
       // build the time diff interval (note: date interval doesn't allow negative periods)
       $time_diff = $db_address->get_time_diff();
       if( 0 <= $time_diff )
@@ -176,7 +225,6 @@ class quexf_manager extends \cenozo\singleton
       {
         $time_diff_interval = new \DateInterval( sprintf( 'PT%dM', -round( 60 * $time_diff ) ) );
         $time_diff_interval->invert = true;
-        log::debug( $db_quexf_person->id );
       }
 
       // make sure there is a uid available
@@ -239,7 +287,8 @@ class quexf_manager extends \cenozo\singleton
 
       // create entries into the phone table
       $rank = 1;
-      if( !is_null( $db_quexf_person->home_phone ) )
+      if( !is_null( $db_quexf_person->home_phone ) &&
+          preg_match( '/[0-9]{3}-[0-9]{3}-[0-9]{4}/', $db_quexf_person->home_phone ) )
       {
         $db_home_phone = lib::create( 'database\phone' );
         $db_home_phone->person_id = $db_person->id;
@@ -251,13 +300,14 @@ class quexf_manager extends \cenozo\singleton
         $db_home_phone->save();
         $rank++;
       }
-      if( !is_null( $db_quexf_person->cell_phone ) )
+      if( !is_null( $db_quexf_person->cell_phone ) &&
+          preg_match( '/[0-9]{3}-[0-9]{3}-[0-9]{4}/', $db_quexf_person->cell_phone ) )
       {
         $db_cell_phone = lib::create( 'database\phone' );
         $db_cell_phone->person_id = $db_person->id;
         $db_cell_phone->active = true;
         $db_cell_phone->rank = $rank;
-        $db_cell_phone->type = 'cell';
+        $db_cell_phone->type = 'mobile';
         $db_cell_phone->number = $db_quexf_person->cell_phone;
         $db_cell_phone->save();
         $rank++;
@@ -455,13 +505,13 @@ class quexf_manager extends \cenozo\singleton
     // (
     $modifier->where_bracket( true );
     $modifier->where( 'home_phone', '!=', NULL );
-    $modifier->where( 'home_phone', '!=', '' );
+    $modifier->where( 'home_phone', 'LIKE', '___-___-____' );
     // )
     $modifier->where_bracket( false );
     // OR (
     $modifier->where_bracket( true, true );
     $modifier->where( 'cell_phone', '!=', NULL );
-    $modifier->where( 'cell_phone', '!=', '' );
+    $modifier->where( 'cell_phone', 'LIKE', '___-___-____' );
     // )
     $modifier->where_bracket( false );
     // )

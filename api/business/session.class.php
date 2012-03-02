@@ -21,21 +21,29 @@ use cenozo\lib, cenozo\log, mastodon\util;
 final class session extends \cenozo\business\session
 {
   /**
-   * Initializes the session.
+   * Processes requested site and role and sets the session appropriately.
    * 
-   * This method should be called immediately after initial construct of the session.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\runtime
-   * @access public
+   * @param string $site_name
+   * @param string $role_name
+   * @access protected
    */
-  public function initialize()
+  protected function process_requested_site_and_role( $site_name, $role_name )
   {
-    // don't initialize more than once
-    if( $this->is_initialized() ) return;
+    // try and use the requested site and role, if necessary
+    if( !is_null( $site_name ) && !is_null( $role_name ) )
+    {
+      // override the parent method since sites have a cohort as well as a name
+      $site_class_name = lib::get_class_name( 'database\site' );
+      $this->requested_site = $site_class_name::get_unique_record(
+        array( 'cohort', 'name' ),
+        explode( '////', $site_name ) );
 
-    parent::initialize();
+      $role_class_name = lib::get_class_name( 'database\role' );
+      $this->requested_role = $role_class_name::get_unique_record( 'name', $role_name );
+    }
   }
-
+  
   /**
    * Get the quexf database.
    * 

@@ -1,6 +1,20 @@
 -- The role_has_operation table's columns are in a different order
 ALTER TABLE role_has_operation MODIFY operation_id INT(10) UNSIGNED AFTER role_id;
 
+-- adding participant primary to supervisor, clerk and coordinator roles
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "participant" AND name = "primary" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "participant" AND name = "primary" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "coordinator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "participant" AND name = "primary" );
+
 -- participant import
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
@@ -157,3 +171,53 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "mailout" AND name = "report" );
+
+-- new contact form download
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "coordinator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "coordinator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "operator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "operator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );

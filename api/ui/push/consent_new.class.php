@@ -58,6 +58,37 @@ class consent_new extends \cenozo\ui\push\base_new
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
       throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
     parent::finish();
+
+    // if a form variable was included try to decode it and store it as a consent form
+    $form = $this->get_argument( 'form', NULL );
+    if( !is_null( $form ) )
+    {
+      $form_decoded = base64_decode( chunk_split( $noid['form'] ) );
+      if( false == $form_decoded )
+        throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
+      
+      $filename = sprintf( '%s/%s.pdf',
+                           CONSENT_FORM_PATH,
+                           $this->get_record()->get_participant()->uid );
+      $handle = fopen( $filename, 'wb' );
+      if( false === $handle )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to open consent file "%s" for writing.', $filename ),
+          __METHOD__ );
+      
+      if( false === fwrite( $handle, $form ) )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to write to consent file "%s".', $filename ),
+          __METHOD__ );
+
+      if( false === fclose( $handle ) )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to close consent file "%s".', $filename ),
+          __METHOD__ );
+    }
   }
 }
 ?>
