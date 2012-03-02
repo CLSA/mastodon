@@ -5,13 +5,14 @@ CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `consent_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `submitted` TINYINT(1)  NOT NULL DEFAULT false ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
   `option_1` TINYINT(1)  NULL ,
   `option_2` TINYINT(1)  NULL ,
   `date` DATE NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_consent_form_id` (`consent_form_id` ASC) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
+  UNIQUE INDEX `uq_consent_form_id_user_id` (`consent_form_id` ASC, `user_id` ASC) ,
   CONSTRAINT `fk_consent_form_entry_consent_form_id`
     FOREIGN KEY (`consent_form_id` )
     REFERENCES `consent_form` (`id` )

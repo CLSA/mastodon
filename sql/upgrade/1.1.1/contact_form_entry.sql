@@ -5,7 +5,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `contact_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `submitted` TINYINT(1)  NOT NULL DEFAULT false ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
   `first_name` VARCHAR(255) NULL ,
   `last_name` VARCHAR(255) NULL ,
   `apartment_number` VARCHAR(45) NULL ,
@@ -46,6 +46,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   INDEX `fk_user_id` (`user_id` ASC) ,
   INDEX `fk_contact_form_id` (`contact_form_id` ASC) ,
   INDEX `fk_contact_form_entry_region_id` (`region_id` ASC) ,
+  UNIQUE INDEX `uq_contact_form_id_user_id` (`contact_form_id` ASC, `user_id` ASC) ,
   CONSTRAINT `fk_contact_form_entry_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )

@@ -6,6 +6,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form` (
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
   `proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
   `scan` BLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_alternate_id` (`alternate_id` ASC) ,

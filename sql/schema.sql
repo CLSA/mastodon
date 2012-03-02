@@ -409,7 +409,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `contact_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `submitted` TINYINT(1)  NOT NULL DEFAULT false ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
   `first_name` VARCHAR(255) NULL ,
   `last_name` VARCHAR(255) NULL ,
   `apartment_number` VARCHAR(45) NULL ,
@@ -450,6 +450,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   INDEX `fk_user_id` (`user_id` ASC) ,
   INDEX `fk_contact_form_id` (`contact_form_id` ASC) ,
   INDEX `fk_contact_form_entry_region_id` (`region_id` ASC) ,
+  UNIQUE INDEX `uq_contact_form_id_user_id` (`contact_form_id` ASC, `user_id` ASC) ,
   CONSTRAINT `fk_contact_form_entry_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
@@ -480,6 +481,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form` (
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
   `contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
   `scan` BLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
@@ -508,13 +510,14 @@ CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `consent_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `submitted` TINYINT(1)  NOT NULL DEFAULT false ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
   `option_1` TINYINT(1)  NULL ,
   `option_2` TINYINT(1)  NULL ,
   `date` DATE NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_consent_form_id` (`consent_form_id` ASC) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
+  UNIQUE INDEX `uq_consent_form_id_user_id` (`consent_form_id` ASC, `user_id` ASC) ,
   CONSTRAINT `fk_consent_form_entry_consent_form_id`
     FOREIGN KEY (`consent_form_id` )
     REFERENCES `consent_form` (`id` )
@@ -540,6 +543,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form` (
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `consent_id` INT UNSIGNED NULL COMMENT 'The consent created by this form.' ,
   `consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
   `scan` BLOB NOT NULL COMMENT 'A PDF file' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_consent_id` (`consent_id` ASC) ,
@@ -568,7 +572,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `proxy_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
-  `submitted` TINYINT(1)  NOT NULL DEFAULT false ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
   `proxy` TINYINT(1)  NULL ,
   `already_identified` TINYINT(1)  NULL ,
   `proxy_first_name` VARCHAR(255) NULL ,
@@ -603,6 +607,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   INDEX `fk_proxy_form_id` (`proxy_form_id` ASC) ,
   INDEX `fk_proxy_region_id` (`proxy_region_id` ASC) ,
   INDEX `fk_informant_region_id` (`informant_region_id` ASC) ,
+  UNIQUE INDEX `uq_proxy_form_id_user_id` (`proxy_form_id` ASC, `user_id` ASC) ,
   CONSTRAINT `fk_proxy_form_entry_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
@@ -638,6 +643,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form` (
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
   `proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
   `scan` BLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_alternate_id` (`alternate_id` ASC) ,

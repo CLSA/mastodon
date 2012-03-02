@@ -6,6 +6,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form` (
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
   `contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
   `scan` BLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
