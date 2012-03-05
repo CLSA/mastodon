@@ -29,9 +29,17 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_view
   {
     parent::__construct( 'consent_form_entry', 'view', $args );
 
-    $this->add_item( 'option_1', 'boolean', 'Option #1' );
-    $this->add_item( 'option_2', 'boolean', 'Option #2' );
-    $this->add_item( 'date', 'date', 'Date' );
+    // validate the entry and insert error values as notes
+    $args = array( 'id' => $this->get_argument( 'id' ) );
+    $operation = lib::create( 'ui\pull\consent_form_entry_validate', $args );
+    $errors = $operation->finish();
+
+    $this->add_item( 'option_1', 'boolean', 'Option #1',
+      array_key_exists( 'option_1', $errors ) ? $errors['option_1'] : NULL );
+    $this->add_item( 'option_2', 'boolean', 'Option #2',
+      array_key_exists( 'option_2', $errors ) ? $errors['option_2'] : NULL );
+    $this->add_item( 'date', 'date', 'Date',
+      array_key_exists( 'date', $errors ) ? $errors['date'] : NULL );
   }
 
   /**

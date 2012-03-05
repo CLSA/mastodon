@@ -30,7 +30,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
     parent::__construct( 'consent_form_entry', $args );
     
     $this->add_column( 'id', 'number', 'ID', true );
-    $this->add_column( 'deferred', 'boolean', 'Deferred', false );
+    $this->add_column( 'date', 'consent_form.date', 'Date Added', false );
   }
   
   /**
@@ -50,7 +50,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
     {
       $this->add_row( $record->id,
         array( 'id' => $record->id,
-               'deferred' => $record->deferred ) );
+               'date' => $record->get_consent_form()->date ) );
     }
 
     $this->finish_setting_rows();
@@ -72,6 +72,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
     $modifier->where( 'consent_form.invalid', '!=', true );
     $modifier->where( 'consent_form.consent_id', '=', NULL );
     $modifier->where( 'user_id', '=', $db_user->id );
+    $modifier->where( 'deferred', '=', true );
 
     return parent::determine_record_count( $modifier );
   }
@@ -92,6 +93,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
     $modifier->where( 'consent_form.invalid', '!=', true );
     $modifier->where( 'consent_form.consent_id', '=', NULL );
     $modifier->where( 'user_id', '=', $db_user->id );
+    $modifier->where( 'deferred', '=', true );
 
     return parent::determine_record_list( $modifier );
   }

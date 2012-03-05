@@ -12,14 +12,37 @@
   {{ parent() }}
   <script type="text/javascript">
     $( function () {
+      // make all help notes appear as error text
+      $( ".help_note" ).addClass( 'ui-state-error' );
+
       // download button
       $( "#{{ widget.full }}__scan" ).click( function() {
         window.location = "consent_form/download?" +
                           jQuery.param( { id: {{ consent_form_id }} } );
       } );
 
+      // defer button
+      $( "#{{ widget.full }}_defer" ).click( function() {
+        var args = new Object();
+        args.id = {{ id }};
+        args.columns = { deferred: 1 };
+        if( ajax_push( "consent_form_entry", "edit", args ) ) slot_prev( {{ slot }} );
+      } );
+
       // submit button
       $( "#{{ widget.full }}_submit" ).click( function() {
+        var args = new Object();
+        args.id = {{ id }};
+        var errors = ajax_pull( "consent_form_entry", "validate", args );
+        if( 0 == errors.length )
+        {
+          args.columns = { deferred: 0 };
+          if( ajax_push( "consent_form_entry", "edit", args ) ) slot_prev( {{ slot }} );
+        }
+        else
+        {
+          slot_refresh( {{ slot }} );
+        }
       } );
     } );
   </script>
@@ -45,6 +68,6 @@
 
   {{ parent() }}
   {% from 'macros.twig' import confirm_buttons %}
-  {{ confirm_buttons( slot, widget.full, ['submit'], 'Defer', 'right', true ) }}
+  {{ confirm_buttons( slot, widget.full, ['defer','submit'], '', 'right', true ) }}
 
 {% endblock post_record %}

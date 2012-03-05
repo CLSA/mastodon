@@ -99,6 +99,12 @@ class consent_form extends \cenozo\database\record
     // first save the record as usual
     parent::save();
 
+    if( $this->read_only )
+    {
+      log::warning( 'Tried to save read-only record.' );
+      return;
+    }
+
     // now save the scan if it is not null
     if( $this->scan_changed && !is_null( $this->id ) )
     {

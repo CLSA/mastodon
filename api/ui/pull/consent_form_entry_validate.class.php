@@ -26,7 +26,7 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form_entry', $args );
+    parent::__construct( 'consent_form_entry', 'validate', $args );
   }
 
   /**
@@ -38,6 +38,23 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
    */
   public function finish()
   {
+    $errors = array();
+    if( is_null( $this->get_record()->option_1 ) )
+      $errors['option_1'] = 'This value cannot be left blank.';
+
+    if( is_null( $this->get_record()->option_2 ) )
+      $errors['option_2'] = 'This value cannot be left blank.';
+
+    if( is_null( $this->get_record()->date ) )
+      $errors['date'] = 'This value cannot be left blank.';
+
+    return $errors;
+  }
+
+  // TODO: document
+  public function get_data_type()
+  {
+    return 'json';
   }
 }
 ?>
