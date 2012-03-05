@@ -92,7 +92,6 @@ class consent_form_list extends \cenozo\ui\widget\base_list
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'invalid', '!=', true );
     $modifier->where( 'consent_id', '=', NULL );
-    $modifier->where( 'consent_form_entry_id', '=', NULL );
 
     if( 'typist' == $db_role->name )
       $modifier->where( 'consent_form_entry.user_id', '=', $db_user->id );
@@ -117,7 +116,6 @@ class consent_form_list extends \cenozo\ui\widget\base_list
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'invalid', '!=', true );
     $modifier->where( 'consent_id', '=', NULL );
-    $modifier->where( 'consent_form_entry_id', '=', NULL );
 
     if( 'typist' == $db_role->name )
       $modifier->where( 'consent_form_entry.user_id', '=', $db_user->id );

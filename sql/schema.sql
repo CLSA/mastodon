@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 
 -- -----------------------------------------------------
@@ -480,19 +480,19 @@ CREATE  TABLE IF NOT EXISTS `contact_form` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
-  `contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `validated_contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
   `date` DATE NOT NULL ,
-  `scan` BLOB NOT NULL ,
+  `scan` MEDIUMBLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
-  INDEX `fk_contact_form_entry_id` (`contact_form_entry_id` ASC) ,
+  INDEX `fk_validated_contact_form_entry_id` (`validated_contact_form_entry_id` ASC) ,
   CONSTRAINT `fk_contact_form_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_contact_form_contact_form_entry_id`
-    FOREIGN KEY (`contact_form_entry_id` )
+  CONSTRAINT `fk_contact_form_validated_contact_form_entry_id`
+    FOREIGN KEY (`validated_contact_form_entry_id` )
     REFERENCES `contact_form_entry` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -542,19 +542,19 @@ CREATE  TABLE IF NOT EXISTS `consent_form` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `consent_id` INT UNSIGNED NULL COMMENT 'The consent created by this form.' ,
-  `consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `validated_consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
   `date` DATE NOT NULL ,
-  `scan` BLOB NOT NULL COMMENT 'A PDF file' ,
+  `scan` MEDIUMBLOB NOT NULL COMMENT 'A PDF file' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_consent_id` (`consent_id` ASC) ,
-  INDEX `fk_consent_form_entry_id` (`consent_form_entry_id` ASC) ,
+  INDEX `fk_validated_consent_form_entry_id` (`validated_consent_form_entry_id` ASC) ,
   CONSTRAINT `fk_consent_form_consent_id`
     FOREIGN KEY (`consent_id` )
     REFERENCES `consent` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_consent_form_consent_form_entry_id`
-    FOREIGN KEY (`consent_form_entry_id` )
+  CONSTRAINT `fk_consent_form_validated_consent_form_entry_id`
+    FOREIGN KEY (`validated_consent_form_entry_id` )
     REFERENCES `consent_form_entry` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -642,19 +642,19 @@ CREATE  TABLE IF NOT EXISTS `proxy_form` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
-  `proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `validated_proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
   `date` DATE NOT NULL ,
-  `scan` BLOB NOT NULL ,
+  `scan` MEDIUMBLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_alternate_id` (`alternate_id` ASC) ,
-  INDEX `fk_proxy_form_entry_id` (`proxy_form_entry_id` ASC) ,
+  INDEX `fk_validated_proxy_form_entry_id` (`validated_proxy_form_entry_id` ASC) ,
   CONSTRAINT `fk_proxy_form_alternate_id`
     FOREIGN KEY (`alternate_id` )
     REFERENCES `alternate` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_proxy_form_proxy_form_entry_id`
-    FOREIGN KEY (`proxy_form_entry_id` )
+  CONSTRAINT `fk_proxy_form_validated_proxy_form_entry_id`
+    FOREIGN KEY (`validated_proxy_form_entry_id` )
     REFERENCES `proxy_form_entry` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

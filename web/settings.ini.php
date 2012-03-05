@@ -22,11 +22,14 @@ $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 // the location of QUEXF for participant contact and consent updates
 $SETTINGS['path']['QUEXF'] = NULL;
 
-// the location to store processed contact form PDF files
-$SETTINGS['path']['CONTACT_FORM'] = '/var/local/mastodon/contact';
+// the location of new consent forms which need to be processed
+$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 
-// the location to store processed consent form PDF files
-$SETTINGS['path']['CONSENT_FORM'] = '/var/local/mastodon/consent';
+// the location of new contact forms which need to be processed
+$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
+
+// the location of new proxy forms which need to be processed
+$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
 
 // database settings
 $SETTINGS['db']['driver'] = 'mysql';
