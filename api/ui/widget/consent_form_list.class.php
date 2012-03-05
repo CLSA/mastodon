@@ -31,6 +31,10 @@ class consent_form_list extends \cenozo\ui\widget\base_list
     
     $this->add_column( 'id', 'number', 'ID', true );
     $this->add_column( 'date', 'date', 'Date Added', true );
+    $this->add_column( 'typist_1', 'string', 'Typist 1', false );
+    $this->add_column( 'typist_1_submitted', 'boolean', 'Submitted', false );
+    $this->add_column( 'typist_2', 'string', 'Typist 2', false );
+    $this->add_column( 'typist_2_submitted', 'boolean', 'Submitted', false );
     $this->add_column( 'conflict', 'boolean', 'Conflict', false );
   }
   
@@ -50,14 +54,36 @@ class consent_form_list extends \cenozo\ui\widget\base_list
 
     foreach( $this->get_record_list() as $record )
     {
-      // determine if the form has a conflict
-      $modifier = lib::create( 'database\modifier' );
-      $modifier->where( 'deferred', '!=', true );
-      $conflict = 1 < count( $record->get_consent_form_entry_list( $modifier ) );
+      // determine who has worked on the form
+      $typist_1 = 'n/a';
+      $typist_1_submitted = false;
+      $typist_2 = 'n/a';
+      $typist_2_submitted = false;
+
+      $consent_form_entry_list = $record->get_consent_form_entry_list();
+      $db_consent_form_entry = current( $consent_form_entry_list );
+      if( $db_consent_form_entry )
+      {
+        $typist_1 = $db_consent_form_entry->get_user()->name;
+        $typist_1_submitted = !$db_consent_form_entry->deferred;
+      }
+      $db_consent_form_entry = next( $consent_form_entry_list );
+      if( $db_consent_form_entry )
+      {
+        $typist_2 = $db_consent_form_entry->get_user()->name;
+        $typist_2_submitted = !$db_consent_form_entry->deferred;
+      }
+
+      // if both typists have submitted and this form is still in the list then there is a conflict
+      $conflict = $typist_1_submitted && $typist_2_submitted;
 
       $this->add_row( $record->id,
         array( 'id' => $record->id,
-               'date' => util::get_formatted_date( $record->date ),
+               'date' => $record->date,
+               'typist_1' => $typist_1,
+               'typist_1_submitted' => $typist_1_submitted,
+               'typist_2' => $typist_2,
+               'typist_2_submitted' => $typist_2_submitted,
                'conflict' => $conflict ) );
     }
 

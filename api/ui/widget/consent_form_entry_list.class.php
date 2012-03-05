@@ -29,7 +29,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
   {
     parent::__construct( 'consent_form_entry', $args );
     
-    $this->add_column( 'id', 'number', 'ID', true );
+    $this->add_column( 'consent_form_id', 'number', 'ID', true );
     $this->add_column( 'date', 'consent_form.date', 'Date Added', false );
   }
   
@@ -49,7 +49,7 @@ class consent_form_entry_list extends \cenozo\ui\widget\base_list
     foreach( $this->get_record_list() as $record )
     {
       $this->add_row( $record->id,
-        array( 'id' => $record->id,
+        array( 'consent_form_id' => $record->consent_form_id,
                'date' => $record->get_consent_form()->date ) );
     }
 

@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a consent_form.
  * @package mastodon\ui
  */
-class consent_form_edit extends \cenozo\ui\push\base_record
+class consent_form_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.
@@ -26,16 +26,7 @@ class consent_form_edit extends \cenozo\ui\push\base_record
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form', 'edit', $args );
-  }
-
-  /**
-   * Executes the push.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
-  {
+    parent::__construct( 'consent_form', $args );
   }
 }
 ?>
