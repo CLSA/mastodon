@@ -73,13 +73,13 @@ class consent_form extends \cenozo\database\record
     { // read the scan from the database
       $modifier = lib::create( 'database\modifier' );
       $modifier->where( 'id', '=', $this->id );
-      $this->scan = static::db()->get_one( sprintf(
+      $this->scan_value = static::db()->get_one( sprintf(
         'SELECT scan FROM %s %s',
         static::get_table_name(),
         $modifier->get_sql() ) );
     }
 
-    return $this->scan;
+    return $this->scan_value;
   }
 
   // TODO: document
@@ -88,7 +88,7 @@ class consent_form extends \cenozo\database\record
     if( 'scan' != $column_name ) parent::__set( $column_name, $value );
     else
     {
-      $this->scan = addslashes( $value );
+      $this->scan_value = $value;
       $this->scan_changed = true;
     }
   }
@@ -102,12 +102,14 @@ class consent_form extends \cenozo\database\record
     // now save the scan if it is not null
     if( $this->scan_changed && !is_null( $this->id ) )
     {
+      $database_class_name = lib::get_class_name( 'database\database' );
+
       $modifier = lib::create( 'database\modifier' );
       $modifier->where( 'id', '=', $this->id );
       static::db()->execute( sprintf(
         'UPDATE %s SET scan = %s %s',
         static::get_table_name(),
-        $this->scan,
+        $database_class_name::format_string( $this->scan_value ),
         $modifier->get_sql() ) );
     }
   }
@@ -116,6 +118,6 @@ class consent_form extends \cenozo\database\record
   protected $scan_changed = false;
 
   // TODO: document
-  protected $scan = NULL;
+  protected $scan_value = NULL;
 }
 ?>

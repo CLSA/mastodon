@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_form_view extends \cenozo\ui\widget\base_record
+class consent_form_view extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -28,6 +28,8 @@ class consent_form_view extends \cenozo\ui\widget\base_record
   public function __construct( $args )
   {
     parent::__construct( 'consent_form', 'view', $args );
+
+    $this->add_item( 'invalid', 'boolean', 'Invalid' );
   }
 
   /**
@@ -39,6 +41,10 @@ class consent_form_view extends \cenozo\ui\widget\base_record
   public function finish()
   {
     parent::finish();
+
+    $this->set_item( 'invalid', $this->get_record()->invalid, true );
+
+    $this->finish_setting_items();
   }
 }
 ?>
