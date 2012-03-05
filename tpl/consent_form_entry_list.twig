@@ -1,0 +1,19 @@
+{##
+ # consent_form_entry_list.twig
+ # 
+ # Lists consent_form_entrys.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_list.twig for parameters
+ #}
+{% extends "base_list.twig" %}
+
+{% block javascript %}
+  {{ parent() }}
+  <script type="text/javascript">
+    // override the add button
+    $( "#{{ widget.full }}_add" ).unbind( 'click' );
+    $( "#{{ widget.full }}_add" ).click( function() {
+      if( ajax_push( "consent_form_entry", "new" ) ) window.location.reload();
+    } );
+  </script>
+{% endblock javascript %}

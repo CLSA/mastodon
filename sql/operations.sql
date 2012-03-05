@@ -91,6 +91,8 @@ VALUES( "push", "consent_form_entry", "defer", true, "Defers entering values for
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent_form_entry", "edit", true, "Edits the details of entry values for a consent form." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "consent_form_entry", "list", true, "Lists entries for scanned consent forms." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent_form_entry", "new", true, "Create new entry values for a consent form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent_form_entry", "validate", true, "Validates the entry values for a consent form." );
@@ -112,6 +114,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "contact_form_entry", "defer", true, "Defers entering values for an contact form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "contact_form_entry", "edit", true, "Edits the details of entry values for a contact form." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "contact_form_entry", "list", true, "Lists entries for scanned contact forms." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "contact_form_entry", "new", true, "Create new entry values for a contact form." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -196,6 +200,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "proxy_form_entry", "defer", true, "Defers entering values for an proxy form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "proxy_form_entry", "edit", true, "Edits the details of entry values for a proxy form." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "proxy_form_entry", "list", true, "Lists entries for scanned proxy forms." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "proxy_form_entry", "new", true, "Create new entry values for a proxy form." );
 INSERT INTO operation( type, subject, name, restricted, description )
