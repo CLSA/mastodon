@@ -117,6 +117,10 @@ AND operation.subject = "typist";
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "widget" AND subject = "consent_form_entry" AND name = "list" );
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
@@ -143,6 +147,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form" AND name = "download" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "widget" AND subject = "contact_form_entry" AND name = "list" );
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
@@ -166,6 +174,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
       type = "pull" AND subject = "contact_form_entry" AND name = "validate" );
 
 -- proxy form
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "proxy_form" AND name = "download" );
 INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
     operation_id = ( SELECT id FROM operation WHERE

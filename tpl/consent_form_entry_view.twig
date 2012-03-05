@@ -1,8 +1,50 @@
 {##
  # consent_form_entry_view.twig
  # 
- # View consent_form details.
+ # View consent_form_entry details.
  # @author Patrick Emond <emondpd@mcmaster.ca>
  # @see base_view.twig for parameters
  #}
 {% extends "base_view.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      // download button
+      $( "#{{ widget.full }}__scan" ).click( function() {
+        window.location = "consent_form/download?" +
+                          jQuery.param( { id: {{ consent_form_id }} } );
+      } );
+
+      // submit button
+      $( "#{{ widget.full }}_submit" ).click( function() {
+      } );
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block record_items %}
+  
+  {{ parent() }}
+  <hr class="ui-widget ui-widget-content">
+  <table>
+    <tr>
+      <td class="heading">Actions:</td>
+      <td class="content">
+        <button id="{{ widget.full }}__scan">Download</button>
+      </td>
+    </tr>
+  </table>
+
+{% endblock record_items %}
+
+{% block post_record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import confirm_buttons %}
+  {{ confirm_buttons( slot, widget.full, ['submit'], 'Defer', 'right', true ) }}
+
+{% endblock post_record %}

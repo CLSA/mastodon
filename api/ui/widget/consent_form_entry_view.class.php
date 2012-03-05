@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_form_entry_view extends \cenozo\ui\widget\base_record
+class consent_form_entry_view extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -28,6 +28,10 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_record
   public function __construct( $args )
   {
     parent::__construct( 'consent_form_entry', 'view', $args );
+
+    $this->add_item( 'option_1', 'boolean', 'Option #1' );
+    $this->add_item( 'option_2', 'boolean', 'Option #2' );
+    $this->add_item( 'date', 'date', 'Date' );
   }
 
   /**
@@ -39,6 +43,14 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_record
   public function finish()
   {
     parent::finish();
+
+    $this->set_item( 'option_1', $this->get_record()->option_1, false );
+    $this->set_item( 'option_2', $this->get_record()->option_2, false );
+    $this->set_item( 'date', $this->get_record()->date, false );
+
+    $this->finish_setting_items();
+
+    $this->set_variable( 'consent_form_id', $this->get_record()->consent_form_id );
   }
 }
 ?>
