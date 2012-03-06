@@ -87,6 +87,8 @@ VALUES( "widget", "consent_form", "view", true, "View the details of a scanned c
 
 -- consent_form_entry
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "consent_form", "adjudicate", true, "Adjudicates conflicts between two entries for a consent form." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent_form_entry", "defer", true, "Defers entering values for an consent form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent_form_entry", "edit", true, "Edits the details of entry values for a consent form." );
@@ -100,6 +102,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "consent_form_entry", "view", true, "View the details of entry values for a consent form." );
 
 -- contact_form
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "contact_form", "adjudicate", true, "Adjudicates conflicts between two entries for a contact form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "contact_form", "download", true, "Downloads a participant's scanned contact form." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -186,6 +190,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "phone", "primary", true, "Retrieves base phone information." );
 
 -- proxy_form
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "proxy_form", "adjudicate", true, "Adjudicates conflicts between two entries for a proxy form." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "proxy_form", "download", true, "Downloads an alternate's scanned proxy form." );
 INSERT INTO operation( type, subject, name, restricted, description )

@@ -259,6 +259,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent_form" AND name = "adjudicate" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "consent_form" AND name = "download" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
@@ -277,6 +281,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "contact_form" AND name = "adjudicate" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "contact_form" AND name = "download" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
@@ -292,6 +300,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
       type = "push" AND subject = "contact_form" AND name = "edit" );
 
 -- proxy form
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "proxy_form" AND name = "adjudicate" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
@@ -560,6 +572,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent_form" AND name = "adjudicate" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "consent_form" AND name = "download" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
@@ -578,6 +594,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "contact_form" AND name = "adjudicate" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "contact_form" AND name = "download" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
@@ -593,6 +613,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
       type = "push" AND subject = "contact_form" AND name = "edit" );
 
 -- proxy form
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "proxy_form" AND name = "adjudicate" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE

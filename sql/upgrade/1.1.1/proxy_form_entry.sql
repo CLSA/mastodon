@@ -6,6 +6,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   `proxy_form_id` INT UNSIGNED NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
   `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
+  `uid` VARCHAR(10) NULL ,
   `proxy` TINYINT(1)  NULL ,
   `already_identified` TINYINT(1)  NULL ,
   `proxy_first_name` VARCHAR(255) NULL ,
@@ -41,6 +42,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   INDEX `fk_proxy_region_id` (`proxy_region_id` ASC) ,
   INDEX `fk_informant_region_id` (`informant_region_id` ASC) ,
   UNIQUE INDEX `uq_proxy_form_id_user_id` (`proxy_form_id` ASC, `user_id` ASC) ,
+  INDEX `dk_uid` (`uid` ASC) ,
   CONSTRAINT `fk_proxy_form_entry_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )

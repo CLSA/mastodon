@@ -25,6 +25,7 @@
           var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
           columns[column_name] = $(this).val();
         } );
+        args.id = {{ id }};
         args.columns = columns;
         if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
       } );
@@ -42,6 +43,17 @@
           }
         );
       } );
+
+      // radio buttons (once all are selected enable the submit button)
+      $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
+        var enable = true;
+        $( "#{{ widget.full }}__edit_form input:radio" ).each( function() {
+          name = $(this).attr( "name" );
+          if( 0 == $( "input:radio[name=" + name + "]:checked" ).length ) enable = false;
+        } );
+
+        $( "#{{ widget.full }}__submit" ).button( { disabled: !enable } );
+      } );
     } );
   </script>
 
@@ -51,8 +63,7 @@
   <table id="{{ widget.full }}__edit_form">
     {% for item_id, entry in item %}
       {# make null entries an empty string #}
-      {% set entry_value_1 = entry.entry_1.value is defined ? entry.entry_1.value : "(no value)" %}
-      {% set entry_value_2 = entry.entry_2.value is defined ? entry.entry_2.value : "(no value)" %}
+      {% set conflict = entry.entry_1.value != entry.entry_2.value %}
       <tr>
         <td rowspan="2" class="heading" style="padding-right: 1.0em">
           <span class="title">{{ entry.heading }}:</span>
@@ -61,12 +72,14 @@
           <span class="title">{{ entry.entry_1.user }}</span>
         </td>
         <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          <input type="radio"
-                 name="{{ widget.full }}__{{ item_id }}"
-                 value="{{ entry.entry_1.user }}" />
+          {% if conflict %}
+            <input type="radio"
+                   name="{{ widget.full }}__{{ item_id }}"
+                   value="{{ entry.entry_1.user }}" />
+          {% endif %}
         </td>
         <td class="content" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          <div class="padded">{{ entry_value_1 }}</div>
+          <div class="padded">{{ entry.entry_1.value }}</div>
           {% if entry.note is defined %}
             <div class="help_note">
               {% autoescape false %}
@@ -81,12 +94,14 @@
           <span class="title">{{ entry.entry_2.user }}</span>
         </td>
         <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          <input type="radio"
-                 name="{{ widget.full }}__{{ item_id }}"
-                 value="{{ entry.entry_2.user }}" />
+          {% if conflict %}
+            <input type="radio"
+                   name="{{ widget.full }}__{{ item_id }}"
+                   value="{{ entry.entry_2.user }}" />
+          {% endif %}
         </td>
         <td class="content" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
-          <div class="padded">{{ entry_value_2 }}</div>
+          <div class="padded">{{ entry.entry_2.value }}</div>
           {% if entry.note is defined %}
             <div class="help_note">
               {% autoescape false %}
@@ -107,7 +122,7 @@
       <td class="heading">Actions:</td>
       <td class="content">
         <button id="{{ widget.full }}__download">Download</button>
-        <button id="{{ widget.full }}__submit">Submit</button>
+        <button id="{{ widget.full }}__submit" disabled>Submit</button>
         <button id="{{ widget.full }}__invalidate">Invalidate</button>
       </td>
     </tr>

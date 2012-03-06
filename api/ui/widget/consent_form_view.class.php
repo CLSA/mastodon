@@ -29,6 +29,7 @@ class consent_form_view extends base_form_view
   {
     parent::__construct( 'consent_form', $args );
 
+    $this->add_item( 'uid', 'CLSA ID' );
     $this->add_item( 'option_1', 'Option #1' );
     $this->add_item( 'option_2', 'Option #2' );
     $this->add_item( 'date', 'Date' );

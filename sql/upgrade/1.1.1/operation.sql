@@ -1,5 +1,7 @@
 -- consent_form
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "consent_form", "adjudicate", true, "Adjudicates conflicts between two entries for a consent form." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent_form", "download", true, "Downloads a participant's scanned consent form." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent_form", "edit", true, "Edits the details of a scanned consent form." );
@@ -24,6 +26,8 @@ VALUES( "widget", "consent_form_entry", "view", true, "View the details of entry
 
 -- contact_form
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "contact_form", "adjudicate", true, "Adjudicates conflicts between two entries for a contact form." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "contact_form", "download", true, "Downloads a participant's scanned contact form." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "contact_form", "edit", true, "Edits the details of a scanned contact form." );
@@ -47,6 +51,8 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "contact_form_entry", "view", true, "View the details of entry values for a contact form." );
 
 -- proxy_form
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "proxy_form", "adjudicate", true, "Adjudicates conflicts between two entries for a proxy form." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "proxy_form", "download", true, "Downloads an alternate's scanned proxy form." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )

@@ -56,14 +56,16 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
     {
       $this->items[$item_id]['entry_1'] = is_null( $this->form_entry_1 )
         ? array( 'user' => 'n/a',
-                 'value' => NULL )
+                 'value' => '(no value)' )
         : array( 'user' => $this->form_entry_1->get_user()->name,
-                 'value' => $this->form_entry_1->$item_id );
+                 'value' => is_null( $this->form_entry_1->$item_id )
+                          ? '(no value)' : $this->form_entry_1->$item_id );
       $this->items[$item_id]['entry_2'] = is_null( $this->form_entry_2 )
         ? array( 'user' => 'n/a',
-                 'value' => NULL )
+                 'value' => '(no value)' )
         : array( 'user' => $this->form_entry_2->get_user()->name,
-                 'value' => $this->form_entry_2->$item_id );
+                 'value' => is_null( $this->form_entry_2->$item_id ) 
+                          ? '(no value)' : $this->form_entry_2->$item_id );
     }
 
     $this->set_variable( 'item', $this->items );

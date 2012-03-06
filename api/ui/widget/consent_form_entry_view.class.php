@@ -34,6 +34,8 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_view
     $operation = lib::create( 'ui\pull\consent_form_entry_validate', $args );
     $errors = $operation->finish();
 
+    $this->add_item( 'uid', 'string', 'CLSA ID',
+      array_key_exists( 'uid', $errors ) ? $errors['uid'] : NULL );
     $this->add_item( 'option_1', 'boolean', 'Option #1',
       array_key_exists( 'option_1', $errors ) ? $errors['option_1'] : NULL );
     $this->add_item( 'option_2', 'boolean', 'Option #2',
@@ -52,6 +54,7 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_view
   {
     parent::finish();
 
+    $this->set_item( 'uid', $this->get_record()->uid, false );
     $this->set_item( 'option_1', $this->get_record()->option_1, false );
     $this->set_item( 'option_2', $this->get_record()->option_2, false );
     $this->set_item( 'date', $this->get_record()->date, false );
