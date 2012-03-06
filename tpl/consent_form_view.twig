@@ -5,40 +5,4 @@
  # @author Patrick Emond <emondpd@mcmaster.ca>
  # @see base_view.twig for parameters
  #}
-{% extends "base_view.twig" %}
-
-{% block javascript %}
-
-  {{ parent() }}
-  <script type="text/javascript">
-    $( function () {
-      $( "#{{ widget.full }}__scan" ).click( function() {
-        window.location = "consent_form/download?" + jQuery.param( { id: {{ id }} } );
-      } );
-    } );
-  </script>
-
-{% endblock javascript %}
-
-{% block record_items %}
-  
-  {{ parent() }}
-  <hr class="ui-widget ui-widget-content">
-  <table>
-    <tr>
-      <td class="heading">Actions:</td>
-      <td class="content">
-        <button id="{{ widget.full }}__scan">Download</button>
-      </td>
-    </tr>
-  </table>
-
-{% endblock record_items %}
-
-{% block post_record %}
-
-  {{ parent() }}
-  {% from 'macros.twig' import confirm_buttons %}
-  {{ confirm_buttons( slot, widget.full, '', 'Back', 'right', true ) }}
-
-{% endblock post_record %}
+{% extends "base_form_view.twig" %}

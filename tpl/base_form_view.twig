@@ -1,0 +1,123 @@
+{##
+ # base_form_view.twig
+ # 
+ # Extends the base_record template for adding records.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ #}
+{% extends "base_record.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      // download button
+      $( "#{{ widget.full }}__download" ).click( function() {
+        window.location = "{{ widget.subject }}/download?" + jQuery.param( { id: {{ id }} } );
+      } );
+
+      // submit button
+      $( "#{{ widget.full }}__submit" ).click( function() {
+        var args = new Object();
+        var columns = new Object();
+        $( "#{{ widget.full }}__edit_form input:radio:checked" ).each( function() {
+          var id_string = $(this).attr( "name" );
+          var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
+          columns[column_name] = $(this).val();
+        } );
+        args.columns = columns;
+        if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
+      } );
+
+      // invalidate button
+      $( "#{{ widget.full }}__invalidate" ).click( function() {
+        confirm_dialog(
+          "Invalidate form #{{ id }}?",
+          "Are you sure you want to invalidate this form?  " +
+          "You will no longer have access to this form if you click yes.",
+          function() {
+            if( ajax_push( "{{ widget.subject }}", "edit",
+                           { id: {{ id }}, columns: { invalid: 1 } } ) )
+              slot_prev( {{ slot }} );
+          }
+        );
+      } );
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block record_items %}
+  <table id="{{ widget.full }}__edit_form">
+    {% for item_id, entry in item %}
+      {# make null entries an empty string #}
+      {% set entry_value_1 = entry.entry_1.value is defined ? entry.entry_1.value : "(no value)" %}
+      {% set entry_value_2 = entry.entry_2.value is defined ? entry.entry_2.value : "(no value)" %}
+      <tr>
+        <td rowspan="2" class="heading" style="padding-right: 1.0em">
+          <span class="title">{{ entry.heading }}:</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <span class="title">{{ entry.entry_1.user }}</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <input type="radio"
+                 name="{{ widget.full }}__{{ item_id }}"
+                 value="{{ entry.entry_1.user }}" />
+        </td>
+        <td class="content" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <div class="padded">{{ entry_value_1 }}</div>
+          {% if entry.note is defined %}
+            <div class="help_note">
+              {% autoescape false %}
+                {{ entry.note }}
+              {% endautoescape %}
+            </div>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="heading" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+          <span class="title">{{ entry.entry_2.user }}</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <input type="radio"
+                 name="{{ widget.full }}__{{ item_id }}"
+                 value="{{ entry.entry_2.user }}" />
+        </td>
+        <td class="content" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+          <div class="padded">{{ entry_value_2 }}</div>
+          {% if entry.note is defined %}
+            <div class="help_note">
+              {% autoescape false %}
+                {{ entry.note }}
+              {% endautoescape %}
+            </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% if not loop.last %}
+        <tr><td></td><td colspan="3"><hr class="ui-widget ui-widget-content"</td></tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+  <hr class="ui-widget ui-widget-content">
+  <table>
+    <tr>
+      <td class="heading">Actions:</td>
+      <td class="content">
+        <button id="{{ widget.full }}__download">Download</button>
+        <button id="{{ widget.full }}__submit">Submit</button>
+        <button id="{{ widget.full }}__invalidate">Invalidate</button>
+      </td>
+    </tr>
+  </table>
+{% endblock record_items %}
+
+{% block post_record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import confirm_buttons %}
+  {{ confirm_buttons( slot, widget.full, '', 'Back', 'right', true ) }}
+
+{% endblock post_record %}
