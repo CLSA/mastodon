@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_form_download extends \cenozo\ui\pull\base_record
+class consent_form_download extends base_form_download
 {
   /**
    * Constructor
@@ -26,25 +26,7 @@ class consent_form_download extends \cenozo\ui\pull\base_record
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form', 'download', $args );
-  }
-
-  // TODO: document
-  public function get_file_name()
-  {
-    return $this->get_record()->id;
-  }
-
-  // TODO: document
-  public function get_data_type()
-  {
-    return 'pdf';
-  }
-
-  // TODO: document
-  public function finish()
-  {
-    return $this->get_record()->scan;
+    parent::__construct( 'consent', $args );
   }
 }
 ?>
