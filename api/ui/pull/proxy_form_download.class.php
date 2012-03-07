@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class proxy_form_download extends \cenozo\ui\pull\base_download
+class proxy_form_download extends base_form_download
 {
   /**
    * Constructor
@@ -26,12 +26,7 @@ class proxy_form_download extends \cenozo\ui\pull\base_download
    */
   public function __construct( $args )
   {
-    parent::__construct( 'proxy_form', $args );
-    
-    // determine the file to upload to the user
-    $alternate_class_name = lib::get_class_name( 'database\alternate' );
-    $db_alternate = lib::create( 'database\alternate', $this->get_argument( 'id' ) );
-    $this->set_file_name( $db_alternate->get_proxy_form_file_name() );
+    parent::__construct( 'proxy', $args );
   }
 }
 ?>

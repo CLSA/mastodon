@@ -1,6 +1,6 @@
 <?php
 /**
- * consent_form_entry_validate.class.php
+ * proxy_form_entry_validate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -11,11 +11,11 @@ namespace mastodon\ui\pull;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * pull: consent_form_entry validate
+ * pull: proxy_form_entry validate
  * 
  * @package mastodon\ui
  */
-class consent_form_entry_validate extends \cenozo\ui\pull\base_record
+class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
 {
   /**
    * Constructor
@@ -26,7 +26,7 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form_entry', $args );
+    parent::__construct( 'proxy_form_entry', 'validate', $args );
   }
 
   /**
@@ -38,6 +38,23 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
    */
   public function finish()
   {
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $errors = array();
+
+    // validate each entry value in the form
+
+    return $errors;
+  }
+
+  /**
+   * Implements the parent's abstract method (data type is always json)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_data_type()
+  {
+    return 'json';
   }
 }
 ?>

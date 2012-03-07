@@ -56,6 +56,7 @@ class consent_form extends base_form
       $database_class_name::format_string( $db_consent_form_entry->uid ),
       $database_class_name::format_string( $db_consent_form_entry->option_2 ) ) );
 
+    // save the new consent record to the form
     $this->consent_id = $db_consent->id;
     $this->save();
   }

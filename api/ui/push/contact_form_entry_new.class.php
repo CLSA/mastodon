@@ -1,6 +1,6 @@
 <?php
 /**
- * consent_form_entry_new.class.php
+ * contact_form_entry_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -11,12 +11,12 @@ namespace mastodon\ui\push;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * push: consent_form_entry new
+ * push: contact_form_entry new
  *
- * Create a new consent_form_entry.
+ * Create a new contact_form_entry.
  * @package mastodon\ui
  */
-class consent_form_entry_new extends \cenozo\ui\push\base_new
+class contact_form_entry_new extends base_form_entry_new
 {
   /**
    * Constructor.
@@ -26,7 +26,7 @@ class consent_form_entry_new extends \cenozo\ui\push\base_new
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form_entry', $args );
+    parent::__construct( 'contact', $args );
   }
 }
 ?>

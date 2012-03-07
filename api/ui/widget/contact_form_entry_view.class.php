@@ -1,6 +1,6 @@
 <?php
 /**
- * consent_form_entry_view.class.php
+ * contact_form_entry_view.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -11,11 +11,11 @@ namespace mastodon\ui\widget;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * widget consent_form_entry view
+ * widget contact_form_entry view
  * 
  * @package mastodon\ui
  */
-class consent_form_entry_view extends \cenozo\ui\widget\base_record
+class contact_form_entry_view extends base_form_entry_view
 {
   /**
    * Constructor
@@ -27,7 +27,10 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_record
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form_entry', 'view', $args );
+    parent::__construct( 'contact', $args );
+
+    // add the entry values
+    $this->add_item( 'name', 'type', 'Title' );
   }
 
   /**
@@ -39,6 +42,11 @@ class consent_form_entry_view extends \cenozo\ui\widget\base_record
   public function finish()
   {
     parent::finish();
+
+    // set the entry values
+    $this->set_item( 'name', $this->get_record()->name, false );
+
+    $this->finish_setting_items();
   }
 }
 ?>

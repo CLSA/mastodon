@@ -29,6 +29,7 @@ class consent_form_entry_view extends base_form_entry_view
   {
     parent::__construct( 'consent', $args );
 
+    // add the entry values
     $this->add_item( 'uid', 'string', 'CLSA ID' );
     $this->add_item( 'option_1', 'boolean', 'Option #1' );
     $this->add_item( 'option_2', 'boolean', 'Option #2' );
@@ -45,6 +46,7 @@ class consent_form_entry_view extends base_form_entry_view
   {
     parent::finish();
 
+    // set the entry values
     $this->set_item( 'uid', $this->get_record()->uid, false );
     $this->set_item( 'option_1', $this->get_record()->option_1, false );
     $this->set_item( 'option_2', $this->get_record()->option_2, false );
