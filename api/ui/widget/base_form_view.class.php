@@ -122,10 +122,18 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
    */
   private $items = array();
 
-  // TODO: document
+  /**
+   * The first user's entry for this form.
+   * @var database\form_entry $form_entry_1
+   * @access protected
+   */
   protected $form_entry_1 = NULL;
 
-  // TODO: document
+  /**
+   * The second user's entry for this form.
+   * @var database\form_entry $form_entry_1
+   * @access protected
+   */
   protected $form_entry_2 = NULL;
 }
 ?>

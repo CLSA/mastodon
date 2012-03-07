@@ -90,7 +90,11 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     }
   }
 
-  // TODO: document
+  /**
+   * The type of form (ie: consent, contact, proxy)
+   * @var string $form_type;
+   * @access private
+   */
   private $form_type;
 }
 ?>

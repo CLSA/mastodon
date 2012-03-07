@@ -34,7 +34,11 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
     $this->get_argument( 'id' );
   }
 
-  // TODO: document
+  /**
+   * Processes the adjudication of the form's two entries
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
   public function finish()
   {
     $columns = $this->get_argument( 'columns' );
@@ -111,7 +115,11 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
     }
   }
 
-  // TODO: document
+  /**
+   * The type of form (ie: consent, contact, proxy)
+   * @var string $form_type;
+   * @access private
+   */
   private $form_type;
 }
 ?>

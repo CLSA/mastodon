@@ -63,7 +63,12 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
     return $errors;
   }
 
-  // TODO: document
+  /**
+   * Implements the parent's abstract method (data type is always json)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
   public function get_data_type()
   {
     return 'json';

@@ -17,7 +17,16 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 abstract class base_form extends \cenozo\database\record
 {
-  // TODO: document
+  /**
+   * Overrides the parent method in order to read in any PDF files in the
+   * form's directory into the database.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
   public static function select( $modifier = NULL, $count = false )
   {
     // first load any scans in the form directory into the database
@@ -70,7 +79,13 @@ abstract class base_form extends \cenozo\database\record
     return parent::select( $modifier, $count );
   }
 
-  // TODO: document
+  /**
+   * Overrides the parent method in order to read the scan column.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $column_name The name of the column or table being fetched from the database
+   * @return mixed
+   * @access public
+   */
   public function __get( $column_name )
   {
     // only override if the column is "scan"
@@ -90,7 +105,13 @@ abstract class base_form extends \cenozo\database\record
     return $this->scan_value;
   }
 
-  // TODO: document
+  /**
+   * Overrides the parent method in order to write to the scan column.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $column_name The name of the column
+   * @param mixed $value The value to set the contents of a column to
+   * @access public
+   */
   public function __set( $column_name, $value )
   {
     if( 'scan' != $column_name ) parent::__set( $column_name, $value );
@@ -101,7 +122,11 @@ abstract class base_form extends \cenozo\database\record
     }
   }
 
-  // TODO: document
+  /**
+   * Overrides the parent method in order to deal with the scan column.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
   public function save()
   {
     // first save the record as usual
@@ -128,13 +153,27 @@ abstract class base_form extends \cenozo\database\record
     }
   }
 
-  // TODO: document
+  /**
+   * Imports the form into the system.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
+   * @abstract
+   * @access public
+   */
   abstract public function import( $db_base_form_entry );
 
-  // TODO: document
+  /**
+   * Whether or not the scan column has been changed.
+   * @var boolean $scan_changed
+   * @access protected
+   */
   protected $scan_changed = false;
 
-  // TODO: document
+  /**
+   * A temporary ivar to hold the value of the scan column (if it is set).
+   * @var boolean $scan_value
+   * @access protected
+   */
   protected $scan_value = NULL;
 }
 ?>

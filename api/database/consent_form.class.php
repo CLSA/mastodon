@@ -17,7 +17,12 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class consent_form extends base_form
 {
-  // TODO: document
+  /**
+   * Implements the parent's abstract import method.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
+   * @access public
+   */
   public function import( $db_consent_form_entry )
   {
     if( is_null( $db_consent_form_entry ) || !$db_consent_form_entry->id )

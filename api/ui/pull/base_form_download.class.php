@@ -31,25 +31,44 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
     $this->form_type = $form_type;
   }
 
-  // TODO: document
+  /**
+   * Returns the file name for the form.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
   public function get_file_name()
   {
     return $this->get_record()->id;
   }
 
-  // TODO: document
+  /**
+   * Returns the file data type (extension) for the form (always pdf)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
   public function get_data_type()
   {
     return 'pdf';
   }
 
-  // TODO: document
+  /**
+   * Returns the form's scan.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return binary string
+   * @access public
+   */
   public function finish()
   {
     return $this->get_record()->scan;
   }
 
-  // TODO: document
+  /**
+   * The type of form (ie: consent, contact, proxy)
+   * @var string $form_type;
+   * @access private
+   */
   private $form_type;
 }
 ?>

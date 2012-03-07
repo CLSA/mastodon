@@ -73,7 +73,11 @@ abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
     $this->set_variable( 'form_id', $this->get_record()->$form_id_name );
   }
 
-  // TODO: document
+  /**
+   * The type of form (ie: consent, contact, proxy)
+   * @var string $form_type;
+   * @access private
+   */
   private $form_type;
 }
 ?>
