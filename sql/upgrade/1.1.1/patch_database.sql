@@ -19,6 +19,9 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
+SOURCE participant.sql
+SOURCE hin.sql
 SOURCE role.sql
 SOURCE operation.sql
 SOURCE role_has_operation.sql
+SOURCE status.sql

@@ -18,6 +18,19 @@ use cenozo\lib, cenozo\log, mastodon\util;
 abstract class base_form extends \cenozo\database\record
 {
   /**
+   * Returns the foreign key column name linking this record to the table it is feeding.
+   * This method must be overridden by child classes
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   * @static
+   */
+  public static function get_link_name()
+  {
+    return NULL;
+  }
+
+  /**
    * Overrides the parent method in order to read in any PDF files in the
    * form's directory into the database.
    * @author Patrick Emond <emondpd@mcmaster.ca>

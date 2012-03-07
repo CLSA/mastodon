@@ -18,6 +18,17 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class consent_form extends base_form
 {
   /**
+   * The consent form links to the consent table.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public static function get_link_name()
+  {
+    return 'consent_id';
+  }
+
+  /**
    * Implements the parent's abstract import method.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.

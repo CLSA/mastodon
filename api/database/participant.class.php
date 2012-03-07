@@ -111,7 +111,7 @@ class participant extends person
     $database_class_name = lib::get_class_name( 'database\database' );
 
     // need custom SQL
-    $sql = ' SELECT access, code IS NULL AS missing'.
+    $sql = ' SELECT access, future_access, code IS NULL AS missing'.
            ' FROM hin'.
            ' WHERE uid = '.$database_class_name::format_string( $this->uid );
 

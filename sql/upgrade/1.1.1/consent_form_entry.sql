@@ -10,6 +10,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
   `option_1` TINYINT(1)  NULL ,
   `option_2` TINYINT(1)  NULL ,
   `date` DATE NULL ,
+  `note` TEXT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_consent_form_id` (`consent_form_id` ASC) ,
   INDEX `fk_user_id` (`user_id` ASC) ,

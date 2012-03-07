@@ -33,9 +33,10 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     lib::create( 'business\session' )->set_use_transaction( false );
 
     // get the form and form_entry (dynamic) names
-    $form_name = $this->form_type.'_name';
+    $form_name = $this->form_type.'_form';
     $form_id_name = $form_name.'_id';
-    $type_id_name = $this->form_type.'_id';
+    $form_entry_list_class_name = lib::get_class_name( 'database\\'.$form_name );
+    $link_id_name = $form_entry_list_class_name::get_link_name();
     $form_class_name = lib::get_class_name( 'database\\'.$form_name );
     $form_entry_count_method_name = sprintf( 'get_%s_count', $this->get_subject() );
 
@@ -58,7 +59,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     $found = false;
     $form_mod = lib::create( 'database\modifier' );
     $form_mod->where( 'invalid', '!=', true );
-    $form_mod->where( $type_id_name, '=', NULL );
+    $form_mod->where( $link_id_name, '=', NULL );
     $form_mod->order( 'id' );
     foreach( $form_class_name::select( $form_mod ) as $db_form )
     {
