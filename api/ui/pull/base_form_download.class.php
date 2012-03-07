@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class base_form_download extends \cenozo\ui\pull\base_record
+abstract class base_form_download extends \cenozo\ui\pull\base_record
 {
   /**
    * Constructor
@@ -28,6 +28,7 @@ class base_form_download extends \cenozo\ui\pull\base_record
   public function __construct( $form_type, $args )
   {
     parent::__construct( $form_type.'_form', 'download', $args );
+    $this->form_type = $form_type;
   }
 
   // TODO: document
@@ -47,5 +48,8 @@ class base_form_download extends \cenozo\ui\pull\base_record
   {
     return $this->get_record()->scan;
   }
+
+  // TODO: document
+  private $form_type;
 }
 ?>

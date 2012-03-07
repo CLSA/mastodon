@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\ui
  */
-class base_form_entry_new extends \cenozo\ui\push\base_new
+abstract class base_form_entry_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.
@@ -27,18 +27,17 @@ class base_form_entry_new extends \cenozo\ui\push\base_new
   public function __construct( $form_type, $args )
   {
     parent::__construct( $form_type.'_form_entry', $args );
+    $this->form_type = $form_type;
 
     // we can't use a transaction, otherwise the semaphore in the finish() method won't work right
     lib::create( 'business\session' )->set_use_transaction( false );
 
     // get the form and form_entry (dynamic) names
-    $form_entry_name = $this->get_subject();
-    $form_name = substr( $form_entry_name, 0, strrpos( $form_entry_name, '_' ) );
+    $form_name = $this->form_type.'_name';
     $form_id_name = $form_name.'_id';
-    $type_name = substr( $form_name, 0, strrpos( $form_name, '_' ) );
-    $type_id_name = $type_name.'_id';
+    $type_id_name = $this->form_type.'_id';
     $form_class_name = lib::get_class_name( 'database\\'.$form_name );
-    $form_entry_count_method_name = sprintf( 'get_%s_count', $form_entry_name );
+    $form_entry_count_method_name = sprintf( 'get_%s_count', $this->get_subject() );
 
     $db_user = lib::create( 'business\session' )->get_user();
 
@@ -90,5 +89,8 @@ class base_form_entry_new extends \cenozo\ui\push\base_new
         $session->get_user()->id ) );
     }
   }
+
+  // TODO: document
+  private $form_type;
 }
 ?>

@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Base class to adjudicate conflicts in two form entries.
  * @package mastodon\ui
  */
-class base_form_adjudicate extends \cenozo\ui\push\base_record
+abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
 {
   /**
    * Constructor.
@@ -28,6 +28,7 @@ class base_form_adjudicate extends \cenozo\ui\push\base_record
   public function __construct( $form_type, $args )
   {
     parent::__construct( $form_type.'_form', 'adjudicate', $args );
+    $this->form_type = $form_type;
 
     // make sure we have an id (we don't actually need to use it since the parent does)
     $this->get_argument( 'id' );
@@ -109,5 +110,8 @@ class base_form_adjudicate extends \cenozo\ui\push\base_record
       $this->get_record()->import( $db_form_entry );
     }
   }
+
+  // TODO: document
+  private $form_type;
 }
 ?>
