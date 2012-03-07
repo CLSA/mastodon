@@ -40,6 +40,16 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
     $session = lib::create( 'business\session' );
 
     $this->set_heading( 'Viewing '.$this->get_subject().' details' );
+
+    // Set the two form entries
+    $form_entry_list_method = sprintf( 'get_%s_entry_list', $this->get_subject() );
+    $form_entry_list = $this->get_record()->$form_entry_list_method();
+    $db_form_entry_1 = current( $form_entry_list );
+    $db_form_entry_2 = next( $form_entry_list ); 
+
+    $this->set_form_entries(
+      false == $db_form_entry_1 ? NULL : $db_form_entry_1,
+      false == $db_form_entry_2 ? NULL : $db_form_entry_2 );
   }
   
   /**

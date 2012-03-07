@@ -29,19 +29,11 @@ class consent_form_view extends base_form_view
   {
     parent::__construct( 'consent_form', $args );
 
+    // add entry values
     $this->add_item( 'uid', 'CLSA ID' );
     $this->add_item( 'option_1', 'Option #1' );
     $this->add_item( 'option_2', 'Option #2' );
     $this->add_item( 'date', 'Date' );
-
-    $consent_form_entry_list = 
-      $this->get_record()->get_consent_form_entry_list();
-    $db_consent_form_entry_1 = current( $consent_form_entry_list );
-    $db_consent_form_entry_2 = next( $consent_form_entry_list );
-
-    $this->set_form_entries(
-      false == $db_consent_form_entry_1 ? NULL : $db_consent_form_entry_1,
-      false == $db_consent_form_entry_2 ? NULL : $db_consent_form_entry_2 );
   }
 }
 ?>
