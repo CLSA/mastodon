@@ -31,7 +31,15 @@ class base_form_entry_new extends \cenozo\ui\push\base_new
     // we can't use a transaction, otherwise the semaphore in the finish() method won't work right
     lib::create( 'business\session' )->set_use_transaction( false );
 
-    $form_class_name = lib::get_class_name( 'database\\'.$this->get_subject() );
+    // get the form and form_entry (dynamic) names
+    $form_entry_name = $this->get_subject();
+    $form_name = substr( $form_entry_name, 0, strrpos( $form_entry_name, '_' ) );
+    $form_id_name = $form_name.'_id';
+    $type_name = substr( $form_name, 0, strrpos( $form_name, '_' ) );
+    $type_id_name = $type_name.'_id';
+    $form_class_name = lib::get_class_name( 'database\\'.$form_name );
+    $form_entry_count_method_name = sprintf( 'get_%s_count', $form_entry_name );
+
     $db_user = lib::create( 'business\session' )->get_user();
 
     // we need to use a semaphore to avoid race conditions
@@ -48,10 +56,6 @@ class base_form_entry_new extends \cenozo\ui\push\base_new
 
     // This new operation is different from others.  Instead of providing an ID the system must
     // instead search for one, reporting a notice if none are available
-    $type_id_name = substr( $this->get_subject(), 0, strpos( $this->get_subject(), '_' ) );
-    $form_id_name = $this->get_subject();
-    $form_entry_count_method_name = sprintf( 'get_%s_entry_count', $this->get_subject );
-
     $found = false;
     $form_mod = lib::create( 'database\modifier' );
     $form_mod->where( 'invalid', '!=', true );

@@ -1,0 +1,75 @@
+{##
+ # base_form_entry_view.twig
+ # 
+ # Base template for all form entry view templates.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see base_view.twig for parameters
+ #}
+{% extends "base_view.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      // download button
+      $( "#{{ widget.full }}__scan" ).click( function() {
+        window.location = "{{ form_name }}/download?" +
+                          jQuery.param( { id: {{ form_id }} } );
+      } );
+
+      // defer button
+      $( "#{{ widget.full }}_defer" ).click( function() {
+        var args = new Object();
+        args.id = {{ id }};
+        args.columns = { deferred: 1 };
+        if( ajax_push( "{{ widget.subject }}", "edit", args ) ) slot_prev( {{ slot }} );
+      } );
+
+      // submit button
+      $( "#{{ widget.full }}_submit" ).click( function() {
+        var args = new Object();
+        args.id = {{ id }};
+        var errors = ajax_pull( "{{ widget.subject }}", "validate", args );
+        if( 0 == errors.length )
+        {
+          args.columns = { deferred: 0 };
+          if( ajax_push( "{{ widget.subject }}", "edit", args ) ) slot_prev( {{ slot }} );
+        }
+        else
+        {
+          slot_refresh( {{ slot }} );
+        }
+      } );
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block post_edit %}
+  // something has been edited, re-validate the form
+  slot_refresh( {{ slot }} );
+{% endblock post_edit %}
+
+{% block record_items %}
+  
+  {{ parent() }}
+  <hr class="ui-widget ui-widget-content">
+  <table>
+    <tr>
+      <td class="heading">Actions:</td>
+      <td class="content">
+        <button id="{{ widget.full }}__scan">Download</button>
+      </td>
+    </tr>
+  </table>
+
+{% endblock record_items %}
+
+{% block post_record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import confirm_buttons %}
+  {{ confirm_buttons( slot, widget.full, ['defer','submit'], '', 'right', true ) }}
+
+{% endblock post_record %}

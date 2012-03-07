@@ -16,19 +16,21 @@
         window.location = "{{ widget.subject }}/download?" + jQuery.param( { id: {{ id }} } );
       } );
 
-      // submit button
-      $( "#{{ widget.full }}__submit" ).click( function() {
-        var args = new Object();
-        var columns = new Object();
-        $( "#{{ widget.full }}__edit_form input:radio:checked" ).each( function() {
-          var id_string = $(this).attr( "name" );
-          var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
-          columns[column_name] = $(this).val();
+      {% if allow_adjudication %}
+        // submit button
+        $( "#{{ widget.full }}__submit" ).click( function() {
+          var args = new Object();
+          var columns = new Object();
+          $( "#{{ widget.full }}__edit_form input:radio:checked" ).each( function() {
+            var id_string = $(this).attr( "name" );
+            var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
+            columns[column_name] = $(this).val();
+          } );
+          args.id = {{ id }};
+          args.columns = columns;
+          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
         } );
-        args.id = {{ id }};
-        args.columns = columns;
-        if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
-      } );
+      {% endif %}
 
       // invalidate button
       $( "#{{ widget.full }}__invalidate" ).click( function() {
@@ -44,16 +46,18 @@
         );
       } );
 
-      // radio buttons (once all are selected enable the submit button)
-      $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
-        var enable = true;
-        $( "#{{ widget.full }}__edit_form input:radio" ).each( function() {
-          name = $(this).attr( "name" );
-          if( 0 == $( "input:radio[name=" + name + "]:checked" ).length ) enable = false;
-        } );
+      {% if allow_adjudication %}
+        // radio buttons (once all are selected enable the submit button)
+        $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
+          var enable = true;
+          $( "#{{ widget.full }}__edit_form input:radio" ).each( function() {
+            name = $(this).attr( "name" );
+            if( 0 == $( "input:radio[name=" + name + "]:checked" ).length ) enable = false;
+          } );
 
-        $( "#{{ widget.full }}__submit" ).button( { disabled: !enable } );
-      } );
+          $( "#{{ widget.full }}__submit" ).button( { disabled: !enable } );
+        } );
+      {% endif %}
     } );
   </script>
 
@@ -72,7 +76,7 @@
           <span class="title">{{ entry.entry_1.user }}</span>
         </td>
         <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          {% if conflict %}
+          {% if conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_1.user }}" />
@@ -80,13 +84,6 @@
         </td>
         <td class="content" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
           <div class="padded">{{ entry.entry_1.value }}</div>
-          {% if entry.note is defined %}
-            <div class="help_note">
-              {% autoescape false %}
-                {{ entry.note }}
-              {% endautoescape %}
-            </div>
-          {% endif %}
         </td>
       </tr>
       <tr>
@@ -94,7 +91,7 @@
           <span class="title">{{ entry.entry_2.user }}</span>
         </td>
         <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          {% if conflict %}
+          {% if conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_2.user }}" />
@@ -102,13 +99,6 @@
         </td>
         <td class="content" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
           <div class="padded">{{ entry.entry_2.value }}</div>
-          {% if entry.note is defined %}
-            <div class="help_note">
-              {% autoescape false %}
-                {{ entry.note }}
-              {% endautoescape %}
-            </div>
-          {% endif %}
         </td>
       </tr>
       {% if not loop.last %}
