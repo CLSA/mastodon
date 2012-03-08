@@ -18,17 +18,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class contact_form extends base_form
 {
   /**
-   * The contact form links to the participant table.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return string
-   * @access public
-   */
-  public static function get_link_name()
-  {
-    return 'participant_id';
-  }
-
-  /**
    * Implements the parent's abstract import method.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
@@ -105,6 +94,7 @@ class contact_form extends base_form
       $db_participant_note->user_id = $db_contact_form_entry->user_id;
       $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
       $db_participant_note->note = $db_contact_form_entry->note;
+      $db_participant_note->save();
     }
 
     // import data to the status table
@@ -331,6 +321,7 @@ class contact_form extends base_form
     }
 
     // save the new participant record to the form
+    $this->complete = true;
     $this->participant_id = $db_participant->id;
     $this->save();
   }

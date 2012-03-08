@@ -3,6 +3,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `consent_id` INT UNSIGNED NULL COMMENT 'The consent created by this form.' ,
   `validated_consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,

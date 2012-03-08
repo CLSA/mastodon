@@ -69,6 +69,7 @@ class contact_form_view extends base_form_view
     $this->add_item( 'time_19_20', '7pm to 8pm' );
     $this->add_item( 'time_20_21', '8pm to 9pm' );
     $this->add_item( 'language', 'Language' );
+    $this->add_item( 'signed', 'Signed' );
     $this->add_item( 'date', 'Date Signed' );
     $this->add_item( 'cohort', 'Cohort' );
     $this->add_item( 'note', 'Note' );

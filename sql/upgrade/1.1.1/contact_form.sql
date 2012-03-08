@@ -3,6 +3,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
   `validated_contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,

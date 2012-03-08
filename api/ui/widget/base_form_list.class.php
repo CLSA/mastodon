@@ -104,10 +104,9 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
   protected function determine_record_count( $modifier = NULL )
   {
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$this->get_subject() );
-    $link_id_name = $form_entry_list_class_name::get_link_name();
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'invalid', '!=', true );
-    $modifier->where( $link_id_name, '=', NULL );
+    $modifier->where( 'invalid', '=', false );
+    $modifier->where( 'complete', '=', false );
 
     return parent::determine_record_count( $modifier );
   }
@@ -123,10 +122,9 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
   protected function determine_record_list( $modifier = NULL )
   {
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$this->get_subject() );
-    $link_id_name = $form_entry_list_class_name::get_link_name();
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'invalid', '!=', true );
-    $modifier->where( $link_id_name, '=', NULL );
+    $modifier->where( 'invalid', '=', false );
+    $modifier->where( 'complete', '=', false );
 
     return parent::determine_record_list( $modifier );
   }

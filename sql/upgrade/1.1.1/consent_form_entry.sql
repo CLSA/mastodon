@@ -9,6 +9,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
   `uid` VARCHAR(10) NULL ,
   `option_1` TINYINT(1)  NOT NULL DEFAULT false ,
   `option_2` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
   `date` DATE NULL ,
   `note` TEXT NULL ,
   PRIMARY KEY (`id`) ,

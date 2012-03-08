@@ -73,12 +73,11 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
   {
     $form_name = $this->form_type.'_form';
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$form_name );
-    $link_id_name = $form_entry_list_class_name::get_link_name();
     $db_user = lib::create( 'business\session' )->get_user();
 
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( $form_name.'.invalid', '!=', true );
-    $modifier->where( $form_name.'.'.$link_id_name, '=', NULL );
+    $modifier->where( $form_name.'.invalid', '=', false );
+    $modifier->where( $form_name.'.complete', '=', false );
     $modifier->where( 'user_id', '=', $db_user->id );
     $modifier->where( 'deferred', '=', true );
 
@@ -97,12 +96,11 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
   {
     $form_name = $this->form_type.'_form';
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$form_name );
-    $link_id_name = $form_entry_list_class_name::get_link_name();
     $db_user = lib::create( 'business\session' )->get_user();
 
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( $form_name.'.invalid', '!=', true );
-    $modifier->where( $form_name.'.'.$link_id_name, '=', NULL );
+    $modifier->where( $form_name.'.invalid', '=', false );
+    $modifier->where( $form_name.'.complete', '=', false );
     $modifier->where( 'user_id', '=', $db_user->id );
     $modifier->where( 'deferred', '=', true );
 

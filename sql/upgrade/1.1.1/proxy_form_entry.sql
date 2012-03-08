@@ -43,6 +43,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   `informant_note` TEXT NULL ,
   `informant_continue` TINYINT(1)  NOT NULL DEFAULT false ,
   `health_card` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
   `date` DATE NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_id` (`user_id` ASC) ,

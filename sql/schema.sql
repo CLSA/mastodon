@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
 
 
 -- -----------------------------------------------------
@@ -308,7 +308,7 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('consent to contact received','consent for proxy received','consent form received','package mailed') NOT NULL ,
+  `event` ENUM('consent to contact received','consent for proxy received','package mailed') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `dk_event` (`event` ASC) ,
@@ -451,8 +451,9 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   `time_19_20` TINYINT(1)  NOT NULL DEFAULT false ,
   `time_20_21` TINYINT(1)  NOT NULL DEFAULT false ,
   `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either' ,
-  `date` DATE NULL ,
   `cohort` ENUM('tracking','comprehensive') NULL ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NULL ,
   `note` TEXT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
@@ -486,6 +487,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
   `validated_contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
@@ -522,6 +524,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
   `uid` VARCHAR(10) NULL ,
   `option_1` TINYINT(1)  NOT NULL DEFAULT false ,
   `option_2` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
   `date` DATE NULL ,
   `note` TEXT NULL ,
   PRIMARY KEY (`id`) ,
@@ -551,6 +554,7 @@ CREATE  TABLE IF NOT EXISTS `consent_form` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
   `consent_id` INT UNSIGNED NULL COMMENT 'The consent created by this form.' ,
   `validated_consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
@@ -621,6 +625,7 @@ CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
   `informant_note` TEXT NULL ,
   `informant_continue` TINYINT(1)  NOT NULL DEFAULT false ,
   `health_card` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
   `date` DATE NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_id` (`user_id` ASC) ,
@@ -661,22 +666,30 @@ CREATE  TABLE IF NOT EXISTS `proxy_form` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
   `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
-  `alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
+  `proxy_alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
+  `informant_alternate_id` INT UNSIGNED NULL ,
   `validated_proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
   `date` DATE NOT NULL ,
   `scan` MEDIUMBLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_alternate_id` (`alternate_id` ASC) ,
+  INDEX `fk_proxy_alternate_id` (`proxy_alternate_id` ASC) ,
   INDEX `fk_validated_proxy_form_entry_id` (`validated_proxy_form_entry_id` ASC) ,
-  CONSTRAINT `fk_proxy_form_alternate_id`
-    FOREIGN KEY (`alternate_id` )
+  INDEX `fk_informant_alternate_id` (`informant_alternate_id` ASC) ,
+  CONSTRAINT `fk_proxy_form_proxy_alternate_id`
+    FOREIGN KEY (`proxy_alternate_id` )
     REFERENCES `alternate` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_proxy_form_validated_proxy_form_entry_id`
     FOREIGN KEY (`validated_proxy_form_entry_id` )
     REFERENCES `proxy_form_entry` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_informant_alternate_id`
+    FOREIGN KEY (`informant_alternate_id` )
+    REFERENCES `alternate` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
