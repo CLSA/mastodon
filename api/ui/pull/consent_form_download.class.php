@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class consent_form_download extends \cenozo\ui\pull\base_download
+class consent_form_download extends base_form_download
 {
   /**
    * Constructor
@@ -26,12 +26,7 @@ class consent_form_download extends \cenozo\ui\pull\base_download
    */
   public function __construct( $args )
   {
-    parent::__construct( 'consent_form', $args );
-    
-    // determine the file to upload to the user
-    $participant_class_name = lib::get_class_name( 'database\participant' );
-    $db_participant = lib::create( 'database\participant', $this->get_argument( 'id' ) );
-    $this->set_file_name( $db_participant->get_consent_form_file_name() );
+    parent::__construct( 'consent', $args );
   }
 }
 ?>

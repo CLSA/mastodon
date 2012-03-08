@@ -1,0 +1,128 @@
+{##
+ # base_form_view.twig
+ # 
+ # Extends the base_record template for adding records.
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ #}
+{% extends "base_record.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      // download button
+      $( "#{{ widget.full }}__download" ).click( function() {
+        window.location = "{{ widget.subject }}/download?" + jQuery.param( { id: {{ id }} } );
+      } );
+
+      {% if allow_adjudication %}
+        // submit button
+        $( "#{{ widget.full }}__submit" ).click( function() {
+          var args = new Object();
+          var columns = new Object();
+          $( "#{{ widget.full }}__edit_form input:radio:checked" ).each( function() {
+            var id_string = $(this).attr( "name" );
+            var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
+            columns[column_name] = $(this).val();
+          } );
+          args.id = {{ id }};
+          args.columns = columns;
+          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
+        } );
+      {% endif %}
+
+      // invalidate button
+      $( "#{{ widget.full }}__invalidate" ).click( function() {
+        confirm_dialog(
+          "Invalidate form #{{ id }}?",
+          "Are you sure you want to invalidate this form?  " +
+          "You will no longer have access to this form if you click yes.",
+          function() {
+            if( ajax_push( "{{ widget.subject }}", "edit",
+                           { id: {{ id }}, columns: { invalid: 1 } } ) )
+              slot_prev( {{ slot }} );
+          }
+        );
+      } );
+
+      {% if allow_adjudication %}
+        // radio buttons (once all are selected enable the submit button)
+        $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
+          var enable = true;
+          $( "#{{ widget.full }}__edit_form input:radio" ).each( function() {
+            name = $(this).attr( "name" );
+            if( 0 == $( "input:radio[name=" + name + "]:checked" ).length ) enable = false;
+          } );
+
+          $( "#{{ widget.full }}__submit" ).button( { disabled: !enable } );
+        } );
+      {% endif %}
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block record_items %}
+  <table id="{{ widget.full }}__edit_form">
+    {% for item_id, entry in item %}
+      {# make null entries an empty string #}
+      {% set conflict = entry.entry_1.value != entry.entry_2.value %}
+      <tr>
+        <td rowspan="2" class="heading" style="padding-right: 1.0em">
+          <span class="title">{{ entry.heading }}:</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <span class="title">{{ entry.entry_1.user }}</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          {% if conflict and allow_adjudication %}
+            <input type="radio"
+                   name="{{ widget.full }}__{{ item_id }}"
+                   value="{{ entry.entry_1.user }}" />
+          {% endif %}
+        </td>
+        <td class="content" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          <div class="padded">{{ entry.entry_1.value }}</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="heading" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+          <span class="title">{{ entry.entry_2.user }}</span>
+        </td>
+        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+          {% if conflict and allow_adjudication %}
+            <input type="radio"
+                   name="{{ widget.full }}__{{ item_id }}"
+                   value="{{ entry.entry_2.user }}" />
+          {% endif %}
+        </td>
+        <td class="content" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+          <div class="padded">{{ entry.entry_2.value }}</div>
+        </td>
+      </tr>
+      {% if not loop.last %}
+        <tr><td></td><td colspan="3"><hr class="ui-widget ui-widget-content"</td></tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+  <hr class="ui-widget ui-widget-content">
+  <table>
+    <tr>
+      <td class="heading">Actions:</td>
+      <td class="content">
+        <button id="{{ widget.full }}__download">Download</button>
+        <button id="{{ widget.full }}__submit" disabled>Submit</button>
+        <button id="{{ widget.full }}__invalidate">Invalidate</button>
+      </td>
+    </tr>
+  </table>
+{% endblock record_items %}
+
+{% block post_record %}
+
+  {{ parent() }}
+  {% from 'macros.twig' import confirm_buttons %}
+  {{ confirm_buttons( slot, widget.full, '', 'Back', 'right', true ) }}
+
+{% endblock post_record %}

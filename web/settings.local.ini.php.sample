@@ -24,11 +24,14 @@ $SETTINGS['path']['APPLICATION'] = '/path/to/mastodon';
 // Comment out to disable quexf support.
 $SETTINGS['path']['QUEXF'] = '/path/to/quexf/contact';
 
-// the location to store processed contact form PDF files
-$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/web/contact';
+// the location of new consent forms which need to be processed
+$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 
-// the location to store processed consent form PDF files
-$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/web/consent';
+// the location of new contact forms which need to be processed
+$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
+
+// the location of new proxy forms which need to be processed
+$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
 
 // The path to the log file
 $SETTINGS['path']['LOG_FILE'] = $SETTINGS['path']['APPLICATION'].'/log';

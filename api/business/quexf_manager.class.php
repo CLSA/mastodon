@@ -468,9 +468,8 @@ class quexf_manager extends \cenozo\singleton
         // do nothing, all availability is the same as having no availability entries
       }
 
-      // now update the quexf person's uid and copy the contact form
-      if( !copy( $contact_form_path, sprintf( '%s/%s.pdf', CONTACT_FORM_PATH, $uid ) ) )
-        log::err( sprintf( 'Failed to copy contact form %s from quexf.', $contact_form_path ) );
+      // now update the quexf person's uid and copy the contact form to the database
+      // TODO: need to implement copying form to database
       $db_quexf_person->uid = $db_participant->uid;
       $db_quexf_person->save();
     }
