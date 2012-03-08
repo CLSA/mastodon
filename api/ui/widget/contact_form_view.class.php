@@ -41,8 +41,11 @@ class contact_form_view extends base_form_view
     $this->add_item( 'city', 'City' );
     $this->add_item( 'region_id', 'Province' );
     $this->add_item( 'postcode', 'Postal Code' );
+    $this->add_item( 'address_note', 'Address Note' );
     $this->add_item( 'home_phone', 'Home Phone' );
+    $this->add_item( 'home_phone_note', 'Home Phone Note' );
     $this->add_item( 'mobile_phone', 'Mobile Phone' );
+    $this->add_item( 'mobile_phone_note', 'Mobile Phone Note' );
     $this->add_item( 'phone_preference', 'Phone Preference' );
     $this->add_item( 'email', 'Email Address' );
     $this->add_item( 'gender', 'Sex' );

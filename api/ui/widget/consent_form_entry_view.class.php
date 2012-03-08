@@ -49,8 +49,8 @@ class consent_form_entry_view extends base_form_entry_view
 
     // set the entry values
     $this->set_item( 'uid', $this->get_record()->uid, false );
-    $this->set_item( 'option_1', $this->get_record()->option_1, false );
-    $this->set_item( 'option_2', $this->get_record()->option_2, false );
+    $this->set_item( 'option_1', $this->get_record()->option_1, true );
+    $this->set_item( 'option_2', $this->get_record()->option_2, true );
     $this->set_item( 'date', $this->get_record()->date, false );
     $this->set_item( 'note', $this->get_record()->note, false );
 

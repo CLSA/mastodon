@@ -70,12 +70,25 @@ class util extends \cenozo\util
 
     if( !is_null( $other ) )
     {
-      $value = 'RR '.$other;
-      if( is_null( $address[0] ) ) $address[0] = $value;
-      else $address[1] = is_null( $address[1] ) ? $value : $address[1] = $address[1].', '.$value;
+      if( is_null( $address[0] ) ) $address[0] = $other;
+      else $address[1] = is_null( $address[1] ) ? $other : $address[1] = $address[1].', '.$other;
     }
     
     return $address;
+  }
+
+  /**
+   * Validates a north-american phone number in XXX-XXX-XXXX format.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $number
+   * @return boolean
+   * @access public
+   */
+  public static function validate_phone_number( $number )
+  {
+    return preg_match(
+      '/[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}/',
+      $number );
   }
 }
 ?>

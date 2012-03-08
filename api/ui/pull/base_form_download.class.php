@@ -66,7 +66,7 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
 
   /**
    * The type of form (ie: consent, contact, proxy)
-   * @var string $form_type;
+   * @var string $form_type
    * @access private
    */
   private $form_type;

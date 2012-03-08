@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a proxy_form_entry.
  * @package mastodon\ui
  */
-class proxy_form_entry_edit extends \cenozo\ui\push\base_edit
+class proxy_form_entry_edit extends base_form_entry_edit
 {
   /**
    * Constructor.
@@ -26,7 +26,7 @@ class proxy_form_entry_edit extends \cenozo\ui\push\base_edit
    */
   public function __construct( $args )
   {
-    parent::__construct( 'proxy_form_entry', $args );
+    parent::__construct( 'proxy', $args );
   }
 }
 ?>

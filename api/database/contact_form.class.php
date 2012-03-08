@@ -43,6 +43,7 @@ class contact_form extends base_form
     }
 
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $source_class_name = lib::get_class_name( 'database\source' );
 
     // link to the form
     $this->validated_contact_form_entry_id = $db_contact_form_entry->id;
@@ -89,7 +90,8 @@ class contact_form extends base_form
     $db_participant->date_of_birth = $dob;
     $db_participant->eligible = true;
     $db_participant->status = NULL;
-    $db_participant->language = $db_contact_form_entry->language;
+    if( 'either' != $db_contact_form_entry->language )
+      $db_participant->language = $db_contact_form_entry->language;
     $db_participant->no_in_home = false;
     $db_participant->prior_contact_date = NULL;
     $db_participant->email = $db_contact_form_entry->email;
@@ -119,14 +121,24 @@ class contact_form extends base_form
       $db_contact_form_entry->street_name,
       $db_contact_form_entry->box,
       $db_contact_form_entry->rural_route,
-      $db_contact_form_entry->other );
+      $db_contact_form_entry->address_other );
 
     $db_address = lib::create( 'database\address' );
+    $db_address->person_id = $db_person->id;
+    $db_address->active = true;
+    $db_address->rank = 1;
     $db_address->address1 = $address[0];
     $db_address->address2 = $address[1];
     $db_address->city = $db_contact_form_entry->city;
     $db_address->region_id = $db_contact_form_entry->region_id;
-    $db_address->postcode = $db_contact_form_entry->postcode;
+    $postcode = 6 == strlen( $db_contact_form_entry->postcode )
+              ? sprintf( '%s %s',
+                         substr( $db_contact_form_entry->postcode, 0, 3 ),
+                         substr( $db_contact_form_entry->postcode, 3, 3 ) )
+              : $db_contact_form_entry->postcode;
+    $db_address->postcode = $postcode;
+    $db_address->note = $db_contact_form_entry->address_note;
+    $db_address->save();
 
     // import data to the phone table
     $db_home_phone = NULL;
@@ -141,6 +153,7 @@ class contact_form extends base_form
       $db_home_phone->rank = $rank;
       $db_home_phone->type = 'home';
       $db_home_phone->number = $db_contact_form_entry->home_phone;
+      $db_home_phone->note = $db_contact_form_entry->home_phone_note;
       $db_home_phone->save();
       $rank++;
     }
@@ -152,6 +165,7 @@ class contact_form extends base_form
       $db_mobile_phone->rank = $rank;
       $db_mobile_phone->type = 'mobile';
       $db_mobile_phone->number = $db_contact_form_entry->mobile_phone;
+      $db_mobile_phone->note = $db_contact_form_entry->mobile_phone_note;
       $db_mobile_phone->save();
     }
 

@@ -133,7 +133,7 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
 
   /**
    * The type of form (ie: consent, contact, proxy)
-   * @var string $form_type;
+   * @var string $form_type
    * @access private
    */
   private $form_type;
