@@ -19,9 +19,6 @@ $SETTINGS['general']['development_mode'] = false;
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
-// the location of QUEXF for participant contact and consent updates
-$SETTINGS['path']['QUEXF'] = NULL;
-
 // the location of new consent forms which need to be processed
 $SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 

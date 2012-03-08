@@ -226,3 +226,9 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "proxy_form_entry" AND name = "validate" );
+
+-- remove old participant import operations from all roles
+DELETE FROM role_has_operation
+WHERE operation_id IN (
+  SELECT id FROM operation
+  WHERE subject = "participant" AND name = "import" );

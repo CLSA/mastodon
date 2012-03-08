@@ -166,12 +166,6 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_alternate", true, "Retrieves a list of a participant's alternates." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_consent", true, "Retrieves a list of participant's consent information." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "participant", "import", true, "A form to import participants into the system." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "participant", "import", true, "Returns a summary of changes to be made given a list of UIDs to import." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "participant", "import", true, "Imports participants into the system." );
 
 -- phone
 INSERT INTO operation( type, subject, name, restricted, description )

@@ -20,10 +20,6 @@ $SETTINGS['url']['CENOZO'] = sprintf( 'http%s://%s/url/to/cenozo',
 $SETTINGS['path']['CENOZO'] = '/path/to/cenozo';
 $SETTINGS['path']['APPLICATION'] = '/path/to/mastodon';
 
-// The location of QUEXF for participant contact and consent updates
-// Comment out to disable quexf support.
-$SETTINGS['path']['QUEXF'] = '/path/to/quexf/contact';
-
 // the location of new consent forms which need to be processed
 $SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 
