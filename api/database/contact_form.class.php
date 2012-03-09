@@ -42,7 +42,9 @@ class contact_form extends base_form
 
     // make sure there is a uid available
     $uid = $participant_class_name::get_new_uid();
-    if( is_null( $uid ) ) break;
+    if( is_null( $uid ) ) throw lib::create( 'exception\notice',
+      'There are no new UIDs available, please report this to an administrator immediately!',
+      __METHOD__ );
     
     $year = date( 'Y' );
     $dob = NULL;
