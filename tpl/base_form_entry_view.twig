@@ -47,8 +47,8 @@
 {% endblock javascript %}
 
 {% block post_edit %}
-  // something has been edited, re-validate the form
-  slot_refresh( {{ slot }} );
+  // when the uid is set, refresh to screen to immediately update the result
+  if( 'uid' == column_name ) slot_refresh( {{ slot }} );
 {% endblock post_edit %}
 
 {% block record_items %}
