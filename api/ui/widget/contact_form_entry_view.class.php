@@ -118,8 +118,11 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'city', $record->city, false );
     $this->set_item( 'region_id', $record->region_id, false, $region_list );
     $this->set_item( 'postcode', $record->postcode, false );
+    $this->set_item( 'address_note', $record->address_note, false );
     $this->set_item( 'home_phone', $record->home_phone, false );
+    $this->set_item( 'home_phone_note', $record->home_phone_note, false );
     $this->set_item( 'mobile_phone', $record->mobile_phone, false );
+    $this->set_item( 'mobile_phone_note', $record->mobile_phone_note, false );
     $this->set_item( 'phone_preference', $record->phone_preference, true, $phone_preference_list );
     $this->set_item( 'email', $record->email, false );
     $this->set_item( 'gender', $record->gender, false, $gender_list );
