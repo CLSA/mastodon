@@ -72,7 +72,10 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
         {
           if( 'id' != $column &&
               'user_id' != $column &&
-              $db_form_entry->$column != $this->get_record()->$column )
+              ( is_string( $this->get_record()->$column ) &&
+                strtoupper( $db_form_entry->$column ) !=
+                strtoupper( $this->get_record()->$column ) ) ||
+              ( $db_form_entry->$column == $this->get_record()->$column ) )
           {
             $match = false;
             break;

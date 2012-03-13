@@ -67,7 +67,7 @@
   <table id="{{ widget.full }}__edit_form">
     {% for item_id, entry in item %}
       {# make null entries an empty string #}
-      {% set conflict = entry.entry_1.value != entry.entry_2.value %}
+      {% set conflict = entry.entry_1.value.toUpperCase() != entry.entry_2.value.toUpperCase() %}
       <tr>
         <td rowspan="2" class="heading" style="padding-right: 1.0em">
           <span class="title">{{ entry.heading }}:</span>
