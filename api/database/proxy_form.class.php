@@ -60,7 +60,7 @@ class proxy_form extends base_form
       $alternate_list = $alternate_class_name::select( $alternate_mod );
       $db_proxy_alternate = current( $alternate_list );
 
-      if( is_null( $db_proxy_alternate ) )
+      if( false == $db_proxy_alternate )
       { // create a new alternate if no match was found
         $db_person = lib::create( 'database\person' );
         $db_person->save();
@@ -240,9 +240,10 @@ class proxy_form extends base_form
 
     // save the new alternate record to the form
     $this->complete = true;
-    if( $db_proxy_form_entry->proxy ) $this->proxy_alternate_id = $db_proxy_alternate->id;
+    if( $db_proxy_form_entry->proxy )
+      $this->proxy_alternate_id = $db_proxy_alternate->id;
     if( $db_proxy_form_entry->same_as_proxy )
-      $this->informant_alternate_id = $db_proxy_form_entry->same_as_proxy;
+      $this->informant_alternate_id = $db_proxy_alternate->id;
     else if( $db_proxy_form_entry->informant )
       $this->informant_alternate_id = $db_informant_alternate->id;
     $this->save();
