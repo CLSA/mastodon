@@ -62,20 +62,18 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
       $form_entry_mod = lib::create( 'database\modifier' );
       $form_entry_mod->where( 'deferred', '=', false );
       $form_entry_mod->where( 'id', '!=', $this->get_record()->id );
-      $form_entry_list =
-        $this->get_record()->$entry_list_method_name( $form_entry_mod );
+      $form_entry_list = $db_form->$entry_list_method_name( $form_entry_mod );
       if( 1 == count( $form_entry_list ) )
       {
         $match = true;
         $db_form_entry = current( $form_entry_list );
         foreach( $db_form_entry->get_column_names() as $column )
         {
-          if( 'id' != $column &&
-              'user_id' != $column &&
-              ( is_string( $this->get_record()->$column ) &&
+          if( 'id' == $column || 'user_id' == $column ) continue;
+          if( ( is_string( $this->get_record()->$column ) &&
                 strtoupper( $db_form_entry->$column ) !=
                 strtoupper( $this->get_record()->$column ) ) ||
-              ( $db_form_entry->$column == $this->get_record()->$column ) )
+              ( $db_form_entry->$column != $this->get_record()->$column ) )
           {
             $match = false;
             break;
