@@ -98,7 +98,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       if( is_null( $record->proxy_postcode ) )
         $errors['proxy_postcode'] = 'This value cannot be left blank.';
 
-      if( !is_null( $record->proxy_region_id ) && !is_null( $record->postcode ) )
+      if( !is_null( $record->proxy_region_id ) && !is_null( $record->proxy_postcode ) )
       { // make sure the postcode is in the database
         $db_address = lib::create( 'database\address' );
         $db_address->address1 = 'anything';
@@ -161,7 +161,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       if( is_null( $record->informant_postcode ) )
         $errors['informant_postcode'] = 'This value cannot be left blank.';
 
-      if( !is_null( $record->informant_region_id ) && !is_null( $record->postcode ) )
+      if( !is_null( $record->informant_region_id ) && !is_null( $record->informant_postcode ) )
       { // make sure the postcode is in the database
         $db_address = lib::create( 'database\address' );
         $db_address->address1 = 'anything';
