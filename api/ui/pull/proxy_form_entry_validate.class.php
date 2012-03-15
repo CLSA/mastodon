@@ -76,11 +76,11 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       }
 
       if( !is_null( $record->proxy_box ) &&
-          $record->proxy_box != (string)( (integer) $record->box ) )
+          $record->proxy_box != (string)( (integer) $record->proxy_box ) )
         $errors['proxy_box'] = 'Must be a number only (do not include PO, # or Box).';
 
       if( !is_null( $record->proxy_rural_route ) &&
-          $record->proxy_rural_route != (string)( (integer) $record->rural_route ) )
+          $record->proxy_rural_route != (string)( (integer) $record->proxy_rural_route ) )
         $errors['proxy_rural_route'] = 'Must be a number only (do not include RR or #).';
 
       if( is_null( $record->proxy_city ) )
@@ -139,11 +139,11 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       }
 
       if( !is_null( $record->informant_box ) &&
-          $record->informant_box != (string)( (integer) $record->box ) )
+          $record->informant_box != (string)( (integer) $record->informant_box ) )
         $errors['informant_box'] = 'Must be a number only (do not include PO, # or Box).';
 
       if( !is_null( $record->informant_rural_route ) &&
-          $record->informant_rural_route != (string)( (integer) $record->rural_route ) )
+          $record->informant_rural_route != (string)( (integer) $record->informant_rural_route ) )
         $errors['informant_rural_route'] = 'Must be a number only (do not include RR or #).';
 
       if( is_null( $record->informant_city ) )
