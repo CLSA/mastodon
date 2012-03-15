@@ -196,6 +196,7 @@ class proxy_form extends base_form
         $db_proxy_form_entry->informant_rural_route,
         $db_proxy_form_entry->informant_address_other );
 
+      $db_informant_address = lib::create( 'database\address' );
       $db_informant_address->person_id = $db_person->id;
       $db_informant_address->active = true;
       $db_informant_address->rank = 1;
