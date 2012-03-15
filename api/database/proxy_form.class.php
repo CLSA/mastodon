@@ -72,10 +72,8 @@ class proxy_form extends base_form
         $db_person = $db_proxy_alternate->get_person();
 
         // replace any address and phone numbers
-        foreach( $db_proxy_alternate->get_address_list() as $db_proxy_alternate )
-          $db_proxy_alternate->delete();
-        foreach( $db_proxy_alternate->get_phone_list() as $db_proxy_alternate )
-          $db_proxy_alternate->delete();
+        foreach( $db_proxy_alternate->get_address_list() as $db_address ) $db_address->delete();
+        foreach( $db_proxy_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
       }
 
       $db_proxy_alternate->participant_id = $db_participant->id;
@@ -161,10 +159,8 @@ class proxy_form extends base_form
         $db_person = $db_informant_alternate->get_person();
 
         // replace any address and phone numbers
-        foreach( $db_informant_alternate->get_address_list() as $db_informant_alternate )
-          $db_informant_alternate->delete();
-        foreach( $db_informant_alternate->get_phone_list() as $db_informant_alternate )
-          $db_informant_alternate->delete();
+        foreach( $db_informant_alternate->get_address_list() as $db_address ) $db_address->delete();
+        foreach( $db_informant_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
       }
 
       $db_informant_alternate->participant_id = $db_participant->id;
