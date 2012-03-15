@@ -111,6 +111,8 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
 
       if( is_null( $record->proxy_phone ) )
         $errors['proxy_phone'] = 'This value cannot be left blank.';
+      else if( !util::validate_phone_number( $record->proxy_phone ) )
+        $errors['proxy_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
     if( $record->informant && !$record->same_as_proxy )
@@ -174,6 +176,8 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
 
       if( is_null( $record->informant_phone ) )
         $errors['informant_phone'] = 'This value cannot be left blank.';
+      else if( !util::validate_phone_number( $record->informant_phone ) )
+        $errors['informant_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
     return $errors;
