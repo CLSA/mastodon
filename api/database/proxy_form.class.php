@@ -149,7 +149,7 @@ class proxy_form extends base_form
       $alternate_list = $alternate_class_name::select( $alternate_mod );
       $db_informant_alternate = current( $alternate_list );
 
-      if( is_null( $db_informant_alternate ) )
+      if( false == $db_informant_alternate )
       { // create a new alternate if no match was found
         $db_person = lib::create( 'database\person' );
         $db_person->save();
