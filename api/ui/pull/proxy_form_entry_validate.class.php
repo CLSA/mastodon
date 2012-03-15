@@ -61,7 +61,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       if( is_null( $record->proxy_street_number ) xor is_null( $record->proxy_street_name ) )
       {
         $name = is_null( $record->proxy_street_number )
-              ? 'street_number' : 'street_name';
+              ? 'proxy_street_number' : 'proxy_street_name';
         $errors[$name] = 'Street address must include both the number and name.';
       }
 
@@ -124,7 +124,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
       if( is_null( $record->informant_street_number ) xor is_null( $record->informant_street_name ) )
       {
         $name = is_null( $record->informant_street_number )
-              ? 'street_number' : 'street_name';
+              ? 'informant_street_number' : 'informant_street_name';
         $errors[$name] = 'Street address must include both the number and name.';
       }
 
