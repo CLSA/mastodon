@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: alternate delete_address
  * 
  * @package mastodon\ui
  */
-class alternate_delete_address extends base_delete_record
+class alternate_delete_address extends \cenozo\ui\push\base_delete_record
 {
   /**
    * Constructor.

@@ -8,14 +8,12 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * hin: record
  *
  * @package mastodon\database
  */
-class hin extends record {}
+class hin extends \cenozo\database\record {}
 ?>

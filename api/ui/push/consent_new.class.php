@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: consent new
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Create a new consent.
  * @package mastodon\ui
  */
-class consent_new extends base_new
+class consent_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.
@@ -38,10 +35,11 @@ class consent_new extends base_new
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['participant_id'] = $db_participant->id;
     }
 
@@ -58,9 +56,39 @@ class consent_new extends base_new
     // make sure the date column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
-      throw new exc\notice( 'The date cannot be left blank.', __METHOD__ );
-
+      throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
     parent::finish();
+
+    // if a form variable was included try to decode it and store it as a consent form
+    $form = $this->get_argument( 'form', NULL );
+    if( !is_null( $form ) )
+    {
+      $form_decoded = base64_decode( chunk_split( $noid['form'] ) );
+      if( false == $form_decoded )
+        throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
+      
+      $filename = sprintf( '%s/%s.pdf',
+                           CONSENT_FORM_PATH,
+                           $this->get_record()->get_participant()->uid );
+      $handle = fopen( $filename, 'wb' );
+      if( false === $handle )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to open consent file "%s" for writing.', $filename ),
+          __METHOD__ );
+      
+      if( false === fwrite( $handle, $form ) )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to write to consent file "%s".', $filename ),
+          __METHOD__ );
+
+      if( false === fclose( $handle ) )
+        throw lib::create(
+          'exception\runtime',
+          sprintf( 'Unable to close consent file "%s".', $filename ),
+          __METHOD__ );
+    }
   }
 }
 ?>

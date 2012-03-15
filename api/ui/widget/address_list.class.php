@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget address list
  * 
  * @package mastodon\ui
  */
-class address_list extends base_list
+class address_list extends \cenozo\ui\widget\base_list
 {
   /**
    * Constructor

@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: alternate edit
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Edit a alternate.
  * @package mastodon\ui
  */
-class alternate_edit extends base_edit
+class alternate_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.

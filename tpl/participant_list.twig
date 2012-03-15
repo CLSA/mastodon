@@ -5,9 +5,33 @@
  # @author Patrick Emond <emondpd@mcmaster.ca>
  # @see base_list.twig for parameters
  #}
-{% extends "site_restricted_list.twig" %}
+{% extends "base_list.twig" %}
 
 {% from 'macros.twig' import note_widget %}
+
+{% block javascript %}
+  {{ parent() }}
+  {% if import %}
+    <script type="text/javascript">
+      $( function() {
+        $( "#{{ widget.full }}_import" ).click( function() {
+          slot_load( {{ slot }}, "participant", "import" );
+        } );
+      } );
+    </script>
+  {% endif %}
+{% endblock javascript %}
+
+{% block widget %}
+  {% if import %}
+    <div style="padding-top: 4px; padding-bottom: 4px;">
+      <span class="spacer">
+        <button id="{{ widget.full }}_import">Import Participants</button>
+      </span>
+    </div>
+  {% endif %}
+  {{ parent() }}
+{% endblock widget %}
 
 {% block header_button_columns %}
   <th width="1%"></th>

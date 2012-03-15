@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant edit
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Edit a participant.
  * @package mastodon\ui
  */
-class participant_edit extends base_edit
+class participant_edit extends \cenozo\ui\push\base_edit
 {
   /**
    * Constructor.
@@ -38,10 +35,11 @@ class participant_edit extends base_edit
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw exc\argument( 'noid', $noid, __METHOD__ );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['id'] = $db_participant->id;
     }
 

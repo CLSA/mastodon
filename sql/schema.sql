@@ -4,23 +4,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
 
 
 -- -----------------------------------------------------
--- Table `site`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `site` ;
-
-CREATE  TABLE IF NOT EXISTS `site` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
-  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `person`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `person` ;
@@ -30,6 +13,21 @@ CREATE  TABLE IF NOT EXISTS `person` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `source`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `source` ;
+
+CREATE  TABLE IF NOT EXISTS `source` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -45,9 +43,8 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `person_id` INT UNSIGNED NOT NULL ,
   `active` TINYINT(1)  NOT NULL DEFAULT true ,
   `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
-  `source` ENUM('statscan','ministry','rdd') NOT NULL ,
+  `source_id` INT UNSIGNED NULL DEFAULT NULL ,
   `cohort` ENUM('comprehensive','tracking') NOT NULL ,
-  `site_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'If not null then force all calls to this participant to the site.' ,
   `first_name` VARCHAR(45) NOT NULL ,
   `last_name` VARCHAR(45) NOT NULL ,
   `gender` ENUM('male','female') NOT NULL ,
@@ -59,102 +56,40 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,
   INDEX `dk_prior_contact_date` (`prior_contact_date` ASC) ,
   UNIQUE INDEX `uq_uid` (`uid` ASC) ,
   INDEX `dk_uid` (`uid` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
-  CONSTRAINT `fk_participant_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_person`
+  INDEX `fk_source_id` (`source_id` ASC) ,
+  CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `user`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `user` ;
-
-CREATE  TABLE IF NOT EXISTS `user` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `first_name` VARCHAR(255) NOT NULL ,
-  `last_name` VARCHAR(255) NOT NULL ,
-  `active` TINYINT(1)  NOT NULL DEFAULT true ,
-  `theme` VARCHAR(45) NULL DEFAULT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name` (`name` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `role`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `role` ;
-
-CREATE  TABLE IF NOT EXISTS `role` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name` (`name` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `operation`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `operation` ;
-
-CREATE  TABLE IF NOT EXISTS `operation` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `type` ENUM('push','pull','widget') NOT NULL ,
-  `subject` VARCHAR(45) NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `restricted` TINYINT(1)  NOT NULL DEFAULT true ,
-  `description` TEXT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_type_subject_name` (`type` ASC, `subject` ASC, `name` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `role_has_operation`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `role_has_operation` ;
-
-CREATE  TABLE IF NOT EXISTS `role_has_operation` (
-  `role_id` INT UNSIGNED NOT NULL ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `operation_id` INT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`role_id`, `operation_id`) ,
-  INDEX `fk_role_id` (`role_id` ASC) ,
-  INDEX `fk_operation_id` (`operation_id` ASC) ,
-  CONSTRAINT `fk_role_has_operation_role`
-    FOREIGN KEY (`role_id` )
-    REFERENCES `role` (`id` )
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_role_has_operation_operation`
-    FOREIGN KEY (`operation_id` )
-    REFERENCES `operation` (`id` )
+  CONSTRAINT `fk_participant_source_id`
+    FOREIGN KEY (`source_id` )
+    REFERENCES `source` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `site`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `site` ;
+
+CREATE  TABLE IF NOT EXISTS `site` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
+  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
 ENGINE = InnoDB;
 
 
@@ -173,44 +108,11 @@ CREATE  TABLE IF NOT EXISTS `consent` (
   `note` TEXT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_event` (`event` ASC) ,
+  INDEX `dk_date` (`date` ASC) ,
   CONSTRAINT `fk_consent_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `access`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `access` ;
-
-CREATE  TABLE IF NOT EXISTS `access` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `user_id` INT UNSIGNED NOT NULL ,
-  `role_id` INT UNSIGNED NOT NULL ,
-  `site_id` INT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_role_id` (`role_id` ASC) ,
-  INDEX `fk_user_id` (`user_id` ASC) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  UNIQUE INDEX `uq_user_role_site` (`user_id` ASC, `role_id` ASC, `site_id` ASC) ,
-  CONSTRAINT `fk_access_user`
-    FOREIGN KEY (`user_id` )
-    REFERENCES `user` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_access_role`
-    FOREIGN KEY (`role_id` )
-    REFERENCES `role` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_access_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -231,113 +133,20 @@ CREATE  TABLE IF NOT EXISTS `person_note` (
   `datetime` DATETIME NOT NULL ,
   `note` TEXT NOT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_user_id` (`user_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
-  CONSTRAINT `fk_participant_note_user`
-    FOREIGN KEY (`user_id` )
-    REFERENCES `user` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  INDEX `dk_sticky_datetime` (`sticky` ASC, `datetime` ASC) ,
   CONSTRAINT `fk_participant_note_person`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `activity`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `activity` ;
-
-CREATE  TABLE IF NOT EXISTS `activity` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `user_id` INT UNSIGNED NOT NULL ,
-  `site_id` INT UNSIGNED NOT NULL ,
-  `role_id` INT UNSIGNED NOT NULL ,
-  `operation_id` INT UNSIGNED NOT NULL ,
-  `query` VARCHAR(511) NOT NULL ,
-  `elapsed` FLOAT NOT NULL DEFAULT 0 COMMENT 'The total time to perform the operation in seconds.' ,
-  `datetime` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_role_id` (`role_id` ASC) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  INDEX `fk_operation_id` (`operation_id` ASC) ,
-  CONSTRAINT `fk_activity_user`
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_person_note_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_activity_role`
-    FOREIGN KEY (`role_id` )
-    REFERENCES `role` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_activity_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_activity_operation`
-    FOREIGN KEY (`operation_id` )
-    REFERENCES `operation` (`id` )
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `setting`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `setting` ;
-
-CREATE  TABLE IF NOT EXISTS `setting` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `category` VARCHAR(45) NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `type` ENUM( 'boolean', 'integer', 'float', 'string' ) NOT NULL ,
-  `value` VARCHAR(45) NOT NULL ,
-  `description` TEXT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_category_name` (`category` ASC, `name` ASC) ,
-  INDEX `dk_category` (`category` ASC) ,
-  INDEX `dk_name` (`name` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `setting_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `setting_value` ;
-
-CREATE  TABLE IF NOT EXISTS `setting_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `setting_id` INT UNSIGNED NOT NULL ,
-  `site_id` INT UNSIGNED NOT NULL ,
-  `value` VARCHAR(45) NOT NULL ,
-  INDEX `fk_setting_id` (`setting_id` ASC) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_setting_id_site_id` (`setting_id` ASC, `site_id` ASC) ,
-  CONSTRAINT `fk_setting_value_setting`
-    FOREIGN KEY (`setting_id` )
-    REFERENCES `setting` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_setting_value_site`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-COMMENT = 'Site-specific setting overriding the default.' ;
 
 
 -- -----------------------------------------------------
@@ -399,6 +208,8 @@ CREATE  TABLE IF NOT EXISTS `address` (
   INDEX `fk_region_id` (`region_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
   UNIQUE INDEX `uq_person_id_rank` (`person_id` ASC, `rank` ASC) ,
+  INDEX `dk_city` (`city` ASC) ,
+  INDEX `dk_postcode` (`postcode` ASC) ,
   CONSTRAINT `fk_address_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
@@ -495,9 +306,11 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('TBD') NULL ,
+  `event` ENUM('consent to contact received','package mailed') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `dk_event` (`event` ASC) ,
+  INDEX `dk_datetime` (`datetime` ASC) ,
   CONSTRAINT `fk_status_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
@@ -540,40 +353,44 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `sample`
+-- Table `unique_identifier_pool`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sample` ;
+DROP TABLE IF EXISTS `unique_identifier_pool` ;
 
-CREATE  TABLE IF NOT EXISTS `sample` (
+CREATE  TABLE IF NOT EXISTS `unique_identifier_pool` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` VARCHAR(45) NOT NULL ,
-  `create_timestamp` VARCHAR(45) NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `active` VARCHAR(45) NOT NULL DEFAULT 'false' COMMENT 'Samples of participants which are actively being contacted.' ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `uid` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
+  UNIQUE INDEX `uid_UNIQUE` (`uid` ASC) )
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `sample_has_participant`
+-- Table `availability`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sample_has_participant` ;
+DROP TABLE IF EXISTS `availability` ;
 
-CREATE  TABLE IF NOT EXISTS `sample_has_participant` (
-  `sample_id` INT UNSIGNED NOT NULL ,
+CREATE  TABLE IF NOT EXISTS `availability` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
-  `update_timestamp` VARCHAR(45) NOT NULL ,
-  `create_timestamp` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`sample_id`, `participant_id`) ,
+  `monday` TINYINT(1) NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1) NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1) NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1) NOT NULL DEFAULT false ,
+  `friday` TINYINT(1) NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1) NOT NULL DEFAULT false ,
+  `sunday` TINYINT(1) NOT NULL DEFAULT false ,
+  `start_time` TIME NOT NULL ,
+  `end_time` TIME NOT NULL ,
+  PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
-  INDEX `fk_sample_id` (`sample_id` ASC) ,
-  CONSTRAINT `fk_sample_has_participant_sample`
-    FOREIGN KEY (`sample_id` )
-    REFERENCES `sample` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_sample_has_participant_participant`
+  INDEX `dk_start_time` (`start_time` ASC) ,
+  INDEX `dk_end_time` (`end_time` ASC) ,
+  CONSTRAINT `fk_availability_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
     ON DELETE NO ACTION
@@ -715,6 +532,21 @@ CREATE  OR REPLACE VIEW `alternate_first_address` AS
 SELECT alternate.id AS alternate_id, address_id
 FROM person_first_address, alternate
 WHERE person_first_address.person_id = alternate.person_id;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS `remove_uid_from_pool` $$
+
+
+CREATE TRIGGER remove_uid_from_pool BEFORE
+  INSERT ON participant
+  FOR EACH ROW BEGIN
+    DELETE FROM unique_identifier_pool WHERE uid = new.uid;
+  END;
+$$
+
+
+DELIMITER ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

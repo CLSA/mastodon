@@ -8,14 +8,12 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * consent: record
  *
  * @package mastodon\database
  */
-class consent extends record {}
+class consent extends \cenozo\database\record {}
 ?>

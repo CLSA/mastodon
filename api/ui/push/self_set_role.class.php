@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: self set_role
@@ -20,7 +17,7 @@ use mastodon\exception as exc;
  * Arguments must include 'role'.
  * @package mastodon\ui
  */
-class self_set_role extends \mastodon\ui\push
+class self_set_role extends \cenozo\ui\push\self_set_role
 {
   /**
    * Constructor.
@@ -39,35 +36,15 @@ class self_set_role extends \mastodon\ui\push
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'role.name', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
-      $db_site = db\role::get_unique_record( 'name', $noid['role.name'] );
-      if( !$db_site ) throw new exc\argument( 'name', $noid['role.name'], __METHOD__ );
+      $class_name = lib::get_class_name( 'database\role' );
+      $db_site = $class_name::get_unique_record( 'name', $noid['role.name'] );
+      if( !$db_site ) throw lib::create( 'exception\argument', 'name', $noid['role.name'], __METHOD__ );
       $args['id'] = $db_site->id;
     }
 
-    parent::__construct( 'self', 'set_role', $args );
-  }
-  
-  /**
-   * Executes the push.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\runtime
-   * @access public
-   */
-  public function finish()
-  {
-    try
-    {
-      $db_role = new db\role( $this->get_argument( 'id' ) );
-    }
-    catch( exc\runtime $e )
-    {
-      throw new exc\argument( 'id', $this->get_argument( 'id' ), __METHOD__, $e );
-    }
-    
-    $session = bus\session::self();
-    $session->set_site_and_role( $session->get_site(), $db_role );
+    parent::__construct( $args );
   }
 }
 ?>

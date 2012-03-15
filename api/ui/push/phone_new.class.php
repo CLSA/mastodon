@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: phone new
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Create a new phone.
  * @package mastodon\ui
  */
-class phone_new extends base_new
+class phone_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.
@@ -38,18 +35,20 @@ class phone_new extends base_new
       // make sure there is sufficient information
       if( !is_array( $noid ) ||
           !array_key_exists( 'participant.uid', $noid ) )
-        throw new exc\argument( 'noid', $noid, __METHOD__ );
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       
-      $db_participant = db\participant::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $args['columns']['person_id'] = $db_participant->person_id;
       
       if( array_key_exists( 'address.rank', $noid ) )
       {
-        $db_address = db\address::get_unique_record(
+        $address_class_name = lib::get_class_name( 'database\address' );
+        $db_address = $address_class_name::get_unique_record(
           array( 'person_id', 'rank' ),
           array( $db_participant->person_id, $noid['address.rank'] ) );
-        if( !$db_address ) throw new exc\argument( 'noid', $noid, __METHOD__ );
+        if( !$db_address ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
         $args['columns']['address_id'] = $db_address->id;
       }
     }
@@ -70,7 +69,7 @@ class phone_new extends base_new
     
     // validate the number
     if( 10 != strlen( preg_replace( '/[^0-9]/', '', $columns['number'] ) ) )
-      throw new exc\notice(
+      throw lib::create( 'exception\notice',
         'Phone numbers must have exactly 10 digits.', __METHOD__ );
 
     parent::finish();

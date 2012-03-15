@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget phone view
  * 
  * @package mastodon\ui
  */
-class phone_view extends base_view
+class phone_view extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -54,11 +51,12 @@ class phone_view extends base_view
     $db_person = $this->get_record()->get_person();
 
     // create enum arrays
-    $modifier = new db\modifier();
+    $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'person_id', '=', $db_person->id );
     $modifier->order( 'rank' );
     $addresses = array();
-    foreach( db\address::select( $modifier ) as $db_address )
+    $address_class_name = lib::get_class_name( 'database\address' );
+    foreach( $address_class_name::select( $modifier ) as $db_address )
     {
       $db_region = $db_address->get_region();
       $addresses[$db_address->id] = sprintf( '%d. %s, %s, %s',
@@ -72,7 +70,8 @@ class phone_view extends base_view
     $ranks = array();
     for( $rank = 1; $rank <= $num_phones; $rank++ ) $ranks[] = $rank;
     $ranks = array_combine( $ranks, $ranks );
-    $types = db\phone::get_enum_values( 'type' );
+    $phone_class_name = lib::get_class_name( 'database\phone' );
+    $types = $phone_class_name::get_enum_values( 'type' );
     $types = array_combine( $types, $types );
 
     // set the view's items

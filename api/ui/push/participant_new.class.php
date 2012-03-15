@@ -8,10 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant new
@@ -19,7 +16,7 @@ use mastodon\exception as exc;
  * Create a new participant.
  * @package mastodon\ui
  */
-class participant_new extends base_new
+class participant_new extends \cenozo\ui\push\base_new
 {
   /**
    * Constructor.
@@ -42,9 +39,21 @@ class participant_new extends base_new
     // make sure the name column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'first_name', $columns ) || 0 == strlen( $columns['first_name'] ) )
-      throw new exc\notice( 'The participant\'s first name cannot be left blank.', __METHOD__ );
+      throw lib::create( 'exception\notice', 'The participant\'s first name cannot be left blank.', __METHOD__ );
     if( !array_key_exists( 'last_name', $columns ) || 0 == strlen( $columns['last_name'] ) )
-      throw new exc\notice( 'The participant\'s last name cannot be left blank.', __METHOD__ );
+      throw lib::create( 'exception\notice', 'The participant\'s last name cannot be left blank.', __METHOD__ );
+
+    if( 0 == $columns['person_id'] )
+    {
+      $db_person = lib::create( 'database\person' );
+      $db_person->save();
+      // direct access to the parent operation class's protected arguments ivar
+      // is necessary in this isolated case since a person id is required
+      // to manually create a new particpant via the widget interface.
+      // in future, it may be necessary to create a set_arguments method 
+      // in the operation class and make arguments a private ivar
+      $this->arguments['columns']['person_id'] = $db_person->id;
+    }
 
     parent::finish();
   }

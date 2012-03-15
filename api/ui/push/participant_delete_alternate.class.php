@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\push;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant delete_alternate
  * 
  * @package mastodon\ui
  */
-class participant_delete_alternate extends base_delete_record
+class participant_delete_alternate extends \cenozo\ui\push\base_delete_record
 {
   /**
    * Constructor.
@@ -39,7 +36,7 @@ class participant_delete_alternate extends base_delete_record
   public function finish()
   {
     // get the alternate's person record
-    $db_alternate = new db\alternate( $this->get_argument( 'remove_id' ) );
+    $db_alternate = lib::create( 'database\alternate', $this->get_argument( 'remove_id' ) );
     $db_person = $db_alternate->get_person();
 
     // call the parent method to delete the alternate
@@ -50,11 +47,11 @@ class participant_delete_alternate extends base_delete_record
     {
       $db_person->delete();
     }
-    catch( exc\database $e )
+    catch( \cenozo\exception\database $e )
     { // help describe exceptions to the user
       if( $e->is_constrained() )
       {
-        throw new exc\notice(
+        throw lib::create( 'exception\notice',
           'Unable to delete the '.$this->child_subject.
           ' because it is being referenced by the database.', __METHOD__, $e );
       }

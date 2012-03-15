@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\pull;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: participant primary
  * 
  * @package mastodon\ui
  */
-class participant_primary extends base_primary
+class participant_primary extends \cenozo\ui\pull\base_primary
 {
   /**
    * Constructor
@@ -32,10 +29,17 @@ class participant_primary extends base_primary
     // if the uid is provided instead of the id  then fetch the participant id based on the uid
     if( isset( $args['uid'] ) )
     {
-      $db_participant = db\participant::get_unique_record( 'uid', $args['uid'] );
+      $class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $class_name::get_unique_record( 'uid', $args['uid'] );
 
       if( is_null( $db_participant ) )
-        throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+        throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
+
+      // make sure not to mix up comprehensive and tracking participants
+      if( $db_participant->cohort != lib::create( 'business\session' )->get_site()->cohort )
+        throw lib::create( 'exception\runtime',
+          'Tried to get participant from wrong cohort.', __METHOD__ );
+
       $args['id'] = $db_participant->id;
     }
 
@@ -56,7 +60,12 @@ class participant_primary extends base_primary
     // restrict by cohort, if asked to
     $cohort = $this->get_argument( 'cohort', false );
     if( $cohort && $cohort != $this->get_record()->cohort )
-      throw new exc\argument( 'uid', $args['uid'], __METHOD__ );
+      throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
+
+    // convert source_id to source (name)
+    $data['source_name'] = is_null( $data['source_id'] )
+                         ? NULL
+                         : $this->get_record()->get_source()->name;
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
@@ -123,12 +132,12 @@ class participant_primary extends base_primary
       
       if( count( $hin_info ) )
       {
-        $data['hin_access'] = $hin_info['access'];
-        $data['hin_missing'] = !$hin_info['missing'];
+        $data['hin_access'] = $hin_info['access'] ? 1 : 0;
+        $data['hin_missing'] = $hin_info['missing'];
       }
       else
       {
-        $data['hin_access'] = false;
+        $data['hin_access'] = -1; // -1 means there is no access information
         $data['hin_missing'] = true;
       }
     }

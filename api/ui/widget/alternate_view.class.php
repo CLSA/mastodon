@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget alternate view
  * 
  * @package mastodon\ui
  */
-class alternate_view extends base_view
+class alternate_view extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -43,11 +40,11 @@ class alternate_view extends base_view
     try
     {
       // create the address sub-list widget
-      $this->address_list = new address_list( $args );
+      $this->address_list = lib::create( 'ui\widget\address_list', $args );
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->address_list = NULL;
     }
@@ -55,11 +52,11 @@ class alternate_view extends base_view
     try
     {
       // create the phone sub-list widget
-      $this->phone_list = new phone_list( $args );
+      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
-    catch( exc\permission $e )
+    catch( \cenozo\exception\permission $e )
     {
       $this->phone_list = NULL;
     }

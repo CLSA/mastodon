@@ -8,9 +8,7 @@
  */
 
 namespace mastodon\database;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * participant: record
@@ -19,72 +17,6 @@ use mastodon\exception as exc;
  */
 class participant extends person
 {
-  /**
-   * Identical to the parent's select method but restrict to a particular site.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param site $db_site The site to restrict the selection to.
-   * @param modifier $modifier Modifications to the selection.
-   * @param boolean $count If true the total number of records instead of a list
-   * @return array( record ) | int
-   * @static
-   * @access public
-   */
-  public static function select_for_site( $db_site, $modifier = NULL, $count = false )
-  {
-    // if there is no site restriction then just use the parent method
-    if( is_null( $db_site ) ) return parent::select( $modifier, $count );
-
-    // left join the participant_primary_address and address tables
-    if( is_null( $modifier ) ) $modifier = new modifier();
-    $sql = sprintf( ( $count ? 'SELECT COUNT( %s.%s ) ' : 'SELECT %s.%s ' ).
-                    'FROM %s '.
-                    'LEFT JOIN participant_primary_address '.
-                    'ON %s.id = participant_primary_address.participant_id '.
-                    'LEFT JOIN address '.
-                    'ON participant_primary_address.address_id = address.id '.
-                    'WHERE ( %s.site_id = %d '.
-                    '  OR ( %s.site_id IS NULL '.
-                    '    AND address.region_id IN ( '.
-                    '      SELECT id FROM region WHERE site_id = %d ) ) ) %s',
-                    static::get_table_name(),
-                    static::get_primary_key_name(),
-                    static::get_table_name(),
-                    static::get_table_name(),
-                    static::get_table_name(),
-                    $db_site->id,
-                    static::get_table_name(),
-                    $db_site->id,
-                    $modifier->get_sql( true ) );
-
-    if( $count )
-    {
-      return intval( static::db()->get_one( $sql ) );
-    }
-    else
-    {
-      $id_list = static::db()->get_col( $sql );
-      $records = array();
-      foreach( $id_list as $id ) $records[] = new static( $id );
-      return $records;
-    }
-  }
-
-  /**
-   * Identical to the parent's count method but restrict to a particular site.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param site $db_site The site to restrict the count to.
-   * @param modifier $modifier Modifications to the count.
-   * @return int
-   * @static
-   * @access public
-   */
-  public static function count_for_site( $db_site, $modifier = NULL )
-  {
-    return static::select_for_site( $db_site, $modifier, true );
-  }
-  
   /**
    * Get the participant's last consent
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -99,14 +31,16 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
+    
+    $database_class_name = lib::get_class_name( 'database\database' );
 
     // need custom SQL
     $consent_id = static::db()->get_one(
       sprintf( 'SELECT consent_id '.
                'FROM participant_last_consent '.
                'WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $consent_id ? new consent( $consent_id ) : NULL;
+               $database_class_name::format_string( $this->id ) ) );
+    return $consent_id ? lib::create( 'database\consent', $consent_id ) : NULL;
   }
 
   /**
@@ -124,11 +58,13 @@ class participant extends person
       return NULL;
     }
     
+    $database_class_name = lib::get_class_name( 'database\database' );
+    
     // need custom SQL
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_primary_address WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
+               $database_class_name::format_string( $this->id ) ) );
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**
@@ -147,38 +83,14 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
-    
+
+    $database_class_name = lib::get_class_name( 'database\database' );
+
     // need custom SQL
     $address_id = static::db()->get_one(
       sprintf( 'SELECT address_id FROM participant_first_address WHERE participant_id = %s',
-               database::format_string( $this->id ) ) );
-    return $address_id ? new address( $address_id ) : NULL;
-  }
-
-  /**
-   * Get the site that the participant belongs to.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return site
-   * @access public
-   */
-  public function get_primary_site()
-  {
-    $db_site = NULL;
-
-    if( !is_null( $this->site_id ) )
-    { // site is specifically defined
-      $db_site = $this->get_site();
-    }
-    else
-    {
-      $db_address = $this->get_primary_address();
-      if( !is_null( $db_address ) )
-      { // there is a primary address
-        $db_site = $db_address->get_region()->get_site();
-      }
-    }
-
-    return $db_site;
+               $database_class_name::format_string( $this->id ) ) );
+    return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
   /**
@@ -195,13 +107,149 @@ class participant extends person
       log::warning( 'Tried to query participant with no id.' );
       return NULL;
     }
-    
+   
+    $database_class_name = lib::get_class_name( 'database\database' );
+
     // need custom SQL
     $sql = ' SELECT access, code IS NULL AS missing'.
            ' FROM hin'.
-           ' WHERE uid = '.database::format_string( $this->uid );
+           ' WHERE uid = '.$database_class_name::format_string( $this->uid );
 
     return static::db()->get_row( $sql );
+  }
+
+  /**
+   * Returns the path to the participant's contact form.
+   * Note, this method will return a path whether the file exists or not.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_contact_form_file_name()
+  {
+    return sprintf( '%s/%s.pdf', CONTACT_FORM_PATH, $this->uid );
+  }
+
+  /**
+   * Returns the path to the participant's consent form.
+   * Note, this method will return a path whether the file exists or not.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_consent_form_file_name()
+  {
+    return sprintf( '%s/%s.pdf', CONSENT_FORM_PATH, $this->uid );
+  }
+
+  /**
+   * Get a list of all participants who have or do not have a particular event.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return array( database\participant )
+   * @param string $event One of status.event enum types.
+   * @param boolean $missing Set to false to return participants with the event, true for those
+   *                without it.
+   * @param modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
+  public static function select_for_event(
+    $event, $missing = false, $modifier = NULL, $count = false )
+  {
+    $database_class_name = lib::get_class_name( 'database\database' );
+
+    // we need to build custom sql for this query
+    $sql = sprintf(
+      'SELECT DISTINCT participant.id '.
+      'FROM participant, status '.
+      'WHERE participant.id = status.participant_id '.
+      'AND status.event = %s ',
+      $database_class_name::format_string( $event ) );
+
+    if( $missing )
+    {
+      // determine the inverse (missing events) by using a sub-select
+      $sql = sprintf(
+        ( $count ? 'SELECT COUNT(*) ' : 'SELECT id ' ).
+        'FROM participant '.
+        'WHERE id NOT IN ( %s ) ',
+        $sql );
+    }
+    else
+    {
+      // add in the COUNT function if we are counting
+      if( $count ) preg_replace( '/DISTINCT id/', 'COUNT( DISTINCT id )', $sql );
+    }
+
+    // add in the modifier if it exists
+    if( !is_null( $modifier ) ) $sql .= $modifier->get_sql( true );
+
+    if( $count )
+    {
+      return intval( static::db()->get_one( $sql ) );
+    }
+    else
+    {
+      $id_list = static::db()->get_col( $sql );
+      $records = array();
+      foreach( $id_list as $id ) $records[] = new static( $id );
+      return $records;
+    }
+  }
+
+  /**
+   * Count all participants who have or do not have a particular event.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string $event One of status.event enum types.
+   * @param boolean $missing Set to false to return participants with the event, true for those
+   *                without it.
+   * @param modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
+  public static function count_for_event( $event, $missing = false, $modifier = NULL )
+  {
+    return static::select_for_event( $event, $missing, $modifier, true );
+  }
+
+  /**
+   * Get a random UID from the pool of unassigned UIDs.  If the pool is empty this returns NULL.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @static
+   * @access public
+   */
+  public static function get_new_uid()
+  {
+    $new_uid = NULL;
+
+    // Get a random UID by selecting a random number between the min and max ID and finding
+    // the first record who's id is greater or equal to that random number (since some may
+    // get deleted)
+    $row = static::db()->get_row( 'SELECT MIN( id ) AS min, MAX( id ) AS max FROM unique_identifier_pool' );
+    if( count( $row ) )
+    {
+      $new_uid = static::db()->get_one(
+        'SELECT uid FROM unique_identifier_pool WHERE id >= '.rand( $row['min'], $row['max'] ) );
+    }
+
+    return $new_uid;
+  }
+
+  /**
+   * Get the number of UIDs available in the pool of unassigned UIDs.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return int
+   * @static
+   * @access public
+   */
+  public static function get_uid_pool_count()
+  {
+    return static::db()->get_one( 'SELECT COUNT(*) FROM unique_identifier_pool' );
   }
 }
 ?>

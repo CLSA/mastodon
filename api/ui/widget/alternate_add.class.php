@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget alternate add
  * 
  * @package mastodon\ui
  */
-class alternate_add extends base_view
+class alternate_add extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -54,7 +51,7 @@ class alternate_add extends base_view
     
     // this widget must have a parent, and it's subject must be a participant
     if( is_null( $this->parent ) || 'participant' != $this->parent->get_subject() )
-      throw new exc\runtime(
+      throw lib::create( 'exception\runtime',
         'Association widget must have a parent with participant as the subject.', __METHOD__ );
 
     // set the view's items

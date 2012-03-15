@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget alternate list
  * 
  * @package mastodon\ui
  */
-class alternate_list extends site_restricted_list
+class alternate_list extends \cenozo\ui\widget\site_restricted_list
 {
   /**
    * Constructor

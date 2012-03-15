@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget address add
  * 
  * @package mastodon\ui
  */
-class address_add extends base_view
+class address_add extends \cenozo\ui\widget\base_view
 {
   /**
    * Constructor
@@ -71,7 +68,7 @@ class address_add extends base_view
     // this widget must have a parent, and it's subject must be a participant
     $subject = $this->parent->get_subject();
     if( is_null( $this->parent ) || ( 'participant' != $subject && 'alternate' != $subject ) )
-      throw new exc\runtime(
+      throw lib::create( 'exception\runtime',
         'Address widget must have a parent with participant or alternate as the subject.',
         __METHOD__ );
     
@@ -84,7 +81,8 @@ class address_add extends base_view
     $last_rank_key = key( $ranks );
     reset( $ranks );
     $regions = array();
-    foreach( db\region::select() as $db_region )
+    $class_name = lib::get_class_name( 'database\region' );
+    foreach( $class_name::select() as $db_region )
       $regions[$db_region->id] = $db_region->name.', '.$db_region->country;
     reset( $regions );
 

@@ -8,17 +8,14 @@
  */
 
 namespace mastodon\ui\widget;
-use mastodon\log, mastodon\util;
-use mastodon\business as bus;
-use mastodon\database as db;
-use mastodon\exception as exc;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget participant list
  * 
  * @package mastodon\ui
  */
-class participant_list extends site_restricted_list
+class participant_list extends \cenozo\ui\widget\base_list
 {
   /**
    * Constructor
@@ -36,7 +33,7 @@ class participant_list extends site_restricted_list
     $this->add_column( 'first_name', 'string', 'First Name', true );
     $this->add_column( 'last_name', 'string', 'Last Name', true );
     $this->add_column( 'active', 'boolean', 'Active', true );
-    $this->add_column( 'source', 'string', 'Source', true );
+    $this->add_column( 'source.name', 'string', 'Source', true );
     $this->add_column( 'cohort', 'string', 'Cohort', true );
   }
   
@@ -52,48 +49,23 @@ class participant_list extends site_restricted_list
     
     foreach( $this->get_record_list() as $record )
     {
+      $db_source = $record->get_source();
+      $source_name = is_null( $db_source ) ? '(none)' : $db_source->name;
       $this->add_row( $record->id,
         array( 'uid' => $record->uid ? $record->uid : '(none)',
                'first_name' => $record->first_name,
                'last_name' => $record->last_name,
                'active' => $record->active,
-               'source' => $record->source,
+               'source.name' => $source_name,
                'cohort' => $record->cohort,
                // note count isn't a column, it's used for the note button
                'note_count' => $record->get_note_count() ) );
     }
 
     $this->finish_setting_rows();
-  }
 
-  /**
-   * Overrides the parent class method to restrict participant list based on user's role
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return int
-   * @access protected
-   */
-  protected function determine_record_count( $modifier = NULL )
-  {
-    return is_null( $this->db_restrict_site )
-         ? parent::determine_record_count( $modifier )
-         : db\participant::count_for_site( $this->db_restrict_site, $modifier );
-  }
-  
-  /**
-   * Overrides the parent class method to restrict participant list based on user's role
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the list.
-   * @return array( record )
-   * @access protected
-   */
-  protected function determine_record_list( $modifier = NULL )
-  {
-    return is_null( $this->db_restrict_site )
-         ? parent::determine_record_list( $modifier )
-         : db\participant::select_for_site( $this->db_restrict_site, $modifier );
+    $quexf_manager = lib::create( 'business\quexf_manager' );
+    $this->set_variable( 'import', $quexf_manager->is_enabled() );
   }
 }
 ?>
