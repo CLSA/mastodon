@@ -52,9 +52,6 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['uid'] = 'No such participant exists.';
     }
 
-    if( is_null( $this->get_record()->date ) )
-      $errors['date'] = 'This value cannot be left blank.';
-
     return $errors;
   }
 

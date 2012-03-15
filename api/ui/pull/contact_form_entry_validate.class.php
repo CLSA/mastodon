@@ -148,9 +148,6 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     if( is_null( $record->age_bracket ) )
       $errors['age_bracket'] = 'This value cannot be left blank.';
 
-    if( is_null( $record->date ) )
-      $errors['date'] = 'This value cannot be left blank.';
-
     if( is_null( $record->cohort ) )
       $errors['cohort'] = 'This value cannot be left blank.';
 

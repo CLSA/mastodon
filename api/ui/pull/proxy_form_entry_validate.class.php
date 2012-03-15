@@ -176,9 +176,6 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['informant_phone'] = 'This value cannot be left blank.';
     }
 
-    if( is_null( $record->date ) )
-      $errors['date'] = 'This value cannot be left blank.';
-
     return $errors;
   }
 
