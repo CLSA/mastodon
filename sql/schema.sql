@@ -308,7 +308,7 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('consent to contact received','consent for proxy received','package mailed') NOT NULL ,
+  `event` ENUM('consent to contact received','consent for proxy received','package mailed','imported by rdd') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `dk_event` (`event` ASC) ,
@@ -690,6 +690,98 @@ CREATE  TABLE IF NOT EXISTS `proxy_form` (
   CONSTRAINT `fk_proxy_form_informant_alternate_id`
     FOREIGN KEY (`informant_alternate_id` )
     REFERENCES `alternate` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `import`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `import` ;
+
+CREATE  TABLE IF NOT EXISTS `import` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(255) NOT NULL ,
+  `date` DATE NOT NULL ,
+  `processed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `md5` VARCHAR(45) NOT NULL ,
+  `data` MEDIUMBLOB NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_md5` (`md5` ASC) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `import_entry`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `import_entry` ;
+
+CREATE  TABLE IF NOT EXISTS `import_entry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `import_id` INT UNSIGNED NOT NULL ,
+  `row` INT NOT NULL ,
+  `participant_id` INT UNSIGNED NULL DEFAULT NULL ,
+  `address_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `province_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `postcode_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `home_phone_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `mobile_phone_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `duplicate_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `first_name` VARCHAR(255) NOT NULL ,
+  `last_name` VARCHAR(255) NOT NULL ,
+  `apartment` VARCHAR(15) NULL ,
+  `street` VARCHAR(255) NOT NULL ,
+  `address_other` VARCHAR(255) NULL ,
+  `city` VARCHAR(255) NOT NULL ,
+  `province` VARCHAR(2) NOT NULL ,
+  `postcode` VARCHAR(10) NOT NULL ,
+  `home_phone` VARCHAR(45) NOT NULL ,
+  `mobile_phone` VARCHAR(45) NULL ,
+  `phone_preference` ENUM('home','mobile') NULL ,
+  `email` VARCHAR(255) NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `date_of_birth` DATE NOT NULL ,
+  `monday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `friday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_9_10` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_10_11` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_11_12` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_12_13` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_13_14` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_14_15` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_15_16` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_16_17` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_17_18` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_18_19` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_19_20` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_20_21` TINYINT(1)  NOT NULL DEFAULT false ,
+  `language` ENUM('en','fr') NULL ,
+  `cohort` ENUM('tracking','comprehensive') NOT NULL ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_import_id` (`import_id` ASC) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  UNIQUE INDEX `uq_participant_id` (`participant_id` ASC) ,
+  UNIQUE INDEX `uq_import_id_row` (`import_id` ASC, `row` ASC) ,
+  CONSTRAINT `fk_import_entry_import_id`
+    FOREIGN KEY (`import_id` )
+    REFERENCES `import` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_import_entry_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

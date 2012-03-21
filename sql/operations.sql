@@ -127,6 +127,16 @@ VALUES( "pull", "contact_form_entry", "validate", true, "Validates the entry val
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "contact_form_entry", "view", true, "View the details of entry values for a contact form." );
 
+-- import
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "import", "add", true, "Displays a widget for participant import files to be uploaded." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "new", true, "Imports new participants from a CSV file." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "delete", true, "Deletes a CSV import file." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "process", true, "Processes entries imported from a CSV file." );
+
 -- participant
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete", true, "Removes a participant from the system." );

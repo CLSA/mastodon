@@ -1,0 +1,391 @@
+{##
+ # import_add.twig
+ # 
+ # Used to upload participant CSV data files
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ #}
+{% extends "widget.twig" %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{{ constant('JS_URL') }}/md5.js"></script>
+  <script type="text/javascript">
+    $( function() {
+      $( "#{{ widget.full }}__file" ).change( function() {
+        var file = this.files[0];
+        if( 0 == file.size ) {
+          alert( "Unable to proceed, the file you selected is empty." );
+          $(this).val( "" );
+        } else if ( "text/csv" != file.type ) {
+          alert( "Unable to proceed, the file you selected is not a CSV file." );
+          $(this).val( "" );
+        }
+
+        $( "#{{ widget.full }}__import" ).button( { disabled: "" == $(this).val() } );
+      } );
+
+      $( "#{{ widget.full }}__form" ).bind( "submit", function(e) {
+        e.preventDefault();
+        var file = document.getElementById( "{{ widget.full }}__file" ).files[0];
+        ajax_push(
+          "import",
+          "new",
+          file,
+          function( request ) {
+            if( 200 == request.status ) {
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                md5 = hex_md5( e.target.result );
+                slot_load(
+                  {{ slot }}, "{{ widget.subject }}", "{{ widget.name }}", { md5: md5 } );
+              }
+              reader.readAsBinaryString( file );
+            }
+          }
+        );
+      } );
+
+      {% if md5 %}
+        // delete button
+        $( "#{{ widget.full }}_delete" ).click( function() {
+          if( ajax_push( "import", "delete", { id: "{{ id }}" } ) )
+            slot_load( {{ slot }}, "participant", "list" );
+        } );
+
+        // proceed button
+        $( "#{{ widget.full }}_proceed" ).click( function() {
+          if( ajax_push( "import", "process", { id: "{{ id }}" } ) )
+            slot_load( {{ slot }}, "participant", "list" );
+        } );
+      {% endif %}
+    } );
+  </script>
+{% endblock javascript %}
+
+{% block widget %}
+  <div class="ui-widget ui-widget-content app-widget-content">
+    <div class="spacer">
+      Use this utility to upload new participants using a CSV (comma separated values) file where
+      all fields are enclosed by double quotes (&quot;)
+    </div>
+    <form id="{{ widget.full }}__form" action="" enctype="multipart/form-data">
+      <input type="hidden" name="MAX_FILE_SIZE" value="64000000" />
+      <table>
+        <tr>
+          <td class="heading">
+            <span class="title">CVS file to import:</span>
+          </td>
+          <td class="content">
+            <input type="file" {{ md5 ? "disabled" : "" }}
+                   id="{{ widget.full }}__file" name="file" />
+          </td>
+          <td class="content">
+            <button id="{{ widget.full }}__import" style="width:150px;" disabled>Import</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+    {% if md5 %}
+      <div class="ui-widget ui-widget-content spacer">
+        <table>
+          <tr>
+            <td class="heading">Filename:</td>
+            <td class="content">{{ filename }}</td>
+          </tr>
+          <tr>
+            <td class="heading">Rows:</td>
+            <td class="content">{{ rows }}</td>
+          </tr>
+          <tr>
+            <td class="heading">Valid Participants:</td>
+            <td class="content">{{ valid_count }}</td>
+          </tr>
+          {% if address_error_list|length %}
+            <tr>
+              <td class="heading">Invalid Address:</td>
+              <td class="content">
+                row{{ 1 < address_error_list|length ? "s" : "" }}
+                {% for row in address_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if province_error_list|length %}
+            <tr>
+              <td class="heading">Invalid Province:</td>
+              <td class="content">
+                row{{ 1 < province_error_list|length ? "s" : "" }}
+                {% for row in province_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if postcode_error_list|length %}
+            <tr>
+              <td class="heading">Invalid Province:</td>
+              <td class="content">
+                row{{ 1 < postcode_error_list|length ? "s" : "" }}
+                {% for row in postcode_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if home_phone_error_list|length %}
+            <tr>
+              <td class="heading">Invalid Home Phone:</td>
+              <td class="content">
+                row{{ 1 < home_phone_error_list|length ? "s" : "" }}
+                {% for row in home_phone_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if mobile_phone_error_list|length %}
+            <tr>
+              <td class="heading">Invalid Mobile Phone:</td>
+              <td class="content">
+                row{{ 1 < mobile_phone_error_list|length ? "s" : "" }}
+                {% for row in mobile_phone_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if duplicate_error_list|length %}
+            <tr>
+              <td class="heading">Duplicate Participant:</td>
+              <td class="content">
+                row{{ 1 < duplicate_error_list|length ? "s" : "" }}
+                {% for row in duplicate_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+        </table>
+      </div>
+      {% from 'macros.twig' import confirm_buttons %}
+      {{ confirm_buttons( slot, widget.full, ['delete','proceed'], false, 'right', true ) }}
+    {% else %}
+      <hr class="ui-widget ui-widget-content">
+      <div class="spacer">
+        The file must have the following columns in this order:
+        <div class="ui-widget ui-widget-content spacer">
+          <table>
+            <thead class="ui-widget-header">
+              <tr>
+                <th>Description</th>
+                <th>Mask</th>
+                <th>Blank?</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align: right;">First name</td>
+                <td></td>
+                <td>No</td>
+                <td style="text-align: left;">May include second name(s)</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Last name</td>
+                <td></td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Apartment Number</td>
+                <td></td>
+                <td>Yes</td>
+                <td style="text-align: left;">Never include “APT” or “#”</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Street Number and Name</td>
+                <td></td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">P.O. Box, Rural Route</td>
+                <td></td>
+                <td>Yes</td>
+                <td style="text-align: left;">Include “P.O. Box” or “RR” or “Site”, etc</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">City Name</td>
+                <td></td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Province Abbreviation</td>
+                <td>XX</td>
+                <td>No</td>
+                <td style="text-align: left;">Two-letter abbreviations only</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Postal code</td>
+                <td>XXX XXX</td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Home Phone</td>
+                <td>XXX-XXX-XXXX</td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Cell Phone</td>
+                <td>  XXX-XXX-XXXX</td>
+                <td>Yes</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Preferred phone number</td>
+                <td>  home/cell</td>
+                <td>Yes</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Email</td>
+                <td></td>
+                <td>Yes</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Sex</td>
+                <td> m/f</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Date of Birth</td>
+                <td> YYYY-MM-DD</td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Monday</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Tuesday</td>
+                <td> y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Wednesday</td>
+                <td> y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Thursday</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Friday</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available Saturday</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 9am to 10am</td>
+                <td> y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 10am to 11am</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 11am to 12pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 12pm to 1pm</td>
+                <td> y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 1pm to 2pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 2pm to 3pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 3pm to 4pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 4pm to 5pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 5pm to 6pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 6pm to 7pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 7pm to 8pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Available 8pm to 9pm</td>
+                <td>  y/n</td>
+                <td>No</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Preferred language</td>
+                <td>  en/fr</td>
+                <td>Yes</td>
+                <td style="text-align: left;">Must be lower case.</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">Cohort</td>
+                <td>comprehensive/tracking</td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: right;">The date the data was gathered</td>
+                <td>YYYY-MM-DD</td>
+                <td>No</td>
+                <td style="text-align: left;"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock widget %}

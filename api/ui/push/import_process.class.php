@@ -1,0 +1,54 @@
+<?php
+/**
+ * import_process.class.php
+ *
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ * @package mastodon\ui
+ * @filesource
+ */
+
+namespace mastodon\ui\push;
+use cenozo\lib, cenozo\log, mastodon\util;
+
+/**
+ * push: import process
+ * 
+ * Processes a list of pending imported participants, adding them to the system.
+ * @package mastodon\ui
+ */
+class import_process extends \cenozo\ui\push\base_record
+{
+  /**
+   * Constructor.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args Push arguments
+   * @access public
+   */
+  public function __construct( $args )
+  {
+    parent::__construct( 'import', 'process', $args );
+  }
+
+  /**
+   * Executes the push.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function finish()
+  {
+    // import all entries with no errors, then mark the import as processed
+    $import_entry_mod = lib::create( 'database\modifier' );
+    $import_entry_mod->where( 'address_error', '=', false );
+    $import_entry_mod->where( 'province_error', '=', false );
+    $import_entry_mod->where( 'postcode_error', '=', false );
+    $import_entry_mod->where( 'home_phone_error', '=', false );
+    $import_entry_mod->where( 'mobile_phone_error', '=', false );
+    $import_entry_mod->where( 'duplicate_error', '=', false );
+    foreach( $this->get_record()->get_import_entry_list( $import_entry_mod ) as $db_entry )
+      $db_entry->import();
+
+    $this->get_record()->processed = true;
+    $this->get_record()->save();
+  }
+}
+?>
