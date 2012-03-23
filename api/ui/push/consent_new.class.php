@@ -63,7 +63,7 @@ class consent_new extends \cenozo\ui\push\base_new
     $form = $this->get_argument( 'form', NULL );
     if( !is_null( $form ) )
     {
-      $form_decoded = base64_decode( chunk_split( $noid['form'] ) );
+      $form_decoded = base64_decode( chunk_split( $form ) );
       if( false == $form_decoded )
         throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
 
