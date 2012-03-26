@@ -39,7 +39,8 @@ class consent_delete extends \cenozo\ui\push\base_delete
         throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $participant_class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
+      $db_participant =
+        $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
       if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
 
       $consent_mod = lib::create( 'database\modifier' );
@@ -49,7 +50,8 @@ class consent_delete extends \cenozo\ui\push\base_delete
 
       $consent_class_name = lib::get_class_name( 'database\consent' );
       $consent_list = $consent_class_name::select( $consent_mod );
-      if( 0 == count( $consent_list ) ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+      if( 0 == count( $consent_list ) )
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
       $db_consent = current( $consent_list );
       $args['id'] = $db_consent->id;
     }
