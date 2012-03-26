@@ -72,6 +72,7 @@ class consent_new extends \cenozo\ui\push\base_new
       $db_consent_form->consent_id = $this->get_record()->id;
       $db_consent_form->date = util::get_datetime_object()->format( 'Y-m-d' );
       $db_consent_form->scan = $form_decoded;
+      $db_consent_form->complete = true;
       $db_consent_form->save();
     }
   }
