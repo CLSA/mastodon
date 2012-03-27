@@ -15,9 +15,6 @@
         if( 0 == file.size ) {
           alert( "Unable to proceed, the file you selected is empty." );
           $(this).val( "" );
-        } else if ( "text/csv" != file.type ) {
-          alert( "Unable to proceed, the file you selected is not a CSV file." );
-          $(this).val( "" );
         }
 
         $( "#{{ widget.full }}__import" ).button( { disabled: "" == $(this).val() } );

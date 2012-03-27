@@ -36,7 +36,7 @@ class import_new extends \cenozo\ui\push
    */
   public function finish()
   {
-    if( 0 == $_SERVER['CONTENT_LENGTH'] || 'text/csv' != $_SERVER['CONTENT_TYPE'] )
+    if( 0 == $_SERVER['CONTENT_LENGTH'] )
     {
       throw lib::create( 'exception\notice',
         'Tried to import participant data without a valid CSV file.',
