@@ -116,7 +116,7 @@
           {% endif %}
           {% if postcode_error_list|length %}
             <tr>
-              <td class="heading">Invalid Province:</td>
+              <td class="heading">Invalid Postal Code:</td>
               <td class="content">
                 row{{ 1 < postcode_error_list|length ? "s" : "" }}
                 {% for row in postcode_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
