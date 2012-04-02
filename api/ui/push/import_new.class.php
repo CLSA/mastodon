@@ -120,7 +120,9 @@ class import_new extends \cenozo\ui\push
         else if( 0 == strcasecmp( 'cell', $values[10] ) )
           $db_import_entry->phone_preference = 'mobile';
         $db_import_entry->email = '' == $values[11] ? NULL : $values[11];
-        $db_import_entry->gender = 0 == strcasecmp( 'f', $values[12] ) ? 'female' : 'male';
+        if( 0 == strcasecmp( 'f', $values[12] ) ) $db_import_entry->gender = 'female';
+        else if( 0 == strcasecmp( 'm', $values[12] ) ) $db_import_entry->gender = 'male';
+        else $db_import_entry->gender = '';
         $db_import_entry->date_of_birth = $values[13];
         $db_import_entry->monday = 0 == strcasecmp( 'y', $values[14] );
         $db_import_entry->tuesday = 0 == strcasecmp( 'y', $values[15] );
