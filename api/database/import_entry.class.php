@@ -29,6 +29,9 @@ class import_entry extends \cenozo\database\record
     $region_class_name = lib::get_class_name( 'database\region' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     
+    if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
+      $this->apartment_error = true;
+
     // check that the address is valid
     if( is_null( $this->street ) && is_null( $this->address_other ) )
       $this->address_error = true;
@@ -67,12 +70,30 @@ class import_entry extends \cenozo\database\record
       }
     }
 
-    return !$this->address_error &&
+    // other obvious checks (because you can't trust anyone...)
+    if( 0 == preg_match( '/^male|female$/', $this->gender ) )
+      $this->gender_error = true;
+    if( !util::validate_date( $this->date_of_birth ) )
+      $this->date_of_birth_error = true;
+    if( 0 == preg_match( '/^en|fr$/', $this->language ) )
+      $this->language_error = true;
+    if( 0 == preg_match( '/^comprehensive|tracking$/', $this->cohort ) )
+      $this->cohort_error = true;
+    if( !util::validate_date( $this->date ) )
+      $this->date_error = true;
+
+    return !$this->apartment_error &&
+           !$this->address_error &&
            !$this->province_error &&
            !$this->postcode_error &&
            !$this->home_phone_error &&
            !$this->mobile_phone_error &&
-           !$this->duplicate_error;
+           !$this->duplicate_error &&
+           !$this->gender_error &&
+           !$this->date_of_birth_error &&
+           !$this->language_error &&
+           !$this->cohort_error &&
+           !$this->date_error;
   }
 
   /**

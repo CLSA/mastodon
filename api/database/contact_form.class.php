@@ -48,21 +48,21 @@ class contact_form extends base_form
     
     $year = date( 'Y' );
     $dob = NULL;
-    if( '45_49' == $db_contact_form_entry->age_bracket )
+    if( '45-49' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 47 );
-    else if( '50_54' == $db_contact_form_entry->age_bracket )
+    else if( '50-54' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 52 );
-    else if( '55_59' == $db_contact_form_entry->age_bracket )
+    else if( '55-59' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 57 );
-    else if( '60_64' == $db_contact_form_entry->age_bracket )
+    else if( '60-64' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 62 );
-    else if( '65_69' == $db_contact_form_entry->age_bracket )
+    else if( '65-69' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 67 );
-    else if( '70_74' == $db_contact_form_entry->age_bracket )
+    else if( '70-74' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 72 );
-    else if( '75_79' == $db_contact_form_entry->age_bracket )
+    else if( '75-79' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 77 );
-    else if( '80_85' == $db_contact_form_entry->age_bracket )
+    else if( '80-85' == $db_contact_form_entry->age_bracket )
       $dob = sprintf( '%d-01-01', $year - 82 );
 
     // import data to the person and participant tables
