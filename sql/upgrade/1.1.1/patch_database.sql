@@ -25,3 +25,5 @@ SOURCE role.sql
 SOURCE operation.sql
 SOURCE role_has_operation.sql
 SOURCE status.sql
+SOURCE import.sql
+SOURCE import_entry.sql

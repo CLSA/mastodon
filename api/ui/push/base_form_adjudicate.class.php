@@ -87,7 +87,7 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
 
       // if this user already has an entry edit that one, otherwise make a new one
       $db_form_entry = $form_entry_class_name::get_unique_record(
-        array( 'consent_form_id', 'user_id' ),
+        array( $form_id_column_name, 'user_id' ),
         array( $this->get_record()->id, $user_id ) );
 
       if( is_null( $db_form_entry ) )

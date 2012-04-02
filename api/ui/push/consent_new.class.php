@@ -63,7 +63,7 @@ class consent_new extends \cenozo\ui\push\base_new
     $form = $this->get_argument( 'form', NULL );
     if( !is_null( $form ) )
     {
-      $form_decoded = base64_decode( chunk_split( $noid['form'] ) );
+      $form_decoded = base64_decode( chunk_split( $form ) );
       if( false == $form_decoded )
         throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
 
@@ -72,6 +72,7 @@ class consent_new extends \cenozo\ui\push\base_new
       $db_consent_form->consent_id = $this->get_record()->id;
       $db_consent_form->date = util::get_datetime_object()->format( 'Y-m-d' );
       $db_consent_form->scan = $form_decoded;
+      $db_consent_form->complete = true;
       $db_consent_form->save();
     }
   }

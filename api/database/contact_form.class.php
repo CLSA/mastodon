@@ -102,7 +102,9 @@ class contact_form extends base_form
     // import data to the status table
     $db_status = lib::create( 'database\status' );
     $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = $db_contact_form_entry->date;
+    $db_status->datetime = is_null( $db_contact_form_entry->date ) ?
+      util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
+
     $db_status->event = 'consent to contact received';
     $db_status->save();
     

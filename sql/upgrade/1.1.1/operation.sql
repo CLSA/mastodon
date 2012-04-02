@@ -75,3 +75,13 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "proxy_form_entry", "validate", true, "Validates the entry values for a proxy form." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form_entry", "view", true, "View the details of entry values for a proxy form." );
+
+-- import
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "import", "add", true, "Displays a widget for participant import files to be uploaded." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "new", true, "Imports new participants from a CSV file." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "delete", true, "Deletes a CSV import file." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "process", true, "Processes entries imported from a CSV file." );
