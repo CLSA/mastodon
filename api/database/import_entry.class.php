@@ -80,10 +80,8 @@ class import_entry extends \cenozo\database\record
     if( 0 == preg_match( '/^comprehensive|tracking$/', $this->cohort ) )
       $this->cohort_error = true;
     if( !util::validate_date( $this->date ) )
-    {
-      log::debug( $this->date );
       $this->date_error = true;
-    }
+
     return !$this->apartment_error &&
            !$this->address_error &&
            !$this->province_error &&
