@@ -28,6 +28,7 @@ class import_entry extends \cenozo\database\record
   {
     $region_class_name = lib::get_class_name( 'database\region' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
       $this->apartment_error = true;
@@ -42,12 +43,9 @@ class import_entry extends \cenozo\database\record
     else
     {
       // check that the postal code is valid
-      $db_address = lib::create( 'database\address' );
-      $db_address->address1 = 'anything';
-      $db_address->city = 'anything';
-      $db_address->region_id = $db_region->id;
-      $db_address->postcode = $this->postcode;
-      if( !$db_address->is_valid() ) $this->postcode_error = true;
+      $db_postcode = $postcode_class_name::get_match( $this->postcode );
+      if( is_null( $db_postcode ) || $db_postcode->region_id != $db_region->id )
+        $this->postcode_error = true;
     }
 
     if( !is_null( $this->home_phone ) && !util::validate_phone_number( $this->home_phone ) )
@@ -172,6 +170,7 @@ class import_entry extends \cenozo\database\record
                          substr( $this->postcode, 3, 3 ) )
               : $this->postcode;
     $db_address->postcode = $postcode;
+    $db_address->source_postcode();
     $db_address->save();
 
     // import data to the phone table

@@ -131,6 +131,7 @@ class contact_form extends base_form
                          substr( $db_contact_form_entry->postcode, 3, 3 ) )
               : $db_contact_form_entry->postcode;
     $db_address->postcode = $postcode;
+    $db_address->source_postcode();
     $db_address->note = $db_contact_form_entry->address_note;
     $db_address->save();
 

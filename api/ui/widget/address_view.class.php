@@ -38,6 +38,10 @@ class address_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'region_id', 'enum', 'Region' );
     $this->add_item( 'postcode', 'string', 'Postcode',
       'Postal codes must be in "A1A 1A1" format, zip codes in "01234" format.' );
+    $this->add_item( 'timezone_offset', 'number', 'Timezone Offset',
+      'The number of hours difference between the address\' timezone and UTC.' );
+    $this->add_item( 'daylight_savings', 'boolean', 'Daylight Savings',
+      'Whether the address observes daylight savings.' );
     $this->add_item( 'note', 'text', 'Note' );
   }
 
@@ -72,7 +76,6 @@ class address_view extends \cenozo\ui\widget\base_view
     for( $rank = 1; $rank <= $num_addresss; $rank++ ) $ranks[] = $rank;
     $ranks = array_combine( $ranks, $ranks );
     $regions = array();
-
     $class_name = lib::get_class_name( 'database\region' );
     foreach( $class_name::select() as $db_region )
       $regions[$db_region->id] = $db_region->name.', '.$db_region->country;
@@ -85,6 +88,8 @@ class address_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'city', $record->city );
     $this->set_item( 'region_id', $record->region_id, false, $regions );
     $this->set_item( 'postcode', $record->postcode, true );
+    $this->set_item( 'timezone_offset', $record->timezone_offset, true );
+    $this->set_item( 'daylight_savings', $record->daylight_savings, true );
     $this->set_item( 'note', $record->note );
 
     $this->finish_setting_items();

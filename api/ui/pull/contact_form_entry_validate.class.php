@@ -85,13 +85,9 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
       $errors['postcode'] = 'This value cannot be left blank.';
 
     if( !is_null( $record->region_id ) && !is_null( $record->postcode ) )
-    { // make sure the postcode is in the database
-      $db_address = lib::create( 'database\address' );
-      $db_address->address1 = 'anything';
-      $db_address->city = 'anything';
-      $db_address->region_id = $record->region_id;
-      $db_address->postcode = $record->postcode;
-      if( !$db_address->is_valid() )
+    { // check that the postal code is valid
+      $db_postcode = $postcode_class_name::get_match( $record->postcode );
+      if( is_null( $db_postcode ) || $db_postcode->region_id != $record->region_id )
         $errors['postcode'] = 'The postal code does not exist in the selected province.';
     }
 
