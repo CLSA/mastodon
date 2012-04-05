@@ -40,13 +40,29 @@ class consent_form extends base_form
     // import the data to the consent table
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_consent_form_entry->uid );
-    $db_consent = lib::create( 'database\consent' );
-    $db_consent->participant_id = $db_participant->id;
-    $db_consent->event =
-      sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
-    $db_consent->date = util::get_datetime_object()->format( 'Y-m-d' );
-    $db_consent->note = 'Imported by data entry system.';
-    $db_consent->save();
+    $event = sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
+    $date = util::get_datetime_object()->format( 'Y-m-d' );
+
+    // look for duplicates
+    $db_consent = NULL;
+    $consent_mod = lib::create( 'database\modifier' );
+    $consent_mod->where( 'event', '=', $event );
+    $consent_mod->where( 'date', '=', $date );
+    $consent_list = $db_participant->get_consent_list( $consent_mod );
+    if( 0 < count( $consent_list ) )
+    { // found a duplicate, link the form to it
+      $db_consent = current( $consent_list );
+    }
+    else
+    { // no duplicate, create a new consent record
+      $db_consent = lib::create( 'database\consent' );
+      $db_consent->participant_id = $db_participant->id;
+      $db_consent->event =
+        sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
+      $db_consent->date = util::get_datetime_object()->format( 'Y-m-d' );
+      $db_consent->note = 'Imported by data entry system.';
+      $db_consent->save();
+    }
 
     // import the data to the hin table
     static::db()->execute( sprintf(
