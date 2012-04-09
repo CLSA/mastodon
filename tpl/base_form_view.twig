@@ -48,7 +48,9 @@
 
       // defer buttons
       {% if entry_1.exists %}
-        $( "#{{ widget.full }}__defer_entry_1" ).click( function() {
+        $button1 = $( "#{{ widget.full }}__defer_{{ entry_1.user }}" );
+        {% if entry_1.deferred %}$button1.button( { disabled: true } );{% endif %}
+        $button1.click( function() {
           var args = new Object();
           args.id = {{ entry_1.id }};
           args.columns = { deferred: 1 };
@@ -56,7 +58,9 @@
         } );
       {% endif %}
       {% if entry_2.exists %}
-        $( "#{{ widget.full }}__defer_entry_2" ).click( function() {
+        $button2 = $( "#{{ widget.full }}__defer_{{ entry_2.user }}" );
+        {% if entry_1.deferred %}$button2.button( { disabled: true } );{% endif %}
+        $button2.click( function() {
           var args = new Object();
           args.id = {{ entry_2.id }};
           args.columns = { deferred: 1 };
@@ -64,6 +68,8 @@
         } );
       {% endif %}
 
+      // always start the submit button disabled
+      $( "#{{ widget.full }}__submit" ).button( { disabled: true } );
       {% if allow_adjudication %}
         // radio buttons (once all are selected enable the submit button)
         $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
@@ -135,25 +141,19 @@
         <tr><td></td><td colspan="3"><hr class="ui-widget ui-widget-content"</td></tr>
       {% endif %}
     {% endfor %}
-  </table>
-  <hr class="ui-widget ui-widget-content">
-  <table>
-    <tr>
-      <td class="heading">Actions:</td>
-      <td class="content">
-        <button id="{{ widget.full }}__download">Download</button>
-        <button id="{{ widget.full }}__submit" disabled>Submit</button>
-        <button id="{{ widget.full }}__invalidate">Invalidate</button>
-        {% if entry_1.exists %}
-          <button id="{{ widget.full }}__defer_entry_1"
-                  {{ entry_1.deferred ? "disabled" : "" }}>Defer {{ entry_1.user }}</button>
-        {% endif %}
-        {% if entry_2.exists %}
-          <button id="{{ widget.full }}__defer_entry_2"
-                  {{ entry_2.deferred ? "disabled" : "" }}>Defer {{ entry_2.user }}</button>
-        {% endif %}
-      </td>
-    </tr>
+    {% if actions|length %}
+      <tr><td colspan="22"><hr class="ui-widget ui-widget-content"></td></tr>
+      <tr>
+        <td class="heading"><span class="title">Actions:</span></td>
+        <td colspan="3" class="content">
+          {% for action_id, action in actions %}
+            <button {% if action.description|default(false) %}
+                      title="{{ action.description }}"
+                    {% endif %}
+                    id="{{ widget.full }}__{{ action_id }}">{{ action.heading }}</button>
+          {% endfor %}
+        </td>
+    {% endif %}
   </table>
 {% endblock record_items %}
 
