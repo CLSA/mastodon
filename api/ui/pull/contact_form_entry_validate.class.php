@@ -86,6 +86,7 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
 
     if( !is_null( $record->region_id ) && !is_null( $record->postcode ) )
     { // check that the postal code is valid
+      $postcode_class_name = lib::get_class_name( 'database\postcode' );
       $db_postcode = $postcode_class_name::get_match( $record->postcode );
       if( is_null( $db_postcode ) || $db_postcode->region_id != $record->region_id )
         $errors['postcode'] = 'The postal code does not exist in the selected province.';
