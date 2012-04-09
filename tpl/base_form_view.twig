@@ -46,6 +46,24 @@
         );
       } );
 
+      // defer buttons
+      {% if entry_1.exists %}
+        $( "#{{ widget.full }}__defer_entry_1" ).click( function() {
+          var args = new Object();
+          args.id = {{ entry_1.id }};
+          args.columns = { deferred: 1 };
+          if( ajax_push( "{{ widget.subject }}_entry", "edit", args ) ) slot_refresh( {{ slot }} );
+        } );
+      {% endif %}
+      {% if entry_2.exists %}
+        $( "#{{ widget.full }}__defer_entry_2" ).click( function() {
+          var args = new Object();
+          args.id = {{ entry_2.id }};
+          args.columns = { deferred: 1 };
+          if( ajax_push( "{{ widget.subject }}_entry", "edit", args ) ) slot_refresh( {{ slot }} );
+        } );
+      {% endif %}
+
       {% if allow_adjudication %}
         // radio buttons (once all are selected enable the submit button)
         $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
@@ -72,33 +90,45 @@
         <td rowspan="2" class="heading" style="padding-right: 1.0em">
           <span class="title">{{ entry.heading }}:</span>
         </td>
-        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+        <td class="heading"
+            style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
           <span class="title">{{ entry.entry_1.user }}</span>
         </td>
-        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+        <td class="heading"
+            style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
           {% if conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_1.user }}" />
           {% endif %}
         </td>
-        <td class="content" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+        <td class="content"
+            style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
           <div class="padded">{{ entry.entry_1.value }}</div>
+          {% if entry.entry_1.error %}
+            <div class="help_note ui-state-error">{{ entry.entry_1.error }}</div>
+          {% endif %}
         </td>
       </tr>
       <tr>
-        <td class="heading" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+        <td class="heading"
+            style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
           <span class="title">{{ entry.entry_2.user }}</span>
         </td>
-        <td class="heading" style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
+        <td class="heading"
+            style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
           {% if conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_2.user }}" />
           {% endif %}
         </td>
-        <td class="content" style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
+        <td class="content"
+            style="padding-left: 0.5em; padding-bottom: 0.5em; padding-right: 0.5em">
           <div class="padded">{{ entry.entry_2.value }}</div>
+          {% if entry.entry_2.error %}
+            <div class="help_note ui-state-error">{{ entry.entry_2.error }}</div>
+          {% endif %}
         </td>
       </tr>
       {% if not loop.last %}
@@ -114,6 +144,14 @@
         <button id="{{ widget.full }}__download">Download</button>
         <button id="{{ widget.full }}__submit" disabled>Submit</button>
         <button id="{{ widget.full }}__invalidate">Invalidate</button>
+        {% if entry_1.exists %}
+          <button id="{{ widget.full }}__defer_entry_1"
+                  {{ entry_1.deferred ? "disabled" : "" }}>Defer {{ entry_1.user }}</button>
+        {% endif %}
+        {% if entry_2.exists %}
+          <button id="{{ widget.full }}__defer_entry_2"
+                  {{ entry_2.deferred ? "disabled" : "" }}>Defer {{ entry_2.user }}</button>
+        {% endif %}
       </td>
     </tr>
   </table>

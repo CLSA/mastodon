@@ -61,26 +61,61 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
   public function finish()
   {
     parent::finish();
+    
+    // validate the entries
+    $error_list_1 = array();
+    if( !is_null( $this->form_entry_1 ) )
+    {
+      $args = array( 'id' => $this->form_entry_1->id );
+      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
+      $error_list_1 = $operation->finish();
+    }
+    $error_list_2 = array();
+    if( !is_null( $this->form_entry_2 ) )
+    {
+      $args = array( 'id' => $this->form_entry_2->id );
+      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
+      $error_list_2 = $operation->finish();
+    }
 
     foreach( $this->items as $item_id => $item )
     {
       $this->items[$item_id]['entry_1'] = is_null( $this->form_entry_1 )
         ? array( 'user' => 'n/a',
+                 'error' => false,
                  'value' => '(no value)' )
         : array( 'user' => sprintf( '%s%s',
                                     $this->form_entry_1->get_user()->name,
                                     $this->form_entry_1->deferred ? ' (deferred)' : '' ),
+                 'error' => array_key_exists( $item_id, $error_list_1 )
+                          ? $error_list_1[$item_id] : false,
                  'value' => is_null( $this->form_entry_1->$item_id )
                           ? '(no value)' : $this->form_entry_1->$item_id );
       $this->items[$item_id]['entry_2'] = is_null( $this->form_entry_2 )
         ? array( 'user' => 'n/a',
+                 'error' => false,
                  'value' => '(no value)' )
         : array( 'user' => sprintf( '%s%s',
                                     $this->form_entry_2->get_user()->name,
                                     $this->form_entry_2->deferred ? ' (deferred)' : '' ),
+                 'error' => array_key_exists( $item_id, $error_list_2 )
+                          ? $error_list_2[$item_id] : false,
                  'value' => is_null( $this->form_entry_2->$item_id ) 
                           ? '(no value)' : $this->form_entry_2->$item_id );
     }
+
+    $this->set_variable( 'entry_1', is_null( $this->form_entry_1 )
+      ? array( 'exists' => false )
+      : array( 'exists' => true,
+               'id' => $this->form_entry_1->id,
+               'deferred' => $this->form_entry_1->deferred,
+               'user' => $this->form_entry_1->get_user()->name ) );
+    $this->set_variable( 'entry_2', is_null( $this->form_entry_2 )
+      ? array( 'exists' => false )
+      : array( 'exists' => true,
+               'id' => $this->form_entry_2->id,
+               'deferred' => $this->form_entry_2->deferred,
+               'user' => $this->form_entry_2->get_user()->name ) );
 
     $this->set_variable( 'item', $this->items );
     $this->set_variable( 'allow_adjudication',

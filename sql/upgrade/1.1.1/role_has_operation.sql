@@ -19,6 +19,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "consent_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form_entry" AND name = "validate" );
 
 -- contact form
 INSERT IGNORE INTO role_has_operation
@@ -41,6 +49,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "contact_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "contact_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form_entry" AND name = "validate" );
 
 -- proxy form
 INSERT IGNORE INTO role_has_operation
@@ -63,6 +79,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "proxy_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "proxy_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "proxy_form_entry" AND name = "validate" );
 
 -- consent form
 INSERT IGNORE INTO role_has_operation
@@ -85,6 +109,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "consent_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "consent_form_entry" AND name = "validate" );
 
 -- contact form
 INSERT IGNORE INTO role_has_operation
@@ -107,6 +139,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "contact_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "contact_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "contact_form_entry" AND name = "validate" );
 
 -- proxy form
 INSERT IGNORE INTO role_has_operation
@@ -129,6 +169,14 @@ INSERT IGNORE INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "push" AND subject = "proxy_form" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "proxy_form_entry" AND name = "edit" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "clerk" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "proxy_form_entry" AND name = "validate" );
 
 -- typist (specific to this role)
 INSERT IGNORE INTO role_has_operation( role_id, operation_id )
