@@ -147,11 +147,14 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'no_in_home', $record->no_in_home, true );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
 
-    $this->finish_setting_items();
+    // add a contact form download action
+    $db_contact_form = $record->get_contact_form();
+    if( !is_null( $db_contact_form ) )
+      $this->set_variable( 'contact_form_id', $db_contact_form->id );
+    $this->add_action( 'contact_form', 'Contact Form', NULL,
+      'Download this participant\'s contact form, if available' );
 
-    // temporarily disable forms for now
-    $this->set_variable( 'contact_form_available', false );
-    $this->set_variable( 'consent_form_available', false );
+    $this->finish_setting_items();
 
     if( !is_null( $this->address_list ) )
     {

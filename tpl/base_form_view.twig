@@ -59,7 +59,7 @@
       {% endif %}
       {% if entry_2.exists %}
         $button2 = $( "#{{ widget.full }}__defer_{{ entry_2.user }}" );
-        {% if entry_1.deferred %}$button2.button( { disabled: true } );{% endif %}
+        {% if entry_2.deferred %}$button2.button( { disabled: true } );{% endif %}
         $button2.click( function() {
           var args = new Object();
           args.id = {{ entry_2.id }};
