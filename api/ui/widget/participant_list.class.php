@@ -62,6 +62,11 @@ class participant_list extends \cenozo\ui\widget\base_list
                'note_count' => $record->get_note_count() ) );
     }
 
+    $operation_class_name = lib::get_class_name( 'database\operation' );
+    $db_operation = $operation_class_name::get_operation( 'widget', 'import', 'add' );
+    $this->add_action( 'import', 'Participant Import', $db_operation,
+      'Import participants from an external CSV file' );
+
     $this->finish_setting_rows();
   }
 }
