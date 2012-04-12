@@ -79,10 +79,13 @@ class alternate_new extends \cenozo\ui\push\base_new
 
     try
     {
-      // create a person record and like the new record to it
-      $db_person = lib::create( 'database\person' );
-      $db_person->save();
-      $db_alternate->person_id = $db_person->id;
+      // create a person record if the alternate doesn't already have one
+      if( is_null( $db_alternate->person_id ) )
+      {
+        $db_person = lib::create( 'database\person' );
+        $db_person->save();
+        $db_alternate->person_id = $db_person->id;
+      }
       $db_alternate->save();
     }
     catch( \cenozo\exception\base_exception $e )
@@ -122,6 +125,26 @@ class alternate_new extends \cenozo\ui\push\base_new
 
         throw $e;
       }
+    }
+
+    // if address argument exists then add an address to the alternate
+    $address_info = $this->get_argument( 'address', array() );
+    if( is_array( $address_info ) && 0 < count( $address_info ) )
+    {
+      $args = array( 'columns' => $address_info );
+      $args['columns']['person_id'] = $db_alternate->person_id;
+      $operation = lib::create( 'ui\push\address_new', $args );
+      $operation->finish();
+    }
+
+    // if phone argument exists then add a phone number to the alternate
+    $phone_info = $this->get_argument( 'phone', array() );
+    if( is_array( $phone_info ) && 0 < count( $phone_info ) )
+    {
+      $args = array( 'columns' => $phone_info );
+      $args['columns']['person_id'] = $db_alternate->person_id;
+      $operation = lib::create( 'ui\push\phone_new', $args );
+      $operation->finish();
     }
 
     // if a form variable was included try to decode it and store it as a proxy form
