@@ -38,7 +38,7 @@ class alternate_report extends \cenozo\ui\pull\base_report
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
     $this->add_title( 
-      'List of all participant who have an alternate contact with missing information.',
+      'List of all participant who have an alternate contact with missing information.' );
     
     $contents = array();
     foreach( $participant_class_name::select() as $db_participant )
