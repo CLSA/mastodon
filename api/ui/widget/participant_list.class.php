@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class participant_list extends \cenozo\ui\widget\base_list
+class participant_list extends site_restricted_list
 {
   /**
    * Constructor
@@ -35,6 +35,9 @@ class participant_list extends \cenozo\ui\widget\base_list
     $this->add_column( 'active', 'boolean', 'Active', true );
     $this->add_column( 'source.name', 'string', 'Source', true );
     $this->add_column( 'cohort', 'string', 'Cohort', true );
+
+    // participants are either jurisdiction or participant_site based
+    $this->extended_site_selection = true;
   }
   
   /**

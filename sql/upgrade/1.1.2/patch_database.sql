@@ -4,3 +4,6 @@ SOURCE operation.sql
 SOURCE role_has_operation.sql
 SOURCE postcode.sql
 SOURCE address.sql
+SOURCE jurisdiction.sql
+SOURCE participant.sql
+SOURCE participant_site.sql
