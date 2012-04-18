@@ -112,6 +112,11 @@ class import_entry extends \cenozo\database\record
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
     $region_class_name = lib::get_class_name( 'database\region' );
+    $site_class_name = lib::get_class_name( 'database\site' );
+
+    $db_french_site = $site_class_name::get_unique_record(
+      array( 'name', 'cohort' ),
+      array( 'Sherbrooke', 'tracking' ) );
 
     // all participants are from the rdd source
     $db_source = $source_class_name::get_unique_record( 'name', 'rdd' );
@@ -142,6 +147,14 @@ class import_entry extends \cenozo\database\record
     $db_participant->no_in_home = false;
     $db_participant->prior_contact_date = NULL;
     $db_participant->email = $this->email;
+
+    // make sure that all tracking participants whose preferred language is french have
+    // their preferred site set to Sherbrooke
+    // TODO: this custom code needs to be made more generic
+    if( 'tracking' == $db_participant->cohort &&
+        0 == strcasecmp( 'fr', $db_participant->language ) )
+      $db_participant->site_id = $db_french_site->id;
+
     $db_participant->save();
 
     // import data to the status table

@@ -33,6 +33,11 @@ class contact_form extends base_form
 
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $site_class_name = lib::get_class_name( 'database\site' );
+
+    $db_french_site = $site_class_name::get_unique_record(
+      array( 'name', 'cohort' ),
+      array( 'Sherbrooke', 'tracking' ) );
 
     // link to the form
     $this->validated_contact_form_entry_id = $db_contact_form_entry->id;
@@ -86,6 +91,14 @@ class contact_form extends base_form
     $db_participant->no_in_home = false;
     $db_participant->prior_contact_date = NULL;
     $db_participant->email = $db_contact_form_entry->email;
+
+    // make sure that all tracking participants whose preferred language is french have
+    // their preferred site set to Sherbrooke
+    // TODO: this custom code needs to be made more generic
+    if( 'tracking' == $db_participant->cohort &&
+        0 == strcasecmp( 'fr', $db_participant->language ) )
+      $db_participant->site_id = $db_french_site->id;
+
     $db_participant->save();
 
     if( !is_null( $db_contact_form_entry->note ) )
