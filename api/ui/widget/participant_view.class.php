@@ -148,7 +148,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'last_name', $record->last_name );
     $this->set_item( 'source_id', $record->source_id, false, $sources );
     $this->set_item( 'cohort', $record->cohort );
-    $this->set_item( 'default_site', $record->get_primary_site()->name );
+    $this->set_item( 'default_site', $record->get_default_site()->name );
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
