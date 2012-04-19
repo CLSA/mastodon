@@ -74,6 +74,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `use_informant` TINYINT(1)  NULL DEFAULT NULL ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,
+  `sync_datetime` DATETIME NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,

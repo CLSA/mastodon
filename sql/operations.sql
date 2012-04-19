@@ -173,6 +173,8 @@ VALUES( "push", "participant", "delete_alternate", true, "Remove a participant's
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "primary", true, "Retrieves base participant information." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "participant", "list", true, "Retrieves base information for a list of participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_alternate", true, "Retrieves a list of a participant's alternates." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_consent", true, "Retrieves a list of participant's consent information." );
