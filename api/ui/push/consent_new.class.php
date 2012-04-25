@@ -63,31 +63,17 @@ class consent_new extends \cenozo\ui\push\base_new
     $form = $this->get_argument( 'form', NULL );
     if( !is_null( $form ) )
     {
-      $form_decoded = base64_decode( chunk_split( $noid['form'] ) );
+      $form_decoded = base64_decode( chunk_split( $form ) );
       if( false == $form_decoded )
         throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
-      
-      $filename = sprintf( '%s/%s.pdf',
-                           CONSENT_FORM_PATH,
-                           $this->get_record()->get_participant()->uid );
-      $handle = fopen( $filename, 'wb' );
-      if( false === $handle )
-        throw lib::create(
-          'exception\runtime',
-          sprintf( 'Unable to open consent file "%s" for writing.', $filename ),
-          __METHOD__ );
-      
-      if( false === fwrite( $handle, $form ) )
-        throw lib::create(
-          'exception\runtime',
-          sprintf( 'Unable to write to consent file "%s".', $filename ),
-          __METHOD__ );
 
-      if( false === fclose( $handle ) )
-        throw lib::create(
-          'exception\runtime',
-          sprintf( 'Unable to close consent file "%s".', $filename ),
-          __METHOD__ );
+      // create a new consent form
+      $db_consent_form = lib::create( 'database\consent_form' );
+      $db_consent_form->consent_id = $this->get_record()->id;
+      $db_consent_form->date = util::get_datetime_object()->format( 'Y-m-d' );
+      $db_consent_form->scan = $form_decoded;
+      $db_consent_form->complete = true;
+      $db_consent_form->save();
     }
   }
 }

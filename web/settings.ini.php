@@ -11,7 +11,7 @@ global $SETTINGS;
 
 // tagged version
 $SETTINGS['general']['application_name'] = 'mastodon';
-$SETTINGS['general']['version'] = '1.1.0';
+$SETTINGS['general']['version'] = '1.1.1';
 
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;
@@ -19,14 +19,14 @@ $SETTINGS['general']['development_mode'] = false;
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
-// the location of QUEXF for participant contact and consent updates
-$SETTINGS['path']['QUEXF'] = NULL;
+// the location of new consent forms which need to be processed
+$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 
-// the location to store processed contact form PDF files
-$SETTINGS['path']['CONTACT_FORM'] = '/var/local/mastodon/contact';
+// the location of new contact forms which need to be processed
+$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
 
-// the location to store processed consent form PDF files
-$SETTINGS['path']['CONSENT_FORM'] = '/var/local/mastodon/consent';
+// the location of new proxy forms which need to be processed
+$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
 
 // database settings
 $SETTINGS['db']['driver'] = 'mysql';

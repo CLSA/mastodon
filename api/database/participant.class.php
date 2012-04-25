@@ -111,35 +111,11 @@ class participant extends person
     $database_class_name = lib::get_class_name( 'database\database' );
 
     // need custom SQL
-    $sql = ' SELECT access, code IS NULL AS missing'.
+    $sql = ' SELECT access, future_access, code IS NULL AS missing'.
            ' FROM hin'.
            ' WHERE uid = '.$database_class_name::format_string( $this->uid );
 
     return static::db()->get_row( $sql );
-  }
-
-  /**
-   * Returns the path to the participant's contact form.
-   * Note, this method will return a path whether the file exists or not.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return string
-   * @access public
-   */
-  public function get_contact_form_file_name()
-  {
-    return sprintf( '%s/%s.pdf', CONTACT_FORM_PATH, $this->uid );
-  }
-
-  /**
-   * Returns the path to the participant's consent form.
-   * Note, this method will return a path whether the file exists or not.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return string
-   * @access public
-   */
-  public function get_consent_form_file_name()
-  {
-    return sprintf( '%s/%s.pdf', CONSENT_FORM_PATH, $this->uid );
   }
 
   /**

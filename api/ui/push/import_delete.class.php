@@ -1,6 +1,6 @@
 <?php
 /**
- * participant_import.class.php
+ * import_delete.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @package mastodon\ui
@@ -11,12 +11,11 @@ namespace mastodon\ui\push;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * push: participant import
- *
- * Syncs participant information between Sabretooth and Mastodon
+ * push: import delete
+ * 
  * @package mastodon\ui
  */
-class participant_import extends \cenozo\ui\push
+class import_delete extends \cenozo\ui\push\base_delete
 {
   /**
    * Constructor.
@@ -26,7 +25,7 @@ class participant_import extends \cenozo\ui\push
    */
   public function __construct( $args )
   {
-    parent::__construct( 'participant', 'import', $args );
+    parent::__construct( 'import', $args );
   }
 
   /**
@@ -36,8 +35,11 @@ class participant_import extends \cenozo\ui\push
    */
   public function finish()
   {
-    $quexf_manager = lib::create( 'business\quexf_manager', QUEXF_PATH );
-    $quexf_manager->import_contact_data();
+    // delete all import entries before deleting the import
+    foreach( $this->get_record()->get_import_entry_list() as $db_import_entry )
+      $db_import_entry->delete();
+
+    parent::finish();
   }
 }
 ?>

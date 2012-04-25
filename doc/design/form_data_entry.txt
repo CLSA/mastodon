@@ -1,0 +1,86 @@
+NEW ROLE: TYPIST
+typist sees two lists of forms:
+  1) all of their forms which have been deferred and are not invalid
+  2) all forms which they have never processed, are not invalid
+     and which have less than two entries
+
+process form => NEW WIDGET: FORM_ENTRY VIEW
+{
+  display form and data entry widget
+  disable defer button if form not previously deferred
+  if( user submits form )
+  {
+    validate data => NEW PULL: FORM_ENTRY VALIDATE
+    save entered data => NEW PUSHES: FORM_ENTRY NEW & FORM_ENTRY EDIT
+    if( data not valid ) { show invalid entries }
+    else // data valid
+    {
+      if( form has data entered from other user AND data matches ) { import data, link form }
+      DONE (go back to form list)
+    }
+  }
+  else if( user defers form ) => NEW PUSH: FORM_ENTRY DEFER
+  {
+    save entered data => NEW PUSHES: FORM_ENTRY NEW & FORM_ENTRY EDIT
+    mark form entry as deferred
+  }
+}
+
+any non-typist who has access sees two list of forms
+  1) all forms which have at least two entries but not linked and are not invalid
+  2) all forms which do not have at least two complete entries and are not invalid
+
+process form from list (1) => NEW WIDGET: FORM VIEW
+{
+  display form and data from both entries
+  for every field a radio button to select which entry to accept
+  submit button disabled until user selects all radio buttons
+  if( submit ) => NEW PUSH: FORM EDIT
+  {
+    import data, link form
+    return to lists
+  }
+  // cancel
+  else { return to lists }
+}
+
+view form from list (2) => NEW WIDGET: FORM VIEW
+{
+  display form, invalidate button and back button
+  if( invalidate form ) { mark form as invalid } => NEW PUSH: FORM EDIT
+  return to lists
+}
+
+
+NEW ROLE: TYPIST
+NEW WIDGET: FORM LIST
+  roles: typist, admin, clerk
+  input: type of list (for typist: deferred, ready; for others: arbitrate, incomplete)
+  - display form ID, deferred column for typists, ready column (2 entries) for others
+  - dropdown to restrict to deferred/not deferred or ready/not ready
+NEW WIDGET: FORM VIEW
+  roles: admin, clerk
+  input: form_id
+  - if 2 entries: 2 entries with select boxes per item in the form, submit and back buttons
+  - if <2 entries: invalidate and back buttons
+NEW PUSH: FORM EDIT
+  roles: admin, clerk
+  input: form_id, optionally include arbitration variables
+  - if arbitration variables are included, create new form entry and link
+NEW WIDGET: FORM_ENTRY VIEW
+  roles: typist
+  input: any form from typist's lists
+  - display one entry box per item in the form
+NEW PUSH: FORM_ENTRY NEW
+  roles: typist
+  input: form_id and entry values
+NEW PUSH: FORM_ENTRY EDIT
+  roles: typist
+  input: form_id, form_entry_id and entry values
+NEW PUSH: FORM_ENTRY DEFER
+  roles: typist
+  input: form_entry_id
+NEW PULL: FORM_ENTRY VALIDATE
+  roles: typist
+  input: form_entry_id
+  output: list of invalid columns with user-friendly error message for each

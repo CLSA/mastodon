@@ -131,27 +131,27 @@ class participant_view extends \cenozo\ui\widget\base_view
     $statuses = array_combine( $statuses, $statuses );
 
     // set the view's items
-    $this->set_item( 'active', $this->get_record()->active, true );
-    $this->set_item( 'uid', $this->get_record()->uid, true );
-    $this->set_item( 'first_name', $this->get_record()->first_name );
-    $this->set_item( 'last_name', $this->get_record()->last_name );
-    $this->set_item( 'source_id', $this->get_record()->source_id, false, $sources );
-    $this->set_item( 'cohort', $this->get_record()->cohort );
-    $this->set_item( 'gender', $this->get_record()->gender, true, $genders );
-    $this->set_item( 'date_of_birth', $this->get_record()->date_of_birth );
-    $this->set_item( 'language', $this->get_record()->language, false, $languages );
-    $this->set_item( 'email', $this->get_record()->email, false );
-    $this->set_item( 'status', $this->get_record()->status, false, $statuses );
-    $this->set_item( 'eligible', $this->get_record()->eligible, true );
-    $this->set_item( 'no_in_home', $this->get_record()->no_in_home, true );
-    $this->set_item( 'prior_contact_date', $this->get_record()->prior_contact_date, false );
+    $record = $this->get_record();
+    $this->set_item( 'active', $record->active, true );
+    $this->set_item( 'uid', $record->uid, true );
+    $this->set_item( 'first_name', $record->first_name );
+    $this->set_item( 'last_name', $record->last_name );
+    $this->set_item( 'source_id', $record->source_id, false, $sources );
+    $this->set_item( 'cohort', $record->cohort );
+    $this->set_item( 'gender', $record->gender, true, $genders );
+    $this->set_item( 'date_of_birth', $record->date_of_birth );
+    $this->set_item( 'language', $record->language, false, $languages );
+    $this->set_item( 'email', $record->email, false );
+    $this->set_item( 'status', $record->status, false, $statuses );
+    $this->set_item( 'eligible', $record->eligible, true );
+    $this->set_item( 'no_in_home', $record->no_in_home, true );
+    $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
 
     $this->finish_setting_items();
 
-    $this->set_variable(
-      'contact_form_available', is_file( $this->get_record()->get_contact_form_file_name() ) );
-    $this->set_variable(
-      'consent_form_available', is_file( $this->get_record()->get_consent_form_file_name() ) );
+    // temporarily disable forms for now
+    $this->set_variable( 'contact_form_available', false );
+    $this->set_variable( 'consent_form_available', false );
 
     if( !is_null( $this->address_list ) )
     {

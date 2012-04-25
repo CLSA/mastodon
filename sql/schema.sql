@@ -53,6 +53,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
   `no_in_home` TINYINT(1)  NOT NULL DEFAULT false ,
+  `use_informant` TINYINT(1)  NULL DEFAULT NULL ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
@@ -290,6 +291,7 @@ CREATE  TABLE IF NOT EXISTS `hin` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `access` TINYINT(1)  NULL DEFAULT NULL ,
+  `future_access` TINYINT(1)  NULL DEFAULT NULL ,
   `code` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`uid`) )
 ENGINE = InnoDB;
@@ -306,7 +308,7 @@ CREATE  TABLE IF NOT EXISTS `status` (
   `create_timestamp` TIMESTAMP NOT NULL ,
   `participant_id` INT UNSIGNED NOT NULL ,
   `datetime` DATETIME NOT NULL ,
-  `event` ENUM('consent to contact received','package mailed') NOT NULL ,
+  `event` ENUM('consent to contact received','consent for proxy received','package mailed','imported by rdd') NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `dk_event` (`event` ASC) ,
@@ -391,6 +393,399 @@ CREATE  TABLE IF NOT EXISTS `availability` (
   INDEX `dk_start_time` (`start_time` ASC) ,
   INDEX `dk_end_time` (`end_time` ASC) ,
   CONSTRAINT `fk_availability_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `contact_form_entry`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `contact_form_entry` ;
+
+CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `contact_form_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
+  `first_name` VARCHAR(255) NULL ,
+  `last_name` VARCHAR(255) NULL ,
+  `apartment_number` VARCHAR(15) NULL ,
+  `street_number` VARCHAR(15) NULL ,
+  `street_name` VARCHAR(255) NULL ,
+  `box` VARCHAR(15) NULL ,
+  `rural_route` VARCHAR(15) NULL ,
+  `address_other` VARCHAR(255) NULL ,
+  `city` VARCHAR(255) NULL ,
+  `region_id` INT UNSIGNED NULL ,
+  `postcode` VARCHAR(10) NULL ,
+  `address_note` TEXT NULL ,
+  `home_phone` VARCHAR(45) NULL ,
+  `home_phone_note` TEXT NULL ,
+  `mobile_phone` VARCHAR(45) NULL ,
+  `mobile_phone_note` TEXT NULL ,
+  `phone_preference` ENUM('either','home','mobile') NOT NULL DEFAULT 'either' ,
+  `email` VARCHAR(255) NULL ,
+  `gender` ENUM('male','female') NULL ,
+  `age_bracket` ENUM('45-49','50-54','55-59','60-64','65-69','70-74','75-79','80-85') NULL ,
+  `monday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `friday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_9_10` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_10_11` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_11_12` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_12_13` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_13_14` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_14_15` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_15_16` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_16_17` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_17_18` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_18_19` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_19_20` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_20_21` TINYINT(1)  NOT NULL DEFAULT false ,
+  `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either' ,
+  `cohort` ENUM('tracking','comprehensive') NULL ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NULL ,
+  `note` TEXT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  INDEX `fk_contact_form_id` (`contact_form_id` ASC) ,
+  INDEX `fk_contact_form_entry_region_id` (`region_id` ASC) ,
+  UNIQUE INDEX `uq_contact_form_id_user_id` (`contact_form_id` ASC, `user_id` ASC) ,
+  CONSTRAINT `fk_contact_form_entry_user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contact_form_entry_contact_form_id`
+    FOREIGN KEY (`contact_form_id` )
+    REFERENCES `contact_form` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contact_form_entry_region_id`
+    FOREIGN KEY (`region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `contact_form`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `contact_form` ;
+
+CREATE  TABLE IF NOT EXISTS `contact_form` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
+  `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
+  `participant_id` INT UNSIGNED NULL COMMENT 'The participant created by this form.' ,
+  `validated_contact_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
+  `scan` MEDIUMBLOB NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_validated_contact_form_entry_id` (`validated_contact_form_entry_id` ASC) ,
+  CONSTRAINT `fk_contact_form_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contact_form_validated_contact_form_entry_id`
+    FOREIGN KEY (`validated_contact_form_entry_id` )
+    REFERENCES `contact_form_entry` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `consent_form_entry`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `consent_form_entry` ;
+
+CREATE  TABLE IF NOT EXISTS `consent_form_entry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `consent_form_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
+  `uid` VARCHAR(10) NULL ,
+  `option_1` TINYINT(1)  NOT NULL DEFAULT false ,
+  `option_2` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NULL ,
+  `note` TEXT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_consent_form_id` (`consent_form_id` ASC) ,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  UNIQUE INDEX `uq_consent_form_id_user_id` (`consent_form_id` ASC, `user_id` ASC) ,
+  INDEX `dk_uid` (`uid` ASC) ,
+  CONSTRAINT `fk_consent_form_entry_consent_form_id`
+    FOREIGN KEY (`consent_form_id` )
+    REFERENCES `consent_form` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_consent_form_entry_user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `consent_form`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `consent_form` ;
+
+CREATE  TABLE IF NOT EXISTS `consent_form` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
+  `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
+  `consent_id` INT UNSIGNED NULL COMMENT 'The consent created by this form.' ,
+  `validated_consent_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
+  `scan` MEDIUMBLOB NOT NULL COMMENT 'A PDF file' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_consent_id` (`consent_id` ASC) ,
+  INDEX `fk_validated_consent_form_entry_id` (`validated_consent_form_entry_id` ASC) ,
+  CONSTRAINT `fk_consent_form_consent_id`
+    FOREIGN KEY (`consent_id` )
+    REFERENCES `consent` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_consent_form_validated_consent_form_entry_id`
+    FOREIGN KEY (`validated_consent_form_entry_id` )
+    REFERENCES `consent_form_entry` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proxy_form_entry`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proxy_form_entry` ;
+
+CREATE  TABLE IF NOT EXISTS `proxy_form_entry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `proxy_form_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `deferred` TINYINT(1)  NOT NULL DEFAULT true ,
+  `uid` VARCHAR(10) NULL ,
+  `proxy` TINYINT(1)  NOT NULL DEFAULT false ,
+  `already_identified` TINYINT(1)  NOT NULL DEFAULT false ,
+  `proxy_first_name` VARCHAR(255) NULL ,
+  `proxy_last_name` VARCHAR(255) NULL ,
+  `proxy_apartment_number` VARCHAR(15) NULL ,
+  `proxy_street_number` VARCHAR(15) NULL ,
+  `proxy_street_name` VARCHAR(255) NULL ,
+  `proxy_box` VARCHAR(15) NULL ,
+  `proxy_rural_route` VARCHAR(15) NULL ,
+  `proxy_address_other` VARCHAR(255) NULL ,
+  `proxy_city` VARCHAR(255) NULL ,
+  `proxy_region_id` INT UNSIGNED NULL ,
+  `proxy_postcode` VARCHAR(10) NULL COMMENT 'May be postal code or zip code.' ,
+  `proxy_address_note` TEXT NULL ,
+  `proxy_phone` VARCHAR(45) NULL ,
+  `proxy_phone_note` TEXT NULL ,
+  `proxy_note` TEXT NULL ,
+  `informant` TINYINT(1)  NOT NULL DEFAULT false ,
+  `same_as_proxy` TINYINT(1)  NOT NULL DEFAULT false ,
+  `informant_first_name` VARCHAR(255) NULL ,
+  `informant_last_name` VARCHAR(255) NULL ,
+  `informant_apartment_number` VARCHAR(15) NULL ,
+  `informant_street_number` VARCHAR(15) NULL ,
+  `informant_street_name` VARCHAR(255) NULL ,
+  `informant_box` VARCHAR(15) NULL ,
+  `informant_rural_route` VARCHAR(15) NULL ,
+  `informant_address_other` VARCHAR(255) NULL ,
+  `informant_city` VARCHAR(255) NULL ,
+  `informant_region_id` INT UNSIGNED NULL ,
+  `informant_postcode` VARCHAR(10) NULL ,
+  `informant_address_note` TEXT NULL ,
+  `informant_phone` VARCHAR(45) NULL ,
+  `informant_phone_note` TEXT NULL ,
+  `informant_note` TEXT NULL ,
+  `informant_continue` TINYINT(1)  NOT NULL DEFAULT false ,
+  `health_card` TINYINT(1)  NOT NULL DEFAULT false ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  INDEX `fk_proxy_form_id` (`proxy_form_id` ASC) ,
+  INDEX `fk_proxy_region_id` (`proxy_region_id` ASC) ,
+  INDEX `fk_informant_region_id` (`informant_region_id` ASC) ,
+  UNIQUE INDEX `uq_proxy_form_id_user_id` (`proxy_form_id` ASC, `user_id` ASC) ,
+  INDEX `dk_uid` (`uid` ASC) ,
+  CONSTRAINT `fk_proxy_form_entry_user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_entry_proxy_form_id`
+    FOREIGN KEY (`proxy_form_id` )
+    REFERENCES `proxy_form` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_entry_proxy_region_id`
+    FOREIGN KEY (`proxy_region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_entry_informant_region_id`
+    FOREIGN KEY (`informant_region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proxy_form`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proxy_form` ;
+
+CREATE  TABLE IF NOT EXISTS `proxy_form` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `complete` TINYINT(1)  NOT NULL DEFAULT false ,
+  `invalid` TINYINT(1)  NOT NULL DEFAULT false COMMENT 'If true then the form cannot be processed.' ,
+  `proxy_alternate_id` INT UNSIGNED NULL COMMENT 'The alternate created by this form.' ,
+  `informant_alternate_id` INT UNSIGNED NULL ,
+  `validated_proxy_form_entry_id` INT UNSIGNED NULL COMMENT 'The entry data which has been validated and accepted.' ,
+  `date` DATE NOT NULL ,
+  `scan` MEDIUMBLOB NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_proxy_alternate_id` (`proxy_alternate_id` ASC) ,
+  INDEX `fk_validated_proxy_form_entry_id` (`validated_proxy_form_entry_id` ASC) ,
+  INDEX `fk_informant_alternate_id` (`informant_alternate_id` ASC) ,
+  CONSTRAINT `fk_proxy_form_proxy_alternate_id`
+    FOREIGN KEY (`proxy_alternate_id` )
+    REFERENCES `alternate` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_validated_proxy_form_entry_id`
+    FOREIGN KEY (`validated_proxy_form_entry_id` )
+    REFERENCES `proxy_form_entry` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_proxy_form_informant_alternate_id`
+    FOREIGN KEY (`informant_alternate_id` )
+    REFERENCES `alternate` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `import`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `import` ;
+
+CREATE  TABLE IF NOT EXISTS `import` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(255) NOT NULL ,
+  `date` DATE NOT NULL ,
+  `processed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `md5` VARCHAR(45) NOT NULL ,
+  `data` MEDIUMBLOB NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_md5` (`md5` ASC) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `import_entry`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `import_entry` ;
+
+CREATE  TABLE IF NOT EXISTS `import_entry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `import_id` INT UNSIGNED NOT NULL ,
+  `row` INT NOT NULL ,
+  `participant_id` INT UNSIGNED NULL DEFAULT NULL ,
+  `apartment_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `address_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `province_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `postcode_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `home_phone_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `mobile_phone_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `duplicate_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `gender_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date_of_birth_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `language_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `cohort_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date_error` TINYINT(1)  NOT NULL DEFAULT false ,
+  `first_name` VARCHAR(255) NOT NULL ,
+  `last_name` VARCHAR(255) NOT NULL ,
+  `apartment` VARCHAR(15) NULL ,
+  `street` VARCHAR(255) NOT NULL ,
+  `address_other` VARCHAR(255) NULL ,
+  `city` VARCHAR(255) NOT NULL ,
+  `province` VARCHAR(2) NOT NULL ,
+  `postcode` VARCHAR(10) NOT NULL ,
+  `home_phone` VARCHAR(45) NOT NULL ,
+  `mobile_phone` VARCHAR(45) NULL ,
+  `phone_preference` ENUM('home','mobile') NULL ,
+  `email` VARCHAR(255) NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `date_of_birth` DATE NOT NULL ,
+  `monday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `tuesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `wednesday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `thursday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `friday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `saturday` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_9_10` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_10_11` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_11_12` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_12_13` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_13_14` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_14_15` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_15_16` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_16_17` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_17_18` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_18_19` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_19_20` TINYINT(1)  NOT NULL DEFAULT false ,
+  `time_20_21` TINYINT(1)  NOT NULL DEFAULT false ,
+  `language` ENUM('en','fr') NULL ,
+  `cohort` ENUM('tracking','comprehensive') NOT NULL ,
+  `signed` TINYINT(1)  NOT NULL DEFAULT false ,
+  `date` DATE NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_import_id` (`import_id` ASC) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  UNIQUE INDEX `uq_participant_id` (`participant_id` ASC) ,
+  UNIQUE INDEX `uq_import_id_row` (`import_id` ASC, `row` ASC) ,
+  CONSTRAINT `fk_import_entry_import_id`
+    FOREIGN KEY (`import_id` )
+    REFERENCES `import` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_import_entry_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )
     ON DELETE NO ACTION
