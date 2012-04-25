@@ -39,6 +39,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
   public function finish()
   {
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
     $errors = array();
     $record = $this->get_record();
 
