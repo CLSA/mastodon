@@ -28,12 +28,16 @@ class participant extends person
    */
   public static function select( $modifier = NULL, $count = false )
   {
+    // define the join to the jurisdiction table
     $jurisdiction_mod = lib::create( 'database\modifier' );
     $jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
     $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
     $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
     $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
     static::customize_join( 'jurisdiction', $jurisdiction_mod );
+
+    // define the uid as the primary unique key
+    static::set_primary_unique_key( 'uq_uid' );
 
     return parent::select( $modifier, $count );
   }

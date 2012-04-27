@@ -16,7 +16,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Edit a address.
  * @package mastodon\ui
  */
-class address_edit extends \cenozo\ui\push\base_edit
+class address_edit extends base_edit
 {
   /**
    * Constructor.
@@ -26,39 +26,15 @@ class address_edit extends \cenozo\ui\push\base_edit
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) ||
-          !array_key_exists( 'address.rank', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $address_class_name = lib::get_class_name( 'database\address' );
-      $db_address = $address_class_name::get_unique_record(
-        array( 'person_id', 'rank' ),
-        array( $db_participant->person_id, $noid['address.rank'] ) );
-      if( !$db_address ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_address->id;
-
-      if( array_key_exists( 'region.abbreviation', $noid ) )
-      {
-        $region_class_name = lib::get_class_name( 'database\region' );
-        $db_region = $region_class_name::get_unique_record( 'abbreviation', $noid['region.abbreviation'] );
-        if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-        $args['columns']['region_id'] = $db_region->id;
-      }
-    }
-
     parent::__construct( 'address', $args );
+
+    // only send a machine request if the participant has been synched
+    $db_participant = $this->get_record()->get_person()->get_participant();
+    $url = !is_null( $db_participant )
+         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+         : NULL;
+    $this->set_machine_request_enabled( !is_null( $url ) );
+    $this->set_machine_request_url( $url );
   }
 
   /**

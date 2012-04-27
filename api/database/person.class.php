@@ -17,6 +17,32 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class person extends \cenozo\database\has_note
 {
+  // TODO: document
+  public function get_participant()
+  {
+    // this method is for person records only
+    if( 'person' != $this->get_class_name() ) return parent::get_participant();
+
+    // no primary id means no participant
+    if( is_null( $this->id ) ) return NULL;
+
+    $participant_class_name = lib::create( 'database\participant' );
+    return $participant_class_name::get_unique_record( 'person_id', $this->id );
+  }
+
+  // TODO: document
+  public function get_alternate()
+  {
+    // this method is for person records only
+    if( 'person' != $this->get_class_name() ) return parent::get_alternate();
+
+    // no primary id means no alternate
+    if( is_null( $this->id ) ) return NULL;
+
+    $alternate_class_name = lib::create( 'database\alternate' );
+    return $alternate_class_name::get_unique_record( 'person_id', $this->id );
+  }
+
   /**
    * Override get_address_list()
    * 

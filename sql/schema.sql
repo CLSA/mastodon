@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
 
 
 -- -----------------------------------------------------
@@ -84,6 +84,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   INDEX `fk_person_id` (`person_id` ASC) ,
   INDEX `fk_source_id` (`source_id` ASC) ,
   INDEX `fk_site_id` (`site_id` ASC) ,
+  UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
   CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
@@ -351,6 +352,7 @@ CREATE  TABLE IF NOT EXISTS `alternate` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
+  UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
   CONSTRAINT `fk_alternate_participant`
     FOREIGN KEY (`participant_id` )
     REFERENCES `participant` (`id` )

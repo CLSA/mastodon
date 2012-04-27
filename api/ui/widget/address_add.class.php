@@ -65,7 +65,7 @@ class address_add extends \cenozo\ui\widget\base_view
     $this->set_variable( 'november', true );
     $this->set_variable( 'december', true );
 
-    // this widget must have a parent, and it's subject must be a participant
+    // this widget must have a parent, and it's subject must be a participant or alternate
     $subject = $this->parent->get_subject();
     if( is_null( $this->parent ) || ( 'participant' != $subject && 'alternate' != $subject ) )
       throw lib::create( 'exception\runtime',
