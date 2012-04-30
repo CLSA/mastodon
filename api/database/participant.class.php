@@ -18,31 +18,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class participant extends person
 {
   /**
-   * Extend the select() method by adding a custom join to the jursidiction table.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the selection.
-   * @param boolean $count If true the total number of records instead of a list
-   * @return array( record ) | int
-   * @static
-   * @access public
-   */
-  public static function select( $modifier = NULL, $count = false )
-  {
-    // define the join to the jurisdiction table
-    $jurisdiction_mod = lib::create( 'database\modifier' );
-    $jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
-    $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
-    $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
-    $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
-    static::customize_join( 'jurisdiction', $jurisdiction_mod );
-
-    // define the uid as the primary unique key
-    static::set_primary_unique_key( 'uq_uid' );
-
-    return parent::select( $modifier, $count );
-  }
-
-  /**
    * Get the participant's last consent
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return consent
@@ -312,4 +287,15 @@ class participant extends person
     return static::db()->get_one( 'SELECT COUNT(*) FROM unique_identifier_pool' );
   }
 }
+
+// define the join to the jurisdiction table
+$jurisdiction_mod = lib::create( 'database\modifier' );
+$jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
+$jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
+$jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
+$jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
+participant::customize_join( 'jurisdiction', $jurisdiction_mod );
+
+// define the uid as the primary unique key
+participant::set_primary_unique_key( 'uq_uid' );
 ?>
