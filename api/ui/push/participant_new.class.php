@@ -27,6 +27,9 @@ class participant_new extends \cenozo\ui\push\base_new
   public function __construct( $args )
   {
     parent::__construct( 'participant', $args );
+
+    // never send a machine request since this is a new participant
+    $this->set_machine_request_enabled( false );
   }
 
   /**
