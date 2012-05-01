@@ -36,7 +36,13 @@ class address_delete extends \cenozo\ui\push\base_delete
          : NULL );
   }
 
-  // TODO: document
+  /**
+   * Override the parent method to replace the person key with a participant key.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args An argument list, usually those passed to the push operation.
+   * @return array
+   * @access protected
+   */
   protected function convert_to_noid( $args )
   {
     $args = parent::convert_to_noid( $args );
@@ -52,7 +58,13 @@ class address_delete extends \cenozo\ui\push\base_delete
     return $args;
   }
 
-  // TODO: document
+  /**
+   * Override the parent method to replace the participant key with a person key.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args An argument list, usually those passed to the push operation.
+   * @return array
+   * @access protected
+   */
   protected function convert_from_noid( $args )
   {
     if( array_key_exists( 'noid', $args ) ) 

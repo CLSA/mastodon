@@ -25,31 +25,64 @@ class phone_delete extends \cenozo\ui\push\base_delete
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) ||
-          !array_key_exists( 'phone.rank', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $phone_class_name = lib::get_class_name( 'database\phone' );
-      $db_phone = $phone_class_name::get_unique_record(
-        array( 'person_id', 'rank' ),
-        array( $db_participant->person_id, $noid['phone.rank'] ) );
-      if( !$db_phone ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_phone->id;
-    }
-
     parent::__construct( 'phone', $args );
+
+    // only send a machine request if the participant has been synched
+    $db_participant = $this->get_record()->get_person()->get_participant();
+    $this->set_machine_request_enabled( !is_null( $db_participant ) &&
+                                        !is_null( $db_participant->sync_datetime ) );
+    $this->set_machine_request_url( !is_null( $db_participant )
+         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+         : NULL );
+  }
+
+  /**
+   * Override the parent method to replace the person key with a participant key.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args An argument list, usually those passed to the push operation.
+   * @return array
+   * @access protected
+   */
+  protected function convert_to_noid( $args )
+  {
+    $args = parent::convert_to_noid( $args );
+
+    // replace person key with participant key
+    $person_id = $args['noid']['phone']['person_id'];
+    unset( $args['noid']['phone']['person_id'] );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $db_participant = $this->get_record()->get_person()->get_participant();
+    $args['noid']['phone']['participant_id'] =
+      $participant_class_name::get_unique_from_primary_key( $db_participant->id );
+
+    return $args;
+  }
+
+  /**
+   * Override the parent method to replace the participant key with a person key.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args An argument list, usually those passed to the push operation.
+   * @return array
+   * @access protected
+   */
+  protected function convert_from_noid( $args )
+  {
+    if( array_key_exists( 'noid', $args ) ) 
+    {   
+      // replace the participant key with a person key
+      $uid = $args['noid']['phone']['participant_id']['uid'];
+      unset( $args['noid']['phone']['participant_id'] );
+  
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $db_participant = $participant_class_name::get_unique_record( 'uid', $uid );
+      if( is_null( $db_participant ) ) 
+        throw lib::create( 'exception\argument',
+          'args[noid][phone][participant_id][uid]', $uid, __METHOD__ );
+  
+      $args['noid']['phone']['person_id'] = $db_participant->person_id;
+    }   
+
+    return parent::convert_from_noid( $args );
   }
 }
 ?>

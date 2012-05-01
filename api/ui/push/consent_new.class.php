@@ -26,24 +26,14 @@ class consent_new extends \cenozo\ui\push\base_new
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['columns']['participant_id'] = $db_participant->id;
-    }
-
     parent::__construct( 'consent', $args );
+
+    // only send a machine request if the participant has been synched
+    $db_participant = $this->get_record()->get_participant();
+    $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
+    $this->set_machine_request_url( !is_null( $db_participant )
+         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+         : NULL );
   }
 
   /**

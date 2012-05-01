@@ -63,7 +63,12 @@ class address_new extends \cenozo\ui\push\base_new
     parent::finish();
   }
 
-  // TODO: document
+  /**
+   * Overrides the parent method to make sure the postcode is valid.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access public
+   */
   protected function convert_to_noid( $args )
   {
     // replace person id with participant id
@@ -81,7 +86,13 @@ class address_new extends \cenozo\ui\push\base_new
     return parent::convert_to_noid( $args );
   }
 
-  // TODO: document
+  /**
+   * Override the parent method to replace the participant key with a person key.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array $args An argument list, usually those passed to the push operation.
+   * @return array
+   * @access protected
+   */
   protected function convert_from_noid( $args )
   {
     $args = parent::convert_from_noid( $args );

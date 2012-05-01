@@ -25,24 +25,22 @@ class user_delete extends \cenozo\ui\push\user_delete
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'user.name', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $class_name = lib::get_class_name( 'database\user' );
-      $db_user = $class_name::get_unique_record( 'name', $noid['user.name'] );
-      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_user->id;
-    }
-
     parent::__construct( $args );
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
+   * Override the parent method to send a request to both Beartooth and Sabretooth
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function send_machine_request()
+  {
+    // send the request to both beartooth and sabretooth
+    $this->set_machine_request_url( BEARTOOTH_URL );
+    parent::send_machine_request();
+    $this->set_machine_request_url( SABRETOOTH_URL );
+    parent::send_machine_request();
   }
 }
 ?>

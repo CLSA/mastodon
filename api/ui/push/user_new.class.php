@@ -26,33 +26,22 @@ class user_new extends \cenozo\ui\push\user_new
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'role.name', $noid ) ||
-          !array_key_exists( 'site.name', $noid ) ||
-          !array_key_exists( 'site.cohort', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $role_class_name = lib::get_class_name( 'database\role' );
-      $db_role = $role_class_name::get_unique_record( 'name', $noid['role.name'] );
-      if( !$db_role ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $this->role_id = $db_role->id;
-
-      $site_class_name = lib::get_class_name( 'database\site' );
-      $db_site = $site_class_name::get_unique_record(
-        array( 'name', 'cohort' ),
-        array( $noid['site.name'], $noid['site.cohort'] ) );
-      if( !$db_site ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $this->site_id = $db_site->id;
-    }
-
     parent::__construct( $args );
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
+   * Override the parent method to send a request to both Beartooth and Sabretooth
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function send_machine_request()
+  {
+    // send the request to both beartooth and sabretooth
+    $this->set_machine_request_url( BEARTOOTH_URL );
+    parent::send_machine_request();
+    $this->set_machine_request_url( SABRETOOTH_URL );
+    parent::send_machine_request();
   }
 }
 ?>
