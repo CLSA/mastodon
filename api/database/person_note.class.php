@@ -15,5 +15,5 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * @package mastodon\database
  */
-class person_note extends \cenozo\database\record {}
+class person_note extends \cenozo\database\base_note {}
 ?>
