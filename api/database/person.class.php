@@ -156,9 +156,10 @@ class person extends \cenozo\database\has_note
    */
   public function get_note_count( $modifier = NULL )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $note_class_name = lib::get_class_name( 'database\person_note' );
     if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'person_id', '=', $this->id );
+    $modifier->where( 'person_id', '=', $person_id );
     return $note_class_name::count( $modifier );
   }
 
@@ -171,9 +172,10 @@ class person extends \cenozo\database\has_note
    */
   public function get_note_list( $modifier = NULL )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $note_class_name = lib::get_class_name( 'database\person_note' );
     if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'person_id', '=', $this->id );
+    $modifier->where( 'person_id', '=', $person_id );
     $modifier->order( 'sticky', true );
     $modifier->order( 'datetime' );
     return $note_class_name::select( $modifier );
@@ -188,10 +190,11 @@ class person extends \cenozo\database\has_note
    */
   public function add_note( $user, $note )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $date_obj = util::get_datetime_object();
     $db_note = lib::create( 'database\person_note' );
     $db_note->user_id = $user->id;
-    $db_note->person_id = $this->id;
+    $db_note->person_id = $person_id;
     $db_note->datetime = $date_obj->format( 'Y-m-d H:i:s' );
     $db_note->note = $note;
     $db_note->save();
