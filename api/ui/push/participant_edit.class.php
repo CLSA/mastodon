@@ -35,7 +35,11 @@ class participant_edit extends \cenozo\ui\push\base_edit
       'comprehensive' == $this->get_record()->cohort ? BEARTOOTH_URL : SABRETOOTH_URL );
   }
 
-  // TODO: document
+  /**
+   * Overrides the parent method to prevent some columns from being sent in machine requests
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
   public function finish()
   {
     // don't send information 
