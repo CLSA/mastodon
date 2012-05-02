@@ -8,7 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use cenozo\lib, cenozo\log, cenozo\util;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Extends the parent class to send machine requests.
@@ -25,7 +25,17 @@ class note_delete extends \cenozo\ui\push\note_delete
   public function __construct( $args )
   {
     parent::__construct( $args );
-    $this->set_machine_request_enabled( true );
+
+    // only send a machine request if the participant has been synched
+    if( 'participant' == $this->get_argument( 'category' ) )
+    {
+      $db_participant = lib::create( 'database\participant', $this->get_argument( 'category_id' ) );
+      $this->set_machine_request_enabled( !is_null( $db_participant ) &&
+                                          !is_null( $db_participant->sync_datetime ) );
+      $this->set_machine_request_url( !is_null( $db_participant )
+           ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+           : NULL );
+    }
   }
 
   /** 
@@ -37,6 +47,7 @@ class note_delete extends \cenozo\ui\push\note_delete
    */
   protected function convert_from_noid( $args )
   {
+    $converted = false;
     if( array_key_exists( 'noid', $args ) )
     {
       if( array_key_exists( 'participant_note', $args['noid'] ) )
@@ -53,10 +64,21 @@ class note_delete extends \cenozo\ui\push\note_delete
         unset( $args['noid']['participant_note'] );
         $args['noid']['person_note']['person_id'] = $db_participant->get_person()->id;
         unset( $args['noid']['person_note']['participant_id'] );
+
+        $converted = true;
       }
     }
 
-    return parent::convert_from_noid( $args );
+    $args = parent::convert_from_noid( $args );
+    
+    // if we converted the participant note above then we now have a person_note_id
+    if( $converted )
+    {
+      $args['id'] = $args['person_note_id'];
+      unset( $args['person_note_id'] );
+    }
+
+    return $args;
   }
 }
 ?>

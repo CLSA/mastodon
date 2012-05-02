@@ -8,7 +8,7 @@
  */
 
 namespace mastodon\ui\push;
-use cenozo\lib, cenozo\log, cenozo\util;
+use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Extends the parent class to send machine requests.
