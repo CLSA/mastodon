@@ -93,6 +93,7 @@ class note_edit extends \cenozo\ui\push\note_edit
           throw lib::create( 'exception\runtime',
             sprintf( 'Participant UID "%s" not found.', $uid ), __METHOD__ );
 
+        $args['category'] = 'person';
         $args['noid']['person_note'] = $args['noid']['participant_note'];
         unset( $args['noid']['participant_note'] );
         $args['noid']['person_note']['person_id'] = $db_participant->get_person()->id;
