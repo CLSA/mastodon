@@ -95,6 +95,19 @@ class participant_list extends \cenozo\ui\pull\base_list
         }
         $item['consent_list'][] = $consent;
       }
+
+      // add the participant's availability list
+      $item['availability_list'] = array();
+      foreach( $record->get_availability_list() as $db_availability )
+      {
+        $availability = array();
+        foreach( $db_availability->get_column_names() as $column )
+        {
+          if( 'participant_id' == $column ) {} // do nothing
+          else $availability[$column] = $db_availability->$column;
+        }
+        $item['availability_list'][] = $availability;
+      }
     }
     else
     {
