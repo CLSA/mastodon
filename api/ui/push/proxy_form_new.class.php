@@ -63,6 +63,12 @@ class proxy_form_new extends \cenozo\ui\push\base_new
       $db_proxy_form_entry->signed = !is_null( $this->get_record()->scan );
       foreach( $entry as $column => $value ) $db_proxy_form_entry->$column = $value;
 
+      // the user is in a noid argument
+      $noid = $this->get_argument( 'noid' );
+      $user_class_name = util::get_class_name( 'database\user' );
+      $db_user = $user_class_name::get_unique_record( 'name', $noid['user.name'] );
+      $db_proxy_form_entry->user_id = $db_user->id;
+
       $db_proxy_form_entry->save();
 
       // validate the entry
