@@ -44,3 +44,11 @@ SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "participant" AND name = "list" );
 
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "onyx" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "proxy_form" AND name = "new" );
+INSERT IGNORE INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "onyx" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "pull" AND subject = "proxy_form_entry" AND name = "validate" );
