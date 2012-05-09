@@ -28,6 +28,41 @@ class proxy_form_new extends \cenozo\ui\push\base_new
    */
   public function __construct( $args )
   {
+    if( array_key_exists( 'noid', $args ) )
+    {
+      $user_class_name = lib::get_class_name( 'database\user' );
+      $region_class_name = lib::get_class_name( 'database\region' );
+
+      // use the noid argument and remove it from the args input
+      $noid = $args['noid'];
+      unset( $args['noid'] );
+
+      // make sure there is sufficient information
+      if( !is_array( $noid ) ||
+          !array_key_exists( 'user.name', $noid ) )
+        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+      
+      $db_user = $user_class_name::get_unique_record( 'name', $noid['user.name'] );
+      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+      $args['entry']['user_id'] = $db_user->id;
+
+      if( array_key_exists( 'proxy_region.abbreviation', $noid ) )
+      {
+        $db_region = $region_class_name::get_unique_record(
+          'abbreviation', $noid['proxy_region.abbreviation'] );
+        if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+        $args['entry']['proxy_region_id'] = $db_region->id;
+      }
+
+      if( array_key_exists( 'informant_region.abbreviation', $noid ) )
+      {
+        $db_region = $region_class_name::get_unique_record(
+          'abbreviation', $noid['informant_region.abbreviation'] );
+        if( !$db_region ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
+        $args['entry']['informant_region_id'] = $db_region->id;
+      }
+    }
+
     parent::__construct( 'proxy_form', $args );
   }
 
@@ -62,12 +97,6 @@ class proxy_form_new extends \cenozo\ui\push\base_new
       $db_proxy_form_entry->deferred = false;
       $db_proxy_form_entry->signed = !is_null( $this->get_record()->scan );
       foreach( $entry as $column => $value ) $db_proxy_form_entry->$column = $value;
-
-      // the user is in a noid argument
-      $noid = $this->get_argument( 'noid' );
-      $user_class_name = util::get_class_name( 'database\user' );
-      $db_user = $user_class_name::get_unique_record( 'name', $noid['user.name'] );
-      $db_proxy_form_entry->user_id = $db_user->id;
 
       $db_proxy_form_entry->save();
 
