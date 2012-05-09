@@ -7,3 +7,4 @@ SOURCE address.sql
 SOURCE jurisdiction.sql
 SOURCE participant.sql
 SOURCE participant_site.sql
+SOURCE proxy_form.sql

@@ -26,6 +26,10 @@ class proxy_form_entry_new extends base_form_entry_new
    */
   public function __construct( $args )
   {
+    // make sure not to include forms from onyx
+    $this->form_mod = lib::create( 'database\modifier' );
+    $this->form_mod->where( 'from_onyx', '=', false );
+
     parent::__construct( 'proxy', $args );
   }
 }
