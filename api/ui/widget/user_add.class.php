@@ -26,9 +26,19 @@ class user_add extends \cenozo\ui\widget\user_add{
   {
     parent::finish();
     
+    $role_class_name = lib::get_class_name( 'database\role' );
     $site_class_name = lib::get_class_name( 'database\site' );
+
     $session = lib::create( 'business\session' );
     $is_top_tier = 3 == $session->get_role()->tier;
+
+    // create enum arrays
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'tier', '<=', $session->get_role()->tier );
+    $modifier->where( 'name', 'IN', array( 'administrator', 'typist' ) );
+    $roles = array();
+    foreach( $role_class_name::select( $modifier ) as $db_role )
+      $roles[$db_role->id] = $db_role->name;
 
     // re-create the site enum array to include cohort
     $sites = array();
@@ -43,6 +53,7 @@ class user_add extends \cenozo\ui\widget\user_add{
 
     $value = $is_top_tier ? current( $sites ) : $session->get_site()->id;
     $this->set_item( 'site_id', $value, true, $is_top_tier ? $sites : NULL );
+    $this->set_item( 'role_id', current( $roles ), true, $roles );
 
     $this->finish_setting_items();
   }

@@ -62,7 +62,7 @@ abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
     // validate the entry and insert error values as notes
     $args = array( 'id' => $this->get_argument( 'id' ) );
     $operation = lib::create( sprintf( 'ui\pull\%s_validate', $this->get_subject() ), $args );
-    $errors = $operation->finish();
+    $errors = $operation->process();
     foreach( $errors as $type => $error ) $this->set_note( $type, $error, true );
 
     // get the form's subject

@@ -117,7 +117,7 @@ class alternate_new extends \cenozo\ui\push\base_new
       $args = array( 'columns' => $address_info );
       $args['columns']['person_id'] = $db_alternate->person_id;
       $operation = lib::create( 'ui\push\address_new', $args );
-      $operation->finish();
+      $operation->process();
     }
 
     // if phone argument exists then add a phone number to the alternate
@@ -127,7 +127,7 @@ class alternate_new extends \cenozo\ui\push\base_new
       $args = array( 'columns' => $phone_info );
       $args['columns']['person_id'] = $db_alternate->person_id;
       $operation = lib::create( 'ui\push\phone_new', $args );
-      $operation->finish();
+      $operation->process();
     }
 
     // if a form variable was included try to decode it and store it as a proxy form

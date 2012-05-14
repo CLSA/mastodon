@@ -91,13 +91,13 @@ class alternate_view extends \cenozo\ui\widget\base_view
 
     if( !is_null( $this->address_list ) )
     {
-      $this->address_list->finish();
+      $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
 
     if( !is_null( $this->phone_list ) )
     {
-      $this->phone_list->finish();
+      $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
   }

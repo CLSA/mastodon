@@ -68,14 +68,14 @@ abstract class base_form_view
     {
       $args = array( 'id' => $this->form_entry_1->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_1 = $operation->finish();
+      $error_list_1 = $operation->process();
     }
     $error_list_2 = array();
     if( !is_null( $this->form_entry_2 ) )
     {
       $args = array( 'id' => $this->form_entry_2->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_2 = $operation->finish();
+      $error_list_2 = $operation->process();
     }
 
     $operation_class_name = lib::get_class_name( 'database\operation' );
@@ -98,7 +98,7 @@ abstract class base_form_view
 
       $args = array( 'id' => $this->form_entry_1->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_1 = $operation->finish();
+      $error_list_1 = $operation->process();
     }
     $error_list_2 = array();
     if( !is_null( $this->form_entry_2 ) )
@@ -109,7 +109,7 @@ abstract class base_form_view
 
       $args = array( 'id' => $this->form_entry_2->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_2 = $operation->finish();
+      $error_list_2 = $operation->process();
     }
 
     foreach( $this->items as $item_id => $item )

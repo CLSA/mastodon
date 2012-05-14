@@ -36,11 +36,23 @@ class access_delete extends \cenozo\ui\push\access_delete
    */
   protected function send_machine_request()
   {
-    // send the request to both beartooth and sabretooth
-    $this->set_machine_request_url( BEARTOOTH_URL );
-    parent::send_machine_request();
-    $this->set_machine_request_url( SABRETOOTH_URL );
-    parent::send_machine_request();
+    // determine which application to send the user request to
+    $db_site = lib::create( 'database\site', $this->get_record()->site_id );
+    $db_role = lib::create( 'database\role', $this->get_record()->role_id );
+
+    if( 'typist' != $db_role->name )
+    {
+      if( 'comprehensive' == $db_site->cohort )
+      {
+        $this->set_machine_request_url( BEARTOOTH_URL );
+        parent::send_machine_request();
+      }
+      else if( 'tracking' == $db_site->cohort )
+      {
+        $this->set_machine_request_url( SABRETOOTH_URL );
+        parent::send_machine_request();
+      }
+    }
   }
 }
 ?>

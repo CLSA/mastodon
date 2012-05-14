@@ -29,9 +29,6 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
   {
     parent::__construct( $form_type.'_form', 'adjudicate', $args );
     $this->form_type = $form_type;
-
-    // make sure we have an id (we don't actually need to use it since the parent does)
-    $this->get_argument( 'id' );
   }
 
   /**

@@ -28,9 +28,7 @@ class site_view extends \cenozo\ui\widget\site_view
   public function __construct( $args )
   {
     parent::__construct( $args );
-    
-    // create an associative array with everything we want to display about the site
-    $this->add_item( 'cohort', 'enum', 'Type' );
+    $this->add_item( 'cohort', 'constant', 'Cohort' );
   }
 
   /**
@@ -41,14 +39,7 @@ class site_view extends \cenozo\ui\widget\site_view
    */
   public function finish()
   {
-    // create enum arrays
-    $class_name = lib::get_class_name( 'database\site' );
-    $cohorts = $class_name::get_enum_values( 'cohort' );
-    $cohorts = array_combine( $cohorts, $cohorts );
-
-    // set the view's items
-    $this->set_item( 'cohort', $this->get_record()->cohort, true, $cohorts );
-
+    $this->set_item( 'cohort', $this->get_record()->cohort );
     parent::finish();
   }
 }
