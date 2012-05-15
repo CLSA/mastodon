@@ -17,21 +17,8 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class user_delete extends \cenozo\ui\push\user_delete
 {
-  /**
-   * Constructor.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args Push arguments
-   * @access public
-   */
-  public function __construct( $args )
-  {
-    parent::__construct( $args );
-    $this->set_machine_request_enabled( true );
-  }
-
-  /**
-   * Override the parent method to build the machine arguments even if the request was
-   * received by a machine.
+  /** 
+   * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @throws exception\notice
@@ -42,13 +29,28 @@ class user_delete extends \cenozo\ui\push\user_delete
   {
     parent::prepare();
 
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @abstract
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    // we send a machine request even if one was received
     if( $this->get_machine_request_received() && $this->get_machine_request_enabled() )
       $this->machine_arguments = $this->convert_to_noid( $this->arguments );
   }
 
   /**
-   * Override the parent method to send a machine request even if the request was
-   * received by a machine.
+   * Finishes the operation with any post-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access public
@@ -57,6 +59,7 @@ class user_delete extends \cenozo\ui\push\user_delete
   {
     parent::finish();
 
+    // we send a machine request even if one was received
     if( $this->get_machine_request_received() && $this->get_machine_request_enabled() )
       $this->send_machine_request();
   }

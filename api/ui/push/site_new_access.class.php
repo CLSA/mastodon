@@ -17,15 +17,18 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class site_new_access extends \cenozo\ui\push\site_new_access
 {
-  /**
-   * Constructor.
+  /** 
+   * Processes arguments, preparing them for the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args Push arguments
-   * @access public
+   * @throws exception\notice
+   * @abstract
+   * @access protected
    */
-  public function __construct( $args )
+  protected function prepare()
   {
-    parent::__construct( $args );
+    parent::prepare();
+
     $this->set_machine_request_enabled( true );
   }
 

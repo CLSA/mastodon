@@ -27,6 +27,11 @@ class participant_edit extends \cenozo\ui\push\base_edit
   public function __construct( $args )
   {
     parent::__construct( 'participant', $args );
+  }
+
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     $this->set_machine_request_enabled(
@@ -35,25 +40,25 @@ class participant_edit extends \cenozo\ui\push\base_edit
       'comprehensive' == $this->get_record()->cohort ? BEARTOOTH_URL : SABRETOOTH_URL );
   }
 
-  /**
-   * Overrides the parent method to prevent some columns from being sent in machine requests
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
+  // TODO: document
+  protected function setup()
   {
-    // don't send information 
-    $columns = $this->get_argument( 'columns', array() );
-    if( array_key_exists( 'cohort', $columns ) ||
-        array_key_exists( 'gender', $columns ) ||
-        array_key_exists( 'date_of_birth', $columns ) ||
-        array_key_exists( 'eligible', $columns ) ||
-        array_key_exists( 'no_in_home', $columns ) ||
-        array_key_exists( 'use_informant', $columns ) ||
-        array_key_exists( 'email', $columns ) )
-      $this->set_machine_request_enabled( false );
+    parent::setup();
 
-    parent::finish();
+    if( $this->get_machine_request_enabled() )
+    {
+      $columns = $this->get_argument( 'columns', array() );
+
+      // don't send information 
+      if( array_key_exists( 'cohort', $columns ) ||
+          array_key_exists( 'gender', $columns ) ||
+          array_key_exists( 'date_of_birth', $columns ) ||
+          array_key_exists( 'eligible', $columns ) ||
+          array_key_exists( 'no_in_home', $columns ) ||
+          array_key_exists( 'use_informant', $columns ) ||
+          array_key_exists( 'email', $columns ) )
+        $this->set_machine_request_enabled( false );
+    }
   }
 }
 ?>
