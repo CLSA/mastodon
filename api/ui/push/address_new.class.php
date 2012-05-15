@@ -27,6 +27,12 @@ class address_new extends \cenozo\ui\push\base_new
   public function __construct( $args )
   {
     parent::__construct( 'address', $args );
+  }
+
+  // TODO: document
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     $columns = $this->get_argument( 'columns' );
@@ -39,28 +45,34 @@ class address_new extends \cenozo\ui\push\base_new
          : NULL );
   }
 
-  /**
-   * Overrides the parent method to make sure the postcode is valid.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @access public
-   */
-  public function finish()
+  // TODO: document
+  public function validate()
   {
+    parent::validate();
+
     $columns = $this->get_argument( 'columns' );
-    $postcode = $columns['postcode'];
     
     // validate the postcode
-    if( !preg_match( '/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/', $postcode ) && // postal code
-        !preg_match( '/^[0-9]{5}$/', $postcode ) ) // zip code
+    if( !preg_match( '/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/', $columns['postcode'] ) && // postal code
+        !preg_match( '/^[0-9]{5}$/', $columns['postcode'] ) ) // zip code
       throw lib::create( 'exception\notice',
         'Postal codes must be in "A1A 1A1" format, zip codes in "01234" format.', __METHOD__ );
 
-    // determine the region, timezone and daylight savings from the postcode
-    $this->get_record()->postcode = $postcode;
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
+    $db_postcode = $postcode_class_name::get_match( $columns['postcode'] );
+    if( is_null( $db_postcode ) ) 
+      throw lib::create( 'exception\notice',
+        'The postcode is invalid and cannot be used.', __METHOD__ );
+  }
+
+  // TODO: document
+  protected function execute()
+  {
+    $columns = $this->get_argument( 'columns' );
+    $this->get_record()->postcode = $columns['postcode'];
     $this->get_record()->source_postcode();
 
-    parent::finish();
+    parent::execute();
   }
 
   /**
@@ -97,17 +109,21 @@ class address_new extends \cenozo\ui\push\base_new
   {
     $args = parent::convert_from_noid( $args );
 
-    // replace the participant id with a person id
-    $participant_id = $args['columns']['participant_id'];
-    unset( $args['columns']['participant_id'] );
-    $db_participant = lib::create( 'database\participant', $participant_id );
-    if( is_null( $db_participant ) )
-      throw lib::create( 'exception\runtime',
-        sprintf( 'Participant id %d not found when receiving machine request.',
-          $participant_id ),
-        __METHOD__ );
-    
-    $args['columns']['person_id'] = $db_participant->person_id;
+    if( array_key_exists( 'noid', $args ) )
+    {
+      // replace the participant id with a person id
+      $participant_id = $args['columns']['participant_id'];
+      unset( $args['columns']['participant_id'] );
+      $db_participant = lib::create( 'database\participant', $participant_id );
+      if( is_null( $db_participant ) )
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Participant id %d not found when receiving machine request.',
+            $participant_id ),
+          __METHOD__ );
+      
+      $args['columns']['person_id'] = $db_participant->person_id;
+    }
+
     return $args;
   }
 }
