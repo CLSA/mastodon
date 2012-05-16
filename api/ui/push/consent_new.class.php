@@ -27,27 +27,37 @@ class consent_new extends \cenozo\ui\push\base_new
   public function __construct( $args )
   {
     parent::__construct( 'consent', $args );
+  }
+
+  // TODO: document
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
-    $db_participant = $this->get_record()->get_participant();
+    $columns = $this->get_argument( 'columns' );
+    $db_participant = lib::create( 'database\participant', $columns['participant_id'] );
     $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
     $this->set_machine_request_url( !is_null( $db_participant )
          ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
          : NULL );
   }
 
-  /**
-   * Executes the push.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
+  // TODO: document
+  public function validate()
   {
+    parent::validate();
+
     // make sure the date column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
       throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
-    parent::finish();
+  }
+
+  // TODO: document
+  public function execute()
+  {
+    parent::execute();
 
     // if a form variable was included try to decode it and store it as a consent form
     $form = $this->get_argument( 'form', NULL );
