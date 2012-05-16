@@ -26,6 +26,12 @@ class availability_delete extends \cenozo\ui\push\base_delete
   public function __construct( $args )
   {
     parent::__construct( 'availability', $args );
+  }
+
+  // TODO: document
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     $db_participant = $this->get_record()->get_participant();

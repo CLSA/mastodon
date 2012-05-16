@@ -26,13 +26,6 @@ class participant_delete_availability extends \cenozo\ui\push\base_delete_record
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'availability', $args );
-
-    // only send a machine request if the participant has been synched
-    $db_participant = $this->get_record()->get_participant();
-    $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
-    $this->set_machine_request_url( !is_null( $db_participant )
-         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
-         : NULL );
   }
 }
 ?>
