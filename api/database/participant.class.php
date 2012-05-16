@@ -109,8 +109,9 @@ class participant extends person
       if( !is_null( $db_address ) )
       { // there is a primary address
         $jurisdiction_class_name = lib::get_class_name( 'database\jurisdiction' );
-        $db_jurisdiction = $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
-        if( !is_null( $db_address ) ) $db_site = $db_jurisdiction->get_site();
+        $db_jurisdiction =
+          $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
+        if( !is_null( $db_jurisdiction ) ) $db_site = $db_jurisdiction->get_site();
       }
     }
     else

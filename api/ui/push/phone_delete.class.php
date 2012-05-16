@@ -26,6 +26,12 @@ class phone_delete extends \cenozo\ui\push\base_delete
   public function __construct( $args )
   {
     parent::__construct( 'phone', $args );
+  }
+
+  // TODO: document
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     $db_participant = $this->get_record()->get_person()->get_participant();
@@ -69,16 +75,12 @@ class phone_delete extends \cenozo\ui\push\base_delete
   {
     if( array_key_exists( 'noid', $args ) ) 
     {   
-      // replace the participant key with a person key
-      $uid = $args['noid']['phone']['participant_id']['uid'];
-      unset( $args['noid']['phone']['participant_id'] );
-  
+      // replace the participant unique key with a person primary key
       $participant_class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $uid );
-      if( is_null( $db_participant ) ) 
-        throw lib::create( 'exception\argument',
-          'args[noid][phone][participant_id][uid]', $uid, __METHOD__ );
-  
+      $participant_id = $participant_class_name::get_primary_from_unique_key(
+        $args['noid']['phone']['participant_id'] );
+      unset( $args['noid']['phone']['participant_id'] );
+      $db_participant = lib::create( 'database\participant', $participant_id );
       $args['noid']['phone']['person_id'] = $db_participant->person_id;
     }   
 

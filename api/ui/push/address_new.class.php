@@ -109,18 +109,12 @@ class address_new extends \cenozo\ui\push\base_new
   {
     $args = parent::convert_from_noid( $args );
 
-    if( array_key_exists( 'noid', $args ) )
+    if( array_key_exists( 'participant_id', $args['columns'] ) )
     {
       // replace the participant id with a person id
       $participant_id = $args['columns']['participant_id'];
       unset( $args['columns']['participant_id'] );
       $db_participant = lib::create( 'database\participant', $participant_id );
-      if( is_null( $db_participant ) )
-        throw lib::create( 'exception\runtime',
-          sprintf( 'Participant id %d not found when receiving machine request.',
-            $participant_id ),
-          __METHOD__ );
-      
       $args['columns']['person_id'] = $db_participant->person_id;
     }
 

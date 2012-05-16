@@ -141,6 +141,9 @@ class participant_view extends \cenozo\ui\widget\base_view
     $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
 
+    $db_default_site = $this->get_record()->get_default_site();
+    $default_site = is_null( $db_default_site ) ? 'None' : $db_default_site->name;
+
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
@@ -148,7 +151,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'last_name', $record->last_name );
     $this->set_item( 'source_id', $record->source_id, false, $sources );
     $this->set_item( 'cohort', $record->cohort );
-    $this->set_item( 'default_site', $record->get_default_site()->name );
+    $this->set_item( 'default_site', $default_site );
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );

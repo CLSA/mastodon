@@ -27,6 +27,12 @@ class phone_new extends \cenozo\ui\push\base_new
   public function __construct( $args )
   {
     parent::__construct( 'phone', $args );
+  }
+
+  // TODO: document
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     $columns = $this->get_argument( 'columns' );
@@ -39,23 +45,32 @@ class phone_new extends \cenozo\ui\push\base_new
          : NULL );
   }
 
-  /**
-   * Overrides the parent method to make sure the number isn't blank and is a valid number
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @access public
-   */
-  public function finish()
+  // TODO: document
+  public function validate()
   {
+    parent::validate();
+
     $columns = $this->get_argument( 'columns' );
-    $number = $columns['number'];
-    
-    // validate the number
-    if( 10 != strlen( preg_replace( '/[^0-9]/', '', $columns['number'] ) ) )
+
+    // make sure the number column isn't blank
+    if( !array_key_exists( 'number', $columns ) )
+      throw lib::create( 'exception\notice', 'The number cannot be left blank.', __METHOD__ );
+
+    // validate the phone number
+    $number_only = preg_replace( '/[^0-9]/', '', $columns['number'] );
+    if( 10 != strlen( $number_only ) )
       throw lib::create( 'exception\notice',
         'Phone numbers must have exactly 10 digits.', __METHOD__ );
 
-    parent::finish();
+    $formatted_number = sprintf( '%s-%s-%s',
+                                 substr( $number_only, 0, 3 ),
+                                 substr( $number_only, 3, 3 ),
+                                 substr( $number_only, 6 ) );
+    if( !util::validate_phone_number( $formatted_number ) )
+      throw lib::create( 'exception\notice',
+        sprintf( 'The provided number "%s" is not a valid North American phone number.',
+                 $formatted_number ),
+        __METHOD__ );
   }
 
   /** 
@@ -92,17 +107,15 @@ class phone_new extends \cenozo\ui\push\base_new
   {
     $args = parent::convert_from_noid( $args );
 
-    // replace the participant id with a person id
-    $participant_id = $args['columns']['participant_id'];
-    unset( $args['columns']['participant_id'] );
-    $db_participant = lib::create( 'database\participant', $participant_id );
-    if( is_null( $db_participant ) ) 
-      throw lib::create( 'exception\runtime',
-        sprintf( 'Participant id %d not found when receiving machine request.',
-          $participant_id ),
-        __METHOD__ );
+    if( array_key_exists( 'participant_id', $args['columns'] ) )
+    {
+      // replace the participant id with a person id
+      $participant_id = $args['columns']['participant_id'];
+      unset( $args['columns']['participant_id'] );
+      $db_participant = lib::create( 'database\participant', $participant_id );
+      $args['columns']['person_id'] = $db_participant->person_id;
+    }
 
-    $args['columns']['person_id'] = $db_participant->person_id;
     return $args;
   }
 }
