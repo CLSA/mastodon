@@ -25,6 +25,18 @@ class note_delete extends \cenozo\ui\push\note_delete
   public function __construct( $args )
   {
     parent::__construct( $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
 
     // only send a machine request if the participant has been synched
     if( 'participant' == $this->get_argument( 'category' ) )
