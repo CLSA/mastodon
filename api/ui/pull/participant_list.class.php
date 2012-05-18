@@ -128,7 +128,6 @@ class participant_list extends \cenozo\ui\pull\base_list
               $key['participant_id'] =
                 $participant_class_name::get_unique_from_primary_key( $participant_id );
             }
-            log::info( $key );
 
             $data[$column_name] = $key;
           }
