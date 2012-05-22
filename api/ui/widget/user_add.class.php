@@ -15,16 +15,17 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @package mastodon\ui
  */
-class user_add extends \cenozo\ui\widget\user_add{
+class user_add extends \cenozo\ui\widget\user_add
+{
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     $role_class_name = lib::get_class_name( 'database\role' );
     $site_class_name = lib::get_class_name( 'database\site' );
@@ -54,8 +55,6 @@ class user_add extends \cenozo\ui\widget\user_add{
     $value = $is_top_tier ? current( $sites ) : $session->get_site()->id;
     $this->set_item( 'site_id', $value, true, $is_top_tier ? $sites : NULL );
     $this->set_item( 'role_id', current( $roles ), true, $roles );
-
-    $this->finish_setting_items();
   }
 }
 ?>

@@ -28,6 +28,18 @@ class access_list extends site_restricted_list
   public function __construct( $args )
   {
     parent::__construct( 'access', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     $this->add_column( 'user.name', 'string', 'User', true );
     $this->add_column( 'role.name', 'string', 'Role', true );
@@ -36,14 +48,14 @@ class access_list extends site_restricted_list
   }
 
   /**
-   * Finish setting the variables in the list widget, including filling in the rows.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     foreach( $this->get_record_list() as $record )
     {
@@ -53,8 +65,6 @@ class access_list extends site_restricted_list
                'site.name' => $record->get_site()->name,
                'site.cohort' => $record->get_site()->cohort ) );
     }
-
-    $this->finish_setting_rows();
   }
 }
 ?>

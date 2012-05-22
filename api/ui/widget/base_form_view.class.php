@@ -33,6 +33,18 @@ abstract class base_form_view
   public function __construct( $subject, $args )
   {
     parent::__construct( $subject, 'view', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     $id = $this->get_argument( 'id' );
 
@@ -53,14 +65,14 @@ abstract class base_form_view
   }
   
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     // validate the entries
     $error_list_1 = array();

@@ -18,16 +18,15 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class self_menu extends \cenozo\ui\widget\self_menu
 {
   /**
-   * Constructor
+   * Processes arguments, preparing them for the operation.
    * 
-   * Defines all variables which need to be set for the associated template.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args An associative array of arguments to be processed by the widget
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function __construct( $args )
+  protected function prepare()
   {
-    parent::__construct( $args );
+    parent::prepare();
 
     $this->exclude_list( array(
       'address',
@@ -38,14 +37,14 @@ class self_menu extends \cenozo\ui\widget\self_menu
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     $utilities = $this->get_variable( 'utilities' );
 
