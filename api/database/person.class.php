@@ -17,7 +17,14 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class person extends \cenozo\database\has_note
 {
-  // TODO: document
+  /**
+   * Returns the participant associated with this person, or NULL if the person is not
+   * associated with a participant.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\participant
+   * @access public
+   */
   public function get_participant()
   {
     // this method is for person records only
@@ -30,7 +37,14 @@ class person extends \cenozo\database\has_note
     return $participant_class_name::get_unique_record( 'person_id', $this->id );
   }
 
-  // TODO: document
+  /**
+   * Returns the alternate associated with this person, or NULL if the person is not
+   * associated with a alternate.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\alternate
+   * @access public
+   */
   public function get_alternate()
   {
     // this method is for person records only

@@ -18,12 +18,10 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class user_edit extends \cenozo\ui\push\user_edit
 {
-  /** 
+  /**
    * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function prepare()
@@ -37,8 +35,6 @@ class user_edit extends \cenozo\ui\push\user_edit
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function setup()
@@ -54,9 +50,9 @@ class user_edit extends \cenozo\ui\push\user_edit
    * received by a machine.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function finish()
   {
     parent::finish();
 

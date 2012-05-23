@@ -31,10 +31,15 @@ class alternate_report extends \cenozo\ui\pull\base_report
   }
 
   /**
-   * TODO: implement and document
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Dean Inglis <inglisd@mcmaster.ca>
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
+    parent::setup();
+
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
     $this->add_title( 
@@ -43,13 +48,12 @@ class alternate_report extends \cenozo\ui\pull\base_report
     $contents = array();
     foreach( $participant_class_name::select() as $db_participant )
     {
+      // TODO: implement
     }
     
     $header = array();
     
     $this->add_table( NULL, $header, $contents, NULL );
-
-    return parent::finish();
   }
 }
 ?>

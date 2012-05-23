@@ -17,12 +17,10 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class user_delete extends \cenozo\ui\push\user_delete
 {
-  /** 
+  /**
    * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function prepare()
@@ -36,8 +34,6 @@ class user_delete extends \cenozo\ui\push\user_delete
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function setup()
@@ -53,9 +49,9 @@ class user_delete extends \cenozo\ui\push\user_delete
    * Finishes the operation with any post-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function finish()
   {
     parent::finish();
 

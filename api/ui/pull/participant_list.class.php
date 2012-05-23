@@ -34,6 +34,7 @@ class participant_list extends \cenozo\ui\pull\base_list
    * Overrides the parent method to add participant address, phone and consent details.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\record $record
+   * @return array
    * @access public
    */
   public function process_record( $record )

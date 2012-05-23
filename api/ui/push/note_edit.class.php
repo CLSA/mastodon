@@ -31,7 +31,6 @@ class note_edit extends \cenozo\ui\push\note_edit
    * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
    * @access protected
    */
   protected function prepare()

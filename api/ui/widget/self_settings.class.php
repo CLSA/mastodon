@@ -20,7 +20,7 @@ class self_settings extends \cenozo\ui\widget\self_settings
   /**
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @author Dean Inglis <inglisd@mcmaster.ca>
    * @access protected
    */
   protected function setup()

@@ -29,6 +29,12 @@ class participant_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'participant', $args );
   }
 
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function prepare()
   {
     parent::prepare();
@@ -40,7 +46,12 @@ class participant_edit extends \cenozo\ui\push\base_edit
       'comprehensive' == $this->get_record()->cohort ? BEARTOOTH_URL : SABRETOOTH_URL );
   }
 
-  // TODO: document
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function setup()
   {
     parent::setup();

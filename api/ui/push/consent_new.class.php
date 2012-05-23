@@ -29,7 +29,12 @@ class consent_new extends \cenozo\ui\push\base_new
     parent::__construct( 'consent', $args );
   }
 
-  // TODO: document
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function prepare()
   {
     parent::prepare();
@@ -43,8 +48,14 @@ class consent_new extends \cenozo\ui\push\base_new
          : NULL );
   }
 
-  // TODO: document
-  public function validate()
+  /**
+   * Validate the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function validate()
   {
     parent::validate();
 
@@ -54,8 +65,13 @@ class consent_new extends \cenozo\ui\push\base_new
       throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
   }
 
-  // TODO: document
-  public function execute()
+  /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function execute()
   {
     parent::execute();
 

@@ -30,18 +30,31 @@ class import_new extends \cenozo\ui\push
   }
 
   /**
-   * Executes the push.
+   * Validate the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function finish()
+  protected function validate()
   {
+    parent::validate();
+
     if( 0 == $_SERVER['CONTENT_LENGTH'] )
-    {
       throw lib::create( 'exception\notice',
         'Tried to import participant data without a valid CSV file.',
         __METHOD__ );
-    }
+  }
+
+  /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function execute()
+  {
+    parent::execute();
 
     $import_class_name = lib::get_class_name( 'database\import' );
 

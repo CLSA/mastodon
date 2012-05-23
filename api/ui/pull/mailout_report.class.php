@@ -30,8 +30,16 @@ class mailout_report extends \cenozo\ui\pull\base_report
     parent::__construct( 'mailout', $args );
   }
 
-  public function finish()
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Dean Inglis <inglisd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
   {
+    parent::setup();
+
     // get the report arguments
     $cohort = $this->get_argument( 'restrict_cohort' );
     $db_source = lib::create( 'database\source', $this->get_argument( 'restrict_source_id' ) );
@@ -101,8 +109,6 @@ class mailout_report extends \cenozo\ui\pull\base_report
       'Age' );
     
     $this->add_table( NULL, $header, $contents, NULL );
-
-    return parent::finish();
   }
 }
 ?>

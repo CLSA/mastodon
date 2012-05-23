@@ -29,7 +29,12 @@ class address_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'address', $args );
   }
 
-  // TODO: document
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function prepare()
   {
     parent::prepare();
@@ -43,7 +48,13 @@ class address_edit extends \cenozo\ui\push\base_edit
          : NULL );
   }
 
-  // TODO: document
+  /**
+   * Validate the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
   protected function validate()
   {
     parent::validate();
@@ -66,7 +77,12 @@ class address_edit extends \cenozo\ui\push\base_edit
     }
   }
 
-  // TODO: document
+  /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function execute()
   {
     parent::execute();

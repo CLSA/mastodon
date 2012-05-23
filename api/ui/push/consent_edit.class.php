@@ -29,7 +29,12 @@ class consent_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'consent', $args );
   }
 
-  // TODO: document
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
   protected function prepare()
   {
     parent::prepare();

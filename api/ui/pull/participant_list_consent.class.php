@@ -26,18 +26,29 @@ class participant_list_consent extends \cenozo\ui\pull\base_list_record
    */
   public function __construct( $args )
   {
+    parent::__construct( 'participant', 'consent', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
     // if the uid is provided instead of the id then fetch the participant id based on the uid
-    if( isset( $args['uid'] ) )
+    if( isset( $this->arguments['uid'] ) )
     {
       $class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $class_name::get_unique_record( 'uid', $args['uid'] );
+      $db_participant = $class_name::get_unique_record( 'uid', $this->arguments['uid'] );
 
       if( is_null( $db_participant ) )
-        throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
-      $args['id'] = $db_participant->id;
+        throw lib::create( 'exception\argument', 'uid', $this->arguments['uid'], __METHOD__ );
+      $this->arguments['id'] = $db_participant->id;
     }
-
-    parent::__construct( 'participant', 'consent', $args );
   }
 }
 ?>

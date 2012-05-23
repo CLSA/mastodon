@@ -31,12 +31,16 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
   }
 
   /**
-   * Override the parent in case the entry is being un-deferred
+   * Validate the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function finish()
+  protected function validate()
   {
+    parent::validate();
+
     $columns = $this->get_argument( 'columns' );
 
     // if we are changing the defer boolean to false then validate and submit the entry
@@ -54,10 +58,28 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
                    $this->form_type,
                    count( $errors ) ),
           __METHOD__ );
+    }
+  }
 
-      parent::finish();
+  /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function execute()
+  {
+    parent::execute();
 
-      // now import the record if the other entry exists, is not deferred and matches this one
+    $columns = $this->get_argument( 'columns' );
+
+    // if we are changing the defer boolean to false then import the record if the other
+    // entry exists, is not deferred and matches this one
+    if( array_key_exists( 'deferred', $columns ) && !$columns['deferred'] )
+    {
+      $get_form_method_name = sprintf( 'get_%s_form', $this->form_type );
+      $entry_list_method_name = sprintf( 'get_%s_form_entry_list', $this->form_type );
+
       $db_form = $this->get_record()->$get_form_method_name();
       $form_entry_mod = lib::create( 'database\modifier' );
       $form_entry_mod->where( 'deferred', '=', false );
@@ -83,7 +105,6 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
         if( $match ) $db_form->import( $this->get_record() );
       }
     }
-    else parent::finish();
   }
 
   /**

@@ -18,12 +18,10 @@ use cenozo\lib, cenozo\log, mastodon\util;
  */
 class user_new extends \cenozo\ui\push\user_new
 {
-  /** 
+  /**
    * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function prepare()
@@ -37,8 +35,6 @@ class user_new extends \cenozo\ui\push\user_new
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @abstract
    * @access protected
    */
   protected function setup()
@@ -54,9 +50,9 @@ class user_new extends \cenozo\ui\push\user_new
    * received by a machine.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function finish()
   {
     parent::finish();
 
@@ -64,7 +60,7 @@ class user_new extends \cenozo\ui\push\user_new
       $this->send_machine_request();
   }
 
-  /** 
+  /**
    * Override the parent method to remove mastodon-only roles.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param array $args An argument list, usually those passed to the push operation.
