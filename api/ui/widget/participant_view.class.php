@@ -28,6 +28,18 @@ class participant_view extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'view', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // create an associative array with everything we want to display about the participant
     $this->add_item( 'active', 'boolean', 'Active' );
@@ -50,7 +62,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $args );
+      $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
@@ -62,7 +74,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
+      $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
@@ -74,7 +86,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the availability sub-list widget
-      $this->availability_list = lib::create( 'ui\widget\availability_list', $args );
+      $this->availability_list = lib::create( 'ui\widget\availability_list', $this->arguments );
       $this->availability_list->set_parent( $this );
       $this->availability_list->set_heading( 'Availability' );
     }
@@ -86,7 +98,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the consent sub-list widget
-      $this->consent_list = lib::create( 'ui\widget\consent_list', $args );
+      $this->consent_list = lib::create( 'ui\widget\consent_list', $this->arguments );
       $this->consent_list->set_parent( $this );
       $this->consent_list->set_heading( 'Consent information' );
     }
@@ -98,7 +110,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the alternate sub-list widget
-      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $args );
+      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $this->arguments );
       $this->alternate_list->set_parent( $this );
       $this->alternate_list->set_heading( 'Alternate contacts' );
     }
@@ -112,11 +124,11 @@ class participant_view extends \cenozo\ui\widget\base_view
    * Finish setting the variables in a widget.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
@@ -141,6 +153,9 @@ class participant_view extends \cenozo\ui\widget\base_view
     $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
 
+    $db_default_site = $this->get_record()->get_default_site();
+    $default_site = is_null( $db_default_site ) ? 'None' : $db_default_site->name;
+
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
@@ -148,7 +163,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'last_name', $record->last_name );
     $this->set_item( 'source_id', $record->source_id, false, $sources );
     $this->set_item( 'cohort', $record->cohort );
-    $this->set_item( 'default_site', $record->get_default_site()->name );
+    $this->set_item( 'default_site', $default_site );
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
@@ -166,35 +181,33 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_action( 'contact_form', 'Contact Form', NULL,
       'Download this participant\'s contact form, if available' );
 
-    $this->finish_setting_items();
-
     if( !is_null( $this->address_list ) )
     {
-      $this->address_list->finish();
+      $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
 
     if( !is_null( $this->phone_list ) )
     {
-      $this->phone_list->finish();
+      $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
 
     if( !is_null( $this->availability_list ) )
     {
-      $this->availability_list->finish();
+      $this->availability_list->process();
       $this->set_variable( 'availability_list', $this->availability_list->get_variables() );
     }
 
     if( !is_null( $this->consent_list ) )
     {
-      $this->consent_list->finish();
+      $this->consent_list->process();
       $this->set_variable( 'consent_list', $this->consent_list->get_variables() );
     }
 
     if( !is_null( $this->alternate_list ) )
     {
-      $this->alternate_list->finish();
+      $this->alternate_list->process();
       $this->set_variable( 'alternate_list', $this->alternate_list->get_variables() );
     }
   }

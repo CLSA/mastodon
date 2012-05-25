@@ -28,6 +28,18 @@ class contact_form_entry_view extends base_form_entry_view
   public function __construct( $args )
   {
     parent::__construct( 'contact', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
 
     // add the entry values
     $this->add_item( 'first_name', 'string', 'First Name' );
@@ -76,14 +88,14 @@ class contact_form_entry_view extends base_form_entry_view
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     $region_class_name = lib::get_class_name( 'database\region' );
     $contact_form_entry_class_name = lib::get_class_name( 'database\contact_form_entry' );
@@ -150,8 +162,6 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'date', $record->date, false );
     $this->set_item( 'cohort', $record->cohort, false, $cohort_list );
     $this->set_item( 'note', $record->note, false );
-
-    $this->finish_setting_items();
   }
 }
 ?>

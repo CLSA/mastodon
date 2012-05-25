@@ -18,38 +18,30 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class site_view extends \cenozo\ui\widget\site_view
 {
   /**
-   * Constructor
+   * Processes arguments, preparing them for the operation.
    * 
-   * Defines all variables which need to be set for the associated template.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args An associative array of arguments to be processed by the widget
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function __construct( $args )
+  protected function prepare()
   {
-    parent::__construct( $args );
-    
-    // create an associative array with everything we want to display about the site
-    $this->add_item( 'cohort', 'enum', 'Type' );
+    parent::prepare();
+
+    $this->add_item( 'cohort', 'constant', 'Cohort' );
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    // create enum arrays
-    $class_name = lib::get_class_name( 'database\site' );
-    $cohorts = $class_name::get_enum_values( 'cohort' );
-    $cohorts = array_combine( $cohorts, $cohorts );
+    parent::setup();
 
-    // set the view's items
-    $this->set_item( 'cohort', $this->get_record()->cohort, true, $cohorts );
-
-    parent::finish();
+    $this->set_item( 'cohort', $this->get_record()->cohort );
   }
 }
 ?>

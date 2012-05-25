@@ -30,12 +30,15 @@ class import_process extends \cenozo\ui\push\base_record
   }
 
   /**
-   * Executes the push.
+   * This method executes the operation's purpose.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
+    parent::execute();
+
     // import all entries with no errors, then mark the import as processed
     $import_entry_mod = lib::create( 'database\modifier' );
     $import_entry_mod->where( 'apartment_error', '=', false );

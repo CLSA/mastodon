@@ -30,35 +30,45 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
   {
     parent::__construct( $form_type.'_form_entry', $args );
     $this->form_type = $form_type;
-    
-    $this->add_column( $this->form_type.'_form_id', 'number', 'ID', true );
-    $this->add_column( 'date', $this->form_type.'_form.date', 'Date Added', false );
   }
-  
+
   /**
-   * Set the rows array needed by the template.
+   * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function finish()
+  protected function prepare()
   {
+    parent::prepare();
+
+    $this->add_column( $this->form_type.'_form_id', 'number', 'ID', true );
+    $this->add_column( 'date', $this->form_type.'_form.date', 'Date Added', false );
+  
+    // the "add" function is overridden, so just make sure it gets included in the template
+    $this->set_addable( true );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+    
     $form_id_name = $this->form_type.'_form_id';
     $get_form_method = sprintf( 'get_%s_form', $this->form_type );
 
-    // the "add" function is overridden, so just make sure it gets included in the template
-    $this->set_addable( true );
-
-    parent::finish();
-    
     foreach( $this->get_record_list() as $record )
     {
       $this->add_row( $record->id,
         array( $this->form_type.'_form_id' => $record->$form_id_name,
                'date' => $record->$get_form_method()->date ) );
     }
-
-    $this->finish_setting_rows();
   }
 
   /**

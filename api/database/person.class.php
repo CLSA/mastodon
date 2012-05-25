@@ -18,6 +18,46 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class person extends \cenozo\database\has_note
 {
   /**
+   * Returns the participant associated with this person, or NULL if the person is not
+   * associated with a participant.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\participant
+   * @access public
+   */
+  public function get_participant()
+  {
+    // this method is for person records only
+    if( 'person' != $this->get_class_name() ) return parent::get_participant();
+
+    // no primary id means no participant
+    if( is_null( $this->id ) ) return NULL;
+
+    $participant_class_name = lib::create( 'database\participant' );
+    return $participant_class_name::get_unique_record( 'person_id', $this->id );
+  }
+
+  /**
+   * Returns the alternate associated with this person, or NULL if the person is not
+   * associated with a alternate.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\alternate
+   * @access public
+   */
+  public function get_alternate()
+  {
+    // this method is for person records only
+    if( 'person' != $this->get_class_name() ) return parent::get_alternate();
+
+    // no primary id means no alternate
+    if( is_null( $this->id ) ) return NULL;
+
+    $alternate_class_name = lib::create( 'database\alternate' );
+    return $alternate_class_name::get_unique_record( 'person_id', $this->id );
+  }
+
+  /**
    * Override get_address_list()
    * 
    * Since addresses are related to the person table and not the participant or alternate
@@ -130,9 +170,10 @@ class person extends \cenozo\database\has_note
    */
   public function get_note_count( $modifier = NULL )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $note_class_name = lib::get_class_name( 'database\person_note' );
     if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'person_id', '=', $this->id );
+    $modifier->where( 'person_id', '=', $person_id );
     return $note_class_name::count( $modifier );
   }
 
@@ -145,9 +186,10 @@ class person extends \cenozo\database\has_note
    */
   public function get_note_list( $modifier = NULL )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $note_class_name = lib::get_class_name( 'database\person_note' );
     if ( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'person_id', '=', $this->id );
+    $modifier->where( 'person_id', '=', $person_id );
     $modifier->order( 'sticky', true );
     $modifier->order( 'datetime' );
     return $note_class_name::select( $modifier );
@@ -162,10 +204,11 @@ class person extends \cenozo\database\has_note
    */
   public function add_note( $user, $note )
   {
+    $person_id = 'person' == $this->get_class_name() ? $this->id : $this->person_id;
     $date_obj = util::get_datetime_object();
     $db_note = lib::create( 'database\person_note' );
     $db_note->user_id = $user->id;
-    $db_note->person_id = $this->id;
+    $db_note->person_id = $person_id;
     $db_note->datetime = $date_obj->format( 'Y-m-d H:i:s' );
     $db_note->note = $note;
     $db_note->save();

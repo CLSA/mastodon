@@ -30,9 +30,51 @@ abstract class base_report extends \cenozo\ui\widget\base_report
   public function __construct( $subject, $args )
   {
     parent::__construct( $subject, 'report', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
   
     $this->restrictions['cohort'] = false;
     $this->restrictions['source'] = false;
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    if( $this->restrictions[ 'cohort' ] )
+    {
+      $participant_class_name = lib::get_class_name( 'database\participant' );
+      $cohort_types = $participant_class_name::get_enum_values( 'cohort' );
+      $cohort_types = array_combine( $cohort_types, $cohort_types );
+      $this->set_parameter( 'restrict_cohort', key( $cohort_types ), true, $cohort_types );
+    }
+
+    if( $this->restrictions[ 'source' ] )
+    {
+      $sources = array();
+      $class_name = lib::get_class_name( 'database\source' );
+      foreach( $class_name::select() as $db_source )
+        $sources[ $db_source->id ] = $db_source->name;
+      
+      $this->set_parameter(
+        'restrict_source_id', key( $sources ), true, $sources );
+    }
   }
 
   /**
@@ -56,36 +98,6 @@ abstract class base_report extends \cenozo\ui\widget\base_report
       $this->restrictions[ 'source' ] = true;
       $this->add_parameter( 'restrict_source_id', 'enum', 'Source' );
     }
-  }
-
-  /**
-   * Child classes should implement and call parent's finish and then call 
-   * finish_setting_parameters
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
-  {
-    if( $this->restrictions[ 'cohort' ] )
-    {
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $cohort_types = $participant_class_name::get_enum_values( 'cohort' );
-      $cohort_types = array_combine( $cohort_types, $cohort_types );
-      $this->set_parameter( 'restrict_cohort', key( $cohort_types ), true, $cohort_types );
-    }
-
-    if( $this->restrictions[ 'source' ] )
-    {
-      $sources = array();
-      $class_name = lib::get_class_name( 'database\source' );
-      foreach( $class_name::select() as $db_source )
-        $sources[ $db_source->id ] = $db_source->name;
-      
-      $this->set_parameter(
-        'restrict_source_id', key( $sources ), true, $sources );
-    }
-
-    parent::finish();
   }
 }
 ?>

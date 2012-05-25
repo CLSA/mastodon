@@ -26,38 +26,54 @@ class consent_new extends \cenozo\ui\push\base_new
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $class_name = lib::get_class_name( 'database\participant' );
-      $db_participant = $class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['columns']['participant_id'] = $db_participant->id;
-    }
-
     parent::__construct( 'consent', $args );
   }
 
   /**
-   * Executes the push.
+   * Processes arguments, preparing them for the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function prepare()
   {
+    parent::prepare();
+
+    // only send a machine request if the participant has been synched
+    $columns = $this->get_argument( 'columns' );
+    $db_participant = lib::create( 'database\participant', $columns['participant_id'] );
+    $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
+    $this->set_machine_request_url( !is_null( $db_participant )
+         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+         : NULL );
+  }
+
+  /**
+   * Validate the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function validate()
+  {
+    parent::validate();
+
     // make sure the date column isn't blank
     $columns = $this->get_argument( 'columns' );
     if( !array_key_exists( 'date', $columns ) || 0 == strlen( $columns['date'] ) )
       throw lib::create( 'exception\notice', 'The date cannot be left blank.', __METHOD__ );
-    parent::finish();
+  }
+
+  /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function execute()
+  {
+    parent::execute();
 
     // if a form variable was included try to decode it and store it as a consent form
     $form = $this->get_argument( 'form', NULL );

@@ -30,29 +30,26 @@ class alternate_primary extends \cenozo\ui\pull\base_primary
   }
 
   /**
-   * Overrides the parent class' base functionality by adding more data.
+   * This method executes the operation's purpose.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return associative array
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
-    $data = parent::finish();
+    parent::execute();
 
     // add the primary address
     $db_address = $this->get_record()->get_primary_address();
     if( !is_null( $db_address ) )
     {
-      $data['street'] = is_null( $db_address->address2 )
-                      ? $db_address->address1
-                      : $db_address->address1.', '.$db_address->address2;
-      $data['city'] = $db_address->city;
-      $data['region'] = $db_address->get_region()->name;
-      $data['postcode'] = $db_address->postcode;
+      $this->data['street'] = is_null( $db_address->address2 )
+                            ? $db_address->address1
+                            : $db_address->address1.', '.$db_address->address2;
+      $this->data['city'] = $db_address->city;
+      $this->data['region'] = $db_address->get_region()->name;
+      $this->data['postcode'] = $db_address->postcode;
     }
-
-    return $data;
   }
 }
 ?>

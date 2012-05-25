@@ -28,6 +28,18 @@ class alternate_view extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'alternate', 'view', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // create an associative array with everything we want to display about the alternate
     $this->add_item( 'first_name', 'string', 'First Name' );
@@ -40,7 +52,7 @@ class alternate_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $args );
+      $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
@@ -52,7 +64,7 @@ class alternate_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
+      $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
@@ -63,14 +75,14 @@ class alternate_view extends \cenozo\ui\widget\base_view
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     // add a proxy form download action
     $db_proxy_form = $this->get_record()->get_proxy_form();
@@ -87,17 +99,15 @@ class alternate_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'informant', $this->get_record()->informant );
     $this->set_item( 'proxy', $this->get_record()->proxy );
 
-    $this->finish_setting_items();
-
     if( !is_null( $this->address_list ) )
     {
-      $this->address_list->finish();
+      $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
 
     if( !is_null( $this->phone_list ) )
     {
-      $this->phone_list->finish();
+      $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
   }

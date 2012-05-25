@@ -28,6 +28,18 @@ class site_list extends \cenozo\ui\widget\base_list
   public function __construct( $args )
   {
     parent::__construct( 'site', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     $this->add_column( 'name', 'string', 'Name', true );
     $this->add_column( 'cohort', 'string', 'Type', true );
@@ -36,14 +48,14 @@ class site_list extends \cenozo\ui\widget\base_list
   }
 
   /**
-   * Set the rows array needed by the template.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     // get all sites
     foreach( $this->get_record_list() as $record )
@@ -58,8 +70,6 @@ class site_list extends \cenozo\ui\widget\base_list
                'users' => $record->get_user_count(),
                'last' => $last ) );
     }
-
-    $this->finish_setting_rows();
   }
 }
 ?>

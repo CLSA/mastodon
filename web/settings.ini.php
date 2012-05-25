@@ -19,6 +19,12 @@ $SETTINGS['general']['development_mode'] = false;
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
+// the url to Sabretooth (set to NULL to disable Sabretooth support)
+$SETTINGS['url']['SABRETOOTH'] = NULL;
+
+// the url to Beartooth (set to NULL to disable Mastodon support)
+$SETTINGS['url']['BEARTOOTH'] = NULL;
+
 // the location of new consent forms which need to be processed
 $SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
 

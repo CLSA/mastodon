@@ -30,14 +30,15 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * This method executes the operation's purpose.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return associative array
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
+    parent::execute();
+
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $errors = array();
 
@@ -52,7 +53,7 @@ class consent_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['uid'] = 'No such participant exists.';
     }
 
-    return $errors;
+    $this->data = $errors;
   }
 
   /**

@@ -29,23 +29,34 @@ class participant_delete_alternate extends \cenozo\ui\push\base_delete_record
   }
 
   /**
-   * Override parent method to delete the alternate's person record
+   * Processes arguments, preparing them for the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function prepare()
   {
+    parent::prepare();
+
     // get the alternate's person record
     $db_alternate = lib::create( 'database\alternate', $this->get_argument( 'remove_id' ) );
-    $db_person = $db_alternate->get_person();
+    $this->db_person = $db_alternate->get_person();
+  }
 
-    // call the parent method to delete the alternate
+  /**
+   * Finishes the operation with any post-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function finish()
+  {
     parent::finish();
 
-    // now delete the person
+    // delete the alternate's person record
     try
     {
-      $db_person->delete();
+      $this->db_person->delete();
     }
     catch( \cenozo\exception\database $e )
     { // help describe exceptions to the user
@@ -57,7 +68,14 @@ class participant_delete_alternate extends \cenozo\ui\push\base_delete_record
       }
 
       throw $e;
-    } 
+    }
   }
+
+  /**
+   * The person record associated with the alternate being deleted
+   * @var database\person
+   * @access private
+   */
+  private $db_person = NULL;
 }
 ?>

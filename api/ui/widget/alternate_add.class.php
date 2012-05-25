@@ -28,6 +28,18 @@ class alternate_add extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'alternate', 'add', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // define all columns defining this record
     $this->add_item( 'participant_id', 'hidden' );
@@ -40,14 +52,14 @@ class alternate_add extends \cenozo\ui\widget\base_view
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     // this widget must have a parent, and it's subject must be a participant
     if( is_null( $this->parent ) || 'participant' != $this->parent->get_subject() )
@@ -62,8 +74,6 @@ class alternate_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'alternate', true, true );
     $this->set_item( 'informant', false, true );
     $this->set_item( 'proxy', false, true );
-
-    $this->finish_setting_items();
   }
 }
 ?>

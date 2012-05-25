@@ -29,17 +29,18 @@ class import_delete extends \cenozo\ui\push\base_delete
   }
 
   /**
-   * Executes the push.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
+    parent::setup();
+
     // delete all import entries before deleting the import
     foreach( $this->get_record()->get_import_entry_list() as $db_import_entry )
       $db_import_entry->delete();
-
-    parent::finish();
   }
 }
 ?>

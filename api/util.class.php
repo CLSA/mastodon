@@ -76,19 +76,5 @@ class util extends \cenozo\util
     
     return $address;
   }
-
-  /**
-   * Validates a north-american phone number in XXX-XXX-XXXX format.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param string $number
-   * @return boolean
-   * @access public
-   */
-  public static function validate_phone_number( $number )
-  {
-    return preg_match(
-      '/[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}/',
-      $number );
-  }
 }
 ?>

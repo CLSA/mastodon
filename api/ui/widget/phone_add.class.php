@@ -28,6 +28,18 @@ class phone_add extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'phone', 'add', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // add items to the view
     $this->add_item( 'person_id', 'hidden' );
@@ -40,14 +52,14 @@ class phone_add extends \cenozo\ui\widget\base_view
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     // this widget must have a parent, and it's subject must be a participant
     $subject = $this->parent->get_subject();
@@ -90,8 +102,6 @@ class phone_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'type', key( $types ), true, $types );
     $this->set_item( 'number', '', true );
     $this->set_item( 'note', '' );
-
-    $this->finish_setting_items();
   }
 }
 ?>

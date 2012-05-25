@@ -30,7 +30,19 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
   {
     parent::__construct( $form_type.'_form', $args );
     $this->form_type = $form_type;
-    
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
     $this->add_column( 'id', 'number', 'ID', true );
     $this->add_column( 'date', 'date', 'Date Added', true );
     $this->add_column( 'typist_1', 'string', 'Typist 1', false );
@@ -41,14 +53,14 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
   }
   
   /**
-   * Set the rows array needed by the template.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     $form_entry_list_method = sprintf( 'get_%s_entry_list', $this->get_subject() );
     $session = lib::create( 'business\session' );
@@ -89,8 +101,6 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
                'typist_2_submitted' => $typist_2_submitted,
                'conflict' => $conflict ) );
     }
-
-    $this->finish_setting_rows();
   }
 
   /**

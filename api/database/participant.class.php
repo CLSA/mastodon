@@ -18,27 +18,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class participant extends person
 {
   /**
-   * Extend the select() method by adding a custom join to the jursidiction table.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the selection.
-   * @param boolean $count If true the total number of records instead of a list
-   * @return array( record ) | int
-   * @static
-   * @access public
-   */
-  public static function select( $modifier = NULL, $count = false )
-  {
-    $jurisdiction_mod = lib::create( 'database\modifier' );
-    $jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
-    $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
-    $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
-    $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
-    static::customize_join( 'jurisdiction', $jurisdiction_mod );
-
-    return parent::select( $modifier, $count );
-  }
-
-  /**
    * Get the participant's last consent
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return consent
@@ -130,8 +109,9 @@ class participant extends person
       if( !is_null( $db_address ) )
       { // there is a primary address
         $jurisdiction_class_name = lib::get_class_name( 'database\jurisdiction' );
-        $db_jurisdiction = $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
-        if( !is_null( $db_address ) ) $db_site = $db_jurisdiction->get_site();
+        $db_jurisdiction =
+          $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
+        if( !is_null( $db_jurisdiction ) ) $db_site = $db_jurisdiction->get_site();
       }
     }
     else
@@ -308,4 +288,15 @@ class participant extends person
     return static::db()->get_one( 'SELECT COUNT(*) FROM unique_identifier_pool' );
   }
 }
+
+// define the join to the jurisdiction table
+$jurisdiction_mod = lib::create( 'database\modifier' );
+$jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
+$jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
+$jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
+$jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
+participant::customize_join( 'jurisdiction', $jurisdiction_mod );
+
+// define the uid as the primary unique key
+participant::set_primary_unique_key( 'uq_uid' );
 ?>

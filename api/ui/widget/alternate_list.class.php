@@ -28,6 +28,18 @@ class alternate_list extends \cenozo\ui\widget\site_restricted_list
   public function __construct( $args )
   {
     parent::__construct( 'alternate', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     $this->add_column( 'first_name', 'string', 'First Name', true );
     $this->add_column( 'last_name', 'string', 'Last Name', true );
@@ -37,14 +49,14 @@ class alternate_list extends \cenozo\ui\widget\site_restricted_list
   }
   
   /**
-   * Set the rows array needed by the template.
+   * Finish setting the variables in a widget.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     foreach( $this->get_record_list() as $record )
     {
@@ -57,8 +69,6 @@ class alternate_list extends \cenozo\ui\widget\site_restricted_list
                // note count isn't a column, it's used for the note button
                'note_count' => $record->get_note_count() ) );
     }
-
-    $this->finish_setting_rows();
   }
 }
 ?>

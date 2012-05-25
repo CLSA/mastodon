@@ -18,40 +18,42 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class access_delete extends \cenozo\ui\push\access_delete
 {
   /**
-   * Constructor.
+   * Processes arguments, preparing them for the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args Push arguments
-   * @access public
+   * @access protected
    */
-  public function __construct( $args )
+  protected function prepare()
   {
-    if( array_key_exists( 'noid', $args ) )
+    parent::prepare();
+
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
+   * Override the parent method to send a request to both Beartooth and Sabretooth
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function send_machine_request()
+  {
+    // determine which application to send the user request to
+    $db_site = lib::create( 'database\site', $this->get_record()->site_id );
+    $db_role = lib::create( 'database\role', $this->get_record()->role_id );
+
+    if( 'typist' != $db_role->name )
     {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'user.name', $noid ) ||
-          !array_key_exists( 'role.name', $noid ) ||
-          !array_key_exists( 'site.name', $noid ) ||
-          !array_key_exists( 'site.cohort', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      
-      $access_mod = lib::create( 'database\modifier' );
-      $access_mod->where( 'user.name', '=', $noid['user.name'] );
-      $access_mod->where( 'role.name', '=', $noid['role.name'] );
-      $access_mod->where( 'site.name', '=', $noid['site.name'] );
-      $access_mod->where( 'site.cohort', '=', $noid['site.cohort'] );
-
-      $class_name = lib::get_class_name( 'database\access' );
-      $db_access = current( $class_name::select( $access_mod ) );
-      if( !$db_access ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_access->id;
+      if( 'comprehensive' == $db_site->cohort )
+      {
+        $this->set_machine_request_url( BEARTOOTH_URL );
+        parent::send_machine_request();
+      }
+      else if( 'tracking' == $db_site->cohort )
+      {
+        $this->set_machine_request_url( SABRETOOTH_URL );
+        parent::send_machine_request();
+      }
     }
-
-    parent::__construct( $args );
   }
 }
 ?>

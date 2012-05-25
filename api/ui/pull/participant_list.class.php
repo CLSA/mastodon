@@ -34,67 +34,28 @@ class participant_list extends \cenozo\ui\pull\base_list
    * Overrides the parent method to add participant address, phone and consent details.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\record $record
+   * @return array
    * @access public
    */
   public function process_record( $record )
   {
+    $source_class_name = lib::get_class_name( 'database\source' );
+    $site_class_name = lib::get_class_name( 'database\site' );
+
     $item = parent::process_record( $record );
 
-    // convert source_id to source (name)
-    $item['source_name'] = is_null( $record->source_id )
-                         ? NULL
-                         : $record->get_source()->name;
-
-    // convert site_id to site (name)
-    $item['site_name'] = is_null( $item['site_id'] )
-                         ? NULL
-                         : $record->get_site()->name;
+    // convert primary ids to unique
+    $item['source_id'] = $source_class_name::get_unique_from_primary_key( $item['source_id'] );
+    $item['site_id'] = $site_class_name::get_unique_from_primary_key( $item['site_id'] );
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
     {
-      // add the participant's address list
-      $item['address_list'] = array();
-      foreach( $record->get_address_list() as $db_address )
-      {
-        $address = array();
-        foreach( $db_address->get_column_names() as $column )
-        {
-          if( 'person_id' == $column ) {} // do nothing
-          else if( 'region_id' == $column )
-            $address['region_abbreviation'] = $db_address->get_region()->abbreviation;
-          else $address[$column] = $db_address->$column;
-        }
-        $item['address_list'][] = $address;
-      }
-
-      // add the participant's phone list
-      $item['phone_list'] = array();
-      foreach( $record->get_phone_list() as $db_phone )
-      {
-        $phone = array();
-        foreach( $db_phone->get_column_names() as $column )
-        {
-          if( 'person_id' == $column ) {} // do nothing
-          else if( 'address_id' == $column && !is_null( $db_phone->address_id ) )
-            $phone['address_rank'] = $db_phone->get_address()->rank;
-          else $phone[$column] = $db_phone->$column;
-        }
-        $item['phone_list'][] = $phone;
-      }
-
-      // add the participant's consent list
-      $item['consent_list'] = array();
-      foreach( $record->get_consent_list() as $db_consent )
-      {
-        $consent = array();
-        foreach( $db_consent->get_column_names() as $column )
-        {
-          if( 'participant_id' == $column ) {} // do nothing
-          else $consent[$column] = $db_consent->$column;
-        }
-        $item['consent_list'][] = $consent;
-      }
+      $item['address_list'] = $this->prepare_list( $record->get_address_list() );
+      $item['phone_list'] = $this->prepare_list( $record->get_phone_list() );
+      $item['consent_list'] = $this->prepare_list( $record->get_consent_list() );
+      $item['availability_list'] = $this->prepare_list( $record->get_availability_list() );
+      $item['note_list'] = $this->prepare_list( $record->get_note_list() );
     }
     else
     {
@@ -128,6 +89,56 @@ class participant_list extends \cenozo\ui\pull\base_list
     }
 
     return $item;
+  }
+
+  /**
+   * Converts a list of records into an array which can be transmitted without primary IDs
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param array( record ) $record_list
+   * @return array( array )
+   * @access protected
+   */
+  protected function prepare_list( $record_list )
+  {
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
+    $prepared_list = array();
+    foreach( $record_list as $record )
+    {
+      $data = array();
+      foreach( $record->get_column_names() as $column_name )
+      {
+        // ignore id, person_id and participant_id columns
+        if( 'id' != $column_name &&
+            'person_id' != $column_name &&
+            'participant_id' != $column_name )
+        {
+          if( '_id' == substr( $column_name, -3 ) )
+          {
+            $subject = substr( $column_name, 0, -3 );
+            $class_name = lib::get_class_name( 'database\\'.$subject );
+            $key = $class_name::get_unique_from_primary_key( $record->$column_name );
+
+            // convert person keys to participant keys
+            if( array_key_exists( 'person_id', $key ) )
+            {
+              // replace person key with participant key
+              $participant_id = $record->get_person()->get_participant()->id;
+              unset( $key['person_id'] );
+              $key['participant_id'] =
+                $participant_class_name::get_unique_from_primary_key( $participant_id );
+            }
+
+            $data[$column_name] = $key;
+          }
+          else $data[$column_name] = $record->$column_name;
+        }
+      }
+      $prepared_list[] = $data;
+    }
+
+    return $prepared_list;
   }
 }
 ?>
