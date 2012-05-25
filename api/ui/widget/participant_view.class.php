@@ -62,7 +62,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $args );
+      $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
       $this->address_list->set_parent( $this );
       $this->address_list->set_heading( 'Addresses' );
     }
@@ -74,7 +74,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
+      $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
       $this->phone_list->set_parent( $this );
       $this->phone_list->set_heading( 'Phone numbers' );
     }
@@ -86,7 +86,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the availability sub-list widget
-      $this->availability_list = lib::create( 'ui\widget\availability_list', $args );
+      $this->availability_list = lib::create( 'ui\widget\availability_list', $this->arguments );
       $this->availability_list->set_parent( $this );
       $this->availability_list->set_heading( 'Availability' );
     }
@@ -98,7 +98,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the consent sub-list widget
-      $this->consent_list = lib::create( 'ui\widget\consent_list', $args );
+      $this->consent_list = lib::create( 'ui\widget\consent_list', $this->arguments );
       $this->consent_list->set_parent( $this );
       $this->consent_list->set_heading( 'Consent information' );
     }
@@ -110,7 +110,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     try
     {
       // create the alternate sub-list widget
-      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $args );
+      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $this->arguments );
       $this->alternate_list->set_parent( $this );
       $this->alternate_list->set_heading( 'Alternate contacts' );
     }
