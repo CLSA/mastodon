@@ -49,29 +49,15 @@ class alternate_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'informant', 'boolean', 'Informant' );
     $this->add_item( 'proxy', 'boolean', 'Proxy' );
     
-    try
-    {
-      // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
-      $this->address_list->set_parent( $this );
-      $this->address_list->set_heading( 'Addresses' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->address_list = NULL;
-    }
+    // create the address sub-list widget
+    $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
+    $this->address_list->set_parent( $this );
+    $this->address_list->set_heading( 'Addresses' );
 
-    try
-    {
-      // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
-      $this->phone_list->set_parent( $this );
-      $this->phone_list->set_heading( 'Phone numbers' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->phone_list = NULL;
-    }
+    // create the phone sub-list widget
+    $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
+    $this->phone_list->set_parent( $this );
+    $this->phone_list->set_heading( 'Phone numbers' );
   }
 
   /**
@@ -99,17 +85,19 @@ class alternate_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'informant', $this->get_record()->informant );
     $this->set_item( 'proxy', $this->get_record()->proxy );
 
-    if( !is_null( $this->address_list ) )
+    try
     {
       $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->phone_list ) )
+    try
     {
       $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
   }
   
   /**

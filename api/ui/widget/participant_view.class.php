@@ -59,65 +59,30 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
 
-    try
-    {
-      // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
-      $this->address_list->set_parent( $this );
-      $this->address_list->set_heading( 'Addresses' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->address_list = NULL;
-    }
+    // create the address sub-list widget
+    $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
+    $this->address_list->set_parent( $this );
+    $this->address_list->set_heading( 'Addresses' );
 
-    try
-    {
-      // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
-      $this->phone_list->set_parent( $this );
-      $this->phone_list->set_heading( 'Phone numbers' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->phone_list = NULL;
-    }
+    // create the phone sub-list widget
+    $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
+    $this->phone_list->set_parent( $this );
+    $this->phone_list->set_heading( 'Phone numbers' );
 
-    try
-    {
-      // create the availability sub-list widget
-      $this->availability_list = lib::create( 'ui\widget\availability_list', $this->arguments );
-      $this->availability_list->set_parent( $this );
-      $this->availability_list->set_heading( 'Availability' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->availability_list = NULL;
-    }
+    // create the availability sub-list widget
+    $this->availability_list = lib::create( 'ui\widget\availability_list', $this->arguments );
+    $this->availability_list->set_parent( $this );
+    $this->availability_list->set_heading( 'Availability' );
 
-    try
-    {
-      // create the consent sub-list widget
-      $this->consent_list = lib::create( 'ui\widget\consent_list', $this->arguments );
-      $this->consent_list->set_parent( $this );
-      $this->consent_list->set_heading( 'Consent information' );
-    }
-    catch( \cenzo\exception\permission $e )
-    {
-      $this->consent_list = NULL;
-    }
+    // create the consent sub-list widget
+    $this->consent_list = lib::create( 'ui\widget\consent_list', $this->arguments );
+    $this->consent_list->set_parent( $this );
+    $this->consent_list->set_heading( 'Consent information' );
 
-    try
-    {
-      // create the alternate sub-list widget
-      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $this->arguments );
-      $this->alternate_list->set_parent( $this );
-      $this->alternate_list->set_heading( 'Alternate contacts' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->alternate_list = NULL;
-    }
+    // create the alternate sub-list widget
+    $this->alternate_list = lib::create( 'ui\widget\alternate_list', $this->arguments );
+    $this->alternate_list->set_parent( $this );
+    $this->alternate_list->set_heading( 'Alternate contacts' );
   }
 
   /**
@@ -181,35 +146,40 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_action( 'contact_form', 'Contact Form', NULL,
       'Download this participant\'s contact form, if available' );
 
-    if( !is_null( $this->address_list ) )
+    try
     {
       $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->phone_list ) )
+    try
     {
       $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->availability_list ) )
+    try
     {
       $this->availability_list->process();
       $this->set_variable( 'availability_list', $this->availability_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->consent_list ) )
+    try
     {
       $this->consent_list->process();
       $this->set_variable( 'consent_list', $this->consent_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->alternate_list ) )
+    try
     {
       $this->alternate_list->process();
       $this->set_variable( 'alternate_list', $this->alternate_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
   }
   
   /**
