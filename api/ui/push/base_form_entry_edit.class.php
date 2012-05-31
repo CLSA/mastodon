@@ -51,7 +51,8 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
       $entry_list_method_name = sprintf( 'get_%s_form_entry_list', $this->form_type );
 
       $op_validate = lib::create( $validate_class_name, array( 'id' => $this->get_record()->id ) );
-      $errors = $op_validate->process();
+      $op_validate->process();
+      $errors = $op_validate->get_data();
       if( 0 < count( $errors ) )
         throw lib::create( 'exception\runtime',
           sprintf( 'Tried to submit %s form entry that has %d errors.',
