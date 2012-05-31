@@ -37,9 +37,8 @@ class participant_primary extends \cenozo\ui\pull\base_primary
    */
   protected function prepare()
   {
-    parent::prepare();
-
     // if the uid is provided instead of the id  then fetch the participant id based on the uid
+    // NOTE: this must be done before calling the parent prepare() method
     if( isset( $this->arguments['uid'] ) )
     {
       $class_name = lib::get_class_name( 'database\participant' );
@@ -55,6 +54,8 @@ class participant_primary extends \cenozo\ui\pull\base_primary
 
       $this->arguments['id'] = $db_participant->id;
     }
+
+    parent::prepare();
   }
 
   /**
@@ -67,27 +68,29 @@ class participant_primary extends \cenozo\ui\pull\base_primary
   {
     parent::execute();
 
+    $db_participant = $this->get_record();
+
     // restrict by cohort, if asked to
     $cohort = $this->get_argument( 'cohort', false );
-    if( $cohort && $cohort != $this->get_record()->cohort )
+    if( $cohort && $cohort != $db_participant->cohort )
       throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
 
     // convert source_id to source (name)
     $this->data['source_name'] = is_null( $this->data['source_id'] )
                          ? NULL
-                         : $this->get_record()->get_source()->name;
+                         : $db_participant->get_source()->name;
 
     // convert site_id to site (name)
     $this->data['site_name'] = is_null( $this->data['site_id'] )
                          ? NULL
-                         : $this->get_record()->get_site()->name;
+                         : $db_participant->get_site()->name;
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
     {
       // add the participant's address list
       $this->data['address_list'] = array();
-      foreach( $this->get_record()->get_address_list() as $db_address )
+      foreach( $db_participant->get_address_list() as $db_address )
       {
         $item = array();
         foreach( $db_address->get_column_names() as $column )
@@ -102,7 +105,7 @@ class participant_primary extends \cenozo\ui\pull\base_primary
 
       // add the participant's phone list
       $this->data['phone_list'] = array();
-      foreach( $this->get_record()->get_phone_list() as $db_phone )
+      foreach( $db_participant->get_phone_list() as $db_phone )
       {
         $item = array();
         foreach( $db_phone->get_column_names() as $column )
@@ -117,7 +120,7 @@ class participant_primary extends \cenozo\ui\pull\base_primary
 
       // add the participant's consent list
       $this->data['consent_list'] = array();
-      foreach( $this->get_record()->get_consent_list() as $db_consent )
+      foreach( $db_participant->get_consent_list() as $db_consent )
       {
         $item = array();
         foreach( $db_consent->get_column_names() as $column )
@@ -131,7 +134,7 @@ class participant_primary extends \cenozo\ui\pull\base_primary
     else
     {
       // add the primary address
-      $db_address = $this->get_record()->get_primary_address();
+      $db_address = $db_participant->get_primary_address();
       if( !is_null( $db_address ) )
       {
         $this->data['street'] = is_null( $db_address->address2 )
@@ -143,7 +146,7 @@ class participant_primary extends \cenozo\ui\pull\base_primary
       }
       
       // add the hin information
-      $hin_info = $this->get_record()->get_hin_information();
+      $hin_info = $db_participant->get_hin_information();
       
       if( count( $hin_info ) )
       {
