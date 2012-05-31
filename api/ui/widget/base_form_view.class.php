@@ -136,6 +136,9 @@ abstract class base_form_view
                           ? $error_list_2[$item_id] : false,
                  'value' => is_null( $this->form_entry_2->$item_id ) 
                           ? '(no value)' : $this->form_entry_2->$item_id );
+      $this->items[$item_id]['conflict'] =
+        strtolower( $this->items[$item_id]['entry_1']['value'] ) !==
+        strtolower( $this->items[$item_id]['entry_2']['value'] );
     }
 
     $this->set_variable( 'entry_1', is_null( $this->form_entry_1 )
