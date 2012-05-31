@@ -55,7 +55,6 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
 
@@ -135,7 +134,6 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'language', $record->language, false, $languages );
     $this->set_item( 'email', $record->email, false );
     $this->set_item( 'status', $record->status, false, $statuses );
-    $this->set_item( 'eligible', $record->eligible, true );
     $this->set_item( 'no_in_home', $record->no_in_home, true );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
 

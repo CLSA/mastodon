@@ -56,7 +56,6 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
     $this->add_item( 'person_id', 'hidden' );
@@ -109,7 +108,6 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'language', '', false, $languages );
     $this->set_item( 'email', '' );
     $this->set_item( 'status', '', false, $statuses );
-    $this->set_item( 'eligible', true, true );
     $this->set_item( 'no_in_home', false, true );
     $this->set_item( 'prior_contact_date', '' );
     // this particular entry is filled in by the push/participant_new operation

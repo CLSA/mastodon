@@ -141,7 +141,6 @@ class import_entry extends \cenozo\database\record
     $db_participant->last_name = $this->last_name;
     $db_participant->gender = $this->gender;
     $db_participant->date_of_birth = $this->date_of_birth;
-    $db_participant->eligible = true;
     $db_participant->status = NULL;
     $db_participant->language = $this->language;
     $db_participant->no_in_home = false;

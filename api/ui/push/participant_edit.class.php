@@ -64,7 +64,6 @@ class participant_edit extends \cenozo\ui\push\base_edit
       if( array_key_exists( 'cohort', $columns ) ||
           array_key_exists( 'gender', $columns ) ||
           array_key_exists( 'date_of_birth', $columns ) ||
-          array_key_exists( 'eligible', $columns ) ||
           array_key_exists( 'no_in_home', $columns ) ||
           array_key_exists( 'use_informant', $columns ) ||
           array_key_exists( 'email', $columns ) )
