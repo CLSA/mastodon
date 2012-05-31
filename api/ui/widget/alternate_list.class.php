@@ -41,8 +41,8 @@ class alternate_list extends \cenozo\ui\widget\site_restricted_list
   {
     parent::prepare();
     
-    $this->add_column( 'first_name', 'string', 'First Name', true );
-    $this->add_column( 'last_name', 'string', 'Last Name', true );
+    $this->add_column( 'first_name', 'string', 'First', true );
+    $this->add_column( 'last_name', 'string', 'Last', true );
     $this->add_column( 'alternate', 'boolean', 'Alternate', true );
     $this->add_column( 'informant', 'boolean', 'Informant', true );
     $this->add_column( 'proxy', 'boolean', 'Proxy', true );

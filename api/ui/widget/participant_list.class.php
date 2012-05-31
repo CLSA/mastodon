@@ -41,9 +41,9 @@ class participant_list extends site_restricted_list
   {
     parent::prepare();
     
-    $this->add_column( 'uid', 'string', 'Unique ID', true );
-    $this->add_column( 'first_name', 'string', 'First Name', true );
-    $this->add_column( 'last_name', 'string', 'Last Name', true );
+    $this->add_column( 'uid', 'string', 'Unique', true );
+    $this->add_column( 'first_name', 'string', 'First', true );
+    $this->add_column( 'last_name', 'string', 'Last', true );
     $this->add_column( 'active', 'boolean', 'Active', true );
     $this->add_column( 'source.name', 'string', 'Source', true );
     $this->add_column( 'cohort', 'string', 'Cohort', true );
