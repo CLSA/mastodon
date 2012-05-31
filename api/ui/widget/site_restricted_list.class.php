@@ -48,7 +48,8 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
                : sprintf( '%s (%s)',
                           $this->db_restrict_site->name,
                           $this->db_restrict_site->cohort );
-    $this->set_heading( $this->get_heading().' for '.$predicate );
+
+    $this->set_heading( $this->get_subject().' list for '.$predicate );
   }
   
   /**
