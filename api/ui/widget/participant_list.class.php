@@ -81,16 +81,20 @@ class participant_list extends site_restricted_list
 
     $operation_class_name = lib::get_class_name( 'database\operation' );
 
-    $db_operation = $operation_class_name::get_operation( 'widget', 'import', 'add' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $this->add_action( 'import', 'Import', $db_operation,
-        'Import participants from an external CSV file' );
+    // include the sync action if the widget isn't parented
+    if( is_null( $this->parent ) )
+    {
+      $db_operation = $operation_class_name::get_operation( 'widget', 'import', 'add' );
+      if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+        $this->add_action( 'import', 'Import', $db_operation,
+          'Import participants from an external CSV file' );
 
-    $db_operation =
-      $operation_class_name::get_operation( 'widget', 'participant', 'site_reassign' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $this->add_action( 'reassign', 'Site Reassign', $db_operation,
-        'Change the preferred site of multiple participants at once' );
+      $db_operation =
+        $operation_class_name::get_operation( 'widget', 'participant', 'site_reassign' );
+      if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+        $this->add_action( 'reassign', 'Site Reassign', $db_operation,
+          'Change the preferred site of multiple participants at once' );
+    }
   }
 }
 ?>
