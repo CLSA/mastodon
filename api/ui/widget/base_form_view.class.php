@@ -132,8 +132,12 @@ abstract class base_form_view
                  'value' => is_null( $this->form_entry_2->$item_id ) 
                           ? '(no value)' : $this->form_entry_2->$item_id );
       $this->items[$item_id]['conflict'] =
-        strtolower( $this->items[$item_id]['entry_1']['value'] ) !==
-        strtolower( $this->items[$item_id]['entry_2']['value'] );
+        ( is_string( $this->items[$item_id]['entry_1']['value'] ) &&
+          0 != strcasecmp( $this->items[$item_id]['entry_1']['value'],
+                           $this->items[$item_id]['entry_2']['value'] ) ) ||
+        ( !is_string( $this->items[$item_id]['entry_1']['value'] ) &&
+          $this->items[$item_id]['entry_1']['value'] !=
+          $this->items[$item_id]['entry_2']['value'] );
     }
 
     $this->set_variable( 'entry_1', is_null( $this->form_entry_1 )
