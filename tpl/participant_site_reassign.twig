@@ -1,0 +1,66 @@
+{##
+ # participant_site_reassign.twig
+ # 
+ # Form to mass reassign the preferred site of multiple participants
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ # @see widget.twig for parameters
+ #}
+{% extends "widget.twig" %}
+
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      $( "#{{ widget.full }}__proceed" ).click( function () {
+        var args = new Object();
+        args.uid_list = $( "#{{ widget.full }}__uid_list" ).val();
+        args.site_id = $( "#{{ widget.full }}__site_id" ).val();
+        if( ajax_push( "participant", "site_reassign", args ) ) slot_prev( {{ slot }} );
+      } );
+    } );
+  </script>
+
+{% endblock javascript %}
+
+{% block widget %}
+  <div class="ui-widget ui-widget-content app-widget-content">
+    <div class="spacer">
+      <p>
+        Provide a list of participant UIDs which you wish to set the preferred site to.
+        UIDs must be separated by a comma or space and may be qualified by single
+        or double quotes (ie: A123456 B123456 C123456).
+      </p>
+      <p>
+        NOTE: participants which have been synched or which do not belong to the cohort
+        of the site provided will be ignored.
+      </p>
+    </div>
+    <table>
+      <tr>
+        <td class="heading">
+          <span class="title">Preferred Site:</span>
+        </td>
+        <td class="content">
+           <select id="{{ widget.full }}__site_id" class="ui-state-default">
+            <option value="0">None</option>
+            {% for site in sites %}
+              <option value="{{ site.id }}">{{ site.name }} ({{ site.cohort }})</option>
+            {% endfor %}
+           </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="heading">
+          <span class="title">UID list:</span>
+        </td>
+        <td class="content">
+          <textarea id="{{ widget.full }}__uid_list" style="height: 16em;"></textarea>
+        </td>
+      </tr>
+    </table>
+    <div class="spacer" style="text-align: right">
+      <button id="{{ widget.full }}__proceed" style="width:120px">Proceed</button>
+    </div>
+  </:iv>
+{% endblock widget %}
