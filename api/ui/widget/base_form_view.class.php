@@ -48,9 +48,6 @@ abstract class base_form_view
     
     $id = $this->get_argument( 'id' );
 
-    // determine properties based on the current user's permissions
-    $session = lib::create( 'business\session' );
-
     $this->set_heading( sprintf( 'Viewing %s #%d', $this->get_subject(), $id ) );
 
     // Set the two form entries
