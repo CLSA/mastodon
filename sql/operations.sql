@@ -209,6 +209,8 @@ VALUES( "push", "proxy_form", "edit", true, "Edits the details of a scanned prox
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form", "list", true, "Lists scanned proxy forms." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "proxy_form", "new", true, "Adds a new proxy form directly into the data entry system." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form", "view", true, "View the details of a scanned proxy form." );
 
 -- proxy_form_entry

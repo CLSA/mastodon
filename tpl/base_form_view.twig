@@ -90,8 +90,6 @@
 {% block record_items %}
   <table id="{{ widget.full }}__edit_form">
     {% for item_id, entry in item %}
-      {# conflicts are not case-sensitive #}
-      {% set conflict = entry.entry_1.value|lower != entry.entry_2.value|lower %}
       <tr>
         <td rowspan="2" class="heading" style="padding-right: 1.0em">
           <span class="title">{{ entry.heading }}:</span>
@@ -102,7 +100,7 @@
         </td>
         <td class="heading"
             style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          {% if conflict and allow_adjudication %}
+          {% if entry.conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_1.user }}" />
@@ -123,7 +121,7 @@
         </td>
         <td class="heading"
             style="padding-left: 0.5em; padding-top: 0.5em; padding-right: 0.5em">
-          {% if conflict and allow_adjudication %}
+          {% if entry.conflict and allow_adjudication %}
             <input type="radio"
                    name="{{ widget.full }}__{{ item_id }}"
                    value="{{ entry.entry_2.user }}" />

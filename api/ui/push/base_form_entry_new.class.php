@@ -54,11 +54,11 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     // This new operation is different from others.  Instead of providing an ID the system must
     // instead search for one, reporting a notice if none are available
     $found = false;
-    $form_mod = lib::create( 'database\modifier' );
-    $form_mod->where( 'invalid', '=', false );
-    $form_mod->where( 'complete', '=', false );
-    $form_mod->order( 'id' );
-    foreach( $form_class_name::select( $form_mod ) as $db_form )
+    if( is_null( $this->form_mod ) ) $this->form_mod = lib::create( 'database\modifier' );
+    $this->form_mod->where( 'invalid', '=', false );
+    $this->form_mod->where( 'complete', '=', false );
+    $this->form_mod->order( 'id' );
+    foreach( $form_class_name::select( $this->form_mod ) as $db_form )
     {
       // find a form which has less than 2 entries
       $form_entry_mod = lib::create( 'database\modifier' );
@@ -90,5 +90,12 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
    * @access private
    */
   private $form_type;
+
+  /**
+   * The modifier used when selecting a new form.
+   * @var database\modifier $form_mod
+   * @access protected
+   */
+  private $form_mod;
 }
 ?>
