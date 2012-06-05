@@ -37,9 +37,8 @@ class participant_list_consent extends \cenozo\ui\pull\base_list_record
    */
   protected function prepare()
   {
-    parent::prepare();
-
     // if the uid is provided instead of the id then fetch the participant id based on the uid
+    // NOTE: this must be done before calling the parent prepare() method
     if( isset( $this->arguments['uid'] ) )
     {
       $class_name = lib::get_class_name( 'database\participant' );
@@ -47,8 +46,16 @@ class participant_list_consent extends \cenozo\ui\pull\base_list_record
 
       if( is_null( $db_participant ) )
         throw lib::create( 'exception\argument', 'uid', $this->arguments['uid'], __METHOD__ );
+
+      // make sure not to mix up comprehensive and tracking participants
+      if( $db_participant->cohort != lib::create( 'business\session' )->get_site()->cohort )
+        throw lib::create( 'exception\runtime',
+          'Tried to get participant from wrong cohort.', __METHOD__ );
+
       $this->arguments['id'] = $db_participant->id;
     }
+
+    parent::prepare();
   }
 }
 ?>
