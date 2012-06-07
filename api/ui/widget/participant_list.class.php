@@ -41,13 +41,13 @@ class participant_list extends site_restricted_list
   {
     parent::prepare();
     
-    $this->add_column( 'uid', 'string', 'Unique', true );
+    $this->add_column( 'uid', 'string', 'UID', true );
     $this->add_column( 'first_name', 'string', 'First', true );
     $this->add_column( 'last_name', 'string', 'Last', true );
     $this->add_column( 'active', 'boolean', 'Active', true );
     $this->add_column( 'source.name', 'string', 'Source', true );
     $this->add_column( 'cohort', 'string', 'Cohort', true );
-    $this->add_column( 'primary_site', 'string', 'Site', false );
+    $this->add_column( 'site', 'string', 'Site', false );
 
     // participants are either jurisdiction or participant_site based
     $this->extended_site_selection = true;
@@ -74,7 +74,7 @@ class participant_list extends site_restricted_list
                'active' => $record->active,
                'source.name' => $source_name,
                'cohort' => $record->cohort,
-               'primary_site' => $record->get_primary_site()->name,
+               'site' => $record->get_primary_site()->name,
                // note count isn't a column, it's used for the note button
                'note_count' => $record->get_note_count() ) );
     }

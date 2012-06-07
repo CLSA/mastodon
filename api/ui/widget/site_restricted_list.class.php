@@ -62,8 +62,12 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   {
     parent::setup();
 
-    // we're restricting to a site, so remove the cohort column
-    if( !is_null( $this->db_restrict_site ) ) $this->remove_column( 'cohort' );
+    // we're restricting to a site, so remove the site and cohort columns
+    if( !is_null( $this->db_restrict_site ) )
+    {
+      $this->remove_column( 'site' );
+      $this->remove_column( 'cohort' );
+    }
 
     if( static::may_restrict() )
     {
