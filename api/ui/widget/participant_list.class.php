@@ -67,6 +67,8 @@ class participant_list extends site_restricted_list
     {
       $db_source = $record->get_source();
       $source_name = is_null( $db_source ) ? '(none)' : $db_source->name;
+      $db_site = $record->get_primary_site();
+      $site_name = is_null( $db_site ) ? 'none' : $db_site->name;
       $this->add_row( $record->id,
         array( 'uid' => $record->uid ? $record->uid : '(none)',
                'first_name' => $record->first_name,
@@ -74,7 +76,7 @@ class participant_list extends site_restricted_list
                'active' => $record->active,
                'source.name' => $source_name,
                'cohort' => $record->cohort,
-               'site' => $record->get_primary_site()->name,
+               'site' => $site_name,
                // note count isn't a column, it's used for the note button
                'note_count' => $record->get_note_count() ) );
     }
