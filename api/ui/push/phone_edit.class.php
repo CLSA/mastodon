@@ -100,6 +100,15 @@ class phone_edit extends \cenozo\ui\push\base_edit
     $args['noid']['phone']['participant_id'] =
       $participant_class_name::get_unique_from_primary_key( $db_participant->id );
 
+    if( array_key_exists( 'columns', $args['noid'] ) &&
+        array_key_exists( 'address', $args['noid']['columns'] ) &&
+        array_key_exists( 'person_id', $args['noid']['columns']['address'] ) )
+    {
+      unset( $args['noid']['columns']['address']['person_id'] );
+      $args['noid']['columns']['address']['participant_id'] =
+        $args['noid']['phone']['participant_id'];
+    }
+
     return $args;
   }
 
@@ -121,6 +130,16 @@ class phone_edit extends \cenozo\ui\push\base_edit
       unset( $args['noid']['phone']['participant_id'] );
       $db_participant = lib::create( 'database\participant', $participant_id );
       $args['noid']['phone']['person_id'] = $db_participant->person_id;
+
+      if( array_key_exists( 'columns', $args['noid'] ) &&
+          array_key_exists( 'address', $args['noid']['columns'] ) &&
+          array_key_exists( 'participant_id', $args['noid']['columns']['address'] ) )
+      {
+        unset( $args['noid']['columns']['address']['participant_id'] );
+        // same as above
+        $args['noid']['columns']['address']['person_id'] =
+          $args['noid']['phone']['person_id'];
+      }
     }
 
     return parent::convert_from_noid( $args );
