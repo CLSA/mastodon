@@ -52,6 +52,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'site_id', 'enum', 'Prefered Site' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
+    $this->add_item( 'age_group', 'constant', 'Age Group' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'status', 'enum', 'Condition' );
@@ -116,6 +117,13 @@ class participant_view extends \cenozo\ui\widget\base_view
     $db_default_site = $this->get_record()->get_default_site();
     $default_site = is_null( $db_default_site ) ? 'None' : $db_default_site->name;
 
+    $age_group = '';
+    if( !is_null( $record->age_group_id ) )
+    {
+      $db_age_group = lib::create( 'database\age_group', $record->age_group_id );
+      $age_group = sprintf( '%d to %d', $db_age_group->lower, $db_age_group->upper );
+    }
+
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
@@ -127,6 +135,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
+    $this->set_item( 'age_group', $age_group );
     $this->set_item( 'language', $record->language, false, $languages );
     $this->set_item( 'email', $record->email, false );
     $this->set_item( 'status', $record->status, false, $statuses );

@@ -33,6 +33,7 @@ class contact_form extends base_form
 
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $site_class_name = lib::get_class_name( 'database\site' );
 
     $db_french_site = $site_class_name::get_unique_record(
@@ -53,22 +54,51 @@ class contact_form extends base_form
     
     $year = date( 'Y' );
     $dob = NULL;
+    $lower = NULL;
     if( '45-49' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 47 );
+      $lower = 45;
+    }
     else if( '50-54' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 52 );
+      $lower = 45;
+    }
     else if( '55-59' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 57 );
+      $lower = 55;
+    }
     else if( '60-64' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 62 );
+      $lower = 55;
+    }
     else if( '65-69' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 67 );
+      $lower = 65;
+    }
     else if( '70-74' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 72 );
+      $lower = 65;
+    }
     else if( '75-79' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 77 );
+      $lower = 75;
+    }
     else if( '80-85' == $db_contact_form_entry->age_bracket )
+    {
       $dob = sprintf( '%d-01-01', $year - 82 );
+      $lower = 75;
+    }
+
+    $db_age_group = !is_null( $lower )
+                  ? $age_group_class_name::get_unique_record( 'lower', $lower )
+                  : NULL;
 
     // import data to the person and participant tables
     $db_person = lib::create( 'database\person' );
@@ -84,6 +114,7 @@ class contact_form extends base_form
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
     $db_participant->date_of_birth = $dob;
+    if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
     $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
