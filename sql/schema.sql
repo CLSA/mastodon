@@ -49,6 +49,23 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `age_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `age_group` ;
+
+CREATE  TABLE IF NOT EXISTS `age_group` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `lower` INT NOT NULL ,
+  `upper` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_lower` (`lower` ASC) ,
+  UNIQUE INDEX `uq_upper` (`upper` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `participant`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `participant` ;
@@ -66,6 +83,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `last_name` VARCHAR(45) NOT NULL ,
   `gender` ENUM('male','female') NOT NULL ,
   `date_of_birth` DATE NULL ,
+  `age_group_id` INT UNSIGNED NULL DEFAULT NULL ,
   `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
   `site_id` INT UNSIGNED NULL DEFAULT NULL ,
@@ -84,6 +102,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   INDEX `fk_source_id` (`source_id` ASC) ,
   INDEX `fk_site_id` (`site_id` ASC) ,
   UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
+  INDEX `fk_age_group_id` (`age_group_id` ASC) ,
   CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
@@ -97,6 +116,11 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   CONSTRAINT `fk_participant_site_id`
     FOREIGN KEY (`site_id` )
     REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_age_group_id`
+    FOREIGN KEY (`age_group_id` )
+    REFERENCES `age_group` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -279,13 +303,20 @@ CREATE  TABLE IF NOT EXISTS `quota` (
   `region_id` INT UNSIGNED NOT NULL ,
   `cohort` ENUM('comprehensive','tracking') NOT NULL ,
   `gender` ENUM('male','female') NOT NULL ,
-  `age_bracket` ENUM('45-55','55-65','65-75','75-85') NOT NULL ,
+  `age_group_id` INT UNSIGNED NOT NULL ,
   `population` INT NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_region_id` (`region_id` ASC) ,
+  INDEX `fk_age_group_id` (`age_group_id` ASC) ,
+  INDEX `uq_region_id_cohort_gender_age_group_id` (`region_id` ASC, `cohort` ASC, `gender` ASC, `age_group_id` ASC) ,
   CONSTRAINT `fk_quota_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_quota_age_group_id`
+    FOREIGN KEY (`age_group_id` )
+    REFERENCES `age_group` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

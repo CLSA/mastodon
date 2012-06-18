@@ -1594,6 +1594,10 @@ INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "consent_form_entry" AND name = "validate" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "typist" ),
+    operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent" AND name = "new" );
 
 -- contact form
 INSERT INTO role_has_operation
