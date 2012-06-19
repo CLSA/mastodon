@@ -30,6 +30,31 @@ class access_delete extends \cenozo\ui\push\access_delete
     $this->set_machine_request_enabled( true );
   }
 
+  /** 
+   * Validate the operation.  If validation fails this method will throw a notice exception.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws excpetion\argument, exception\permission
+   * @access protected
+   */
+  protected function validate()
+  {
+    parent::validate();
+
+    // only delete roles which mastodon can create (admin and typist)
+    // UNLESS we recevied this operation from another application
+    if( is_null( $this->get_machine_application_name() ) ||
+        'mastodon' == $this->get_machine_application_name() )
+    {
+      $db_access = lib::create( 'database\access', $this->get_argument( 'id' ) );
+      $db_role = $db_access->get_role();
+      if( 'administrator' != $db_role->name && 'typist' != $db_role->name )
+        throw lib::create( 'exception\notice',
+          'Cannot delete that access since it is not an administrator or typist role.',
+          __METHOD__ );
+    }
+  }
+
   /**
    * Override the parent method to send a request to both Beartooth and Sabretooth
    * @author Patrick Emond <emondpd@mcmaster.ca>
