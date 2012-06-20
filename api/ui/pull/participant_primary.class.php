@@ -67,6 +67,11 @@ class participant_primary extends \cenozo\ui\pull\base_primary
                          ? NULL
                          : $this->get_record()->get_source()->name;
 
+    // convert site_id to site (name)
+    $data['site_name'] = is_null( $data['site_id'] )
+                         ? NULL
+                         : $this->get_record()->get_site()->name;
+
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )
     {

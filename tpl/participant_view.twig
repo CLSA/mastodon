@@ -12,15 +12,13 @@
   {{ parent() }}
   <script type="text/javascript">
     $( function () {
-      {% if contact_form_available %}
+      {% if contact_form_id|default(false) %}
         $( "#{{ widget.full }}__contact_form" ).click( function() {
-          window.location = "contact_form/download?" + jQuery.param( { id: {{ id }} } );
+          window.location = "contact_form/download?" +
+                            jQuery.param( { id: {{ contact_form_id }} } );
         } );
-      {% endif %}
-      {% if consent_form_available %}
-        $( "#{{ widget.full }}__consent_form" ).click( function() {
-          window.location = "consent_form/download?" + jQuery.param( { id: {{ id }} } );
-        } );
+      {% else %}
+        $( "#{{ widget.full }}__contact_form" ).button( { 'disabled': true } );
       {% endif %}
     } );
   </script>
@@ -38,27 +36,3 @@
   {{ include_list( 'alternate', alternate_list|default(false), true ) }}
 
 {% endblock record %}
-
-{% block record_items %}
-  
-  {{ parent() }}
-  <hr class="ui-widget ui-widget-content">
-  <table>
-    <tr>
-      <td class="heading">Download Forms:</td>
-      <td class="content">
-        {% if not contact_form_available and not consent_form_available %}
-          (no forms available)
-        {% else %}
-          {% if contact_form_available %}
-            <button id="{{ widget.full }}__contact_form">contact</button>
-          {% endif %}
-          {% if consent_form_available %}
-            <button id="{{ widget.full }}__consent_form">consent</button>
-          {% endif %}
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-{% endblock record_items %}

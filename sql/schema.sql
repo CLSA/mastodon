@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 
 -- -----------------------------------------------------
@@ -32,6 +32,23 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `site`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `site` ;
+
+CREATE  TABLE IF NOT EXISTS `site` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
+  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `participant`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `participant` ;
@@ -50,12 +67,14 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `gender` ENUM('male','female') NOT NULL ,
   `date_of_birth` DATE NULL ,
   `eligible` TINYINT(1)  NOT NULL ,
-  `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','other') NULL DEFAULT NULL ,
+  `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
+  `site_id` INT UNSIGNED NULL DEFAULT NULL ,
   `no_in_home` TINYINT(1)  NOT NULL DEFAULT false ,
   `use_informant` TINYINT(1)  NULL DEFAULT NULL ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,
+  `sync_datetime` DATETIME NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,
@@ -64,6 +83,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   INDEX `dk_uid` (`uid` ASC) ,
   INDEX `fk_person_id` (`person_id` ASC) ,
   INDEX `fk_source_id` (`source_id` ASC) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
   CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
@@ -73,24 +93,12 @@ CREATE  TABLE IF NOT EXISTS `participant` (
     FOREIGN KEY (`source_id` )
     REFERENCES `source` (`id` )
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_site_id`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `site`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `site` ;
-
-CREATE  TABLE IF NOT EXISTS `site` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
-  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
 ENGINE = InnoDB;
 
 
@@ -192,6 +200,8 @@ CREATE  TABLE IF NOT EXISTS `address` (
   `city` VARCHAR(100) NOT NULL ,
   `region_id` INT UNSIGNED NOT NULL ,
   `postcode` VARCHAR(10) NOT NULL ,
+  `timezone_offset` FLOAT NOT NULL ,
+  `daylight_savings` TINYINT(1)  NOT NULL ,
   `january` TINYINT(1)  NOT NULL DEFAULT true ,
   `february` TINYINT(1)  NOT NULL DEFAULT true ,
   `march` TINYINT(1)  NOT NULL DEFAULT true ,
@@ -794,6 +804,31 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `jurisdiction`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `jurisdiction` ;
+
+CREATE  TABLE IF NOT EXISTS `jurisdiction` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `postcode` VARCHAR(7) NOT NULL ,
+  `site_id` INT UNSIGNED NOT NULL ,
+  `longitude` FLOAT NOT NULL ,
+  `latitude` FLOAT NOT NULL ,
+  `distance` FLOAT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_postcode` (`postcode` ASC) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  CONSTRAINT `fk_jurisdiction_site`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Placeholder table for view `person_first_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `person_first_address` (`person_id` INT, `address_id` INT);
@@ -827,6 +862,11 @@ CREATE TABLE IF NOT EXISTS `participant_first_address` (`participant_id` INT, `a
 -- Placeholder table for view `alternate_first_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `alternate_first_address` (`alternate_id` INT, `address_id` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `participant_site`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `participant_site` (`participant_id` INT, `site_id` INT);
 
 -- -----------------------------------------------------
 -- View `person_first_address`
@@ -927,6 +967,31 @@ CREATE  OR REPLACE VIEW `alternate_first_address` AS
 SELECT alternate.id AS alternate_id, address_id
 FROM person_first_address, alternate
 WHERE person_first_address.person_id = alternate.person_id;
+
+-- -----------------------------------------------------
+-- View `participant_site`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `participant_site` ;
+DROP TABLE IF EXISTS `participant_site`;
+CREATE  OR REPLACE VIEW `participant_site` AS
+SELECT participant.id AS participant_id, IF(
+  ISNULL( participant.site_id ),
+  IF(
+    participant.cohort = "comprehensive",
+    jurisdiction.site_id,
+    region.site_id
+  ),
+  participant.site_id
+) AS site_id
+FROM participant
+LEFT JOIN participant_primary_address
+ON participant.id = participant_primary_address.participant_id
+LEFT JOIN address
+ON participant_primary_address.address_id = address.id
+LEFT JOIN jurisdiction
+ON address.postcode = jurisdiction.postcode
+LEFT JOIN region
+ON address.region_id = region.id;
 
 DELIMITER $$
 

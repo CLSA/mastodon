@@ -39,6 +39,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
   public function finish()
   {
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
     $errors = array();
     $record = $this->get_record();
 
@@ -99,13 +100,9 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['proxy_postcode'] = 'This value cannot be left blank.';
 
       if( !is_null( $record->proxy_region_id ) && !is_null( $record->proxy_postcode ) )
-      { // make sure the postcode is in the database
-        $db_address = lib::create( 'database\address' );
-        $db_address->address1 = 'anything';
-        $db_address->city = 'anything';
-        $db_address->region_id = $record->proxy_region_id;
-        $db_address->postcode = $record->proxy_postcode;
-        if( !$db_address->is_valid() )
+      { // check that the postal code is valid
+        $db_postcode = $postcode_class_name::get_match( $record->proxy_postcode );
+        if( is_null( $db_postcode ) || $db_postcode->region_id != $record->proxy_region_id )
           $errors['proxy_postcode'] = 'The postal code does not exist in the selected province.';
       }
 
@@ -164,13 +161,9 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['informant_postcode'] = 'This value cannot be left blank.';
 
       if( !is_null( $record->informant_region_id ) && !is_null( $record->informant_postcode ) )
-      { // make sure the postcode is in the database
-        $db_address = lib::create( 'database\address' );
-        $db_address->address1 = 'anything';
-        $db_address->city = 'anything';
-        $db_address->region_id = $record->informant_region_id;
-        $db_address->postcode = $record->informant_postcode;
-        if( !$db_address->is_valid() )
+      { // check that the postal code is valid
+        $db_postcode = $postcode_class_name::get_match( $record->informant_postcode );
+        if( is_null( $db_postcode ) || $db_postcode->region_id != $record->informant_region_id )
           $errors['informant_postcode'] = 'The postal code does not exist in the selected province.';
       }
 

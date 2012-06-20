@@ -146,7 +146,15 @@ class import_new extends \cenozo\ui\push
         $db_import_entry->cohort = strtolower( $values[33] );
         $db_import_entry->date = $values[34];
         $db_import_entry->validate();
-        $db_import_entry->save();
+        try
+        {
+          $db_import_entry->save();
+        }
+        catch( \cenozo\exception\database $e )
+        {
+          throw lib::create( 'exception\notice',
+            sprintf( 'There was a problem importing row %d.', $row ), __METHOD__, $e );
+        }
       }
 
       $row++;

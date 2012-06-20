@@ -16,7 +16,9 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * @abstract
  * @package cenozo\ui
  */
-abstract class base_form_view extends \cenozo\ui\widget\base_record
+abstract class base_form_view
+  extends \cenozo\ui\widget\base_record
+  implements \cenozo\ui\widget\actionable
 {
   /**
    * Constructor
@@ -24,7 +26,7 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
    * Defines all variables which need to be set for the associated template.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $subject The subject being viewed.
-   * @param array $args An associative array of arguments to be processed by th  widget
+   * @param array $args An associative array of arguments to be processed by the widget
    * @throws exception\argument
    * @access public
    */
@@ -32,14 +34,12 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
   {
     parent::__construct( $subject, 'view', $args );
     
-    // make sure we have an id (we don't actually need to use it since the parent does)
-    $this->get_argument( 'id' );
+    $id = $this->get_argument( 'id' );
 
     // determine properties based on the current user's permissions
-    $operation_class_name = lib::get_class_name( 'database\operation' );
     $session = lib::create( 'business\session' );
 
-    $this->set_heading( 'Viewing '.$this->get_subject().' details' );
+    $this->set_heading( sprintf( 'Viewing %s #%d', $this->get_subject(), $id ) );
 
     // Set the two form entries
     $form_entry_list_method = sprintf( 'get_%s_entry_list', $this->get_subject() );
@@ -78,6 +78,40 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
       $error_list_2 = $operation->finish();
     }
 
+    $operation_class_name = lib::get_class_name( 'database\operation' );
+
+    // add in form actions
+    $this->add_action( 'download', 'Download', NULL,
+      'Download a PDF copy of the form' );
+    $this->add_action( 'submit', 'Submit', NULL,
+      'Submit the selected form values and process the form' );
+    $this->add_action( 'invalidate', 'Invalidate', NULL,
+      'Invalidate the form, removing it from the data entry system' );
+    
+    // validate the entries
+    $error_list_1 = array();
+    if( !is_null( $this->form_entry_1 ) )
+    {
+      $username = $this->form_entry_1->get_user()->name;
+      $this->add_action( 'defer_'.$username, 'Defer '.$username, NULL,
+        sprintf( 'Defer %s\'s form for further editing', $username ) );
+
+      $args = array( 'id' => $this->form_entry_1->id );
+      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
+      $error_list_1 = $operation->finish();
+    }
+    $error_list_2 = array();
+    if( !is_null( $this->form_entry_2 ) )
+    {
+      $username = $this->form_entry_2->get_user()->name;
+      $this->add_action( 'defer_'.$username, 'Defer '.$username, NULL,
+        sprintf( 'Defer %s\'s form for further editing', $username ) );
+
+      $args = array( 'id' => $this->form_entry_2->id );
+      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
+      $error_list_2 = $operation->finish();
+    }
+
     foreach( $this->items as $item_id => $item )
     {
       $this->items[$item_id]['entry_1'] = is_null( $this->form_entry_1 )
@@ -102,6 +136,13 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
                           ? $error_list_2[$item_id] : false,
                  'value' => is_null( $this->form_entry_2->$item_id ) 
                           ? '(no value)' : $this->form_entry_2->$item_id );
+      $this->items[$item_id]['conflict'] =
+        ( is_string( $this->items[$item_id]['entry_1']['value'] ) &&
+          0 != strcasecmp( $this->items[$item_id]['entry_1']['value'],
+                           $this->items[$item_id]['entry_2']['value'] ) ) ||
+        ( !is_string( $this->items[$item_id]['entry_1']['value'] ) &&
+          $this->items[$item_id]['entry_1']['value'] !=
+          $this->items[$item_id]['entry_2']['value'] );
     }
 
     $this->set_variable( 'entry_1', is_null( $this->form_entry_1 )
@@ -121,6 +162,8 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
     $this->set_variable( 'allow_adjudication',
       !is_null( $this->form_entry_1 ) && !$this->form_entry_1->deferred &&
       !is_null( $this->form_entry_2 ) && !$this->form_entry_2->deferred );
+
+    $this->set_variable( 'actions', $this->actions );
   }
   
   /**
@@ -155,6 +198,39 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
   }
 
   /**
+   * Adds a new action to the widget.
+   * 
+   * @param string $action_id The action's id (must be a valid HTML id name).
+   * @param string $heading The action's heading as it will appear in the widget.
+   * @param database\operation $db_operation The operation to perform.  If NULL then the button
+   *        will appear in the interface without any action and the extending template is
+   *        expected to implement the actions operation in the action_script block.
+   * @param string $description Pop-up text to show when hovering over the action's button.
+   * @access public
+   */
+  public function add_action( $action_id, $heading, $db_operation = NULL, $description = NULL )
+  {
+    $this->actions[$action_id] =
+      array( 'heading' => $heading,
+             'type' => is_null( $db_operation ) ? false : $db_operation->type,
+             'subject' => is_null( $db_operation ) ? false : $db_operation->subject,
+             'name' => is_null( $db_operation ) ? false : $db_operation->name,
+             'description' => $description );
+  }
+  
+  /**
+   * Removes an action from the widget.
+   * 
+   * @param string $action_id The action's id (must be a valid HTML id name).
+   * @access public
+   */
+  public function remove_action( $action_id )
+  {
+    if( array_key_exists( $action_id, $this->actions ) )
+      unset( $this->actions[$action_id] );
+  }
+
+  /**
    * An associative array where the key is a unique identifier (usually a column name) and the
    * value is an associative array which includes:
    * "heading" => the label to display
@@ -180,5 +256,16 @@ abstract class base_form_view extends \cenozo\ui\widget\base_record
    * @access protected
    */
   protected $form_entry_2 = NULL;
+
+  /**
+   * An associative array where the key is a unique identifier and the value is an associative
+   * array which includes:
+   * "heading" => the label to display
+   * "name" => the name of the operation to perform on the record
+   * "description" => the popup help text
+   * @var array
+   * @access private
+   */
+  private $actions = array();
 }
 ?>

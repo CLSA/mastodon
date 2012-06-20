@@ -36,6 +36,8 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'last_name', 'string', 'Last Name' );
     $this->add_item( 'source_id', 'enum', 'Source' );
     $this->add_item( 'cohort', 'constant', 'Cohort' );
+    $this->add_item( 'default_site', 'constant', 'Default Site' );
+    $this->add_item( 'site_id', 'enum', 'Prefered Site' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
@@ -119,7 +121,16 @@ class participant_view extends \cenozo\ui\widget\base_view
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $record = $this->get_record();
 
+    $sites = array();
+    $site_class_name = lib::get_class_name( 'database\site' );
+    $site_mod = lib::create( 'database\modifier' );
+    $site_mod->where( 'cohort', '=', $record->cohort );
+    foreach( $site_class_name::select( $site_mod ) as $db_site )
+      $sites[$db_site->id] = $db_site->name;
+    $db_site = $record->get_site();
+    $site_id = is_null( $db_site ) ? '' : $db_site->id;
     $sources = array();
     foreach( $source_class_name::select() as $db_source )
       $sources[$db_source->id] = $db_source->name;
@@ -131,13 +142,14 @@ class participant_view extends \cenozo\ui\widget\base_view
     $statuses = array_combine( $statuses, $statuses );
 
     // set the view's items
-    $record = $this->get_record();
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
     $this->set_item( 'first_name', $record->first_name );
     $this->set_item( 'last_name', $record->last_name );
     $this->set_item( 'source_id', $record->source_id, false, $sources );
     $this->set_item( 'cohort', $record->cohort );
+    $this->set_item( 'default_site', $record->get_default_site()->name );
+    $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
     $this->set_item( 'language', $record->language, false, $languages );
@@ -147,11 +159,14 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'no_in_home', $record->no_in_home, true );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
 
-    $this->finish_setting_items();
+    // add a contact form download action
+    $db_contact_form = $record->get_contact_form();
+    if( !is_null( $db_contact_form ) )
+      $this->set_variable( 'contact_form_id', $db_contact_form->id );
+    $this->add_action( 'contact_form', 'Contact Form', NULL,
+      'Download this participant\'s contact form, if available' );
 
-    // temporarily disable forms for now
-    $this->set_variable( 'contact_form_available', false );
-    $this->set_variable( 'consent_form_available', false );
+    $this->finish_setting_items();
 
     if( !is_null( $this->address_list ) )
     {

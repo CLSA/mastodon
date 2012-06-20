@@ -18,6 +18,27 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class participant extends person
 {
   /**
+   * Extend the select() method by adding a custom join to the jursidiction table.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\modifier $modifier Modifications to the selection.
+   * @param boolean $count If true the total number of records instead of a list
+   * @return array( record ) | int
+   * @static
+   * @access public
+   */
+  public static function select( $modifier = NULL, $count = false )
+  {
+    $jurisdiction_mod = lib::create( 'database\modifier' );
+    $jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
+    $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
+    $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
+    $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );
+    static::customize_join( 'jurisdiction', $jurisdiction_mod );
+
+    return parent::select( $modifier, $count );
+  }
+
+  /**
    * Get the participant's last consent
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return consent
@@ -93,6 +114,49 @@ class participant extends person
     return $address_id ? lib::create( 'database\address', $address_id ) : NULL;
   }
 
+  /**
+   * Get the default site that the participant belongs to.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return site
+   * @access public
+   */
+  public function get_default_site()
+  {
+    $db_site = NULL;
+
+    if( 'comprehensive' == $this->cohort )
+    {
+      $db_address = $this->get_primary_address();
+      if( !is_null( $db_address ) )
+      { // there is a primary address
+        $jurisdiction_class_name = lib::get_class_name( 'database\jurisdiction' );
+        $db_jurisdiction = $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
+        if( !is_null( $db_address ) ) $db_site = $db_jurisdiction->get_site();
+      }
+    }
+    else
+    {
+      $db_address = $this->get_primary_address();
+      if( !is_null( $db_address ) )
+      { // there is a primary address
+        $db_site = $db_address->get_region()->get_site();
+      }
+    }
+
+    return $db_site;
+  }
+
+  /**
+   * Get the site that the participant belongs to.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return site
+   * @access public
+   */
+  public function get_primary_site()
+  {
+    return is_null( $this->site_id ) ? $this->get_default_site() : $this->get_site();
+  }
+  
   /**
    * Get this participant's HIN information.
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -190,6 +254,22 @@ class participant extends person
   public static function count_for_event( $event, $missing = false, $modifier = NULL )
   {
     return static::select_for_event( $event, $missing, $modifier, true );
+  }
+
+  /**
+   * This is a convenience method to get a participant's contact form, if it exists.
+   * For design reasons the participant and contact_form tables do not have a one-to-one
+   * relationship, therefor the base class will refuse a call to get_contact_form(), so
+   * this method fakes it for us.
+   * NOTE: no participant should ever have more than one contact form
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\contact_form
+   * @access public
+   */
+  public function get_contact_form()
+  {
+    $contact_form_list = $this->get_contact_form_list();
+    return count( $contact_form_list ) ? current( $contact_form_list ) : NULL;
   }
 
   /**

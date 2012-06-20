@@ -7,6 +7,24 @@
  #}
 {% extends "base_view.twig" %}
 
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      {% if consent_form_id|default(false) %}
+        $( "#{{ widget.full }}__consent_form" ).click( function() {
+          window.location = "consent_form/download?" +
+                            jQuery.param( { id: {{ consent_form_id }} } );
+        } );
+      {% else %}
+        $( "#{{ widget.full }}__consent_form" ).button( { 'disabled': true } );
+      {% endif %}
+    } );
+  </script>
+
+{% endblock javascript %}
+
 {% block post_record %}
 
   {{ parent() }}

@@ -120,6 +120,7 @@ class proxy_form extends base_form
                            substr( $db_proxy_form_entry->proxy_postcode, 3, 3 ) )
                 : $db_proxy_form_entry->proxy_postcode;
       $db_proxy_address->postcode = $postcode;
+      $db_proxy_address->source_postcode();
       $db_proxy_address->note = $db_proxy_form_entry->proxy_address_note;
       $db_proxy_address->save();
 
@@ -206,6 +207,7 @@ class proxy_form extends base_form
                            substr( $db_proxy_form_entry->informant_postcode, 3, 3 ) )
                 : $db_proxy_form_entry->informant_postcode;
       $db_informant_address->postcode = $postcode;
+      $db_informant_address->source_postcode();
       $db_informant_address->note = $db_proxy_form_entry->informant_address_note;
       $db_informant_address->save();
 

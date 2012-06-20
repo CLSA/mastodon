@@ -72,13 +72,20 @@ class alternate_view extends \cenozo\ui\widget\base_view
   {
     parent::finish();
 
+    // add a proxy form download action
+    $db_proxy_form = $this->get_record()->get_proxy_form();
+    if( !is_null( $db_proxy_form ) )
+      $this->set_variable( 'proxy_form_id', $db_proxy_form->id );
+    $this->add_action( 'proxy_form', 'Proxy Form', NULL,
+      'Download this alternate\'s consent for proxy form, if available' );
+
     // set the view's items
-    $this->set_item( 'first_name', $this->get_record()->first_name );
-    $this->set_item( 'last_name', $this->get_record()->last_name );
-    $this->set_item( 'association', $this->get_record()->association );
-    $this->set_item( 'alternate', $this->get_record()->alternate );
-    $this->set_item( 'informant', $this->get_record()->informant );
-    $this->set_item( 'proxy', $this->get_record()->proxy );
+    $this->set_item( 'first_name', $this->get_record()->first_name, true );
+    $this->set_item( 'last_name', $this->get_record()->last_name, true );
+    $this->set_item( 'association', $this->get_record()->association, true );
+    $this->set_item( 'alternate', $this->get_record()->alternate, true );
+    $this->set_item( 'informant', $this->get_record()->informant, true );
+    $this->set_item( 'proxy', $this->get_record()->proxy, true );
 
     $this->finish_setting_items();
 

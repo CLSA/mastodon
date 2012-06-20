@@ -173,6 +173,8 @@ VALUES( "push", "participant", "delete_alternate", true, "Remove a participant's
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "primary", true, "Retrieves base participant information." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "participant", "list", true, "Retrieves base information for a list of participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_alternate", true, "Retrieves a list of a participant's alternates." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_consent", true, "Retrieves a list of participant's consent information." );
@@ -203,6 +205,8 @@ VALUES( "push", "proxy_form", "edit", true, "Edits the details of a scanned prox
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form", "list", true, "Lists scanned proxy forms." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "proxy_form", "new", true, "Adds a new proxy form directly into the data entry system." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form", "view", true, "View the details of a scanned proxy form." );
 
 -- proxy_form_entry
@@ -224,5 +228,9 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "alternate", "report", true, "Set up a alternate report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "alternate", "report", true, "Download a alternate report." );
 
 COMMIT;

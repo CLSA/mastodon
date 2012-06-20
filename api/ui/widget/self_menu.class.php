@@ -29,13 +29,12 @@ class self_menu extends \cenozo\ui\widget\self_menu
   {
     parent::__construct( $args );
 
-    $exclude = array(
+    $this->exclude_list( array(
       'address',
       'alternate',
       'availability',
       'consent',
-      'phone' );
-    $this->exclude_widget_list = array_merge( $this->exclude_widget_list, $exclude );
+      'phone' ) );
   }
 
   /**

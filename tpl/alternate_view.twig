@@ -7,6 +7,24 @@
  #}
 {% extends "base_view.twig" %}
 
+{% block javascript %}
+
+  {{ parent() }}
+  <script type="text/javascript">
+    $( function () {
+      {% if proxy_form_id|default(false) %}
+        $( "#{{ widget.full }}__proxy_form" ).click( function() {
+          window.location = "proxy_form/download?" +
+                            jQuery.param( { id: {{ proxy_form_id }} } );
+        } );
+      {% else %}
+        $( "#{{ widget.full }}__proxy_form" ).button( { 'disabled': true } );
+      {% endif %}
+    } );
+  </script>
+
+{% endblock javascript %}
+
 {% block record %}
 
   {{ parent() }}
