@@ -133,6 +133,7 @@ class phone_edit extends \cenozo\ui\push\base_edit
 
       if( array_key_exists( 'columns', $args['noid'] ) &&
           array_key_exists( 'address', $args['noid']['columns'] ) &&
+          is_array( $args['noid']['columns']['address'] ) &&
           array_key_exists( 'participant_id', $args['noid']['columns']['address'] ) )
       {
         unset( $args['noid']['columns']['address']['participant_id'] );
