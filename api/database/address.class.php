@@ -99,13 +99,17 @@ class address extends \cenozo\database\has_rank
     $unique_key_array = parent::get_unique_from_primary_key( $key );
 
     $record = new static( $key );
-    $db_participant = $record->get_person()->get_participant();
-    if( !is_null( $db_participant ) )
+    $db_person = $record->get_person();
+    if( !is_null( $db_person ) )
     {
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $unique_key_array['participant_id'] =
-        $participant_class_name::get_unique_from_primary_key( $db_participant->id );
-      unset( $unique_key_array['person_id'] );
+      $db_participant = $db_person->get_participant();
+      if( !is_null( $db_participant ) )
+      {
+        $participant_class_name = lib::get_class_name( 'database\participant' );
+        $unique_key_array['participant_id'] =
+          $participant_class_name::get_unique_from_primary_key( $db_participant->id );
+        unset( $unique_key_array['person_id'] );
+      }
     }
 
     return $unique_key_array;

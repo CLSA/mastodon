@@ -121,7 +121,7 @@ class participant_list extends \cenozo\ui\pull\base_list
             $key = $class_name::get_unique_from_primary_key( $record->$column_name );
 
             // convert person keys to participant keys
-            if( array_key_exists( 'person_id', $key ) )
+            if( is_array( $key ) && array_key_exists( 'person_id', $key ) )
             {
               // replace person key with participant key
               $participant_id = $record->get_person()->get_participant()->id;
