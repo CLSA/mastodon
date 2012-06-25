@@ -98,6 +98,7 @@ class user_new extends \cenozo\ui\push\user_new
       $this->machine_arguments['noid']['columns'] =
         !is_null( $columns ) && 'comprehensive' == $columns['site']['cohort'] ? $columns : NULL;
       $this->set_machine_request_url( BEARTOOTH_URL );
+      $this->use_machine_credentials( true );
       parent::send_machine_request();
     }
 
@@ -106,6 +107,7 @@ class user_new extends \cenozo\ui\push\user_new
       $this->machine_arguments['noid']['columns'] =
         !is_null( $columns ) && 'tracking' == $columns['site']['cohort'] ? $columns : NULL;
       $this->set_machine_request_url( SABRETOOTH_URL );
+      $this->use_machine_credentials( true );
       parent::send_machine_request();
     }
   }

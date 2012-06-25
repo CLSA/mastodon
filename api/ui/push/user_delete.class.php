@@ -70,12 +70,14 @@ class user_delete extends \cenozo\ui\push\user_delete
     if( 'beartooth' != $this->get_machine_application_name() )
     {
       $this->set_machine_request_url( BEARTOOTH_URL );
+      $this->use_machine_credentials( true );
       parent::send_machine_request();
     }
 
     if( 'sabretooth' != $this->get_machine_application_name() )
     {
       $this->set_machine_request_url( SABRETOOTH_URL );
+      $this->use_machine_credentials( true );
       parent::send_machine_request();
     }
   }
