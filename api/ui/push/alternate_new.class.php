@@ -61,6 +61,8 @@ class alternate_new extends \cenozo\ui\push\base_new
 
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
 
+    $columns = $this->get_argument( 'columns' );
+
     // special case: replace alternate's with the same first/last name
     $alternate_mod = lib::create( 'database\modifier' );
     $alternate_mod->where( 'participant_id', '=', $columns['participant_id'] );
