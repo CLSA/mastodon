@@ -986,6 +986,18 @@ SET role_id = ( SELECT id FROM role WHERE name = "onyx" ),
 
 -- -----------------------------------------------------
 -- -----------------------------------------------------
+INSERT INTO role( name ) VALUES( "opal" );
+
+-- opal (specific to this role)
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id
+FROM role, operation
+WHERE role.name = "opal"
+AND operation.subject = "opal";
+
+
+-- -----------------------------------------------------
+-- -----------------------------------------------------
 INSERT INTO role( name ) VALUES( "operator" );
 
 -- operator (specific to this role)
