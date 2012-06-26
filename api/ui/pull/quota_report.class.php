@@ -199,7 +199,11 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->data = $this->report->get_file( $this->get_argument( 'format' ) );
   }
 
-  // TODO: document
+  /**
+   * An internal array which holds all of the data used by the report
+   * @var array
+   * @access private
+   */
   private $population_data;
 }
 ?>
