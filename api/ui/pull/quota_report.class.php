@@ -170,8 +170,6 @@ class quota_report extends \cenozo\ui\pull\base_report
       {
         foreach( $age_data as $column => $gender_data )
         {
-          log::debug( $column );
-          log::debug( $gender_data );
           $this->report->set_cell( $column.$row, $gender_data['male'], false );
           $this->report->set_cell( $column.( $row + 1 ), $gender_data['female'], false );
         }
