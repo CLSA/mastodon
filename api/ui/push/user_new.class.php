@@ -72,7 +72,9 @@ class user_new extends \cenozo\ui\push\user_new
     $args = parent::convert_to_noid( $args );
 
     // remove typist from the role list, if it exists
-    if( 'typist' == $args['noid']['columns']['role']['name'] ) unset( $args['noid']['columns'] );
+    if( array_key_exists( 'columns', $args['noid'] ) &&
+        array_key_exists( 'role', $args['noid']['columns'] ) &&
+        'typist' == $args['noid']['columns']['role']['name'] ) unset( $args['noid']['columns'] );
 
     return $args;
   }
