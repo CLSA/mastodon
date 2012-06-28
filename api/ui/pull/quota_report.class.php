@@ -48,6 +48,21 @@ class quota_report extends \cenozo\ui\pull\base_report
 
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
+    $restrict_start_date = $this->get_argument( 'restrict_start_date' );
+    $restrict_end_date = $this->get_argument( 'restrict_end_date' );
+    $start_datetime_obj = NULL;
+    $end_datetime_obj = NULL;
+
+    if( $restrict_start_date )
+      $start_datetime_obj = util::get_datetime_object( $restrict_start_date );
+    if( $restrict_end_date )
+      $end_datetime_obj = util::get_datetime_object( $restrict_end_date );
+    if( $restrict_start_date && $restrict_end_date && $end_datetime_obj < $start_datetime_obj )
+    {   
+      $temp_datetime_obj = clone $start_datetime_obj;
+      $start_datetime_obj = clone $end_datetime_obj;
+      $end_datetime_obj = clone $temp_datetime_obj;
+    }   
 
     // loop through all quotas by region, age group and gender
     $quota_mod = lib::create( 'database\modifier' );
@@ -65,6 +80,12 @@ class quota_report extends \cenozo\ui\pull\base_report
       $pull_mod = lib::create( 'database\modifier' );
       $pull_mod->where( 'age_group.lower', '=', $db_quota->get_age_group()->lower );
       $pull_mod->where( 'gender', '=', $db_quota->gender );
+      if( !is_null( $start_datetime_obj ) )
+        $pull_mod->where( 'DATE( participant.create_timestamp )', '>=',
+          $start_datetime_obj->format( 'Y-m-d' ) );
+      if( !is_null( $end_datetime_obj ) )
+        $pull_mod->where( 'DATE( participant.create_timestamp )', '<=',
+          $end_datetime_obj->format( 'Y-m-d' ) );
       if( !is_null( $db_source ) ) $pull_mod->where( 'source_id', '=', $db_source->id );
 
       // pre-recruit (total participants)
@@ -73,6 +94,12 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
       $participant_mod->where( 'gender', '=', $db_quota->gender );
       $participant_mod->where( 'cohort', '=', $db_quota->cohort );
+      if( !is_null( $start_datetime_obj ) )
+        $participant_mod->where( 'DATE( participant.create_timestamp )', '>=',
+          $start_datetime_obj->format( 'Y-m-d' ) );
+      if( !is_null( $end_datetime_obj ) )
+        $participant_mod->where( 'DATE( participant.create_timestamp )', '<=',
+          $end_datetime_obj->format( 'Y-m-d' ) );
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -85,6 +112,12 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
       $participant_mod->where( 'gender', '=', $db_quota->gender );
       $participant_mod->where( 'cohort', '=', $db_quota->cohort );
+      if( !is_null( $start_datetime_obj ) )
+        $participant_mod->where( 'DATE( participant.create_timestamp )', '>=',
+          $start_datetime_obj->format( 'Y-m-d' ) );
+      if( !is_null( $end_datetime_obj ) )
+        $participant_mod->where( 'DATE( participant.create_timestamp )', '<=',
+          $end_datetime_obj->format( 'Y-m-d' ) );
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $participant_mod->where( 'sync_datetime', '!=', NULL );
       $this->population_data
@@ -193,6 +226,25 @@ class quota_report extends \cenozo\ui\pull\base_report
       sprintf( 'Generated on %s at %s',
                $now_datetime_obj->format( 'Y-m-d' ),
                $now_datetime_obj->format( 'H:i T' ) ) );
+
+    $restrict_start_date = $this->get_argument( 'restrict_start_date' );
+    $restrict_end_date = $this->get_argument( 'restrict_end_date' );
+
+    if( !is_null( $restrict_start_date ) && is_null( $restrict_end_date ) )
+      $this->report->set_cell( 'A3',
+        sprintf( 'Restricted to participants imported from %s',
+                 $restrict_start_date ) );
+
+    if( is_null( $restrict_start_date ) && !is_null( $restrict_end_date ) )
+      $this->report->set_cell( 'A3',
+        sprintf( 'Restricted to participants imported up to %s',
+                 $restrict_end_date ) );
+
+    if( !is_null( $restrict_start_date ) && !is_null( $restrict_end_date ) )
+      $this->report->set_cell( 'A3',
+        sprintf( 'Restricted to participants imported from %s to %s',
+                 $restrict_start_date,
+                 $restrict_end_date ) );
 
     $this->data = $this->report->get_file( $this->get_argument( 'format' ) );
   }

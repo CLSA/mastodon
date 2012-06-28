@@ -42,9 +42,12 @@ class quota_report extends base_report
     parent::prepare();
 
     $this->add_restriction( 'source' );
+    $this->add_restriction( 'dates' );
 
     $this->set_variable( 'description',
-      'This report provides a list of all age and sex quotas broken down by province.' );
+      'This report provides a list of all age and sex quotas broken down by province.  '.
+      'The date options will restrict participants based on when they were imported into '.
+      'the system.' );
   }
 }
 ?>
