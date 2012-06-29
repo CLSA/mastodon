@@ -100,6 +100,22 @@ class quota_report extends \cenozo\ui\pull\base_report
       if( !is_null( $end_datetime_obj ) )
         $participant_mod->where( 'DATE( participant.create_timestamp )', '<=',
           $end_datetime_obj->format( 'Y-m-d' ) );
+      if( !is_null( $start_datetime_obj ) )
+      {
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
+        $participant_mod->or_where( 'DATE( participant.sync_datetime )', '>=',
+          $start_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where_bracket( false );
+      }
+      if( !is_null( $end_datetime_obj ) )
+      {
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
+        $participant_mod->or_where( 'DATE( participant.sync_datetime )', '<=',
+          $end_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where_bracket( false );
+      }
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -113,10 +129,10 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'gender', '=', $db_quota->gender );
       $participant_mod->where( 'cohort', '=', $db_quota->cohort );
       if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.create_timestamp )', '>=',
+        $participant_mod->where( 'DATE( participant.sync_datetime )', '>=',
           $start_datetime_obj->format( 'Y-m-d' ) );
       if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.create_timestamp )', '<=',
+        $participant_mod->where( 'DATE( participant.sync_datetime )', '<=',
           $end_datetime_obj->format( 'Y-m-d' ) );
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $participant_mod->where( 'sync_datetime', '!=', NULL );
