@@ -55,13 +55,14 @@ class consent_form extends base_form
     }
     else
     { // no duplicate, create a new consent record
-      $db_consent = lib::create( 'database\consent' );
-      $db_consent->participant_id = $db_participant->id;
-      $db_consent->event =
-        sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
-      $db_consent->date = util::get_datetime_object()->format( 'Y-m-d' );
-      $db_consent->note = 'Imported by data entry system.';
-      $db_consent->save();
+      $event = sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
+      $columns = array( 'participant_id' => $db_participant->id,
+                        'event' => $event,
+                        'date' => util::get_datetime_object()->format( 'Y-m-d' ),
+                        'note' => 'Imported by data entry system.' );
+      $args = array( 'columns' => $columns );
+      $db_operation = lib::create( 'ui\push\consent_new', $args );
+      $db_operation->process();
     }
 
     // import the data to the hin table

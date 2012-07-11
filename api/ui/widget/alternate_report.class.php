@@ -28,20 +28,22 @@ class alternate_report extends base_report
   public function __construct( $args )
   {
     parent::__construct( 'alternate', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
 
     $this->set_variable( 'description',
       'This report provides a list of all participants who have an alternate contact with '.
       'missing, incomplete or invalid information.' );
-  }
-
-  /**
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function finish()
-  {
-    parent::finish();
-    $this->finish_setting_parameters();
   }
 }
 ?>

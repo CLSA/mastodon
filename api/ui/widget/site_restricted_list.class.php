@@ -29,6 +29,18 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   public function __construct( $subject, $args )
   {
     parent::__construct( $subject, $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // if restricted, show the site's name and cohort in the heading
     $predicate = is_null( $this->db_restrict_site )
@@ -36,22 +48,26 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
                : sprintf( '%s (%s)',
                           $this->db_restrict_site->name,
                           $this->db_restrict_site->cohort );
-    $this->set_heading( $this->get_heading().' for '.$predicate );
+
+    $this->set_heading( $this->get_subject().' list for '.$predicate );
   }
   
   /**
-   * Set the rows array needed by the template.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    // we're restricting to a site, so remove the cohort column
-    if( !is_null( $this->db_restrict_site ) ) $this->remove_column( 'cohort' );
+    parent::setup();
 
-    // this has to be done AFTER the remove_column() call above
-    parent::finish();
+    // we're restricting to a site, so remove the site and cohort columns
+    if( !is_null( $this->db_restrict_site ) )
+    {
+      $this->remove_column( 'site' );
+      $this->remove_column( 'cohort' );
+    }
 
     if( static::may_restrict() )
     {

@@ -28,6 +28,18 @@ class participant_add extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'add', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
 
     $class_name = lib::get_class_name( 'database\participant' );
     $this->new_uid = $class_name::get_new_uid();
@@ -44,21 +56,20 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
     $this->add_item( 'person_id', 'hidden' );
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
@@ -97,13 +108,10 @@ class participant_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'language', '', false, $languages );
     $this->set_item( 'email', '' );
     $this->set_item( 'status', '', false, $statuses );
-    $this->set_item( 'eligible', true, true );
     $this->set_item( 'no_in_home', false, true );
     $this->set_item( 'prior_contact_date', '' );
-    // this particular entry is filled in during the push in particpant_lib::create( 'ui\widget\finish' )
+    // this particular entry is filled in by the push/participant_new operation
     $this->set_item( 'person_id', 0 );
-
-    $this->finish_setting_items();
   }
 
   /**

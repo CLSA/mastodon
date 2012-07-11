@@ -32,9 +32,20 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
   }
 
   /**
+   * This method executes the operation's purpose.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function execute()
+  {
+    $this->data = $this->get_record()->scan;
+  }
+
+  /**
    * Returns the file name for the form.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return string
+   * @return int
    * @access public
    */
   public function get_file_name()
@@ -45,23 +56,11 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
   /**
    * Returns the file data type (extension) for the form (always pdf)
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return string
    * @access public
    */
   public function get_data_type()
   {
     return 'pdf';
-  }
-
-  /**
-   * Returns the form's scan.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return binary string
-   * @access public
-   */
-  public function finish()
-  {
-    return $this->get_record()->scan;
   }
 
   /**

@@ -33,14 +33,14 @@ abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     // if a uid field exists then automatically display the associated user as a note
     $form_entry_class_name = lib::get_class_name( sprintf( 'database\%s', $this->get_subject() ) );
@@ -62,7 +62,8 @@ abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
     // validate the entry and insert error values as notes
     $args = array( 'id' => $this->get_argument( 'id' ) );
     $operation = lib::create( sprintf( 'ui\pull\%s_validate', $this->get_subject() ), $args );
-    $errors = $operation->finish();
+    $operation->process();
+    $errors = $operation->get_data();
     foreach( $errors as $type => $error ) $this->set_note( $type, $error, true );
 
     // get the form's subject

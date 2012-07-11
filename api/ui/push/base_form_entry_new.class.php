@@ -45,9 +45,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     $semaphore = sem_get( getmyinode() );
     if( !sem_acquire( $semaphore ) )
     {
-      log::err( sprintf(
-        'Unable to aquire semaphore for user id %d',
-        $session->get_user()->id ) );
+      log::err( sprintf( 'Unable to aquire semaphore for user "%s"', $db_user()->name ) );
       throw lib::create( 'exception\notice',
         'The server is busy, please wait a few seconds then click the refresh button.',
         __METHOD__ );
@@ -83,11 +81,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
 
     // release the semaphore
     if( !sem_release( $semaphore ) )
-    {
-      log::err( sprintf(
-        'Unable to release semaphore for user id %d',
-        $session->get_user()->id ) );
-    }
+      log::err( sprintf( 'Unable to release semaphore for user %s', $db_user->name ) );
   }
 
   /**

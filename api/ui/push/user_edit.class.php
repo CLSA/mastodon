@@ -19,31 +19,67 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class user_edit extends \cenozo\ui\push\user_edit
 {
   /**
-   * Constructor.
+   * Processes arguments, preparing them for the operation.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args Push arguments
-   * @access public
+   * @access protected
    */
-  public function __construct( $args )
+  protected function prepare()
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
+    parent::prepare();
 
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'user.name', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      
-      $class_name = lib::get_class_name( 'database\user' );
-      $db_user = $class_name::get_unique_record( 'name', $noid['user.name'] );
-      if( !$db_user ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_user->id;
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    if( $this->get_machine_request_received() && $this->get_machine_request_enabled() )
+      $this->machine_arguments = $this->convert_to_noid( $this->arguments );
+  }
+
+  /**
+   * Override the parent method to send a machine request even if the request was
+   * received by a machine.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function finish()
+  {
+    parent::finish();
+
+    if( $this->get_machine_request_received() && $this->get_machine_request_enabled() )
+      $this->send_machine_request();
+  }
+
+  /**
+   * Override the parent method to send a request to both Beartooth and Sabretooth
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function send_machine_request()
+  {
+    if( 'beartooth' != $this->get_machine_application_name() )
+    {
+      $this->set_machine_request_url( BEARTOOTH_URL );
+      $this->use_machine_credentials( true );
+      parent::send_machine_request();
     }
 
-    parent::__construct( $args );
+    if( 'sabretooth' != $this->get_machine_application_name() )
+    {
+      $this->set_machine_request_url( SABRETOOTH_URL );
+      $this->use_machine_credentials( true );
+      parent::send_machine_request();
+    }
   }
 }
 ?>

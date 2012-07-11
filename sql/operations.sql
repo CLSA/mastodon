@@ -178,6 +178,10 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_alternate", true, "Retrieves a list of a participant's alternates." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "list_consent", true, "Retrieves a list of participant's consent information." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "site_reassign", true, "A form to mass reassign the preferred site of multiple participants at once." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "participant", "site_reassign", true, "Updates the preferred site of a group of participants." );
 
 -- phone
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -232,5 +236,9 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "alternate", "report", true, "Set up a alternate report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "alternate", "report", true, "Download a alternate report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "report", true, "Set up a quota report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "quota", "report", true, "Download a quota report." );
 
 COMMIT;

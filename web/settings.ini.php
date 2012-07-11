@@ -11,13 +11,23 @@ global $SETTINGS;
 
 // tagged version
 $SETTINGS['general']['application_name'] = 'mastodon';
-$SETTINGS['general']['version'] = '1.1.2';
+$SETTINGS['general']['version'] = '1.1.3';
 
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;
 
+// Defines the username and password used by mastodon when communicating as a machine
+$SETTINGS['general']['machine_user'] = 'mastodon';
+$SETTINGS['general']['machine_password'] = '1qaz2wsx';
+
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
+
+// the url to Sabretooth (set to NULL to disable Sabretooth support)
+$SETTINGS['url']['SABRETOOTH'] = NULL;
+
+// the url to Beartooth (set to NULL to disable Mastodon support)
+$SETTINGS['url']['BEARTOOTH'] = NULL;
 
 // the location of new consent forms which need to be processed
 $SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';

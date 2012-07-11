@@ -30,23 +30,41 @@ class mailout_report extends \cenozo\ui\pull\base_report
     parent::__construct( 'mailout', $args );
   }
 
-  public function finish()
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Dean Inglis <inglisd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
   {
+    parent::setup();
+
     // get the report arguments
     $cohort = $this->get_argument( 'restrict_cohort' );
-    $db_source = lib::create( 'database\source', $this->get_argument( 'restrict_source_id' ) );
+    $source_id = $this->get_argument( 'restrict_source_id' );
+    $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
-    $this->add_title( 
-      sprintf( 'List of all %s participant whose source is %s and require a package mailed out.',
-               $cohort,
-               $db_source->name ) );
+    if( is_null( $db_source ) )
+    {
+      $this->add_title( 
+        sprintf( 'List of all %s participant who require a package mailed out.',
+                 $cohort ) );
+    }
+    else
+    {
+      $this->add_title( 
+        sprintf( 'List of all %s participant whose source is %s and require a package mailed out.',
+                 $cohort,
+                 $db_source->name ) );
+    }
     
     // modifiers common to each iteration of the following loops
     $participant_mod = lib::create( 'database\modifier' );
     $participant_mod->where( 'cohort', '=', $cohort );
-    $participant_mod->where( 'source_id', '=', $db_source->id );
+    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
 
     $contents = array();
     $participant_list =
@@ -101,8 +119,6 @@ class mailout_report extends \cenozo\ui\pull\base_report
       'Age' );
     
     $this->add_table( NULL, $header, $contents, NULL );
-
-    return parent::finish();
   }
 }
 ?>

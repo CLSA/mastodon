@@ -29,18 +29,18 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
   {
     parent::__construct( $form_type.'_form', 'adjudicate', $args );
     $this->form_type = $form_type;
-
-    // make sure we have an id (we don't actually need to use it since the parent does)
-    $this->get_argument( 'id' );
   }
 
   /**
-   * Processes the adjudication of the form's two entries
+   * This method executes the operation's purpose.
+   * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
+    parent::execute();
+
     $columns = $this->get_argument( 'columns' );
 
     // there has to be 2 non-deferred entries for this form

@@ -28,6 +28,18 @@ class proxy_form_view extends base_form_view
   public function __construct( $args )
   {
     parent::__construct( 'proxy_form', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
 
     // add entry values
     $this->add_item( 'uid', 'CLSA ID' ); 

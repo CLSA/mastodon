@@ -31,14 +31,26 @@ class import_add extends \cenozo\ui\widget
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Processes arguments, preparing them for the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @throws exception\notice
+   * @access protected
    */
-  public function finish()
+  protected function prepare()
   {
-    parent::finish();
+    parent::prepare();
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
 
     $md5 = $this->get_argument( 'md5', false );
     $this->set_variable( 'md5', $md5 );

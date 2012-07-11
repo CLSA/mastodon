@@ -28,99 +28,75 @@ class participant_view extends \cenozo\ui\widget\base_view
   public function __construct( $args )
   {
     parent::__construct( 'participant', 'view', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     // create an associative array with everything we want to display about the participant
     $this->add_item( 'active', 'boolean', 'Active' );
     $this->add_item( 'uid', 'constant', 'Unique ID' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
-    $this->add_item( 'source_id', 'enum', 'Source' );
+    $this->add_item( 'source', 'constant', 'Source' );
     $this->add_item( 'cohort', 'constant', 'Cohort' );
     $this->add_item( 'default_site', 'constant', 'Default Site' );
     $this->add_item( 'site_id', 'enum', 'Prefered Site' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
+    $this->add_item( 'age_group', 'constant', 'Age Group' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'eligible', 'boolean', 'Eligible' );
     $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
 
-    try
-    {
-      // create the address sub-list widget
-      $this->address_list = lib::create( 'ui\widget\address_list', $args );
-      $this->address_list->set_parent( $this );
-      $this->address_list->set_heading( 'Addresses' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->address_list = NULL;
-    }
+    // create the address sub-list widget
+    $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
+    $this->address_list->set_parent( $this );
+    $this->address_list->set_heading( 'Addresses' );
 
-    try
-    {
-      // create the phone sub-list widget
-      $this->phone_list = lib::create( 'ui\widget\phone_list', $args );
-      $this->phone_list->set_parent( $this );
-      $this->phone_list->set_heading( 'Phone numbers' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->phone_list = NULL;
-    }
+    // create the phone sub-list widget
+    $this->phone_list = lib::create( 'ui\widget\phone_list', $this->arguments );
+    $this->phone_list->set_parent( $this );
+    $this->phone_list->set_heading( 'Phone numbers' );
 
-    try
-    {
-      // create the availability sub-list widget
-      $this->availability_list = lib::create( 'ui\widget\availability_list', $args );
-      $this->availability_list->set_parent( $this );
-      $this->availability_list->set_heading( 'Availability' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->availability_list = NULL;
-    }
+    // create the availability sub-list widget
+    $this->availability_list = lib::create( 'ui\widget\availability_list', $this->arguments );
+    $this->availability_list->set_parent( $this );
+    $this->availability_list->set_heading( 'Availability' );
 
-    try
-    {
-      // create the consent sub-list widget
-      $this->consent_list = lib::create( 'ui\widget\consent_list', $args );
-      $this->consent_list->set_parent( $this );
-      $this->consent_list->set_heading( 'Consent information' );
-    }
-    catch( \cenzo\exception\permission $e )
-    {
-      $this->consent_list = NULL;
-    }
+    // create the consent sub-list widget
+    $this->consent_list = lib::create( 'ui\widget\consent_list', $this->arguments );
+    $this->consent_list->set_parent( $this );
+    $this->consent_list->set_heading( 'Consent information' );
 
-    try
-    {
-      // create the alternate sub-list widget
-      $this->alternate_list = lib::create( 'ui\widget\alternate_list', $args );
-      $this->alternate_list->set_parent( $this );
-      $this->alternate_list->set_heading( 'Alternate contacts' );
-    }
-    catch( \cenozo\exception\permission $e )
-    {
-      $this->alternate_list = NULL;
-    }
+    // create the alternate sub-list widget
+    $this->alternate_list = lib::create( 'ui\widget\alternate_list', $this->arguments );
+    $this->alternate_list->set_parent( $this );
+    $this->alternate_list->set_heading( 'Alternate contacts' );
   }
 
   /**
    * Finish setting the variables in a widget.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
 
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $source_class_name = lib::get_class_name( 'database\source' );
     $record = $this->get_record();
 
     $sites = array();
@@ -131,9 +107,6 @@ class participant_view extends \cenozo\ui\widget\base_view
       $sites[$db_site->id] = $db_site->name;
     $db_site = $record->get_site();
     $site_id = is_null( $db_site ) ? '' : $db_site->id;
-    $sources = array();
-    foreach( $source_class_name::select() as $db_source )
-      $sources[$db_source->id] = $db_source->name;
     $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
     $languages = $participant_class_name::get_enum_values( 'language' );
@@ -141,21 +114,31 @@ class participant_view extends \cenozo\ui\widget\base_view
     $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
 
+    $db_default_site = $this->get_record()->get_default_site();
+    $default_site = is_null( $db_default_site ) ? 'None' : $db_default_site->name;
+
+    $age_group = '';
+    if( !is_null( $record->age_group_id ) )
+    {
+      $db_age_group = lib::create( 'database\age_group', $record->age_group_id );
+      $age_group = sprintf( '%d to %d', $db_age_group->lower, $db_age_group->upper );
+    }
+
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
     $this->set_item( 'first_name', $record->first_name );
     $this->set_item( 'last_name', $record->last_name );
-    $this->set_item( 'source_id', $record->source_id, false, $sources );
+    $this->set_item( 'source', $record->get_source()->name );
     $this->set_item( 'cohort', $record->cohort );
-    $this->set_item( 'default_site', $record->get_default_site()->name );
+    $this->set_item( 'default_site', $default_site );
     $this->set_item( 'site_id', $site_id, false, $sites );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
+    $this->set_item( 'age_group', $age_group );
     $this->set_item( 'language', $record->language, false, $languages );
     $this->set_item( 'email', $record->email, false );
     $this->set_item( 'status', $record->status, false, $statuses );
-    $this->set_item( 'eligible', $record->eligible, true );
     $this->set_item( 'no_in_home', $record->no_in_home, true );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
 
@@ -166,37 +149,40 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_action( 'contact_form', 'Contact Form', NULL,
       'Download this participant\'s contact form, if available' );
 
-    $this->finish_setting_items();
-
-    if( !is_null( $this->address_list ) )
+    try
     {
-      $this->address_list->finish();
+      $this->address_list->process();
       $this->set_variable( 'address_list', $this->address_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->phone_list ) )
+    try
     {
-      $this->phone_list->finish();
+      $this->phone_list->process();
       $this->set_variable( 'phone_list', $this->phone_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->availability_list ) )
+    try
     {
-      $this->availability_list->finish();
+      $this->availability_list->process();
       $this->set_variable( 'availability_list', $this->availability_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->consent_list ) )
+    try
     {
-      $this->consent_list->finish();
+      $this->consent_list->process();
       $this->set_variable( 'consent_list', $this->consent_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
 
-    if( !is_null( $this->alternate_list ) )
+    try
     {
-      $this->alternate_list->finish();
+      $this->alternate_list->process();
       $this->set_variable( 'alternate_list', $this->alternate_list->get_variables() );
     }
+    catch( \cenozo\exception\permission $e ) {}
   }
   
   /**

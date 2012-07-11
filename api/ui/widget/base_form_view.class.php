@@ -33,11 +33,20 @@ abstract class base_form_view
   public function __construct( $subject, $args )
   {
     parent::__construct( $subject, 'view', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
     
     $id = $this->get_argument( 'id' );
-
-    // determine properties based on the current user's permissions
-    $session = lib::create( 'business\session' );
 
     $this->set_heading( sprintf( 'Viewing %s #%d', $this->get_subject(), $id ) );
 
@@ -53,31 +62,15 @@ abstract class base_form_view
   }
   
   /**
-   * Finish setting the variables in a widget.
+   * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function setup()
   {
-    parent::finish();
+    parent::setup();
     
-    // validate the entries
-    $error_list_1 = array();
-    if( !is_null( $this->form_entry_1 ) )
-    {
-      $args = array( 'id' => $this->form_entry_1->id );
-      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_1 = $operation->finish();
-    }
-    $error_list_2 = array();
-    if( !is_null( $this->form_entry_2 ) )
-    {
-      $args = array( 'id' => $this->form_entry_2->id );
-      $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_2 = $operation->finish();
-    }
-
     $operation_class_name = lib::get_class_name( 'database\operation' );
 
     // add in form actions
@@ -98,7 +91,8 @@ abstract class base_form_view
 
       $args = array( 'id' => $this->form_entry_1->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_1 = $operation->finish();
+      $operation->process();
+      $error_list_1 = $operation->get_data();
     }
     $error_list_2 = array();
     if( !is_null( $this->form_entry_2 ) )
@@ -109,7 +103,8 @@ abstract class base_form_view
 
       $args = array( 'id' => $this->form_entry_2->id );
       $operation = lib::create( sprintf( 'ui\pull\%s_entry_validate', $this->get_subject() ), $args );
-      $error_list_2 = $operation->finish();
+      $operation->process();
+      $error_list_2 = $operation->get_data();
     }
 
     foreach( $this->items as $item_id => $item )

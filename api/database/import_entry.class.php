@@ -111,6 +111,7 @@ class import_entry extends \cenozo\database\record
     
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $region_class_name = lib::get_class_name( 'database\region' );
     $site_class_name = lib::get_class_name( 'database\site' );
 
@@ -127,6 +128,14 @@ class import_entry extends \cenozo\database\record
       'There are no new UIDs available, please report this to an administrator immediately!',
       __METHOD__ );
     
+    // get the age group based on the date of birth
+    $interval = util::get_interval( $this->date_of_birth );
+    $age_group_mod = lib::create( 'database\modifier' );
+    $age_group_mod->where( 'lower', '<=', $interval->y );
+    $age_group_mod->where( 'upper', '>', $interval->y );
+    $age_group_list = $age_group_class_name::select( $age_group_mod );
+    $db_age_group = current( $age_group_list );
+
     // import data to the person and participant tables
     $db_person = lib::create( 'database\person' );
     $db_person->save();
@@ -141,7 +150,7 @@ class import_entry extends \cenozo\database\record
     $db_participant->last_name = $this->last_name;
     $db_participant->gender = $this->gender;
     $db_participant->date_of_birth = $this->date_of_birth;
-    $db_participant->eligible = true;
+    if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
     $db_participant->status = NULL;
     $db_participant->language = $this->language;
     $db_participant->no_in_home = false;

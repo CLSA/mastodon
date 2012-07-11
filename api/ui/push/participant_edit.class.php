@@ -26,36 +26,47 @@ class participant_edit extends \cenozo\ui\push\base_edit
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $site_class_name = lib::get_class_name( 'database\site' );
-
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $args['id'] = $db_participant->id;
-
-      if( is_array( $noid ) &&
-          array_key_exists( 'site.name', $noid ) &&
-          array_key_exists( 'site.cohort', $noid ) )
-      {
-        $db_site = $site_class_name::get_unique_record(
-          array( 'name', 'cohort' ),
-          array( $noid['site.name'], $noid['site.cohort'] ) );
-        $args['columns']['site_id'] = $db_site->id;
-      }
-    }
-
     parent::__construct( 'participant', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    // only send a machine request if the participant has been synched
+    $this->set_machine_request_enabled(
+      !is_null( $this->get_record()->sync_datetime ) );
+    $this->set_machine_request_url(
+      'comprehensive' == $this->get_record()->cohort ? BEARTOOTH_URL : SABRETOOTH_URL );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    if( $this->get_machine_request_enabled() )
+    {
+      $columns = $this->get_argument( 'columns', array() );
+
+      // don't send certain information
+      if( array_key_exists( 'cohort', $columns ) ||
+          array_key_exists( 'no_in_home', $columns ) ||
+          array_key_exists( 'use_informant', $columns ) ||
+          array_key_exists( 'email', $columns ) )
+        $this->set_machine_request_enabled( false );
+    }
   }
 }
 ?>

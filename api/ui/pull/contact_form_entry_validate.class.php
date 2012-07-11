@@ -30,14 +30,15 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * This method executes the operation's purpose.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return associative array
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
+    parent::execute();
+
     $record = $this->get_record();
     $errors = array();
 
@@ -148,7 +149,7 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     if( is_null( $record->cohort ) )
       $errors['cohort'] = 'This value cannot be left blank.';
 
-    return $errors;
+    $this->data = $errors;
   }
 
   /**

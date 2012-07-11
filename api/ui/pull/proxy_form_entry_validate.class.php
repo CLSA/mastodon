@@ -30,14 +30,15 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * This method executes the operation's purpose.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return associative array
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function execute()
   {
+    parent::execute();
+
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $postcode_class_name = lib::get_class_name( 'database\postcode' );
     $errors = array();
@@ -173,7 +174,7 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['informant_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
-    return $errors;
+    $this->data = $errors;
   }
 
   /**

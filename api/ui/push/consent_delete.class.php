@@ -25,38 +25,25 @@ class consent_delete extends \cenozo\ui\push\base_delete
    */
   public function __construct( $args )
   {
-    if( array_key_exists( 'noid', $args ) )
-    {
-      // use the noid argument and remove it from the args input
-      $noid = $args['noid'];
-      unset( $args['noid'] );
-
-      // make sure there is sufficient information
-      if( !is_array( $noid ) ||
-          !array_key_exists( 'participant.uid', $noid ) ||
-          !array_key_exists( 'consent.event', $noid ) ||
-          !array_key_exists( 'consent.date', $noid ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $participant_class_name = lib::get_class_name( 'database\participant' );
-      $db_participant =
-        $participant_class_name::get_unique_record( 'uid', $noid['participant.uid'] );
-      if( !$db_participant ) throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-
-      $consent_mod = lib::create( 'database\modifier' );
-      $consent_mod->where( 'participant_id', '=', $db_participant->id );
-      $consent_mod->where( 'event', '=', $noid['consent.event'] );
-      $consent_mod->where( 'date', '=', $noid['consent.date'] );
-
-      $consent_class_name = lib::get_class_name( 'database\consent' );
-      $consent_list = $consent_class_name::select( $consent_mod );
-      if( 0 == count( $consent_list ) )
-        throw lib::create( 'exception\argument', 'noid', $noid, __METHOD__ );
-      $db_consent = current( $consent_list );
-      $args['id'] = $db_consent->id;
-    }
-
     parent::__construct( 'consent', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    // only send a machine request if the participant has been synched
+    $db_participant = $this->get_record()->get_participant();
+    $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
+    $this->set_machine_request_url( !is_null( $db_participant )
+         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
+         : NULL );
   }
 }
 ?>
