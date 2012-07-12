@@ -103,7 +103,8 @@ class proxy_form_new extends \cenozo\ui\push\base_new
       // validate the entry
       $op_validate = lib::create( 'ui\pull\proxy_form_entry_validate',
                                   array( 'id' => $db_proxy_form_entry->id ) );
-      $errors = $op_validate->finish();
+      $op_validate->process();
+      $errors = $op_validate->get_data();
 
       // no errors, so import the entry
       if( 0 == count( $errors ) ) $this->get_record()->import( $db_proxy_form_entry );
