@@ -47,7 +47,6 @@ class consent_form_entry_view extends base_form_entry_view
     $this->add_item( 'option_2', 'boolean', 'Option #2' );
     $this->add_item( 'signed', 'boolean', 'Signed' );
     $this->add_item( 'date', 'date', 'Date Signed' );
-    $this->add_item( 'note', 'text', 'Note' );
   }
 
   /**
@@ -66,7 +65,6 @@ class consent_form_entry_view extends base_form_entry_view
     $this->set_item( 'option_2', $this->get_record()->option_2, true );
     $this->set_item( 'signed', $this->get_record()->signed, true );
     $this->set_item( 'date', $this->get_record()->date, false );
-    $this->set_item( 'note', $this->get_record()->note, false );
   }
 }
 ?>
