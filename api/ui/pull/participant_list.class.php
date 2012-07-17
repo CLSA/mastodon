@@ -114,7 +114,7 @@ class participant_list extends \cenozo\ui\pull\base_list
             'person_id' != $column_name &&
             'participant_id' != $column_name )
         {
-          if( '_id' == substr( $column_name, -3 ) )
+          if( '_id' == substr( $column_name, -3 ) && !is_null( $record->$column_name ) )
           {
             $subject = substr( $column_name, 0, -3 );
             $class_name = lib::get_class_name( 'database\\'.$subject );
