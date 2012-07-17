@@ -109,28 +109,57 @@ abstract class base_form_view
 
     foreach( $this->items as $item_id => $item )
     {
-      $this->items[$item_id]['entry_1'] = is_null( $this->form_entry_1 )
-        ? array( 'user' => 'n/a',
-                 'error' => false,
-                 'value' => '(no value)' )
-        : array( 'user' => sprintf( '%s%s',
-                                    $this->form_entry_1->get_user()->name,
-                                    $this->form_entry_1->deferred ? ' (deferred)' : '' ),
-                 'error' => array_key_exists( $item_id, $error_list_1 )
-                          ? $error_list_1[$item_id] : false,
-                 'value' => is_null( $this->form_entry_1->$item_id )
-                          ? '(no value)' : $this->form_entry_1->$item_id );
-      $this->items[$item_id]['entry_2'] = is_null( $this->form_entry_2 )
-        ? array( 'user' => 'n/a',
-                 'error' => false,
-                 'value' => '(no value)' )
-        : array( 'user' => sprintf( '%s%s',
-                                    $this->form_entry_2->get_user()->name,
-                                    $this->form_entry_2->deferred ? ' (deferred)' : '' ),
-                 'error' => array_key_exists( $item_id, $error_list_2 )
-                          ? $error_list_2[$item_id] : false,
-                 'value' => is_null( $this->form_entry_2->$item_id ) 
-                          ? '(no value)' : $this->form_entry_2->$item_id );
+      // get the user, error and value for the first entry
+      $entry = array( 'user' => 'n/a',
+                      'error' => false,
+                      'value' => '(no value)' );
+      if( !is_null( $this->form_entry_1 ) )
+      {
+        $entry['user'] = sprintf( '%s%s',
+                                  $this->form_entry_1->get_user()->name,
+                                  $this->form_entry_1->deferred ? ' (deferred)' : '' );
+
+        if( array_key_exists( $item_id, $error_list_1 ) )
+          $entry['error'] = $error_list_1[$item_id];
+
+        if( !is_null( $this->form_entry_1->$item_id ) )
+        {
+          if( preg_match( '/region_id/', $item_id ) )
+          {
+            $db_region = lib::create( 'database\region', $this->form_entry_1->$item_id );
+            $entry['value'] = $db_region->name.', '.$db_region->country;
+          }
+          else $entry['value'] = $this->form_entry_1->$item_id;
+        }
+      }
+      $this->items[$item_id]['entry_1'] = $entry;
+
+      // get the user, error and value for the second entry
+      $entry = array( 'user' => 'n/a',
+                      'error' => false,
+                      'value' => '(no value)' );
+      if( !is_null( $this->form_entry_2 ) )
+      {
+        $entry['user'] = sprintf( '%s%s',
+                                  $this->form_entry_2->get_user()->name,
+                                  $this->form_entry_2->deferred ? ' (deferred)' : '' );
+
+        if( array_key_exists( $item_id, $error_list_2 ) )
+          $entry['error'] = $error_list_2[$item_id];
+
+        if( !is_null( $this->form_entry_2->$item_id ) )
+        {
+          if( preg_match( '/region_id/', $item_id ) )
+          {
+            $db_region = lib::create( 'database\region', $this->form_entry_2->$item_id );
+            $entry['value'] = $db_region->name.', '.$db_region->country;
+          }
+          else $entry['value'] = $this->form_entry_2->$item_id;
+        }
+      }
+      $this->items[$item_id]['entry_2'] = $entry;
+
+      // set whether the item is in conflict
       $this->items[$item_id]['conflict'] =
         ( is_string( $this->items[$item_id]['entry_1']['value'] ) &&
           0 != strcasecmp( $this->items[$item_id]['entry_1']['value'],

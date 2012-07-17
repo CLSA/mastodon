@@ -90,12 +90,6 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
 
       if( is_null( $record->proxy_region_id ) )
         $errors['proxy_region_id'] = 'This value cannot be left blank.';
-      else
-      {
-        $db_region = lib::create( 'database\region', $record->proxy_region_id );
-        if( 'Canada' != $db_region->country )
-          $errors['proxy_region_id'] = 'The address must be in Canada.';
-      }
 
       if( is_null( $record->proxy_postcode ) )
         $errors['proxy_postcode'] = 'This value cannot be left blank.';
@@ -151,12 +145,6 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
 
       if( is_null( $record->informant_region_id ) )
         $errors['informant_region_id'] = 'This value cannot be left blank.';
-      else
-      {
-        $db_region = lib::create( 'database\region', $record->informant_region_id );
-        if( 'Canada' != $db_region->country )
-          $errors['informant_region_id'] = 'The address must be in Canada.';
-      }
 
       if( is_null( $record->informant_postcode ) )
         $errors['informant_postcode'] = 'This value cannot be left blank.';
