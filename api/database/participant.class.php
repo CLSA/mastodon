@@ -167,7 +167,7 @@ class participant extends person
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return array( database\participant )
    * @param string $event One of status.event enum types.
-   * @param boolean $missing Set to false to return participants with the event, true for those
+   * @param boolean $exists Set to true to return participants with the event, false for those
    *                without it.
    * @param modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
@@ -176,7 +176,7 @@ class participant extends person
    * @access public
    */
   public static function select_for_event(
-    $event, $missing = false, $modifier = NULL, $count = false )
+    $event, $exists = true, $modifier = NULL, $count = false )
   {
     $database_class_name = lib::get_class_name( 'database\database' );
 
@@ -188,7 +188,12 @@ class participant extends person
       'AND status.event = %s ',
       $database_class_name::format_string( $event ) );
 
-    if( $missing )
+    if( $exists )
+    {
+      // add in the COUNT function if we are counting
+      if( $count ) preg_replace( '/DISTINCT id/', 'COUNT( DISTINCT id )', $sql );
+    }
+    else
     {
       // determine the inverse (missing events) by using a sub-select
       $sql = sprintf(
@@ -196,11 +201,6 @@ class participant extends person
         'FROM participant '.
         'WHERE id NOT IN ( %s ) ',
         $sql );
-    }
-    else
-    {
-      // add in the COUNT function if we are counting
-      if( $count ) preg_replace( '/DISTINCT id/', 'COUNT( DISTINCT id )', $sql );
     }
 
     // add in the modifier if it exists
@@ -223,7 +223,7 @@ class participant extends person
    * Count all participants who have or do not have a particular event.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $event One of status.event enum types.
-   * @param boolean $missing Set to false to return participants with the event, true for those
+   * @param boolean $exists Set to true to return participants with the event, false for those
    *                without it.
    * @param modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
@@ -231,9 +231,9 @@ class participant extends person
    * @static
    * @access public
    */
-  public static function count_for_event( $event, $missing = false, $modifier = NULL )
+  public static function count_for_event( $event, $exists = true, $modifier = NULL )
   {
-    return static::select_for_event( $event, $missing, $modifier, true );
+    return static::select_for_event( $event, $exists, $modifier, true );
   }
 
   /**

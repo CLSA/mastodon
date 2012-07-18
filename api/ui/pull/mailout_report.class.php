@@ -68,7 +68,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
     $contents = array();
     $participant_list =
-      $participant_class_name::select_for_event( 'package mailed', true, $participant_mod );
+      $participant_class_name::select_for_event( 'package mailed', false, $participant_mod );
     foreach( $participant_list as $db_participant )
     {
       $db_address = $db_participant->get_first_address();
