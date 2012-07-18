@@ -46,6 +46,9 @@ class quota_report extends \cenozo\ui\pull\base_report
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $sabretooth_manager = lib::create( 'business\cenozo_manager', SABRETOOTH_URL );
 
+    // since the admin user may not actually have access to Sabretooth, use machine credentials
+    $sabretooth_manager->use_machine_credentials( true );
+
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
