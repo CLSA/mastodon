@@ -62,6 +62,9 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
   {
     parent::setup();
     
+    $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );
+    $this->set_variable( 'restrict_cohort', $restrict_cohort );
+
     $form_entry_list_method = sprintf( 'get_%s_entry_list', $this->get_subject() );
     $session = lib::create( 'business\session' );
     $db_user = $session->get_user();
