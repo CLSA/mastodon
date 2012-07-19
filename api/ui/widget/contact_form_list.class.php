@@ -50,7 +50,7 @@ class contact_form_list extends base_form_list
    * @return int
    * @access protected
    */
-  protected function determine_record_count( $modifier = NULL )
+  public function determine_record_count( $modifier = NULL )
   {
     // restrict by cohort, if necessary
     $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );
@@ -77,7 +77,7 @@ class contact_form_list extends base_form_list
    * @return array( record )
    * @access protected
    */
-  protected function determine_record_list( $modifier = NULL )
+  public function determine_record_list( $modifier = NULL )
   {
     // restrict by cohort, if necessary
     $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );

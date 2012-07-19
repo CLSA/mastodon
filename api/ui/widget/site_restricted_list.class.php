@@ -95,7 +95,7 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
    * @return int
    * @access protected
    */
-  protected function determine_record_count( $modifier = NULL )
+  public function determine_record_count( $modifier = NULL )
   {
     if( !is_null( $this->db_restrict_site ) )
     {
@@ -120,7 +120,7 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
    * @return array( record )
    * @access protected
    */
-  protected function determine_record_list( $modifier = NULL )
+  public function determine_record_list( $modifier = NULL )
   {
     if( !is_null( $this->db_restrict_site ) )
     {

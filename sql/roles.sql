@@ -842,6 +842,10 @@ SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
     operation_id = ( SELECT id FROM operation WHERE
+      type = "push" AND subject = "consent" AND name = "delete" );
+INSERT INTO role_has_operation
+SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
+    operation_id = ( SELECT id FROM operation WHERE
       type = "widget" AND subject = "consent" AND name = "add" );
 INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "interviewer" ),
@@ -982,6 +986,18 @@ INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "onyx" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "proxy_form_entry" AND name = "validate" );
+
+
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+INSERT INTO role( name ) VALUES( "opal" );
+
+-- opal (specific to this role)
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id
+FROM role, operation
+WHERE role.name = "opal"
+AND operation.subject = "opal";
 
 
 -- -----------------------------------------------------

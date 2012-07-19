@@ -79,7 +79,7 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
    * @return int
    * @access protected
    */
-  protected function determine_record_count( $modifier = NULL )
+  public function determine_record_count( $modifier = NULL )
   {
     $form_name = $this->form_type.'_form';
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$form_name );
@@ -102,7 +102,7 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
    * @return array( record )
    * @access protected
    */
-  protected function determine_record_list( $modifier = NULL )
+  public function determine_record_list( $modifier = NULL )
   {
     $form_name = $this->form_type.'_form';
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$form_name );

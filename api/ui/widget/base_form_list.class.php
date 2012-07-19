@@ -111,7 +111,7 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
    * @return int
    * @access protected
    */
-  protected function determine_record_count( $modifier = NULL )
+  public function determine_record_count( $modifier = NULL )
   {
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$this->get_subject() );
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
@@ -129,7 +129,7 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
    * @return array( record )
    * @access protected
    */
-  protected function determine_record_list( $modifier = NULL )
+  public function determine_record_list( $modifier = NULL )
   {
     $form_entry_list_class_name = lib::get_class_name( 'database\\'.$this->get_subject() );
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
