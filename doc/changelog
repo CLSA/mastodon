@@ -1,0 +1,25 @@
+====================================================================================================
+1.1.5
+====================================================================================================
+
+* Removing the "note" field from the consent form in the data entry system.
+  - Notes on consent forms are dealt with before the form goes into the data entry system ('note'
+    field no longer needed)
+
+* Allowing U.S. addresses for alternate contacts in data entry system.
+  - US ZIP codes are checked the same way as postal codes (ie: zip code must match state)
+
+* Mailout report "mailed to" option added
+  - this options makes the report produce a list of all participants who have been mailed to but
+    aren't yet synched
+
+* Various bug fixes
+
+====================================================================================================
+1.1.4
+====================================================================================================
+
+* Quota report completed
+  - There is now a quota report which describes how far along our quotas are being filled
+
+* Various bug fixes
