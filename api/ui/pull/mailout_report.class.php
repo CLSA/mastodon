@@ -71,7 +71,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     if( $mailed_to )
     {
       $participant_mod->order_desc( 'status.datetime' );
-      $participant_mod->where( 'sync_datetime', '=', false );
+      $participant_mod->where( 'sync_datetime', '=', NULL );
     }
     $participant_mod->where( 'cohort', '=', $cohort );
     if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
