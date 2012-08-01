@@ -71,7 +71,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     if( $mailed_to )
     {
       $participant_mod->order_desc( 'status.datetime' );
-      $participant_mod->where( 'sync_datetime', '=', false );
+      $participant_mod->where( 'sync_datetime', '=', NULL );
     }
     $participant_mod->where( 'cohort', '=', $cohort );
     if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
@@ -113,8 +113,10 @@ class mailout_report extends \cenozo\ui\pull\base_report
         $status_mod->order_desc( 'datetime' );
         $status_mod->limit( 1 );
         $status_list = $db_participant->get_status_list( $status_mod );
+        $db_site = $db_participant->get_primary_site();
+        $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
         $db_status = current( $status_list );
-        array_unshift( $row, $db_participant->get_primary_site()->name );
+        array_unshift( $row, $site_name );
         array_unshift( $row, strstr( $db_status->datetime, ' ', true ) );
         array_pop( $row );
       }
