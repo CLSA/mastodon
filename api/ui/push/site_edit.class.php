@@ -3,7 +3,6 @@
  * site_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: site edit
  *
  * Edit a site.
- * @package mastodon\ui
  */
 class site_edit extends \cenozo\ui\push\site_edit
 {

@@ -3,7 +3,6 @@
  * contact_form_adjudicate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: contact_form adjudicate
  *
  * Edit a contact_form.
- * @package mastodon\ui
  */
 class contact_form_adjudicate extends base_form_adjudicate
 {

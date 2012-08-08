@@ -3,7 +3,6 @@
  * self_settings.class.php
  * 
  * @author Dean Inglis <inglisd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget self settings
- * 
- * @package mastodon\ui
  */
 class self_settings extends \cenozo\ui\widget\self_settings
 {

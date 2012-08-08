@@ -3,7 +3,6 @@
  * consent_form_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: consent_form edit
  *
  * Edit a consent_form.
- * @package mastodon\ui
  */
 class consent_form_edit extends \cenozo\ui\push\base_edit
 {

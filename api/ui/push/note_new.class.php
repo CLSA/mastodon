@@ -3,7 +3,6 @@
  * note_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,7 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Extends the parent class to send machine requests.
- * @package mastodon\ui
  */
 class note_new extends \cenozo\ui\push\note_new
 {

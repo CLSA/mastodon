@@ -3,7 +3,6 @@
  * address.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * address: record
- *
- * @package mastodon\database
  */
 class address extends \cenozo\database\has_rank
 {

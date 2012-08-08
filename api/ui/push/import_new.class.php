@@ -3,7 +3,6 @@
  * import_new.class.php
  *
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: import new
  *
  * Import a list of new participants.
- * @package mastodon\ui
  */
 class import_new extends \cenozo\ui\push
 {

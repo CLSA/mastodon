@@ -3,7 +3,6 @@
  * participant_list_alternate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: participant list alternate
- * 
- * @package mastodon\ui
  */
 class participant_list_alternate extends \cenozo\ui\pull\base_list_record
 {

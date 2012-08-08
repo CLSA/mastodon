@@ -3,7 +3,6 @@
  * proxy_form_entry_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: proxy_form_entry edit
  *
  * Edit a proxy_form_entry.
- * @package mastodon\ui
  */
 class proxy_form_entry_edit extends base_form_entry_edit
 {

@@ -3,7 +3,6 @@
  * contact_form_view.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget contact_form view
- * 
- * @package mastodon\ui
  */
 class contact_form_view extends base_form_view
 {

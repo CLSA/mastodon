@@ -3,7 +3,6 @@
  * base_form_entry_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Base class for all form entry lists.
- * 
- * @package mastodon\ui
  */
 class base_form_entry_list extends \cenozo\ui\widget\base_list
 {

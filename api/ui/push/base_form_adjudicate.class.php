@@ -3,7 +3,6 @@
  * base_form_adjudicate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: base_form adjudicate
  *
  * Base class to adjudicate conflicts in two form entries.
- * @package mastodon\ui
  */
 abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
 {

@@ -3,7 +3,6 @@
  * site_restricted_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Base class for all list widgets which may be restricted by site.
- * 
- * @package mastodon\ui
  */
 abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_list
 {

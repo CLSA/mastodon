@@ -3,7 +3,6 @@
  * participant_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: participant edit
  *
  * Edit a participant.
- * @package mastodon\ui
  */
 class participant_edit extends \cenozo\ui\push\base_edit
 {

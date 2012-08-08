@@ -3,7 +3,6 @@
  * phone_add.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget phone add
- * 
- * @package mastodon\ui
  */
 class phone_add extends \cenozo\ui\widget\base_view
 {

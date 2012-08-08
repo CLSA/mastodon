@@ -3,7 +3,6 @@
  * import_process.class.php
  *
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: import process
  * 
  * Processes a list of pending imported participants, adding them to the system.
- * @package mastodon\ui
  */
 class import_process extends \cenozo\ui\push\base_record
 {
