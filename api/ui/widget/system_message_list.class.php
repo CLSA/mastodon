@@ -3,7 +3,6 @@
  * system_message_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget system_message list
- * 
- * @package mastodon\ui
  */
 class system_message_list extends site_restricted_list
 {

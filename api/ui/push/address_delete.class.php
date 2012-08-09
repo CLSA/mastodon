@@ -3,7 +3,6 @@
  * address_delete.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: address delete
- * 
- * @package mastodon\ui
  */
 class address_delete extends \cenozo\ui\push\base_delete
 {

@@ -3,7 +3,6 @@
  * consent_form_adjudicate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: consent_form adjudicate
  *
  * Edit a consent_form.
- * @package mastodon\ui
  */
 class consent_form_adjudicate extends base_form_adjudicate
 {

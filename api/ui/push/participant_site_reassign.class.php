@@ -3,7 +3,6 @@
  * participant_site_reassign.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: participant site_reassign
  *
  * Syncs participant information between Sabretooth and Mastodon
- * @package mastodon\ui
  */
 class participant_site_reassign extends \cenozo\ui\push
 {

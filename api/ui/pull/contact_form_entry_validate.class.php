@@ -3,7 +3,6 @@
  * contact_form_entry_validate.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: contact_form_entry validate
- * 
- * @package mastodon\ui
  */
 class contact_form_entry_validate extends \cenozo\ui\pull\base_record
 {

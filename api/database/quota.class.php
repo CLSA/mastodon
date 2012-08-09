@@ -3,7 +3,6 @@
  * quota.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filequota
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * quota: record
- *
- * @package mastodon\database
  */
 class quota extends \cenozo\database\record {}
 ?>

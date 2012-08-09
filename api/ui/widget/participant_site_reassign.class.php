@@ -3,7 +3,6 @@
  * participant_site_reassign.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget participant site_reassign
- * 
- * @package mastodon\ui
  */
 class participant_site_reassign extends \cenozo\ui\widget
 {

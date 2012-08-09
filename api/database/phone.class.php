@@ -3,7 +3,6 @@
  * phone.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * phone: record
- *
- * @package mastodon\database
  */
 class phone extends \cenozo\database\has_rank
 {

@@ -3,7 +3,6 @@
  * consent_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: consent new
  *
  * Create a new consent.
- * @package mastodon\ui
  */
 class consent_new extends \cenozo\ui\push\base_new
 {

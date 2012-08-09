@@ -3,7 +3,6 @@
  * alternate_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: alternate new
  *
  * Create a new alternate.
- * @package mastodon\ui
  */
 class alternate_new extends \cenozo\ui\push\base_new
 {

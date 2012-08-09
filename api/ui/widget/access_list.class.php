@@ -3,7 +3,6 @@
  * access_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget access list
- * 
- * @package mastodon\ui
  */
 class access_list extends site_restricted_list
 {

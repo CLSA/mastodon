@@ -3,7 +3,6 @@
  * address_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget address list
- * 
- * @package mastodon\ui
  */
 class address_list extends \cenozo\ui\widget\base_list
 {

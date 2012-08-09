@@ -3,7 +3,6 @@
  * availability_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: availability edit
  *
  * Edit a availability.
- * @package mastodon\ui
  */
 class availability_edit extends \cenozo\ui\push\base_edit
 {

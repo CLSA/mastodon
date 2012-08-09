@@ -3,7 +3,6 @@
  * base_form_entry_view.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Base class for form entry view widgets
- * 
- * @package mastodon\ui
  */
 abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
 {

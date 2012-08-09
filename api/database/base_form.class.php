@@ -3,7 +3,6 @@
  * base_form.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Base class for all form records
- *
- * @package mastodon\database
  */
 abstract class base_form extends \cenozo\database\record
 {

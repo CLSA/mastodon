@@ -3,7 +3,6 @@
  * import_entry.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * import_entry: record
- *
- * @package mastodon\database
  */
 class import_entry extends \cenozo\database\record
 {

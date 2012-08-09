@@ -3,7 +3,6 @@
  * status.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * status: record
- *
- * @package mastodon\database
  */
 class status extends \cenozo\database\record {}
 ?>
