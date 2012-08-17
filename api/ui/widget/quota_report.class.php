@@ -38,6 +38,7 @@ class quota_report extends base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'cohort' );
     $this->add_restriction( 'source' );
     $this->add_restriction( 'dates' );
 
