@@ -227,6 +227,22 @@ VALUES( "pull", "proxy_form_entry", "validate", true, "Validates the entry value
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form_entry", "view", true, "View the details of entry values for a proxy form." );
 
+-- quota
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "delete", true, "Removes a quota from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "edit", true, "Edits a quota's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "new", true, "Add a new quota to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "add", true, "View a form for creating a new quota." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "view", true, "View a quota's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "list", true, "List quotas in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "quota", "primary", true, "Retrieves base quota information." );
+
 -- reports
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
