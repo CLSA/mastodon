@@ -42,11 +42,8 @@ class quota_report extends \cenozo\ui\pull\base_report
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $sabretooth_manager = lib::create( 'business\cenozo_manager', SABRETOOTH_URL );
 
-    // since the admin user may not actually have access to Sabretooth, use machine credentials
-    $sabretooth_manager->use_machine_credentials( true );
-
+    $cohort = $this->get_argument( 'restrict_cohort' );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -54,20 +51,26 @@ class quota_report extends \cenozo\ui\pull\base_report
     $start_datetime_obj = NULL;
     $end_datetime_obj = NULL;
 
-    if( $restrict_start_date )
+    if( 0 < strlen( $restrict_start_date ) )
       $start_datetime_obj = util::get_datetime_object( $restrict_start_date );
-    if( $restrict_end_date )
+    if( 0 < strlen( $restrict_end_date ) )
       $end_datetime_obj = util::get_datetime_object( $restrict_end_date );
-    if( $restrict_start_date && $restrict_end_date && $end_datetime_obj < $start_datetime_obj )
+    if( 0 < strlen( $restrict_start_date ) && 0 < strlen( $restrict_end_date ) &&
+        $end_datetime_obj < $start_datetime_obj )
     {   
       $temp_datetime_obj = clone $start_datetime_obj;
       $start_datetime_obj = clone $end_datetime_obj;
       $end_datetime_obj = clone $temp_datetime_obj;
     }   
 
+    // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
+    $url = 'tracking' == $cohort ? SABRETOOTH_URL : BEARTOOTH_URL;
+    $cenozo_manager = lib::create( 'business\cenozo_manager', $url );
+    $cenozo_manager->use_machine_credentials( true );
+
     // loop through all quotas by region, age group and gender
     $quota_mod = lib::create( 'database\modifier' );
-    $quota_mod->where( 'cohort', '=', 'tracking' );
+    $quota_mod->where( 'cohort', '=', $cohort );
     $quota_mod->order( 'region.name' );
     $quota_mod->order( 'age_group.lower' );
     $quota_mod->order( 'gender' );
@@ -143,48 +146,78 @@ class quota_report extends \cenozo\ui\pull\base_report
       $column++;
 
       // contact attempted (at least one call made)
-      $result = $sabretooth_manager->pull( 'participant', 'list',
+      $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  'region' => $region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'contacted' => true ) );
+                 'state' => 'contacted' ) );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
       // reached and viable
-      $result = $sabretooth_manager->pull( 'participant', 'list',
+      if( 'tracking' == $cohort )
+      {
+        $result = $cenozo_manager->pull( 'participant', 'list',
+            array( 'count' => true,
+                   'modifier' => $pull_mod,
+                   'region' => $region_key,
+                   'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                   'state' => 'reached' ) );
+        $this->population_data
+          [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+            intval( $result->data );
+        $column++;
+      }
+
+      // with appointment
+      $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  'region' => $region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'reached' => true ) );
+                 'state' => 'appointment' ) );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
       // interview complete
-      $result = $sabretooth_manager->pull( 'participant', 'list',
+      $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  'region' => $region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'completed' => true ) );
+                 'state' => 'completed' ) );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
+      if( 'comprehensive' == $cohort )
+      {
+        // interview complete (comprehensive site interview)
+       $result = $cenozo_manager->pull( 'participant', 'list',
+            array( 'count' => true,
+                   'modifier' => $pull_mod,
+                   'region' => $region_key,
+                   'qnaire_rank' => 2, // TODO: constant needs to be made a report paramter
+                   'state' => 'completed' ) );
+        $this->population_data
+          [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+            intval( $result->data );
+        $column++;
+      }
+
       // with consent
-      $result = $sabretooth_manager->pull( 'participant', 'list',
+      $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  'region' => $region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'consented' => true ) );
+                 'state' => 'consented' ) );
       $this->population_data
         [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
@@ -210,6 +243,69 @@ class quota_report extends \cenozo\ui\pull\base_report
     // php doesn't allow parent::parent::method() so we have to do the less safe code below
     $pull_class_name = lib::get_class_name( 'ui\pull' );
     $pull_class_name::execute();
+
+    // need to modify the report for the comprehensive cohort
+    $cohort = $this->get_argument( 'restrict_cohort' );
+    if( 'comprehensive' == $cohort )
+    {
+      // column headings
+      $this->report->set_size( 11 );
+      $this->report->set_bold( true );
+      $this->report->set_horizontal_alignment( 'center' );
+      $this->report->set_cell( 'E4', 'With Appoint', false );
+      $this->report->set_cell( 'F4', 'Home Interview', false );
+      $this->report->set_cell( 'G4', 'Site Interview', false );
+
+      // heading descriptions title
+      $this->report->set_size( 10 );
+      $this->report->set_horizontal_alignment( 'left' );
+      $this->report->set_cell( 'A118', 'With Appoint', false );
+      $this->report->set_cell( 'A119', 'Home Interview', false );
+      $this->report->set_cell( 'A120', 'Site Interview', false );
+
+      // heading descriptions text
+      $this->report->set_bold( false );
+      $this->report->set_cell( 'B118',
+        'Participants included in "Open for Access" who have an appointment booked.' );
+      $this->report->set_cell( 'B119',
+        'Participants included in "With Appoint" who have completed the baseline home interview.' );
+      $this->report->set_cell( 'B120',
+        'Participants included in "With Appoint" who have completed the baseline site interview.' );
+
+      // change equation in column L
+      $this->report->set_horizontal_alignment( 'center' );
+      $top_row_list = array( 6, 16, 26, 36, 46, 56, 66, 76, 86 );
+      foreach( $top_row_list as $top_row )
+      {
+        for( $offset = 0; $offset < 8; $offset++ )
+        {
+          $row = $top_row + $offset;
+          $this->report->set_cell( 'L'.$row, sprintf( '=I%s-E%s', $row, $row ), false );
+        }
+      }
+
+      // remove NB and PE
+      $this->report->remove_row( 85, 10 );
+      $this->report->remove_row( 45, 10 );
+
+      // fix formulas broken by the above remove_row calls (PHPExcel bug)
+      for( $col = 'B'; $col <= 'I'; $col++ )
+      {
+        for( $row = 6; $row <= 13; $row++ )
+        {
+          $eq = sprintf( '=SUM(%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)',
+                         $col, $row + 10,
+                         $col, $row + 20,
+                         $col, $row + 30,
+                         $col, $row + 40,
+                         $col, $row + 50,
+                         $col, $row + 60,
+                         $col, $row + 70,
+                         $col, $row + 80 );
+          $this->report->set_cell( $col.$row, $eq );
+        }
+      }
+    }
 
     // the initial row is predefined by the report template
     $row = 16;
@@ -247,17 +343,17 @@ class quota_report extends \cenozo\ui\pull\base_report
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
     $restrict_end_date = $this->get_argument( 'restrict_end_date' );
 
-    if( !is_null( $restrict_start_date ) && is_null( $restrict_end_date ) )
+    if( 0 < strlen( $restrict_start_date ) && is_null( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported from %s',
                  $restrict_start_date ) );
 
-    if( is_null( $restrict_start_date ) && !is_null( $restrict_end_date ) )
+    if( is_null( $restrict_start_date ) && 0 < strlen( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported up to %s',
                  $restrict_end_date ) );
 
-    if( !is_null( $restrict_start_date ) && !is_null( $restrict_end_date ) )
+    if( 0 < strlen( $restrict_start_date ) && 0 < strlen( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported from %s to %s',
                  $restrict_start_date,
