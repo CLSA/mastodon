@@ -28,6 +28,19 @@ class quota_new extends \cenozo\ui\push\base_new
   }
 
   /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    $this->set_machine_request_enabled( true );
+  }
+
+  /**
    * Validate the operation.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -43,6 +56,29 @@ class quota_new extends \cenozo\ui\push\base_new
     if( !array_key_exists( 'population', $columns ) || 0 == strlen( $columns['population'] ) )
       throw lib::create( 'exception\notice',
         'The quota\'s population cannot be left blank.', __METHOD__ );
+  }
+
+  /**
+   * Override the parent method to send a request to the appropriate application
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function send_machine_request()
+  {
+    $cohort = $this->machine_arguments['columns']['cohort'];
+    unset( $this->machine_arguments['columns']['cohort'] );
+
+    if( 'comprehensive' == $cohort )
+    {
+      $this->set_machine_request_url( BEARTOOTH_URL );
+      parent::send_machine_request();
+    }
+
+    if( 'tracking' == $cohort )
+    {
+      $this->set_machine_request_url( SABRETOOTH_URL );
+      parent::send_machine_request();
+    }
   }
 }
 ?>

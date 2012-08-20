@@ -39,9 +39,9 @@ class quota_list extends \cenozo\ui\widget\base_list
     parent::prepare();
     
     $this->add_column( 'cohort', 'string', 'Cohort', true );
-    $this->add_column( 'region_id', 'string', 'Region', true, false );
+    $this->add_column( 'region.name', 'string', 'Region', true );
     $this->add_column( 'gender', 'string', 'Gender', true );
-    $this->add_column( 'age_group_id', 'string', 'Age Group', true, false );
+    $this->add_column( 'age_group.lower', 'string', 'Age Group', true );
     $this->add_column( 'population', 'number', 'Population', true );
   }
   
@@ -63,9 +63,9 @@ class quota_list extends \cenozo\ui\widget\base_list
       $age_group = sprintf( '%s to %s', $db_age_group->lower, $db_age_group->upper );
       $this->add_row( $record->id,
         array( 'cohort' => $record->cohort,
-               'region_id' => $record->get_region()->name,
+               'region.name' => $record->get_region()->name,
                'gender' => $record->gender,
-               'age_group_id' => $age_group,
+               'age_group.lower' => $age_group,
                'population' => $record->population ) );
     }
   }
