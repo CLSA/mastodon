@@ -47,7 +47,6 @@ class consent_form_view extends base_form_view
     $this->add_item( 'option_2', 'Option #2' );
     $this->add_item( 'signed', 'Signed' );
     $this->add_item( 'date', 'Date Signed' );
-    $this->add_item( 'note', 'Note' );
   }
 }
 ?>

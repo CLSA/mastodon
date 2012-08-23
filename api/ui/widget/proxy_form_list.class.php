@@ -29,20 +29,6 @@ class proxy_form_list extends base_form_list
   }
 
   /**
-   * Sets up the operation with any pre-execution instructions that may be necessary.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access protected
-   */
-  protected function setup()
-  {
-    parent::setup();
-
-    $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );
-    $this->set_variable( 'restrict_cohort', $restrict_cohort );
-  }    
-
-  /**
    * Overrides the parent class method to restrict form list
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
