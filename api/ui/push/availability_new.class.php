@@ -3,7 +3,6 @@
  * availability_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: availability new
  *
  * Create a new availability.
- * @package mastodon\ui
  */
 class availability_new extends \cenozo\ui\push\base_new
 {

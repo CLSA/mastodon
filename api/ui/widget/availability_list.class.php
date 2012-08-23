@@ -3,7 +3,6 @@
  * availability_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget availability list
- * 
- * @package mastodon\ui
  */
 class availability_list extends \cenozo\ui\widget\base_list
 {

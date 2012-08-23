@@ -3,7 +3,6 @@
  * user_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: user new
  *
  * Edit a user.
- * @package mastodon\ui
  */
 class user_new extends \cenozo\ui\push\user_new
 {

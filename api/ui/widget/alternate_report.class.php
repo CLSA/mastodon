@@ -3,7 +3,6 @@
  * alternate_report.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget alternate report
- * 
- * @package mastodon\ui
  */
 class alternate_report extends base_report
 {

@@ -3,7 +3,6 @@
  * participant_add_consent.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget participant add_consent
- * 
- * @package mastodon\ui
  */
 class participant_add_consent extends \cenozo\ui\widget\base_add_record
 {

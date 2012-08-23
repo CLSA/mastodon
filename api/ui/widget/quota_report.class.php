@@ -3,7 +3,6 @@
  * quota_report.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget quota report
- * 
- * @package mastodon\ui
  */
 class quota_report extends base_report
 {
@@ -41,6 +38,7 @@ class quota_report extends base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'cohort' );
     $this->add_restriction( 'source' );
     $this->add_restriction( 'dates' );
 

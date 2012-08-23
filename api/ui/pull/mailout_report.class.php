@@ -3,7 +3,6 @@
  * mailout_report.class.php
  * 
  * @author Dean Inglis <inglisd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * Mailout required report data.
  * 
  * @abstract
- * @package mastodon\ui
  */
 class mailout_report extends \cenozo\ui\pull\base_report
 {

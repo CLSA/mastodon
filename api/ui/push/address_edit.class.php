@@ -3,7 +3,6 @@
  * address_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: address edit
  *
  * Edit a address.
- * @package mastodon\ui
  */
 class address_edit extends \cenozo\ui\push\base_edit
 {

@@ -3,7 +3,6 @@
  * base_form_entry_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Base class for all form_entry new operations
- *
- * @package mastodon\ui
  */
 abstract class base_form_entry_new extends \cenozo\ui\push\base_new
 {

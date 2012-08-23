@@ -3,7 +3,6 @@
  * contact_form.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * contact_form: record
- *
- * @package mastodon\database
  */
 class contact_form extends base_form
 {

@@ -3,7 +3,6 @@
  * access_delete.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: access delete
- * 
- * @package mastodon\ui
  */
 class access_delete extends \cenozo\ui\push\access_delete
 {
