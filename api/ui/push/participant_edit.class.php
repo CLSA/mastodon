@@ -61,8 +61,7 @@ class participant_edit extends \cenozo\ui\push\base_edit
       // don't send certain information
       if( array_key_exists( 'cohort', $columns ) ||
           array_key_exists( 'no_in_home', $columns ) ||
-          array_key_exists( 'use_informant', $columns ) ||
-          array_key_exists( 'email', $columns ) )
+          array_key_exists( 'use_informant', $columns ) )
         $this->set_machine_request_enabled( false );
     }
   }
