@@ -25,6 +25,7 @@ class quota_report extends base_report
   public function __construct( $args )
   {
     parent::__construct( 'quota', $args );
+    $this->use_cache = true;
   }
 
   /**
