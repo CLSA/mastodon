@@ -95,28 +95,6 @@ class address_edit extends \cenozo\ui\push\base_edit
   }
 
   /**
-   * Override the parent method to replace the person key with a participant key.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args An argument list, usually those passed to the push operation.
-   * @return array
-   * @access protected
-   */
-  protected function convert_to_noid( $args )
-  {
-    $args = parent::convert_to_noid( $args );
-
-    // replace person key with participant key
-    $person_id = $args['noid']['address']['person_id'];
-    unset( $args['noid']['address']['person_id'] );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
-    $db_participant = $this->get_record()->get_person()->get_participant();
-    $args['noid']['address']['participant_id'] =
-      $participant_class_name::get_unique_from_primary_key( $db_participant->id );
-
-    return $args;
-  }
-
-  /**
    * Override the parent method to replace the participant key with a person key.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param array $args An argument list, usually those passed to the push operation.
