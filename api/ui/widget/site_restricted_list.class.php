@@ -97,9 +97,7 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
     if( !is_null( $this->db_restrict_site ) )
     {
       if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-      $site_column = 'comprehensive' == $this->db_restrict_site->cohort
-                   ? ( $this->extended_site_selection ? 'jurisdiction.' : '' ).'site_id'
-                   : ( $this->extended_site_selection ? 'participant_site.' : '' ).'site_id';
+      $site_column = ( $this->extended_site_selection ? 'participant_site.' : '' ).'site_id';
       $modifier->where( $site_column, '=', $this->db_restrict_site->id );
     }
 
@@ -122,9 +120,7 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
     if( !is_null( $this->db_restrict_site ) )
     {
       if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-      $site_column = 'comprehensive' == $this->db_restrict_site->cohort
-                   ? ( $this->extended_site_selection ? 'jurisdiction.' : '' ).'site_id'
-                   : ( $this->extended_site_selection ? 'participant_site.' : '' ).'site_id';
+      $site_column = ( $this->extended_site_selection ? 'participant_site.' : '' ).'site_id';
       $modifier->where( $site_column, '=', $this->db_restrict_site->id );
     }
 
