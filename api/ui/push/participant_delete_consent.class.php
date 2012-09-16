@@ -3,7 +3,6 @@
  * participant_delete_consent.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * push: participant delete_consent
- * 
- * @package mastodon\ui
  */
 class participant_delete_consent extends \cenozo\ui\push\base_delete_record
 {

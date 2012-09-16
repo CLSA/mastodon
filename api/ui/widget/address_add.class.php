@@ -3,7 +3,6 @@
  * address_add.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget address add
- * 
- * @package mastodon\ui
  */
 class address_add extends \cenozo\ui\widget\base_view
 {

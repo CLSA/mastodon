@@ -3,7 +3,6 @@
  * consent.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * consent: record
- *
- * @package mastodon\database
  */
 class consent extends \cenozo\database\record
 {

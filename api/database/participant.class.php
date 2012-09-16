@@ -3,7 +3,6 @@
  * participant.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * participant: record
- *
- * @package mastodon\database
  */
 class participant extends person
 {

@@ -3,7 +3,6 @@
  * address_primary.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * pull: address primary
- * 
- * @package mastodon\ui
  */
 class address_primary extends \cenozo\ui\pull\base_primary
 {

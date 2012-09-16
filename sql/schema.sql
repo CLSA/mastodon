@@ -308,7 +308,7 @@ CREATE  TABLE IF NOT EXISTS `quota` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_region_id` (`region_id` ASC) ,
   INDEX `fk_age_group_id` (`age_group_id` ASC) ,
-  INDEX `uq_region_id_cohort_gender_age_group_id` (`region_id` ASC, `cohort` ASC, `gender` ASC, `age_group_id` ASC) ,
+  UNIQUE INDEX `uq_region_id_cohort_gender_age_group_id` (`region_id` ASC, `cohort` ASC, `gender` ASC, `age_group_id` ASC) ,
   CONSTRAINT `fk_quota_region`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )

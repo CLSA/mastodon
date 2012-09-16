@@ -3,7 +3,6 @@
  * consent_form_entry_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget consent_form_entry list
- * 
- * @package mastodon\ui
  */
 class consent_form_entry_list extends base_form_entry_list
 {

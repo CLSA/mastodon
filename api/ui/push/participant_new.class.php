@@ -3,7 +3,6 @@
  * participant_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * push: participant new
  *
  * Create a new participant.
- * @package mastodon\ui
  */
 class participant_new extends \cenozo\ui\push\base_new
 {

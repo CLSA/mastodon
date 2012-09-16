@@ -3,7 +3,6 @@
  * self_menu.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget self menu
- * 
- * @package mastodon\ui
  */
 class self_menu extends \cenozo\ui\widget\self_menu
 {

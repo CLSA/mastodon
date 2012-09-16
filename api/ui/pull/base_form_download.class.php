@@ -3,7 +3,6 @@
  * base_form_download.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * Contact form download data.
- * 
- * @package mastodon\ui
  */
 abstract class base_form_download extends \cenozo\ui\pull\base_record
 {

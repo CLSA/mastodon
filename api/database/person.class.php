@@ -3,7 +3,6 @@
  * person.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * A base class for all records which have a one-to-one relationship to `person`
- *
- * @package mastodon\database
  */
 class person extends \cenozo\database\has_note
 {

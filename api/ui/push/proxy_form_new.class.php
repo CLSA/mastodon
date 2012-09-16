@@ -3,7 +3,6 @@
  * proxy_form_new.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -16,7 +15,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * This is a special operation that creates a proxy form including a entry and immediately
  * attempts to import the data.  This is used by Beartooth in order to validate and import
  * proxy forms from Onyx.
- * @package mastodon\ui
  */
 class proxy_form_new extends \cenozo\ui\push\base_new
 {

@@ -3,7 +3,6 @@
  * system_message_view.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget system_message view
- * 
- * @package mastodon\ui
  */
 class system_message_view extends \cenozo\ui\widget\system_message_view
 {

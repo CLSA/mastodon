@@ -3,7 +3,6 @@
  * user_add_access.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package mastodon\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
  * widget user add_access
- * 
- * @package mastodon\ui
  */
 class user_add_access extends \cenozo\ui\widget\user_add_access
 {
