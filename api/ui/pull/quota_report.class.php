@@ -29,15 +29,12 @@ class quota_report extends \cenozo\ui\pull\base_report
   }
 
   /**
-   * Sets up the operation with any pre-execution instructions that may be necessary.
-   * 
+   * Builds the report.
    * @author Dean Inglis <inglisd@mcmaster.ca>
    * @access protected
    */
-  protected function setup()
+  protected function build()
   {
-    parent::setup();
-
     $quota_class_name = lib::get_class_name( 'database\quota' );
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
@@ -232,17 +229,13 @@ class quota_report extends \cenozo\ui\pull\base_report
   }
 
   /**
-   * This method executes the operation's purpose.
-   * 
+   * This method creates the report based on work done in the build() method.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
    */
-  protected function execute()
+  protected function generate()
   {
-    // skip the parent method
-    // php doesn't allow parent::parent::method() so we have to do the less safe code below
-    $pull_class_name = lib::get_class_name( 'ui\pull' );
-    $pull_class_name::execute();
+    // replace the parent method (parent generate() method isn't called on purpose)
 
     // need to modify the report for the comprehensive cohort
     $cohort = $this->get_argument( 'restrict_cohort' );
