@@ -35,6 +35,8 @@ class quota_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
+    $this->report->set_orientation( 'landscape' );
+
     $quota_class_name = lib::get_class_name( 'database\quota' );
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
