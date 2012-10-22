@@ -84,11 +84,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       $pull_mod->where( 'age_group.lower', '=', $db_quota->get_age_group()->lower );
       $pull_mod->where( 'gender', '=', $db_quota->gender );
       if( !is_null( $start_datetime_obj ) )
-        $pull_mod->where( 'DATE( participant.create_timestamp )', '>=',
-          $start_datetime_obj->format( 'Y-m-d' ) );
+        $pull_mod->where( 'participant.create_timestamp', '>=',
+          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
       if( !is_null( $end_datetime_obj ) )
-        $pull_mod->where( 'DATE( participant.create_timestamp )', '<=',
-          $end_datetime_obj->format( 'Y-m-d' ) );
+        $pull_mod->where( 'participant.create_timestamp', '<=',
+          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
       if( !is_null( $db_source ) ) $pull_mod->where( 'source_id', '=', $db_source->id );
 
       // pre-recruit (total participants)
@@ -98,25 +98,25 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'gender', '=', $db_quota->gender );
       $participant_mod->where( 'cohort', '=', $db_quota->cohort );
       if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.create_timestamp )', '>=',
-          $start_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where( 'participant.create_timestamp', '>=',
+          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
       if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.create_timestamp )', '<=',
-          $end_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where( 'participant.create_timestamp', '<=',
+          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
       if( !is_null( $start_datetime_obj ) )
       {
         $participant_mod->where_bracket( true );
         $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'DATE( participant.sync_datetime )', '>=',
-          $start_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->or_where( 'participant.sync_datetime', '>=',
+          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
         $participant_mod->where_bracket( false );
       }
       if( !is_null( $end_datetime_obj ) )
       {
         $participant_mod->where_bracket( true );
         $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'DATE( participant.sync_datetime )', '<=',
-          $end_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->or_where( 'participant.sync_datetime', '<=',
+          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
         $participant_mod->where_bracket( false );
       }
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
@@ -132,11 +132,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'gender', '=', $db_quota->gender );
       $participant_mod->where( 'cohort', '=', $db_quota->cohort );
       if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.sync_datetime )', '>=',
-          $start_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where( 'participant.sync_datetime', '>=',
+          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
       if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'DATE( participant.sync_datetime )', '<=',
-          $end_datetime_obj->format( 'Y-m-d' ) );
+        $participant_mod->where( 'participant.sync_datetime', '<=',
+          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $participant_mod->where( 'sync_datetime', '!=', NULL );
       $this->population_data
@@ -198,7 +198,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       if( 'comprehensive' == $cohort )
       {
         // interview complete (comprehensive site interview)
-       $result = $cenozo_manager->pull( 'participant', 'list',
+        $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,
                    'region' => $region_key,
@@ -261,11 +261,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       // heading descriptions text
       $this->report->set_bold( false );
       $this->report->set_cell( 'B118',
-        'Participants included in "Open for Access" who have an appointment booked.' );
+        'Participants included in "Open for Access" who have an appointment booked.', false );
       $this->report->set_cell( 'B119',
-        'Participants included in "With Appoint" who have completed the baseline home interview.' );
+        'Participants included in "With Appoint" who have completed the baseline home interview.', false );
       $this->report->set_cell( 'B120',
-        'Participants included in "With Appoint" who have completed the baseline site interview.' );
+        'Participants included in "With Appoint" who have completed the baseline site interview.', false );
 
       // change equation in column L
       $this->report->set_horizontal_alignment( 'center' );
@@ -297,7 +297,7 @@ class quota_report extends \cenozo\ui\pull\base_report
                          $col, $row + 60,
                          $col, $row + 70,
                          $col, $row + 80 );
-          $this->report->set_cell( $col.$row, $eq );
+          $this->report->set_cell( $col.$row, $eq, false );
         }
       }
     }
@@ -326,14 +326,15 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->report->set_bold( true );
     $this->report->set_horizontal_alignment( 'center' );
     $this->report->merge_cells( 'A1:M1' );
-    $this->report->set_cell( 'A1', 'Quota Report for '.ucwords( $source ) );
+    $this->report->set_cell( 'A1', 'Quota Report for '.ucwords( $source ), false );
 
     $now_datetime_obj = util::get_datetime_object();
     $this->report->merge_cells( 'A2:M2' );
     $this->report->set_cell( 'A2',
       sprintf( 'Generated on %s at %s',
                $now_datetime_obj->format( 'Y-m-d' ),
-               $now_datetime_obj->format( 'H:i T' ) ) );
+               $now_datetime_obj->format( 'H:i T' ) ),
+      false );
 
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
     $restrict_end_date = $this->get_argument( 'restrict_end_date' );
@@ -341,18 +342,21 @@ class quota_report extends \cenozo\ui\pull\base_report
     if( 0 < strlen( $restrict_start_date ) && is_null( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported from %s',
-                 $restrict_start_date ) );
+                 $restrict_start_date ),
+        false );
 
     if( is_null( $restrict_start_date ) && 0 < strlen( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported up to %s',
-                 $restrict_end_date ) );
+                 $restrict_end_date ),
+        false );
 
     if( 0 < strlen( $restrict_start_date ) && 0 < strlen( $restrict_end_date ) )
       $this->report->set_cell( 'A3',
         sprintf( 'Restricted to participants imported from %s to %s',
                  $restrict_start_date,
-                 $restrict_end_date ) );
+                 $restrict_end_date ),
+        false );
 
     $this->data = $this->report->get_file( $this->get_argument( 'format' ) );
   }
