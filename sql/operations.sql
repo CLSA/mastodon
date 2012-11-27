@@ -245,6 +245,10 @@ VALUES( "pull", "quota", "primary", true, "Retrieves base quota information." );
 
 -- reports
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "contact", "report", true, "Set up a contact report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "contact", "report", true, "Download a contact report." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
