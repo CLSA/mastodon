@@ -256,5 +256,9 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "quota", "report", true, "Set up a quota report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "quota", "report", true, "Download a quota report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
 
 COMMIT;
