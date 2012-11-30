@@ -55,7 +55,7 @@ class self_menu extends \cenozo\ui\widget\self_menu
                             'subject' => 'import',
                             'name' => 'add' );
 
-    // insert participant site reassign into the utilities
+    // insert participant site reassign and multinote into the utilities
     $db_operation =
       $operation_class_name::get_operation( 'widget', 'participant', 'site_reassign' );
     if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
@@ -63,6 +63,13 @@ class self_menu extends \cenozo\ui\widget\self_menu
                             'type' => 'widget',
                             'subject' => 'participant',
                             'name' => 'site_reassign' );
+    $db_operation =
+      $operation_class_name::get_operation( 'widget', 'participant', 'multinote' );
+    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+      $utilities[] = array( 'heading' => 'Participant Multinote',
+                            'type' => 'widget',
+                            'subject' => 'participant',
+                            'name' => 'multinote' );
 
     $this->set_variable( 'utilities', $utilities );
   }
