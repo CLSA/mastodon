@@ -4,6 +4,10 @@
 
 * Removing defunct auditing system
 
+* Adding further handling of participants who require sourcing
+  - There is now a "sourcing required" participant status
+  - Participants who have no active phone numbers are included in the "sourcing required" queue
+
 ====================================================================================================
 1.1.7
 ====================================================================================================
