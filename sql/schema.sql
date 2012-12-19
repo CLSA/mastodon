@@ -84,7 +84,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `gender` ENUM('male','female') NOT NULL ,
   `date_of_birth` DATE NULL ,
   `age_group_id` INT UNSIGNED NULL DEFAULT NULL ,
-  `status` ENUM('deceased','deaf','mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','other') NULL DEFAULT NULL ,
+  `status` ENUM('deceased','deaf','mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','sourcing required','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
   `site_id` INT UNSIGNED NULL DEFAULT NULL ,
   `no_in_home` TINYINT(1) NOT NULL DEFAULT false ,
