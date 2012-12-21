@@ -8,6 +8,10 @@
   - There is now a "sourcing required" participant status
   - Participants who have no active phone numbers are included in the "sourcing required" queue
 
+* Quotas can now be defined by site as well as region
+  - Tracking cohort quota report categorizes quotas by province
+  - Comprehensive cohort quota report categorizes quotas by site
+
 ====================================================================================================
 1.1.7
 ====================================================================================================

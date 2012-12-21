@@ -65,16 +65,15 @@ class quota_new extends \cenozo\ui\push\base_new
    */
   protected function send_machine_request()
   {
-    $cohort = $this->machine_arguments['columns']['cohort'];
-    unset( $this->machine_arguments['columns']['cohort'] );
+    $db_site = lib::create( 'database\site', $this->machine_arguments['columns']['site_id'] );
 
-    if( 'comprehensive' == $cohort )
+    if( 'comprehensive' == $db_site->cohort )
     {
       $this->set_machine_request_url( BEARTOOTH_URL );
       parent::send_machine_request();
     }
 
-    if( 'tracking' == $cohort )
+    if( 'tracking' == $db_site->cohort )
     {
       $this->set_machine_request_url( SABRETOOTH_URL );
       parent::send_machine_request();

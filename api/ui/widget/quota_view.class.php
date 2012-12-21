@@ -39,7 +39,8 @@ class quota_view extends \cenozo\ui\widget\base_view
     parent::prepare();
 
     // create an associative array with everything we want to display about the quota
-    $this->add_item( 'cohort', 'enum', 'Cohort' );
+    $this->add_item( 'cohort', 'constant', 'Cohort' );
+    $this->add_item( 'site_id', 'constant', 'Site' );
     $this->add_item( 'region_id', 'enum', 'Region' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'age_group_id', 'enum', 'Age Group' );
@@ -61,8 +62,6 @@ class quota_view extends \cenozo\ui\widget\base_view
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
 
     // create enum arrays
-    $cohorts = $quota_class_name::get_enum_values( 'cohort' );
-    $cohorts = array_combine( $cohorts, $cohorts );
     $regions = array();
     $region_mod = lib::create( 'database\modifier' );
     $region_mod->order( 'country' );
@@ -77,7 +76,8 @@ class quota_view extends \cenozo\ui\widget\base_view
         sprintf( '%d to %d', $db_age_group->lower, $db_age_group->upper );
 
     // set the view's items
-    $this->set_item( 'cohort', $this->get_record()->cohort, true, $cohorts );
+    $this->set_item( 'cohort', $this->get_record()->get_site()->cohort );
+    $this->set_item( 'site_id', $this->get_record()->get_site()->name );
     $this->set_item( 'region_id', $this->get_record()->region_id, true, $regions );
     $this->set_item( 'gender', $this->get_record()->gender, true, $genders );
     $this->set_item( 'age_group_id', $this->get_record()->age_group_id, true, $age_groups );
