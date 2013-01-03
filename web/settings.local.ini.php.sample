@@ -11,6 +11,10 @@ global $SETTINGS;
 // Whether or not to run the application in development mode
 $SETTINGS['general']['development_mode'] = true;
 
+// Defines the username and password used by mastodon when communicating as a machine
+$SETTINGS['general']['machine_user'] = 'put machine user name here';
+$SETTINGS['general']['machine_password'] = 'put machine password here';
+
 // The web url of the Cenozo framework
 $SETTINGS['url']['CENOZO'] = sprintf( 'http%s://%s/url/to/cenozo',
                                       'on' == $_SERVER["HTTPS"] ? 's' : '',
