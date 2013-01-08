@@ -3,4 +3,7 @@
 SOURCE operation.sql
 SOURCE role_has_operation.sql
 SOURCE participant.sql
+SOURCE import_entry.sql
+
+-- make sure this is last
 SOURCE quota.sql

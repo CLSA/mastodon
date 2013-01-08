@@ -25,6 +25,7 @@ class import_entry extends \cenozo\database\record
   {
     $region_class_name = lib::get_class_name( 'database\region' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $address_class_name = lib::get_class_name( 'database\address' );
     $postcode_class_name = lib::get_class_name( 'database\postcode' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
@@ -51,7 +52,7 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $this->mobile_phone ) && !util::validate_phone_number( $this->mobile_phone ) )
       $this->mobile_phone_error = true;
 
-    // look for duplicates
+    // look for duplicate participants
     $participant_mod = lib::create( 'database\modifier' );
     $participant_mod->where( 'first_name', '=', $this->first_name );
     $participant_mod->where( 'last_name', '=', $this->last_name );
@@ -61,7 +62,7 @@ class import_entry extends \cenozo\database\record
       {
         if( !is_null( $this->home_phone ) && $this->home_phone == $db_phone->number ||
             !is_null( $this->mobile_phone ) && $this->mobile_phone == $db_phone->number )
-          $this->duplicate_error = true;
+          $this->duplicate_participant_error = true;
       }
     }
 
@@ -77,13 +78,47 @@ class import_entry extends \cenozo\database\record
     if( !util::validate_date( $this->date ) )
       $this->date_error = true;
 
+    // look for duplicate addresses
+    if( !$this->apartment_error &&
+        !$this->address_error &&
+        !$this->province_error &&
+        !$this->postcode_error &&
+        !$this->duplicate_participant_error )
+    {
+      // determine the address and postcode as it would appear in the address table and compare
+      $address = $this->street;
+      if( !is_null( $this->apartment ) ) $address = $this->apartment.' '.$address;
+      $postcode = 6 == strlen( $this->postcode )
+                ? sprintf( '%s %s',
+                           substr( $this->postcode, 0, 3 ),
+                           substr( $this->postcode, 3, 3 ) )
+                : $this->postcode;
+
+      $address_mod = lib::create( 'database\modifier' );
+      $address_mod->where( 'address1', '=', $address );
+      $address_mod->where( 'address2', '=', $this->address_other );
+      $address_mod->where( 'city', '=', $this->city );
+      $address_mod->where( 'region_id', '=', $db_region->id );
+      $address_mod->where( 'postcode', '=', $postcode );
+      foreach( $address_class_name::select( $address_mod ) as $db_address )
+      {
+        $db_participant = $db_address->get_person()->get_participant();
+        if( $db_participant && $db_participant->cohort == $this->cohort )
+        {
+          $this->duplicate_address_error = true;
+          break;
+        }
+      }
+    }
+
     return !$this->apartment_error &&
            !$this->address_error &&
            !$this->province_error &&
            !$this->postcode_error &&
            !$this->home_phone_error &&
            !$this->mobile_phone_error &&
-           !$this->duplicate_error &&
+           !$this->duplicate_participant_error &&
+           !$this->duplicate_address_error &&
            !$this->gender_error &&
            !$this->date_of_birth_error &&
            !$this->language_error &&
