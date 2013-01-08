@@ -5,8 +5,9 @@
 * Removing defunct auditing system
 
 * Adding further handling of participants who require sourcing
-  - There is now a "sourcing required" participant status
+  - New conditions "sourcing required" and "unreachable" have been added to participant status
   - Participants who have no active phone numbers are included in the "sourcing required" queue
+  - Can now restrict participant list by condition
 
 * Quotas can now be defined by site as well as region
   - Tracking cohort quota report categorizes quotas by province
