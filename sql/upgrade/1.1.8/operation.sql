@@ -4,3 +4,5 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "activity", "chart", true, "Displays a chart describing system activity." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "form", "chart", true, "Displays a chart describing the progress of forms through the data entry system." );

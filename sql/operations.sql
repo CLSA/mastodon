@@ -75,6 +75,10 @@ VALUES( "widget", "consent", "list", true, "Lists a participant's consent entrie
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent", "primary", true, "Retrieves base consent information." );
 
+-- all forms
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "form", "chart", true, "Displays a chart describing the progress of forms through the data entry system." );
+
 -- consent_form
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent_form", "download", true, "Downloads a participant's scanned consent form." );

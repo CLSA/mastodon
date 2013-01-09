@@ -19,6 +19,9 @@
   - When a clerk completes a form which is in conflict the form will appear in the conflicts list
     where an admin can process it (eg: call the candidate) and invalidate the form
 
+* Adding new charts
+  - data entry incomplete form status chart
+
 ====================================================================================================
 1.1.7
 ====================================================================================================
