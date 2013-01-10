@@ -48,6 +48,13 @@ class participant_list extends site_restricted_list
 
     // participants are either jurisdiction or participant_site based
     $this->extended_site_selection = true;
+
+    $restrict_condition = $this->get_argument( 'restrict_condition', '' );
+    if( $restrict_condition )
+      $this->set_heading(
+        sprintf( '%s, restricted to %s',
+                 $this->get_heading(),
+                 $restrict_condition ) );
   }
   
   /**
@@ -59,6 +66,9 @@ class participant_list extends site_restricted_list
   protected function setup()
   {
     parent::setup();
+
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $operation_class_name = lib::get_class_name( 'database\operation' );
     
     foreach( $this->get_record_list() as $record )
     {
@@ -78,7 +88,8 @@ class participant_list extends site_restricted_list
                'note_count' => $record->get_note_count() ) );
     }
 
-    $operation_class_name = lib::get_class_name( 'database\operation' );
+    $this->set_variable( 'conditions', $participant_class_name::get_enum_values( 'status' ) );
+    $this->set_variable( 'restrict_condition', $this->get_argument( 'restrict_condition', '' ) );
 
     // include the sync action if the widget isn't parented
     if( is_null( $this->parent ) )
@@ -94,6 +105,46 @@ class participant_list extends site_restricted_list
         $this->add_action( 'reassign', 'Site Reassign', $db_operation,
           'Change the preferred site of multiple participants at once' );
     }
+  }
+
+  /**
+   * Overrides the parent class method based on the restrict condition argument.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\modifier $modifier Modifications to the list.
+   * @return int
+   * @access protected
+   */
+  public function determine_record_count( $modifier = NULL )
+  {
+    $restrict_condition = $this->get_argument( 'restrict_condition', '' );
+    if( $restrict_condition )
+    {
+      if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
+      $modifier->where( 'status', '=', $restrict_condition );
+    }
+
+    return parent::determine_record_count( $modifier );
+  }
+
+  /**
+   * Overrides the parent class method based on the restrict condition argument.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\modifier $modifier Modifications to the list.
+   * @return array( record )
+   * @access protected
+   */
+  public function determine_record_list( $modifier = NULL )
+  {
+    $restrict_condition = $this->get_argument( 'restrict_condition', '' );
+    if( $restrict_condition )
+    {
+      if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
+      $modifier->where( 'status', '=', $restrict_condition );
+    }
+
+    return parent::determine_record_list( $modifier );
   }
 }
 ?>

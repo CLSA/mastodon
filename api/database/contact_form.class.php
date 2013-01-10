@@ -37,6 +37,58 @@ class contact_form extends base_form
       array( 'name', 'cohort' ),
       array( 'Sherbrooke', 'tracking' ) );
 
+    // start by checking for address duplicates in the same cohort
+    $address = util::parse_address(
+      $db_contact_form_entry->apartment_number,
+      $db_contact_form_entry->street_number,
+      $db_contact_form_entry->street_name,
+      $db_contact_form_entry->box,
+      $db_contact_form_entry->rural_route,
+      $db_contact_form_entry->address_other );
+    $postcode = 6 == strlen( $db_contact_form_entry->postcode )
+              ? sprintf( '%s %s',
+                         substr( $db_contact_form_entry->postcode, 0, 3 ),
+                         substr( $db_contact_form_entry->postcode, 3, 3 ) )
+              : $db_contact_form_entry->postcode;
+    
+    $address_mod = lib::create( 'database\modifier' );
+    $address_mod->where( 'address1', '=', $address[0] );
+    $address_mod->where( 'address2', '=', $address[1] );
+    $address_mod->where( 'city', '=', $db_contact_form_entry->city );
+    $address_mod->where( 'region_id', '=', $db_contact_form_entry->region_id );
+    $address_mod->where( 'postcode', '=', $postcode );
+    foreach( $address_class_name::select( $address_mod ) as $db_address )
+    {
+      $db_participant = $db_address->get_person()->get_participant();
+      if( $db_participant && $db_participant->cohort == $this->cohort )
+      {
+        throw lib::create( 'exception\notice',
+          'Unable to import contact form because an existing participant from the '.
+          $this->cohort.' cohort shares the same address.',
+          __METHOD__ );
+      }
+    }
+
+
+    $db_address = lib::create( 'database\address' );
+    $db_address->person_id = $db_person->id;
+    $db_address->active = true;
+    $db_address->rank = 1;
+    $db_address->address1 = $address[0];
+    $db_address->address2 = $address[1];
+    $db_address->city = $db_contact_form_entry->city;
+    $db_address->region_id = $db_contact_form_entry->region_id;
+    $postcode = 6 == strlen( $db_contact_form_entry->postcode )
+              ? sprintf( '%s %s',
+                         substr( $db_contact_form_entry->postcode, 0, 3 ),
+                         substr( $db_contact_form_entry->postcode, 3, 3 ) )
+              : $db_contact_form_entry->postcode;
+    $db_address->postcode = $postcode;
+    $db_address->source_postcode();
+    $db_address->note = $db_contact_form_entry->address_note;
+    $db_address->save();
+
+
     // link to the form
     $this->validated_contact_form_entry_id = $db_contact_form_entry->id;
 
@@ -45,8 +97,8 @@ class contact_form extends base_form
 
     // make sure there is a uid available
     $uid = $participant_class_name::get_new_uid();
-    if( is_null( $uid ) ) throw lib::create( 'exception\notice',
-      'There are no new UIDs available, please report this to an administrator immediately!',
+    if( is_null( $uid ) ) throw lib::create( 'exception\runtime',
+      'Tried to import a contact form but the participant UID pool is empty!',
       __METHOD__ );
     
     $year = date( 'Y' );
