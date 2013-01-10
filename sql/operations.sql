@@ -250,6 +250,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "quota", "list", true, "List quotas in the system." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "quota", "primary", true, "Retrieves base quota information." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "chart", true, "Displays a chart describing the progress of participant quotas." );
 
 -- reports
 INSERT INTO operation( type, subject, name, restricted, description )
