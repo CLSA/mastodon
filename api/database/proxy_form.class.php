@@ -238,10 +238,12 @@ class proxy_form extends base_form
     $this->complete = true;
     if( $db_proxy_form_entry->proxy )
       $this->proxy_alternate_id = $db_proxy_alternate->id;
-    if( $db_proxy_form_entry->same_as_proxy )
+
+    if( $db_proxy_form_entry->proxy && $db_proxy_form_entry->same_as_proxy )
       $this->informant_alternate_id = $db_proxy_alternate->id;
     else if( $db_proxy_form_entry->informant )
       $this->informant_alternate_id = $db_informant_alternate->id;
+
     $this->save();
   }
 }
