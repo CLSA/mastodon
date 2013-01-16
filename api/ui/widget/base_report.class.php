@@ -63,12 +63,12 @@ abstract class base_report extends \cenozo\ui\widget\base_report
       if( 'administrator' == $session->get_role()->name )
       {
         $cohort_types = $participant_class_name::get_enum_values( 'cohort' );
+        $cohort_types = array_combine( $cohort_types, $cohort_types );
       }
       else
       {
-        $cohort_types = $session->get_site()->cohort;
+        $cohort_types = array( $session->get_site()->cohort => $session->get_site()->cohort );
       }
-      $cohort_types = array_combine( $cohort_types, $cohort_types );
       $this->set_parameter( 'restrict_cohort', key( $cohort_types ), true, $cohort_types );
     }
 
