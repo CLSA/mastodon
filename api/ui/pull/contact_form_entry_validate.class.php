@@ -36,6 +36,10 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
   {
     parent::execute();
 
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
+    $address_class_name = lib::get_class_name( 'database\address' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
     $record = $this->get_record();
     $errors = array();
 
@@ -84,10 +88,47 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
 
     if( !is_null( $record->region_id ) && !is_null( $record->postcode ) )
     { // check that the postal code is valid
-      $postcode_class_name = lib::get_class_name( 'database\postcode' );
       $db_postcode = $postcode_class_name::get_match( $record->postcode );
       if( is_null( $db_postcode ) || $db_postcode->region_id != $record->region_id )
         $errors['postcode'] = 'The postal code does not exist in the selected province.';
+    }
+
+    // check for address duplicates in the same cohort
+    $address = util::parse_address(
+      $record->apartment_number,
+      $record->street_number,
+      $record->street_name,
+      $record->box,
+      $record->rural_route,
+      $record->address_other );
+    $postcode = 6 == strlen( $record->postcode )
+              ? sprintf( '%s %s',
+                         substr( $record->postcode, 0, 3 ),
+                         substr( $record->postcode, 3, 3 ) )
+              : $record->postcode;
+
+    $address_mod = lib::create( 'database\modifier' );
+    $address_mod->where( 'address1', '=', $address[0] );
+    $address_mod->where( 'address2', '=', $address[1] );
+    $address_mod->where( 'city', '=', $record->city );
+    $address_mod->where( 'region_id', '=', $record->region_id );
+    $address_mod->where( 'postcode', '=', $postcode );
+    foreach( $address_class_name::select( $address_mod ) as $db_address )
+    {
+      $db_participant = $db_address->get_person()->get_participant();
+      if( $db_participant && $db_participant->cohort == $record->cohort )
+      {
+        $message = sprintf( 'A %s participant already exists at this address.', $record->cohort );
+        $errors['apartment_number'] = $message;
+        $errors['street_number'] = $message;
+        $errors['street_name'] = $message;
+        $errors['box'] = $message;
+        $errors['address_other'] = $message;
+        $errors['rural_route'] = $message;
+        $errors['city'] = $message;
+        $errors['region_id'] = $message;
+        $errors['postcode'] = $message;
+      }
     }
 
     if( is_null( $record->home_phone ) && is_null( $record->mobile_phone ) )
@@ -117,7 +158,6 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
         !is_null( $record->last_name ) &&
         ( !is_null( $home_phone ) || !is_null( $mobile_phone ) ) )
     { // look for duplicates
-      $participant_class_name = lib::get_class_name( 'database\participant' );
       $participant_mod = lib::create( 'database\modifier' );
       $participant_mod->where( 'first_name', '=', $record->first_name );
       $participant_mod->where( 'last_name', '=', $record->last_name );
