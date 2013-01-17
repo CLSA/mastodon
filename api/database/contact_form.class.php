@@ -28,6 +28,7 @@ class contact_form extends base_form
         'Tried to import invalid contact form entry.', __METHOD__ );
     }
 
+    $address_class_name = lib::get_class_name( 'database\address' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
@@ -60,34 +61,14 @@ class contact_form extends base_form
     foreach( $address_class_name::select( $address_mod ) as $db_address )
     {
       $db_participant = $db_address->get_person()->get_participant();
-      if( $db_participant && $db_participant->cohort == $this->cohort )
+      if( $db_participant && $db_participant->cohort == $db_contact_form_entry->cohort )
       {
         throw lib::create( 'exception\notice',
           'Unable to import contact form because an existing participant from the '.
-          $this->cohort.' cohort shares the same address.',
+          $db_contact_form_entry->cohort.' cohort shares the same address.',
           __METHOD__ );
       }
     }
-
-
-    $db_address = lib::create( 'database\address' );
-    $db_address->person_id = $db_person->id;
-    $db_address->active = true;
-    $db_address->rank = 1;
-    $db_address->address1 = $address[0];
-    $db_address->address2 = $address[1];
-    $db_address->city = $db_contact_form_entry->city;
-    $db_address->region_id = $db_contact_form_entry->region_id;
-    $postcode = 6 == strlen( $db_contact_form_entry->postcode )
-              ? sprintf( '%s %s',
-                         substr( $db_contact_form_entry->postcode, 0, 3 ),
-                         substr( $db_contact_form_entry->postcode, 3, 3 ) )
-              : $db_contact_form_entry->postcode;
-    $db_address->postcode = $postcode;
-    $db_address->source_postcode();
-    $db_address->note = $db_contact_form_entry->address_note;
-    $db_address->save();
-
 
     // link to the form
     $this->validated_contact_form_entry_id = $db_contact_form_entry->id;
@@ -201,14 +182,6 @@ class contact_form extends base_form
     $db_status->save();
     
     // import data to the address table
-    $address = util::parse_address(
-      $db_contact_form_entry->apartment_number,
-      $db_contact_form_entry->street_number,
-      $db_contact_form_entry->street_name,
-      $db_contact_form_entry->box,
-      $db_contact_form_entry->rural_route,
-      $db_contact_form_entry->address_other );
-
     $db_address = lib::create( 'database\address' );
     $db_address->person_id = $db_person->id;
     $db_address->active = true;
@@ -217,11 +190,6 @@ class contact_form extends base_form
     $db_address->address2 = $address[1];
     $db_address->city = $db_contact_form_entry->city;
     $db_address->region_id = $db_contact_form_entry->region_id;
-    $postcode = 6 == strlen( $db_contact_form_entry->postcode )
-              ? sprintf( '%s %s',
-                         substr( $db_contact_form_entry->postcode, 0, 3 ),
-                         substr( $db_contact_form_entry->postcode, 3, 3 ) )
-              : $db_contact_form_entry->postcode;
     $db_address->postcode = $postcode;
     $db_address->source_postcode();
     $db_address->note = $db_contact_form_entry->address_note;
