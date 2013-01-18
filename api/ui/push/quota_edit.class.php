@@ -47,17 +47,8 @@ class quota_edit extends \cenozo\ui\push\base_edit
    */
   protected function send_machine_request()
   {
-    $cohort = $this->get_record()->get_site()->cohort;
-    if( 'comprehensive' == $cohort )
-    {
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      parent::send_machine_request();
-    }
-    else if( 'tracking' == $cohort )
-    {
-      $this->set_machine_request_url( SABRETOOTH_URL );
-      parent::send_machine_request();
-    }
+    $this->set_machine_request_url( $this->get_record()->get_site()->get_service()->get_url() );
+    parent::send_machine_request();
   }
 }
 ?>

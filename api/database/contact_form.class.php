@@ -32,11 +32,9 @@ class contact_form extends base_form
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $service_class_name = lib::get_class_name( 'database\service' );
     $site_class_name = lib::get_class_name( 'database\site' );
-
-    $db_french_site = $site_class_name::get_unique_record(
-      array( 'name', 'cohort' ),
-      array( 'Sherbrooke', 'tracking' ) );
 
     // start by checking for address duplicates in the same cohort
     $address = util::parse_address(
@@ -61,11 +59,12 @@ class contact_form extends base_form
     foreach( $address_class_name::select( $address_mod ) as $db_address )
     {
       $db_participant = $db_address->get_person()->get_participant();
-      if( $db_participant && $db_participant->cohort == $db_contact_form_entry->cohort )
+      if( $db_participant && $db_participant->cohort_id == $db_contact_form_entry->cohort_id )
       {
         throw lib::create( 'exception\notice',
-          'Unable to import contact form because an existing participant from the '.
-          $db_contact_form_entry->cohort.' cohort shares the same address.',
+          sprintf( 'Unable to import contact form because a %s participant already exists '.
+                   'at the given address.',
+                   $db_contact_form_entry->get_cohort()->name ),
           __METHOD__ );
       }
     }
@@ -139,7 +138,7 @@ class contact_form extends base_form
     $db_participant->active = true;
     $db_participant->uid = $uid;
     $db_participant->source_id = $db_source->id;
-    $db_participant->cohort = $db_contact_form_entry->cohort;
+    $db_participant->cohort_id = $db_contact_form_entry->cohort_id;
     $db_participant->first_name = $db_contact_form_entry->first_name;
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
@@ -154,9 +153,15 @@ class contact_form extends base_form
 
     // make sure that all tracking participants whose preferred language is french have
     // their preferred site set to Sherbrooke
-    // TODO: this custom code needs to be made more generic
-    if( 'tracking' == $db_participant->cohort &&
-        0 == strcasecmp( 'fr', $db_participant->language ) )
+    // TODO: code is not generic since there is no way to define language-specific sites
+    $db_tracking_cohort = $cohort_class_name::get_unique_record( 'name', 'tracking' );
+    $db_french_service =
+      $service_class_name::get_unique_record( 'cohort_id', $db_tracking_cohort->id );
+    $db_french_site = $site_class_name::get_unique_record(
+      array( 'name', 'service_id' ),
+      array( 'Sherbrooke', $db_french_service->id ) );
+    if( 0 == strcasecmp( 'fr', $db_participant->language ) &&
+        $db_participant->get_cohort()->id == $db_tracking_cohort->id )
       $db_participant->site_id = $db_french_site->id;
 
     $db_participant->save();

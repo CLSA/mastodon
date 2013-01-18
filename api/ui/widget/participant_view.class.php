@@ -94,12 +94,14 @@ class participant_view extends \cenozo\ui\widget\base_view
 
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $source_class_name = lib::get_class_name( 'database\source' );
     $record = $this->get_record();
+    $db_source = $source_class_name::get_unique_record( 'cohort_id', $record->cohort_id );
 
     $sites = array();
     $site_class_name = lib::get_class_name( 'database\site' );
     $site_mod = lib::create( 'database\modifier' );
-    $site_mod->where( 'cohort', '=', $record->cohort );
+    $site_mod->where( 'service_id', '=', $db_source->id );
     foreach( $site_class_name::select( $site_mod ) as $db_site )
       $sites[$db_site->id] = $db_site->name;
     $db_site = $record->get_site();
@@ -124,7 +126,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
-    $this->set_item( 'cohort', $record->cohort );
+    $this->set_item( 'cohort', $record->get_cohort()->name );
     $this->set_item( 'source', $record->get_source()->name );
     $this->set_item( 'first_name', $record->first_name );
     $this->set_item( 'last_name', $record->last_name );

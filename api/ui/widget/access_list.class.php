@@ -41,7 +41,7 @@ class access_list extends site_restricted_list
     $this->add_column( 'user.name', 'string', 'User', true );
     $this->add_column( 'role.name', 'string', 'Role', true );
     $this->add_column( 'site.name', 'string', 'Site', true );
-    $this->add_column( 'site.cohort', 'string', 'Cohort', true );
+    $this->add_column( 'site.service_id', 'string', 'Service', true, false );
   }
 
   /**
@@ -60,7 +60,7 @@ class access_list extends site_restricted_list
         array( 'user.name' => $record->get_user()->name,
                'role.name' => $record->get_role()->name,
                'site.name' => $record->get_site()->name,
-               'site.cohort' => $record->get_site()->cohort ) );
+               'site.service_id' => $record->get_site()->get_service()->name ) );
     }
   }
 }

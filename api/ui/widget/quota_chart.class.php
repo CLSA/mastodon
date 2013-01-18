@@ -42,22 +42,24 @@ class quota_chart extends \cenozo\ui\widget
     $quota_class_name = lib::get_class_name( 'database\quota' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $service_class_name = lib::get_class_name( 'database\service' );
 
     $chart_data = array();
-    foreach( array( 'comprehensive', 'tracking' ) as $cohort )
+    foreach( $cohort_class_name::select() as $db_cohort )
     {
       $value_list = array();
 
       // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-      $url = 'tracking' == $cohort ? SABRETOOTH_URL : BEARTOOTH_URL;
-      $cenozo_manager = lib::create( 'business\cenozo_manager', $url );
+      $db_service = $service_class_name::get_unique_record( 'cohort_id', $db_cohort->id );
+      $cenozo_manager = lib::create( 'business\cenozo_manager', $db_service->get_url() );
       $cenozo_manager->use_machine_credentials( true );
 
       foreach( array( 'male', 'female' ) as $gender )
       {
         // loop through all quotas by age group and gender
         $quota_mod = lib::create( 'database\modifier' );
-        $quota_mod->where( 'site.cohort', '=', $cohort );
+        $quota_mod->where( 'site.service_id', '=', $db_service->id );
         $quota_mod->where( 'gender', '=', $gender );
         $quota_mod->order( 'age_group.lower' );
         foreach( $quota_class_name::select( $quota_mod ) as $db_quota )
@@ -79,7 +81,7 @@ class quota_chart extends \cenozo\ui\widget
             $result = $cenozo_manager->pull( 'participant', 'list',
                 array( 'count' => true,
                        'modifier' => $pull_mod,
-                       'qnaire_rank' => 1, // TODO: constant needs to be made a paramter
+                       'qnaire_rank' => 1, // quota only involves the first qnaire
                        'state' => 'completed' ) );
             $value_list[$category] = array(
               'numerator' => intval( $result->data ),
@@ -91,7 +93,9 @@ class quota_chart extends \cenozo\ui\widget
 
         foreach( $value_list as $category => $values )
         {
-          $title = sprintf( '%s Participant Quota Progress (%s)', ucfirst( $cohort ), $gender );
+          $title = sprintf( '%s Participant Quota Progress (%s)',
+                            ucfirst( $db_cohort->name ),
+                            $gender );
           $chart_data[$title][] = array(
             'category' => $category,
             'value' => sprintf( '%0.1f', $values['numerator'] / $values['denominator'] * 100 ) );

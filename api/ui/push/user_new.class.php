@@ -86,6 +86,8 @@ class user_new extends \cenozo\ui\push\user_new
   {
     $columns = NULL;
 
+    $service_class_name = lib::get_class_name( 'database\service' );
+
     // only send the initial site/role to the appropriate application
     if( array_key_exists( 'columns', $this->machine_arguments['noid'] ) )
     {
@@ -93,22 +95,17 @@ class user_new extends \cenozo\ui\push\user_new
       unset( $this->machine_arguments['noid']['columns'] );
     }
 
-    if( 'beartooth' != $this->get_machine_application_name() )
+    foreach( $service_class_name::select() as $db_service )
     {
-      $this->machine_arguments['noid']['columns'] =
-        !is_null( $columns ) && 'comprehensive' == $columns['site']['cohort'] ? $columns : NULL;
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      $this->use_machine_credentials( true );
-      parent::send_machine_request();
-    }
-
-    if( 'sabretooth' != $this->get_machine_application_name() )
-    {
-      $this->machine_arguments['noid']['columns'] =
-        !is_null( $columns ) && 'tracking' == $columns['site']['cohort'] ? $columns : NULL;
-      $this->set_machine_request_url( SABRETOOTH_URL );
-      $this->use_machine_credentials( true );
-      parent::send_machine_request();
+      if( $this->get_machine_application_name != $db_service->name )
+      {
+        $this->machine_arguments['noid']['columns'] =
+          !is_null( $columns ) && $db_service->id == $columns['site']['service_id'] ?
+            $columns : NULL;
+        $this->set_machine_request_url( $db_service->get_url() );
+        $this->use_machine_credentials( true );
+        parent::send_machine_request();
+      }
     }
   }
 }

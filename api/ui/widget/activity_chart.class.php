@@ -30,7 +30,8 @@ class activity_chart extends \cenozo\ui\widget\activity_chart
       if( array_key_exists( 'site_id', $column ) )
       {
         $db_site = lib::create( 'database\site', $column['site_id'] );
-        $month_columns[$index]['name'] .= sprintf( ' (%s)', $db_site->cohort );
+        $month_columns[$index]['name'] .=
+          sprintf( ' (%s)', $db_site->get_service()->get_cohort()->name );
       }
     }
 
@@ -40,7 +41,8 @@ class activity_chart extends \cenozo\ui\widget\activity_chart
       if( array_key_exists( 'site_id', $column ) )
       {
         $db_site = lib::create( 'database\site', $column['site_id'] );
-        $year_columns[$index]['name'] .= sprintf( ' (%s)', $db_site->cohort );
+        $year_columns[$index]['name'] .=
+          sprintf( ' (%s)', $db_site->get_service()->get_cohort()->name );
       }
     }
 

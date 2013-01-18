@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * Edit a participant.
  */
-class participant_edit extends \cenozo\ui\push\base_edit
+class participant_edit extends base_participant_edit
 {
   /**
    * Constructor.
@@ -37,11 +37,7 @@ class participant_edit extends \cenozo\ui\push\base_edit
   {
     parent::prepare();
 
-    // only send a machine request if the participant has been synched
-    $this->set_machine_request_enabled(
-      !is_null( $this->get_record()->sync_datetime ) );
-    $this->set_machine_request_url(
-      'comprehensive' == $this->get_record()->cohort ? BEARTOOTH_URL : SABRETOOTH_URL );
+    $this->set_participant_for_machine_requests( $this->get_record() );
   }
 
   /**
@@ -59,7 +55,7 @@ class participant_edit extends \cenozo\ui\push\base_edit
       $columns = $this->get_argument( 'columns', array() );
 
       // don't send certain information
-      if( array_key_exists( 'cohort', $columns ) ||
+      if( array_key_exists( 'cohort_id', $columns ) ||
           array_key_exists( 'no_in_home', $columns ) ||
           array_key_exists( 'use_informant', $columns ) )
         $this->set_machine_request_enabled( false );

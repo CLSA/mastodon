@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * Create a new participant.
  */
-class participant_new extends \cenozo\ui\push\base_new
+class participant_new extends base_participant_new
 {
   /**
    * Constructor.

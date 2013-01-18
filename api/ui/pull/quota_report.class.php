@@ -40,8 +40,11 @@ class quota_report extends \cenozo\ui\pull\base_report
     parent::prepare();
 
     // check to see if a cohort-specific template exists for this report
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    $filename = sprintf( '%s/report/%s_%s.xls', DOC_PATH, $this->get_full_name(), $cohort );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $filename = sprintf( '%s/report/%s_%s.xls',
+                         DOC_PATH,
+                         $this->get_full_name(),
+                         $db_cohort->name );
     if( file_exists( $filename ) ) $this->report = lib::create( 'business\report', $filename );
   }
 
@@ -59,9 +62,10 @@ class quota_report extends \cenozo\ui\pull\base_report
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $service_class_name = lib::get_class_name( 'database\service' );
 
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    $site_breakdown = 'comprehensive' == $cohort;
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $site_breakdown = 'comprehensive' == $db_cohort->name;
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -82,13 +86,13 @@ class quota_report extends \cenozo\ui\pull\base_report
     }   
 
     // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-    $url = 'tracking' == $cohort ? SABRETOOTH_URL : BEARTOOTH_URL;
-    $cenozo_manager = lib::create( 'business\cenozo_manager', $url );
+    $db_service = $service_class_name::get_unique_record( 'cohort_id', $db_cohort->id );
+    $cenozo_manager = lib::create( 'business\cenozo_manager', $db_service->get_url() );
     $cenozo_manager->use_machine_credentials( true );
 
     // loop through all quotas by region or site (based on breakdown), age group and gender
     $quota_mod = lib::create( 'database\modifier' );
-    $quota_mod->where( 'site.cohort', '=', $cohort );
+    $quota_mod->where( 'site.service_id', '=', $db_service->id );
     $quota_mod->order( $site_breakdown ? 'site.name' : 'region.name' );
     $quota_mod->order( 'age_group.lower' );
     $quota_mod->order( 'gender' );
@@ -173,7 +177,7 @@ class quota_report extends \cenozo\ui\pull\base_report
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                 'qnaire_rank' => 1, // quota only involves the first qnaire
                  'state' => 'contacted' ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -181,13 +185,13 @@ class quota_report extends \cenozo\ui\pull\base_report
       $column++;
 
       // reached and viable
-      if( 'tracking' == $cohort )
+      if( 'tracking' == $db_cohort->name )
       {
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,
                    $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                   'qnaire_rank' => 1, // quota only involves the first qnaire
                    'state' => 'reached' ) );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -200,7 +204,7 @@ class quota_report extends \cenozo\ui\pull\base_report
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                 'qnaire_rank' => 1, // quota only involves the first qnaire
                  'state' => 'appointment' ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -212,21 +216,21 @@ class quota_report extends \cenozo\ui\pull\base_report
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                 'qnaire_rank' => 1, // quota only involves the first qnaire
                  'state' => 'completed' ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
-      if( 'comprehensive' == $cohort )
+      if( 'comprehensive' == $db_cohort->name )
       {
         // interview complete (comprehensive site interview)
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,
                    $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 2, // TODO: constant needs to be made a report paramter
+                   'qnaire_rank' => 2, // comp quota also involves second qnaire
                    'state' => 'completed' ) );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -239,7 +243,7 @@ class quota_report extends \cenozo\ui\pull\base_report
           array( 'count' => true,
                  'modifier' => $pull_mod,
                  $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
+                 'qnaire_rank' => 1, // quota only involves the first qnaire
                  'state' => 'consented' ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
@@ -281,7 +285,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     }
     
     // set the titles
-    $cohort = $this->get_argument( 'restrict_cohort' );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $source = $source_id ? lib::create( 'database\source', $source_id )->name : 'all sources';
     $this->report->set_size( 16 );
@@ -289,7 +293,11 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->report->set_horizontal_alignment( 'center' );
     $this->report->merge_cells( 'A1:M1' );
     $this->report->set_cell(
-      'A1', sprintf( '%s Quota Report for %s', ucwords( $cohort ), ucwords( $source ) ), false );
+      'A1',
+      sprintf( '%s Quota Report for %s',
+               ucwords( $db_cohort->name ),
+               ucwords( $source ) ),
+      false );
 
     $now_datetime_obj = util::get_datetime_object();
     $this->report->merge_cells( 'A2:M2' );

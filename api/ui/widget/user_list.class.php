@@ -64,8 +64,8 @@ class user_list extends site_restricted_list
 
       $site = 'none';
       $db_sites = $record->get_site_list();
-      if( 1 == count( $db_sites ) )
-        $site = sprintf( '%s (%s)', $db_sites[0]->name, $db_sites[0]->cohort ); // only one site?
+      if( 1 == count( $db_sites ) ) // only one site?
+        $site = sprintf( '%s (%s)', $db_sites[0]->name, $db_sites[0]->get_service()->name );
       else if( 1 < count( $db_sites ) ) $site = 'multiple'; // multiple sites?
       
       $role = 'none';

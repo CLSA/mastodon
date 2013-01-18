@@ -57,11 +57,15 @@ class system_message_list extends site_restricted_list
     {
       $db_site = $record->get_site();
       $db_role = $record->get_role();
+      $site_name = $db_site
+                 ? sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->name )
+                 : 'all';
+      $role_name = $db_role ? $db_role->name : 'all';
 
       // assemble the row for this record
       $this->add_row( $record->id,
-        array( 'site.name' => $db_site ? $db_site->name : 'all',
-               'role.name' => $db_role ? $db_role->name : 'all',
+        array( 'site.name' => $site_name,
+               'role.name' => $role_name,
                'title' => $record->title ) );
     }
   }

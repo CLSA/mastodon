@@ -20,6 +20,7 @@ final class session extends \cenozo\business\session
 {
   /**
    * Processes requested site and role and sets the session appropriately.
+   * This method overrides the parent method since sites have a service as well as a name
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $site_name
@@ -31,11 +32,18 @@ final class session extends \cenozo\business\session
     // try and use the requested site and role, if necessary
     if( !is_null( $site_name ) && !is_null( $role_name ) )
     {
-      // override the parent method since sites have a cohort as well as a name
+      // make sure there is an application name in the header
+      if( !array_key_exists( 'HTTP_APPLICATION_NAME', $_SERVER ) )
+        throw lib::create( 'exception\runtime',
+          'Application name missing, unable to process requested site and role', __METHOD__ );
+
+      $service_class_name = lib::get_class_name( 'database\service' );
       $site_class_name = lib::get_class_name( 'database\site' );
+      $db_service =
+        $service_class_name::get_unique_record( 'name', $_SERVER['HTTP_APPLICATION_NAME'] );
       $this->requested_site = $site_class_name::get_unique_record(
-        array( 'cohort', 'name' ),
-        explode( '////', $site_name ) );
+        array( 'service_id', 'name' ),
+        array( $db_service->id, $site_name ) );
 
       $role_class_name = lib::get_class_name( 'database\role' );
       $this->requested_role = $role_class_name::get_unique_record( 'name', $role_name );

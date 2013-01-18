@@ -26,7 +26,7 @@ class site_add extends \cenozo\ui\widget\site_add
     parent::prepare();
     
     // define all columns defining this record
-    $this->add_item( 'cohort', 'enum', 'Type' );
+    $this->add_item( 'service_id', 'enum', 'Service' );
   }
 
   /**
@@ -40,12 +40,12 @@ class site_add extends \cenozo\ui\widget\site_add
     parent::setup();
 
     // create enum arrays
-    $class_name = lib::get_class_name( 'database\site' );
-    $cohorts = $class_name::get_enum_values( 'cohort' );
-    $cohorts = array_combine( $cohorts, $cohorts );
+    $service_class_name = lib::get_class_name( 'database\service' );
+    foreach( $service_class_name::select() as $db_service )
+      $service_list[$db_service->id] = $db_service->name;
 
     // set the view's items
-    $this->set_item( 'cohort', key( $cohorts ), true, $cohorts );
+    $this->set_item( 'service_id', key( $service_list ), true, $service_list );
   }
 }
 ?>

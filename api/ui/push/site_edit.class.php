@@ -30,22 +30,14 @@ class site_edit extends \cenozo\ui\push\site_edit
   }
 
   /**
-   * Override the parent method to send a request to the appropriate application
+   * Override the parent method to send a request to the appropriate service
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
    */
   protected function send_machine_request()
   {
-    if( 'comprehensive' == $this->get_record()->cohort )
-    {
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      parent::send_machine_request();
-    }
-    else if( 'tracking' == $this->get_record()->cohort )
-    {   
-      $this->set_machine_request_url( SABRETOOTH_URL );
-      parent::send_machine_request();
-    }
+    $this->set_machine_request_url( $this->get_record()->get_service()->get_url() );
+    parent::send_machine_request();
   }
 }
 ?>

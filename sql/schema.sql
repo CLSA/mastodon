@@ -32,6 +32,44 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `cohort`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `cohort` ;
+
+CREATE  TABLE IF NOT EXISTS `cohort` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `service`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `service` ;
+
+CREATE  TABLE IF NOT EXISTS `service` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `cohort_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_name` (`name` ASC) ,
+  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
+  UNIQUE INDEX `uq_cohort_id` (`cohort_id` ASC) ,
+  CONSTRAINT `fk_service_cohort_id`
+    FOREIGN KEY (`cohort_id` )
+    REFERENCES `cohort` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `site`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `site` ;
@@ -41,10 +79,16 @@ CREATE  TABLE IF NOT EXISTS `site` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
-  `cohort` ENUM('comprehensive', 'tracking') NOT NULL ,
+  `service_id` INT UNSIGNED NOT NULL ,
   `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_name_cohort` (`name` ASC, `cohort` ASC) )
+  UNIQUE INDEX `uq_name_service_id` (`name` ASC, `service_id` ASC) ,
+  INDEX `fk_service_id` (`service_id` ASC) ,
+  CONSTRAINT `fk_site_service_id`
+    FOREIGN KEY (`service_id` )
+    REFERENCES `service` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -78,7 +122,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `active` TINYINT(1) NOT NULL DEFAULT true ,
   `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
   `source_id` INT UNSIGNED NULL DEFAULT NULL ,
-  `cohort` ENUM('comprehensive','tracking') NOT NULL ,
+  `cohort_id` INT UNSIGNED NOT NULL ,
   `first_name` VARCHAR(45) NOT NULL ,
   `last_name` VARCHAR(45) NOT NULL ,
   `gender` ENUM('male','female') NOT NULL ,
@@ -103,6 +147,7 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   INDEX `fk_site_id` (`site_id` ASC) ,
   UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
   INDEX `fk_age_group_id` (`age_group_id` ASC) ,
+  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
   CONSTRAINT `fk_participant_person_id`
     FOREIGN KEY (`person_id` )
     REFERENCES `person` (`id` )
@@ -121,6 +166,11 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   CONSTRAINT `fk_participant_age_group_id`
     FOREIGN KEY (`age_group_id` )
     REFERENCES `age_group` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_cohort_id`
+    FOREIGN KEY (`cohort_id` )
+    REFERENCES `cohort` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -499,7 +549,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   `time_19_20` TINYINT(1) NOT NULL DEFAULT false ,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT false ,
   `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either' ,
-  `cohort` ENUM('tracking','comprehensive') NULL ,
+  `cohort_id` INT UNSIGNED NULL ,
   `signed` TINYINT(1) NOT NULL DEFAULT false ,
   `date` DATE NULL ,
   `note` TEXT NULL ,
@@ -508,6 +558,7 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   INDEX `fk_contact_form_id` (`contact_form_id` ASC) ,
   INDEX `fk_contact_form_entry_region_id` (`region_id` ASC) ,
   UNIQUE INDEX `uq_contact_form_id_user_id` (`contact_form_id` ASC, `user_id` ASC) ,
+  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
   CONSTRAINT `fk_contact_form_entry_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
@@ -521,6 +572,11 @@ CREATE  TABLE IF NOT EXISTS `contact_form_entry` (
   CONSTRAINT `fk_contact_form_entry_region_id`
     FOREIGN KEY (`region_id` )
     REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contact_form_entry_cohort_id`
+    FOREIGN KEY (`cohort_id` )
+    REFERENCES `cohort` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -820,7 +876,7 @@ CREATE  TABLE IF NOT EXISTS `import_entry` (
   `time_19_20` TINYINT(1) NOT NULL DEFAULT false ,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT false ,
   `language` ENUM('en','fr') NULL ,
-  `cohort` ENUM('tracking','comprehensive') NOT NULL ,
+  `cohort` VARCHAR(45) NOT NULL ,
   `signed` TINYINT(1) NOT NULL DEFAULT false ,
   `date` DATE NOT NULL ,
   PRIMARY KEY (`id`) ,
@@ -861,6 +917,32 @@ CREATE  TABLE IF NOT EXISTS `jurisdiction` (
   CONSTRAINT `fk_jurisdiction_site`
     FOREIGN KEY (`site_id` )
     REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `service_has_cohort`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `service_has_cohort` ;
+
+CREATE  TABLE IF NOT EXISTS `service_has_cohort` (
+  `service_id` INT UNSIGNED NOT NULL ,
+  `cohort_id` INT UNSIGNED NOT NULL ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  PRIMARY KEY (`service_id`, `cohort_id`) ,
+  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
+  INDEX `fk_service_id` (`service_id` ASC) ,
+  CONSTRAINT `fk_service_has_cohort_service_id`
+    FOREIGN KEY (`service_id` )
+    REFERENCES `service` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_service_has_cohort_cohort_id`
+    FOREIGN KEY (`cohort_id` )
+    REFERENCES `cohort` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -1015,13 +1097,15 @@ CREATE  OR REPLACE VIEW `participant_site` AS
 SELECT participant.id AS participant_id, IF(
   ISNULL( participant.site_id ),
   IF(
-    participant.cohort = "comprehensive",
+    cohort.name = "comprehensive",
     jurisdiction.site_id,
     region.site_id
   ),
   participant.site_id
 ) AS site_id
 FROM participant
+JOIN cohort
+ON participant.cohort_id = cohort.id
 LEFT JOIN participant_primary_address
 ON participant.id = participant_primary_address.participant_id
 LEFT JOIN address

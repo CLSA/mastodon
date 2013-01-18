@@ -27,6 +27,7 @@ class import_entry extends \cenozo\database\record
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $address_class_name = lib::get_class_name( 'database\address' );
     $postcode_class_name = lib::get_class_name( 'database\postcode' );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
       $this->apartment_error = true;
@@ -67,16 +68,13 @@ class import_entry extends \cenozo\database\record
     }
 
     // other obvious checks (because you can't trust anyone...)
-    if( 0 == preg_match( '/^male|female$/', $this->gender ) )
-      $this->gender_error = true;
-    if( !util::validate_date( $this->date_of_birth ) )
-      $this->date_of_birth_error = true;
-    if( 0 == preg_match( '/^en|fr$/', $this->language ) )
-      $this->language_error = true;
-    if( 0 == preg_match( '/^comprehensive|tracking$/', $this->cohort ) )
-      $this->cohort_error = true;
-    if( !util::validate_date( $this->date ) )
-      $this->date_error = true;
+    $cohort_names = array();
+    foreach( $cohort_class_name::select() as $db_cohort ) $cohort_names[] = $db_cohort->name;
+    if( 0 == preg_match( '/^male|female$/', $this->gender ) ) $this->gender_error = true;
+    if( !util::validate_date( $this->date_of_birth ) ) $this->date_of_birth_error = true;
+    if( 0 == preg_match( '/^en|fr$/', $this->language ) ) $this->language_error = true;
+    if( !in_array( $this->cohort, $cohort_names ) ) $this->cohort_error = true;
+    if( !util::validate_date( $this->date ) ) $this->date_error = true;
 
     // look for duplicate addresses
     if( !$this->apartment_error &&
@@ -103,7 +101,7 @@ class import_entry extends \cenozo\database\record
       foreach( $address_class_name::select( $address_mod ) as $db_address )
       {
         $db_participant = $db_address->get_person()->get_participant();
-        if( $db_participant && $db_participant->cohort == $this->cohort )
+        if( $db_participant && $db_participant->get_cohort()->name == $this->cohort )
         {
           $this->duplicate_address_error = true;
           break;
@@ -146,10 +144,8 @@ class import_entry extends \cenozo\database\record
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $region_class_name = lib::get_class_name( 'database\region' );
     $site_class_name = lib::get_class_name( 'database\site' );
-
-    $db_french_site = $site_class_name::get_unique_record(
-      array( 'name', 'cohort' ),
-      array( 'Sherbrooke', 'tracking' ) );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $service_class_name = lib::get_class_name( 'database\service' );
 
     // all participants are from the rdd source
     $db_source = $source_class_name::get_unique_record( 'name', 'rdd' );
@@ -177,7 +173,8 @@ class import_entry extends \cenozo\database\record
     $db_participant->active = true;
     $db_participant->uid = $uid;
     $db_participant->source_id = $db_source->id;
-    $db_participant->cohort = $this->cohort;
+    $db_cohort = $cohort_class_name::get_unique_record( 'name', $this->cohort );
+    $db_participant->cohort_id = $db_cohort->id;
     $db_participant->first_name = $this->first_name;
     $db_participant->last_name = $this->last_name;
     $db_participant->gender = $this->gender;
@@ -191,9 +188,15 @@ class import_entry extends \cenozo\database\record
 
     // make sure that all tracking participants whose preferred language is french have
     // their preferred site set to Sherbrooke
-    // TODO: this custom code needs to be made more generic
-    if( 'tracking' == $db_participant->cohort &&
-        0 == strcasecmp( 'fr', $db_participant->language ) )
+    // TODO: code is not generic since there is no way to define language-specific sites
+    $db_tracking_cohort = $cohort_class_name::get_unique_record( 'name', 'tracking' );
+    $db_french_service =
+      $service_class_name::get_unique_record( 'cohort_id', $db_tracking_cohort->id );
+    $db_french_site = $site_class_name::get_unique_record(
+      array( 'name', 'service_id' ),
+      array( 'Sherbrooke', $db_french_service->id ) );
+    if( 0 == strcasecmp( 'fr', $db_participant->language ) &&
+        $db_participant->get_cohort()->id == $db_tracking_cohort->id )
       $db_participant->site_id = $db_french_site->id;
 
     $db_participant->save();

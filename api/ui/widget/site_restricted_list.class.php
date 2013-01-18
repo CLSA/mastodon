@@ -39,12 +39,12 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   {
     parent::prepare();
     
-    // if restricted, show the site's name and cohort in the heading
+    // if restricted, show the site's name and service in the heading
     $predicate = is_null( $this->db_restrict_site )
                ? 'all sites'
                : sprintf( '%s (%s)',
                           $this->db_restrict_site->name,
-                          $this->db_restrict_site->cohort );
+                          $this->db_restrict_site->get_service()->name );
 
     $this->set_heading( $this->get_subject().' list for '.$predicate );
   }
@@ -59,12 +59,8 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   {
     parent::setup();
 
-    // we're restricting to a site, so remove the site and cohort columns
-    if( !is_null( $this->db_restrict_site ) )
-    {
-      $this->remove_column( 'site' );
-      $this->remove_column( 'cohort' );
-    }
+    // we're restricting to a site, so remove the service column
+    if( !is_null( $this->db_restrict_site ) ) $this->remove_column( 'site.service_id' );
 
     if( static::may_restrict() )
     {
@@ -74,11 +70,12 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
       {
         $site_class_name = lib::get_class_name( 'database\site' );
         $site_mod = lib::create( 'database\modifier' );
-        $site_mod->order( 'cohort' );
+        $site_mod->order( 'service_id' );
         $site_mod->order( 'name' );
         $sites = array();
         foreach( $site_class_name::select( $site_mod ) as $db_site )
-          $sites[$db_site->id] = sprintf( '%s (%s)', $db_site->name, $db_site->cohort );
+          $sites[$db_site->id] =
+            sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name );
         $this->set_variable( 'sites', $sites );
       }
     }

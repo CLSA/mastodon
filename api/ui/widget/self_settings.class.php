@@ -33,8 +33,8 @@ class self_settings extends \cenozo\ui\widget\self_settings
     
     $sites = array();
     foreach( $db_user->get_site_list() as $db_site )
-      $sites[ $db_site->id ] = 
-        $db_site->name.' ('.( 'tracking' == $db_site->cohort ? 'track' : 'comp' ).')';
+      $sites[ $db_site->id ] =
+        sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name );
 
     $this->set_variable( 'sites', $sites );    
   }

@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * Create a new address.
  */
-class address_new extends \cenozo\ui\push\base_new
+class address_new extends base_participant_new
 {
   /**
    * Constructor.
@@ -37,15 +37,9 @@ class address_new extends \cenozo\ui\push\base_new
   {
     parent::prepare();
 
-    // only send a machine request if the participant has been synched
     $columns = $this->get_argument( 'columns' );
     $db_person = lib::create( 'database\person', $columns['person_id'] );
-    $db_participant = $db_person->get_participant();
-    $this->set_machine_request_enabled( !is_null( $db_participant ) &&
-                                        !is_null( $db_participant->sync_datetime ) );
-    $this->set_machine_request_url( !is_null( $db_participant )
-         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
-         : NULL );
+    $this->set_participant_for_machine_requests( $db_person->get_participant() );
   }
 
   /**

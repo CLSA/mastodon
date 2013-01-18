@@ -40,12 +40,12 @@ class participant_site_reassign extends \cenozo\ui\widget
     $site_class_name = lib::get_class_name( 'database\site' );
     $sites = array();
     $site_mod = lib::create( 'database\modifier' );
-    $site_mod->order( 'cohort' );
+    $site_mod->order( 'service_id' );
     $site_mod->order( 'name' );
     foreach( $site_class_name::select( $site_mod ) as $db_site )
       $sites[] = array( 'id' => $db_site->id,
                         'name' => $db_site->name,
-                        'cohort' => $db_site->cohort );
+                        'cohort' => $db_site->get_service()->get_cohort() );
     $this->set_variable( 'sites', $sites );
   }
 }

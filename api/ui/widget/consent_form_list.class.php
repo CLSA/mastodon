@@ -36,13 +36,13 @@ class consent_form_list extends base_form_list
   public function determine_record_count( $modifier = NULL )
   {
     // restrict by cohort, if necessary
-    $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );
-    if( 'any' != $restrict_cohort )
+    $restrict_cohort_id = $this->get_argument( 'restrict_cohort_id', 0 );
+    if( 0 < $restrict_cohort_id )
     {
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'consent_form_id', '=', 'consent_form.id', false );
       $sub_mod->where( 'consent_form_entry.uid', '=', 'participant.uid', false );
-      $sub_mod->where( 'participant.cohort', '=', $restrict_cohort );
+      $sub_mod->where( 'participant.cohort_id', '=', $restrict_cohort_id );
       $min_consent_form_entry_sql = sprintf(
         '( SELECT MIN( consent_form_entry.id ) FROM consent_form_entry, participant %s )',
         $sub_mod->get_sql() );
@@ -64,13 +64,13 @@ class consent_form_list extends base_form_list
   public function determine_record_list( $modifier = NULL )
   {
     // restrict by cohort, if necessary
-    $restrict_cohort = $this->get_argument( 'restrict_cohort', 'any' );
-    if( 'any' != $restrict_cohort )
+    $restrict_cohort_id = $this->get_argument( 'restrict_cohort_id', 0 );
+    if( 0 < $restrict_cohort_id )
     {
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'consent_form_id', '=', 'consent_form.id', false );
       $sub_mod->where( 'consent_form_entry.uid', '=', 'participant.uid', false );
-      $sub_mod->where( 'participant.cohort', '=', $restrict_cohort );
+      $sub_mod->where( 'participant.cohort_id', '=', $restrict_cohort_id );
       $min_consent_form_entry_sql = sprintf(
         '( SELECT MIN( consent_form_entry.id ) FROM consent_form_entry, participant %s )',
         $sub_mod->get_sql() );

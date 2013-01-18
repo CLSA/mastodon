@@ -76,7 +76,7 @@ class quota_view extends \cenozo\ui\widget\base_view
         sprintf( '%d to %d', $db_age_group->lower, $db_age_group->upper );
 
     // set the view's items
-    $this->set_item( 'cohort', $this->get_record()->get_site()->cohort );
+    $this->set_item( 'cohort', $this->get_record()->get_site()->get_source()->get_cohort()->name );
     $this->set_item( 'site_id', $this->get_record()->get_site()->name );
     $this->set_item( 'region_id', $this->get_record()->region_id, true, $regions );
     $this->set_item( 'gender', $this->get_record()->gender, true, $genders );

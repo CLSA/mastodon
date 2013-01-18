@@ -100,11 +100,11 @@ class participant extends person
   {
     $db_site = NULL;
 
-    if( 'comprehensive' == $this->cohort )
+    if( 'comprehensive' == $this->get_cohort()->name )
     {
       $db_address = $this->get_primary_address();
       if( !is_null( $db_address ) )
-      { // there is a primary address
+      {
         $jurisdiction_class_name = lib::get_class_name( 'database\jurisdiction' );
         $db_jurisdiction =
           $jurisdiction_class_name::get_unique_record( 'postcode', $db_address->postcode );
@@ -114,10 +114,7 @@ class participant extends person
     else
     {
       $db_address = $this->get_primary_address();
-      if( !is_null( $db_address ) )
-      { // there is a primary address
-        $db_site = $db_address->get_region()->get_site();
-      }
+      if( !is_null( $db_address ) ) $db_site = $db_address->get_region()->get_site();
     }
 
     return $db_site;
@@ -294,7 +291,8 @@ participant::customize_join( 'address', $address_mod );
 
 // define the join to the jurisdiction table
 $jurisdiction_mod = lib::create( 'database\modifier' );
-$jurisdiction_mod->where( 'participant.cohort', '=', 'comprehensive' );
+$jurisdiction_mod->where( 'participant.cohort_id', '=', 'cohort.id', false );
+$jurisdiction_mod->where( 'cohort.name', '=', 'comprehensive' );
 $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
 $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
 $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );

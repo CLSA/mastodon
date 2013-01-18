@@ -37,7 +37,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
   {
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
-    $cohort = $this->get_argument( 'restrict_cohort' );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
@@ -49,7 +49,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
         sprintf( $mailed_to ?
                  'List of all unsynched %s participants who have been mailed to.' :
                  'List of all %s participants who require a package mailed out.',
-                 $cohort ) );
+                 $db_cohort->name ) );
     }
     else
     {
@@ -57,7 +57,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
         sprintf( $mailed_to ?
                  'List of all unsynched %s participants whose source is %s who have been mailed to.' :
                  'List of all %s participants whose source is %s and require a package mailed out.',
-                 $cohort,
+                 $db_cohort->name,
                  $db_source->name ) );
     }
     
@@ -68,7 +68,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
       $participant_mod->order_desc( 'status.datetime' );
       $participant_mod->where( 'sync_datetime', '=', NULL );
     }
-    $participant_mod->where( 'cohort', '=', $cohort );
+    $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
     if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
 
     $contents = array();

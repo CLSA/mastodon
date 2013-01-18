@@ -42,8 +42,9 @@ class participant_list extends site_restricted_list
     $this->add_column( 'first_name', 'string', 'First', true );
     $this->add_column( 'last_name', 'string', 'Last', true );
     $this->add_column( 'active', 'boolean', 'Active', true );
-    $this->add_column( 'source.name', 'string', 'Source', true );
-    $this->add_column( 'cohort', 'string', 'Cohort', true );
+    if( is_null( $this->db_restrict_site ) )
+      $this->add_column( 'source.name', 'string', 'Source', true );
+    $this->add_column( 'cohort.name', 'string', 'Cohort', true );
     $this->add_column( 'site', 'string', 'Site', false );
 
     // participants are either jurisdiction or participant_site based
@@ -76,16 +77,17 @@ class participant_list extends site_restricted_list
       $source_name = is_null( $db_source ) ? '(none)' : $db_source->name;
       $db_site = $record->get_primary_site();
       $site_name = is_null( $db_site ) ? 'none' : $db_site->name;
-      $this->add_row( $record->id,
-        array( 'uid' => $record->uid ? $record->uid : '(none)',
-               'first_name' => $record->first_name,
-               'last_name' => $record->last_name,
-               'active' => $record->active,
-               'source.name' => $source_name,
-               'cohort' => $record->cohort,
-               'site' => $site_name,
-               // note count isn't a column, it's used for the note button
-               'note_count' => $record->get_note_count() ) );
+      $columns = array(
+        'uid' => $record->uid ? $record->uid : '(none)',
+        'first_name' => $record->first_name,
+        'last_name' => $record->last_name,
+        'active' => $record->active,
+        'source.name' => $source_name,
+        'site' => $site_name,
+        // note count isn't a column, it's used for the note button
+        'note_count' => $record->get_note_count() );
+      if( is_null( $this->db_restrict_site ) ) $columns['cohort'] = $record->get_cohort()->name;
+      $this->add_row( $record->id, $columns );
     }
 
     $this->set_variable( 'conditions', $participant_class_name::get_enum_values( 'status' ) );

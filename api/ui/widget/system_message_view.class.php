@@ -33,9 +33,11 @@ class system_message_view extends \cenozo\ui\widget\system_message_view
     {
       $sites = array();
       $site_mod = lib::create( 'database\modifier' );
+      $site_mod->order( 'source_id' );
       $site_mod->order( 'name' );
       foreach( $site_class_name::select( $site_mod ) as $db_site )
-        $sites[$db_site->id] = sprintf( '%s (%s)', $db_site->name, $db_site->cohort );
+        $sites[$db_site->id] =
+          sprintf( '%s (%s)', $db_site->name, $db_site->get_source()->get_cohort()->name );
     }
 
     // set the view's items

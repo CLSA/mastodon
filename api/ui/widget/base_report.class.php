@@ -62,25 +62,27 @@ abstract class base_report extends \cenozo\ui\widget\base_report
 
       if( 'administrator' == $session->get_role()->name )
       {
-        $cohort_types = $participant_class_name::get_enum_values( 'cohort' );
-        $cohort_types = array_combine( $cohort_types, $cohort_types );
+        $cohort_list = array( 0 => 'all' );
+        $class_name = lib::get_class_name( 'database\cohort' );
+        foreach( $class_name::select() as $db_cohort )
+          $cohort_list[ $db_cohort->id ] = $db_cohort->name;
       }
       else
       {
-        $cohort_types = array( $session->get_site()->cohort => $session->get_site()->cohort );
+        $db_cohort = $session->get_site()->get_service()->get_cohort();
+        $cohort_list = array( $db_cohort->id => $db_cohort->name );
       }
-      $this->set_parameter( 'restrict_cohort', key( $cohort_types ), true, $cohort_types );
+      $this->set_parameter( 'restrict_cohort_id', key( $cohort_list ), true, $cohort_list );
     }
 
     if( $this->restrictions[ 'source' ] )
     {
-      $sources = array( 0 => 'all' );
+      $source_list = array( 0 => 'all' );
       $class_name = lib::get_class_name( 'database\source' );
       foreach( $class_name::select() as $db_source )
-        $sources[ $db_source->id ] = $db_source->name;
+        $source_list[ $db_source->id ] = $db_source->name;
       
-      $this->set_parameter(
-        'restrict_source_id', key( $sources ), true, $sources );
+      $this->set_parameter( 'restrict_source_id', key( $source_list ), true, $source_list );
     }
   }
 
@@ -98,7 +100,7 @@ abstract class base_report extends \cenozo\ui\widget\base_report
     if( 'cohort' == $restriction_type )
     {
       $this->restrictions[ 'cohort' ] = true;
-      $this->add_parameter( 'restrict_cohort', 'enum', 'Cohort' );
+      $this->add_parameter( 'restrict_cohort_id', 'enum', 'Cohort' );
     }
     else if( 'source' == $restriction_type )
     {

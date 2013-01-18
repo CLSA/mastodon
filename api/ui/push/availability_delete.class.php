@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * push: availability delete
  */
-class availability_delete extends \cenozo\ui\push\base_delete
+class availability_delete extends base_participant_delete
 {
   /**
    * Constructor.
@@ -35,12 +35,7 @@ class availability_delete extends \cenozo\ui\push\base_delete
   {
     parent::prepare();
 
-    // only send a machine request if the participant has been synched
-    $db_participant = $this->get_record()->get_participant();
-    $this->set_machine_request_enabled( !is_null( $db_participant->sync_datetime ) );
-    $this->set_machine_request_url( !is_null( $db_participant )
-         ? ( 'comprehensive' == $db_participant->cohort ? BEARTOOTH_URL : SABRETOOTH_URL )
-         : NULL );
+    $this->set_participant_for_machine_requests( $this->get_record()->get_participant() );
   }
 }
 ?>

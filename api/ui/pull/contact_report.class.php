@@ -60,7 +60,7 @@ class contact_report extends \cenozo\ui\pull\base_report
       $consent = $db_consent ? $db_consent->event : 'None';
 
       $contents[] = array(
-        $db_participant->cohort,
+        $db_participant->get_cohort()->name,
         $site_name,
         'fr' == $db_participant->language ? 'fr' : 'en', // english if not set
         $db_participant->uid,

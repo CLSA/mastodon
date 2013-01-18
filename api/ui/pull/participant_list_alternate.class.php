@@ -45,7 +45,8 @@ class participant_list_alternate extends \cenozo\ui\pull\base_list_record
         throw lib::create( 'exception\argument', 'uid', $this->arguments['uid'], __METHOD__ );
 
       // make sure not to mix up comprehensive and tracking participants
-      if( $db_participant->cohort != lib::create( 'business\session' )->get_site()->cohort )
+      if( $db_participant->cohort_id !=
+          lib::create( 'business\session' )->get_site()->get_session()->cohort_id )
         throw lib::create( 'exception\runtime',
           'Tried to get participant from wrong cohort.', __METHOD__ );
 

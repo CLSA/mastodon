@@ -41,6 +41,7 @@ class participant_site_reassign extends \cenozo\ui\push
 
     $site_id = $this->get_argument( 'site_id' );
     $db_site = 0 < $site_id ? lib::create( 'database\site', $site_id ) : NULL;
+    $db_service = 0 < $site_id ? $db_site->get_service() : NULL;
 
     $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
     $uid_list_string = trim( $uid_list_string );
@@ -52,7 +53,7 @@ class participant_site_reassign extends \cenozo\ui\push
       $db_participant = $participant_class_name::get_unique_record( 'uid', $uid );
 
       if( !is_null( $db_participant ) &&
-          ( is_null( $db_site ) || $db_participant->cohort == $db_site->cohort ) )
+          ( is_null( $db_site ) || $db_participant->cohort_id == $db_service->cohort_id ) )
       {
         $site_id = is_null( $db_site ) ? NULL : $db_site->id;
         $args = array( 'id' => $db_participant->id,

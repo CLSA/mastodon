@@ -55,16 +55,8 @@ class site_new_access extends \cenozo\ui\push\site_new_access
     // there's a chance that the role list is empty, skip if it is
     if( 0 == count( $this->machine_arguments['noid']['role_list'] ) ) return;
 
-    if( 'comprehensive' == $this->get_record()->cohort )
-    {
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      parent::send_machine_request();
-    }
-    else if( 'tracking' == $this->get_record()->cohort )
-    {   
-      $this->set_machine_request_url( SABRETOOTH_URL );
-      parent::send_machine_request();
-    }
+    $this->set_machine_request_url( $this->get_record()->get_service()->get_url() );
+    parent::send_machine_request();
   }
 }
 ?>

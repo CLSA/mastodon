@@ -45,7 +45,8 @@ class participant_primary extends \cenozo\ui\pull\base_primary
         throw lib::create( 'exception\argument', 'uid', $this->arguments['uid'], __METHOD__ );
 
       // make sure not to mix up comprehensive and tracking participants
-      if( $db_participant->cohort != lib::create( 'business\session' )->get_site()->cohort )
+      if( $db_participant->cohort_id !=
+          lib::create( 'business\session' )->get_site()->get_source()->cohort_id )
         throw lib::create( 'exception\runtime',
           'Tried to get participant from wrong cohort.', __METHOD__ );
 
@@ -69,7 +70,7 @@ class participant_primary extends \cenozo\ui\pull\base_primary
 
     // restrict by cohort, if asked to
     $cohort = $this->get_argument( 'cohort', false );
-    if( $cohort && $cohort != $db_participant->cohort )
+    if( $cohort && $cohort != $db_participant->get_cohort()->name )
       throw lib::create( 'exception\argument', 'uid', $args['uid'], __METHOD__ );
 
     // convert source_id to source (name)

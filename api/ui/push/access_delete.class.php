@@ -65,16 +65,8 @@ class access_delete extends \cenozo\ui\push\access_delete
 
     if( 'typist' != $db_role->name )
     {
-      if( 'comprehensive' == $db_site->cohort )
-      {
-        $this->set_machine_request_url( BEARTOOTH_URL );
-        parent::send_machine_request();
-      }
-      else if( 'tracking' == $db_site->cohort )
-      {
-        $this->set_machine_request_url( SABRETOOTH_URL );
-        parent::send_machine_request();
-      }
+      $this->set_machine_request_url( $db_site->get_service()->get_url() );
+      parent::send_machine_request();
     }
   }
 }

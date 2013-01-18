@@ -36,18 +36,13 @@ class site_new extends \cenozo\ui\push\site_new
    */
   protected function send_machine_request()
   {
-    $cohort = $this->machine_arguments['columns']['cohort'];
-    unset( $this->machine_arguments['columns']['cohort'] );
+    $db_service =
+      lib::create( 'database\service', $this->machine_arguments['columns']['service_id'] );
+    unset( $this->machine_arguments['columns']['service_id'] );
 
-    if( 'comprehensive' == $cohort && 'beartooth' != $this->get_machine_application_name() )
+    if( $this->get_machine_application_name() != $db_service->name )
     {
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      parent::send_machine_request();
-    }
-
-    if( 'tracking' == $cohort && 'sabretooth' != $this->get_machine_application_name() )
-    {   
-      $this->set_machine_request_url( SABRETOOTH_URL );
+      $this->set_machine_request_url( $db_service->get_url() );
       parent::send_machine_request();
     }
   }

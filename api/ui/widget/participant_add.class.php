@@ -71,20 +71,20 @@ class participant_add extends \cenozo\ui\widget\base_view
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
 
     $sources = array();
     foreach( $source_class_name::select() as $db_source )
       $sources[$db_source->id] = $db_source->name;
+    $cohorts = array();
+    foreach( $cohort_class_name::select() as $db_cohort )
+      $cohorts[$db_cohort->id] = $db_cohort->name;
     $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
     $languages = $participant_class_name::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
     $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
-    $cohorts = $participant_class_name::get_enum_values( 'cohort' );
-    $cohorts = array_combine( $cohorts, $cohorts );
-    $sources = $participant_class_name::get_enum_values( 'source' );
-    $sources = array_combine( $sources, $sources );
     
     $sites = array();
     $site_class_name = lib::get_class_name( 'database\site' );

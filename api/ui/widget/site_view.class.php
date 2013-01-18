@@ -25,6 +25,7 @@ class site_view extends \cenozo\ui\widget\site_view
   {
     parent::prepare();
 
+    $this->add_item( 'service_id', 'constant', 'Service' );
     $this->add_item( 'cohort', 'constant', 'Cohort' );
   }
 
@@ -38,7 +39,9 @@ class site_view extends \cenozo\ui\widget\site_view
   {
     parent::setup();
 
-    $this->set_item( 'cohort', $this->get_record()->cohort );
+    $db_service = $this->get_record()->get_service();
+    $this->set_item( 'service_id', $db_service->name );
+    $this->set_item( 'cohort', $db_service->get_cohort()->name );
   }
 }
 ?>
