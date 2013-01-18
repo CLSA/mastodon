@@ -64,11 +64,11 @@ class quota_add extends \cenozo\ui\widget\base_view
     // create enum arrays
     $sites = array();
     $site_mod = lib::create( 'database\modifier' );
-    $site_mod->order( 'source_id' );
+    $site_mod->order( 'service_id' );
     $site_mod->order( 'name' );
     foreach( $site_class_name::select( $site_mod ) as $db_site )
       $sites[$db_site->id] =
-        sprintf( '%s (%s)', $db_site->name, $db_site->get_source()->get_cohort()->name );
+        sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name );
     $regions = array();
     $region_mod = lib::create( 'database\modifier' );
     $region_mod->order( 'country' );

@@ -43,11 +43,11 @@ class user_add extends \cenozo\ui\widget\user_add
     if( $is_top_tier )
     {
       $site_mod = lib::create( 'database\modifier' );
-      $site_mod->order( 'source_id' );
+      $site_mod->order( 'service_id' );
       $site_mod->order( 'name' );
       foreach( $site_class_name::select( $site_mod ) as $db_site )
         $sites[$db_site->id] =
-          sprintf( '%s (%s)', $db_site->name, $db_site->get_source()->get_cohort()->name );
+          sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name );
     }
 
     $value = $is_top_tier ? current( $sites ) : $session->get_site()->id;

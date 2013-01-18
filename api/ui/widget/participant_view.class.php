@@ -94,14 +94,14 @@ class participant_view extends \cenozo\ui\widget\base_view
 
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $source_class_name = lib::get_class_name( 'database\source' );
+    $service_class_name = lib::get_class_name( 'database\service' );
     $record = $this->get_record();
-    $db_source = $source_class_name::get_unique_record( 'cohort_id', $record->cohort_id );
+    $db_service = $service_class_name::get_unique_record( 'cohort_id', $record->cohort_id );
 
     $sites = array();
     $site_class_name = lib::get_class_name( 'database\site' );
     $site_mod = lib::create( 'database\modifier' );
-    $site_mod->where( 'service_id', '=', $db_source->id );
+    $site_mod->where( 'service_id', '=', $db_service->id );
     foreach( $site_class_name::select( $site_mod ) as $db_site )
       $sites[$db_site->id] = $db_site->name;
     $db_site = $record->get_site();

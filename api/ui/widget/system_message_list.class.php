@@ -58,7 +58,7 @@ class system_message_list extends site_restricted_list
       $db_site = $record->get_site();
       $db_role = $record->get_role();
       $site_name = $db_site
-                 ? sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->name )
+                 ? sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name )
                  : 'all';
       $role_name = $db_role ? $db_role->name : 'all';
 

@@ -42,9 +42,9 @@ class participant_list extends site_restricted_list
     $this->add_column( 'first_name', 'string', 'First', true );
     $this->add_column( 'last_name', 'string', 'Last', true );
     $this->add_column( 'active', 'boolean', 'Active', true );
+    $this->add_column( 'source.name', 'string', 'Source', true );
     if( is_null( $this->db_restrict_site ) )
-      $this->add_column( 'source.name', 'string', 'Source', true );
-    $this->add_column( 'cohort.name', 'string', 'Cohort', true );
+      $this->add_column( 'cohort.name', 'string', 'Cohort', true );
     $this->add_column( 'site', 'string', 'Site', false );
 
     // participants are either jurisdiction or participant_site based
@@ -86,7 +86,8 @@ class participant_list extends site_restricted_list
         'site' => $site_name,
         // note count isn't a column, it's used for the note button
         'note_count' => $record->get_note_count() );
-      if( is_null( $this->db_restrict_site ) ) $columns['cohort'] = $record->get_cohort()->name;
+      if( is_null( $this->db_restrict_site ) )
+        $columns['cohort.name'] = $record->get_cohort()->name;
       $this->add_row( $record->id, $columns );
     }
 

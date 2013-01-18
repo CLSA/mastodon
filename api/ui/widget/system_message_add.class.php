@@ -1,6 +1,6 @@
 <?php
 /**
- * system_message_view.class.php
+ * system_message_add.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,12 +10,12 @@ namespace mastodon\ui\widget;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * widget system_message view
+ * widget system_message add
  */
-class system_message_view extends \cenozo\ui\widget\system_message_view
+class system_message_add extends \cenozo\ui\widget\system_message_add
 {
   /**
-   * Defines all items in the view.
+   * Defines all items in the add.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
@@ -40,7 +40,7 @@ class system_message_view extends \cenozo\ui\widget\system_message_view
           sprintf( '%s (%s)', $db_site->name, $db_site->get_service()->get_cohort()->name );
     }
 
-    // set the view's items
+    // set the add's items
     $this->set_item(
       'site_id', $this->get_record()->site_id, false, $is_top_tier ? $sites : NULL );
   }
