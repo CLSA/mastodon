@@ -803,10 +803,6 @@ INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "coordinator" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "quota" AND name = "primary" );
-INSERT INTO role_has_operation
-SET role_id = ( SELECT id FROM role WHERE name = "coordinator" ),
-    operation_id = ( SELECT id FROM operation WHERE
-      type = "widget" AND subject = "quota" AND name = "chart" );
 
 -- report
 INSERT INTO role_has_operation
@@ -1708,10 +1704,6 @@ INSERT INTO role_has_operation
 SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
     operation_id = ( SELECT id FROM operation WHERE
       type = "pull" AND subject = "quota" AND name = "primary" );
-INSERT INTO role_has_operation
-SET role_id = ( SELECT id FROM role WHERE name = "supervisor" ),
-    operation_id = ( SELECT id FROM operation WHERE
-      type = "widget" AND subject = "quota" AND name = "chart" );
 
 -- report
 INSERT INTO role_has_operation
