@@ -128,7 +128,7 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   }
 
   /**
-   * Whether the subject is jurisdiction based.
+   * Whether the subject is participant_site based.
    * @var boolean
    * @access protected
    */

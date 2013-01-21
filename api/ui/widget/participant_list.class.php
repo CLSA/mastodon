@@ -47,7 +47,6 @@ class participant_list extends site_restricted_list
       $this->add_column( 'cohort.name', 'string', 'Cohort', true );
     $this->add_column( 'site', 'string', 'Site', false );
 
-    // participants are either jurisdiction or participant_site based
     $this->extended_site_selection = true;
 
     $restrict_condition = $this->get_argument( 'restrict_condition', '' );
