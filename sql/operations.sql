@@ -75,6 +75,10 @@ VALUES( "widget", "consent", "list", true, "Lists a participant's consent entrie
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent", "primary", true, "Retrieves base consent information." );
 
+-- all forms
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "form", "chart", true, "Displays a chart describing the progress of forms through the data entry system." );
+
 -- consent_form
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "consent_form", "download", true, "Downloads a participant's scanned consent form." );
@@ -246,6 +250,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "quota", "list", true, "List quotas in the system." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "quota", "primary", true, "Retrieves base quota information." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "chart", true, "Displays a chart describing the progress of participant quotas." );
 
 -- reports
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -257,12 +263,12 @@ VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "alternate", "report", true, "Set up a alternate report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "alternate", "report", true, "Download a alternate report." );
-INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "quota", "report", true, "Set up a quota report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "quota", "report", true, "Download a quota report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
 
 COMMIT;

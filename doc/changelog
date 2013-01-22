@@ -1,4 +1,31 @@
 ====================================================================================================
+1.1.8
+====================================================================================================
+
+* Removing defunct auditing system
+
+* Removing defunct alternate report
+
+* Adding further handling of participants who require sourcing
+  - New conditions "sourcing required" and "unreachable" have been added to participant status
+  - Can now restrict participant list by condition
+
+* Quotas can now be defined by site as well as region
+  - Tracking cohort quota report categorizes quotas by province
+  - Comprehensive cohort quota report categorizes quotas by site
+  - Coordinators and supervisors now have read-only access to quotas and the quota report
+
+* No more than one participant from a single address in a single cohort
+  - The data entry system now restricts contact forms to enforce this new policy
+  - Import files are also restricted in this manner
+  - When a clerk completes a form which is in conflict the form will appear in the conflicts list
+    where an admin can process it (eg: call the candidate) and invalidate the form
+
+* Adding new charts
+  - data entry incomplete form status chart
+  - quota progress chart
+
+====================================================================================================
 1.1.7
 ====================================================================================================
 

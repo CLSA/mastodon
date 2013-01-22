@@ -29,6 +29,23 @@ class quota_report extends \cenozo\ui\pull\base_report
   }
 
   /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    // check to see if a cohort-specific template exists for this report
+    $cohort = $this->get_argument( 'restrict_cohort' );
+    $filename = sprintf( '%s/report/%s_%s.xls', DOC_PATH, $this->get_full_name(), $cohort );
+    if( file_exists( $filename ) ) $this->report = lib::create( 'business\report', $filename );
+  }
+
+  /**
    * Builds the report.
    * @author Dean Inglis <inglisd@mcmaster.ca>
    * @access protected
@@ -38,11 +55,13 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->report->set_orientation( 'landscape' );
 
     $quota_class_name = lib::get_class_name( 'database\quota' );
+    $site_class_name = lib::get_class_name( 'database\site' );
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
     $cohort = $this->get_argument( 'restrict_cohort' );
+    $site_breakdown = 'comprehensive' == $cohort;
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -67,17 +86,21 @@ class quota_report extends \cenozo\ui\pull\base_report
     $cenozo_manager = lib::create( 'business\cenozo_manager', $url );
     $cenozo_manager->use_machine_credentials( true );
 
-    // loop through all quotas by region, age group and gender
+    // loop through all quotas by region or site (based on breakdown), age group and gender
     $quota_mod = lib::create( 'database\modifier' );
-    $quota_mod->where( 'cohort', '=', $cohort );
-    $quota_mod->order( 'region.name' );
+    $quota_mod->where( 'site.cohort', '=', $cohort );
+    $quota_mod->order( $site_breakdown ? 'site.name' : 'region.name' );
     $quota_mod->order( 'age_group.lower' );
     $quota_mod->order( 'gender' );
     foreach( $quota_class_name::select( $quota_mod ) as $db_quota )
     {
       $column = 'B';
 
-      $region_key = $region_class_name::get_unique_from_primary_key( $db_quota->region_id );
+      // determine the unique key and id of the site or region (based on breakdown)
+      $site_region_key = $site_breakdown
+                       ? $site_class_name::get_unique_from_primary_key( $db_quota->site_id )
+                       : $region_class_name::get_unique_from_primary_key( $db_quota->region_id );
+      $site_region_id = $site_breakdown ? $db_quota->site_id : $db_quota->region_id;
 
       // modifier used for the pull operations
       $pull_mod = lib::create( 'database\modifier' );
@@ -93,10 +116,10 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       // pre-recruit (total participants)
       $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'address.region_id', '=', $db_quota->region_id );
+      $participant_mod->where(
+        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
       $participant_mod->where( 'gender', '=', $db_quota->gender );
-      $participant_mod->where( 'cohort', '=', $db_quota->cohort );
       if( !is_null( $start_datetime_obj ) )
         $participant_mod->where( 'participant.create_timestamp', '>=',
           $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
@@ -119,18 +142,19 @@ class quota_report extends \cenozo\ui\pull\base_report
           $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
         $participant_mod->where_bracket( false );
       }
+
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
       // open for access (synched participants)
       $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'address.region_id', '=', $db_quota->region_id );
+      $participant_mod->where(
+        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
       $participant_mod->where( 'gender', '=', $db_quota->gender );
-      $participant_mod->where( 'cohort', '=', $db_quota->cohort );
       if( !is_null( $start_datetime_obj ) )
         $participant_mod->where( 'participant.sync_datetime', '>=',
           $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
@@ -140,7 +164,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
       $participant_mod->where( 'sync_datetime', '!=', NULL );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
@@ -148,11 +172,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
-                 'region' => $region_key,
+                 $site_breakdown ? 'site' : 'region' => $site_region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
                  'state' => 'contacted' ) );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
@@ -162,11 +186,11 @@ class quota_report extends \cenozo\ui\pull\base_report
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,
-                   'region' => $region_key,
+                   $site_breakdown ? 'site' : 'region' => $site_region_key,
                    'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
                    'state' => 'reached' ) );
         $this->population_data
-          [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+          [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
             intval( $result->data );
         $column++;
       }
@@ -175,11 +199,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
-                 'region' => $region_key,
+                 $site_breakdown ? 'site' : 'region' => $site_region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
                  'state' => 'appointment' ) );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
@@ -187,11 +211,11 @@ class quota_report extends \cenozo\ui\pull\base_report
       $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
-                 'region' => $region_key,
+                 $site_breakdown ? 'site' : 'region' => $site_region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
                  'state' => 'completed' ) );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
@@ -201,11 +225,11 @@ class quota_report extends \cenozo\ui\pull\base_report
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,
-                   'region' => $region_key,
+                   $site_breakdown ? 'site' : 'region' => $site_region_key,
                    'qnaire_rank' => 2, // TODO: constant needs to be made a report paramter
                    'state' => 'completed' ) );
         $this->population_data
-          [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+          [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
             intval( $result->data );
         $column++;
       }
@@ -214,17 +238,17 @@ class quota_report extends \cenozo\ui\pull\base_report
       $result = $cenozo_manager->pull( 'participant', 'list',
           array( 'count' => true,
                  'modifier' => $pull_mod,
-                 'region' => $region_key,
+                 $site_breakdown ? 'site' : 'region' => $site_region_key,
                  'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
                  'state' => 'consented' ) );
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $result->data );
       $column++;
 
       // grab the quota data itself
       $this->population_data
-        [$db_quota->region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $db_quota->population );
       $column++;
     }
@@ -239,75 +263,12 @@ class quota_report extends \cenozo\ui\pull\base_report
   {
     // replace the parent method (parent generate() method isn't called on purpose)
 
-    // need to modify the report for the comprehensive cohort
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    if( 'comprehensive' == $cohort )
-    {
-      // column headings
-      $this->report->set_size( 11 );
-      $this->report->set_bold( true );
-      $this->report->set_horizontal_alignment( 'center' );
-      $this->report->set_cell( 'E4', 'With Appoint', false );
-      $this->report->set_cell( 'F4', 'Home Interview', false );
-      $this->report->set_cell( 'G4', 'Site Interview', false );
-
-      // heading descriptions title
-      $this->report->set_size( 10 );
-      $this->report->set_horizontal_alignment( 'left' );
-      $this->report->set_cell( 'A118', 'With Appoint', false );
-      $this->report->set_cell( 'A119', 'Home Interview', false );
-      $this->report->set_cell( 'A120', 'Site Interview', false );
-
-      // heading descriptions text
-      $this->report->set_bold( false );
-      $this->report->set_cell( 'B118',
-        'Participants included in "Open for Access" who have an appointment booked.', false );
-      $this->report->set_cell( 'B119',
-        'Participants included in "With Appoint" who have completed the baseline home interview.', false );
-      $this->report->set_cell( 'B120',
-        'Participants included in "With Appoint" who have completed the baseline site interview.', false );
-
-      // change equation in column L
-      $this->report->set_horizontal_alignment( 'center' );
-      $top_row_list = array( 6, 16, 26, 36, 46, 56, 66, 76, 86 );
-      foreach( $top_row_list as $top_row )
-      {
-        for( $offset = 0; $offset < 8; $offset++ )
-        {
-          $row = $top_row + $offset;
-          $this->report->set_cell( 'L'.$row, sprintf( '=I%s-E%s', $row, $row ), false );
-        }
-      }
-
-      // remove NB and PE
-      $this->report->remove_row( 85, 10 );
-      $this->report->remove_row( 45, 10 );
-
-      // fix formulas broken by the above remove_row calls (PHPExcel bug)
-      for( $col = 'B'; $col <= 'I'; $col++ )
-      {
-        for( $row = 6; $row <= 13; $row++ )
-        {
-          $eq = sprintf( '=SUM(%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)',
-                         $col, $row + 10,
-                         $col, $row + 20,
-                         $col, $row + 30,
-                         $col, $row + 40,
-                         $col, $row + 50,
-                         $col, $row + 60,
-                         $col, $row + 70,
-                         $col, $row + 80 );
-          $this->report->set_cell( $col.$row, $eq, false );
-        }
-      }
-    }
-
     // the initial row is predefined by the report template
     $row = 16;
 
-    foreach( $this->population_data as $region_data )
+    foreach( $this->population_data as $site_region_data )
     {
-      foreach( $region_data as $key => $age_data )
+      foreach( $site_region_data as $age_data )
       {
         foreach( $age_data as $column => $gender_data )
         {
@@ -316,17 +277,19 @@ class quota_report extends \cenozo\ui\pull\base_report
         }
         $row += 2; // jump to the next age block
       }
-      $row += 2; // jump to the next region block
+      $row += 2; // jump to the next site/region block
     }
     
     // set the titles
+    $cohort = $this->get_argument( 'restrict_cohort' );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $source = $source_id ? lib::create( 'database\source', $source_id )->name : 'all sources';
     $this->report->set_size( 16 );
     $this->report->set_bold( true );
     $this->report->set_horizontal_alignment( 'center' );
     $this->report->merge_cells( 'A1:M1' );
-    $this->report->set_cell( 'A1', 'Quota Report for '.ucwords( $source ), false );
+    $this->report->set_cell(
+      'A1', sprintf( '%s Quota Report for %s', ucwords( $cohort ), ucwords( $source ) ), false );
 
     $now_datetime_obj = util::get_datetime_object();
     $this->report->merge_cells( 'A2:M2' );

@@ -45,7 +45,8 @@ class import_process extends \cenozo\ui\push\base_record
     $import_entry_mod->where( 'postcode_error', '=', false );
     $import_entry_mod->where( 'home_phone_error', '=', false );
     $import_entry_mod->where( 'mobile_phone_error', '=', false );
-    $import_entry_mod->where( 'duplicate_error', '=', false );
+    $import_entry_mod->where( 'duplicate_participant_error', '=', false );
+    $import_entry_mod->where( 'duplicate_address_error', '=', false );
     $import_entry_mod->where( 'gender_error', '=', false );
     $import_entry_mod->where( 'date_of_birth_error', '=', false );
     $import_entry_mod->where( 'language_error', '=', false );

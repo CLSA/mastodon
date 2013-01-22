@@ -100,7 +100,17 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
           }
         }
 
-        if( $match ) $db_form->import( $this->get_record() );
+        try
+        {
+          if( $match ) $db_form->import( $this->get_record() );
+        }
+        catch( \cenozo\exception\notice $e )
+        {
+          // The notice exception is thrown when the form has a duplicate address in the same
+          // cohort.  Ignore it and complete the operation, the form will appear in the conflicts
+          // list where an admin can handle it by calling the participant to inform them they
+          // are not eligible for the study then invalidate the form.
+        }
       }
     }
   }
