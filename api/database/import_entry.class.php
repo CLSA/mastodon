@@ -145,7 +145,6 @@ class import_entry extends \cenozo\database\record
     $region_class_name = lib::get_class_name( 'database\region' );
     $site_class_name = lib::get_class_name( 'database\site' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
-    $service_class_name = lib::get_class_name( 'database\service' );
 
     // all participants are from the rdd source
     $db_source = $source_class_name::get_unique_record( 'name', 'rdd' );
@@ -190,14 +189,12 @@ class import_entry extends \cenozo\database\record
     // their preferred site set to Sherbrooke
     // TODO: code is not generic since there is no way to define language-specific sites
     $db_tracking_cohort = $cohort_class_name::get_unique_record( 'name', 'tracking' );
-    $db_french_service =
-      $service_class_name::get_unique_record( 'cohort_id', $db_tracking_cohort->id );
     $db_french_site = $site_class_name::get_unique_record(
       array( 'name', 'service_id' ),
-      array( 'Sherbrooke', $db_french_service->id ) );
+      array( 'Sherbrooke', $db_tracking_cohort->get_service()->id ) );
     if( 0 == strcasecmp( 'fr', $db_participant->language ) &&
         $db_participant->get_cohort()->id == $db_tracking_cohort->id )
-      $db_participant->site_id = $db_french_site->id;
+      $db_participant->set_preferred_site( $db_french_site->id );
 
     $db_participant->save();
 

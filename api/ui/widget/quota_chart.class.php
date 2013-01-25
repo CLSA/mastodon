@@ -43,7 +43,6 @@ class quota_chart extends \cenozo\ui\widget
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
-    $service_class_name = lib::get_class_name( 'database\service' );
 
     $chart_data = array();
     foreach( $cohort_class_name::select() as $db_cohort )
@@ -51,7 +50,7 @@ class quota_chart extends \cenozo\ui\widget
       $value_list = array();
 
       // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-      $db_service = $service_class_name::get_unique_record( 'cohort_id', $db_cohort->id );
+      $db_service = $db_cohort->get_service();
       $cenozo_manager = lib::create( 'business\cenozo_manager', $db_service->get_url() );
       $cenozo_manager->use_machine_credentials( true );
 

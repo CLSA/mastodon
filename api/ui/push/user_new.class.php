@@ -97,10 +97,10 @@ class user_new extends \cenozo\ui\push\user_new
 
     foreach( $service_class_name::select() as $db_service )
     {
-      if( $this->get_machine_application_name != $db_service->name )
+      if( $this->get_machine_application_name() != $db_service->name )
       {
         $this->machine_arguments['noid']['columns'] =
-          !is_null( $columns ) && $db_service->id == $columns['site']['service_id'] ?
+          !is_null( $columns ) && $db_service->name == $columns['site']['service_id']['name'] ?
             $columns : NULL;
         $this->set_machine_request_url( $db_service->get_url() );
         $this->use_machine_credentials( true );

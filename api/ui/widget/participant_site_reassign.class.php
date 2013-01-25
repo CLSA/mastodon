@@ -45,7 +45,7 @@ class participant_site_reassign extends \cenozo\ui\widget
     foreach( $site_class_name::select( $site_mod ) as $db_site )
       $sites[] = array( 'id' => $db_site->id,
                         'name' => $db_site->name,
-                        'cohort' => $db_site->get_service()->get_cohort() );
+                        'service' => $db_site->get_service()->name );
     $this->set_variable( 'sites', $sites );
   }
 }

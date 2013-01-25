@@ -1,7 +1,7 @@
 -- change the cohort column to a foreign key to the cohort table
-DROP PROCEDURE IF EXISTS patch_participant;
+DROP PROCEDURE IF EXISTS patch_participant1;
 DELIMITER //
-CREATE PROCEDURE patch_participant()
+CREATE PROCEDURE patch_participant1()
   BEGIN
     SET @test = (
       SELECT COUNT(*)
@@ -30,6 +30,29 @@ CREATE PROCEDURE patch_participant()
   END //
 DELIMITER ;
 
--- now call the procedure and remove the procedure
-CALL patch_participant();
-DROP PROCEDURE IF EXISTS patch_participant;
+-- drop the site_id column
+DROP PROCEDURE IF EXISTS patch_participant2;
+DELIMITER //
+CREATE PROCEDURE patch_participant2()
+  BEGIN
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "participant"
+      AND COLUMN_NAME = "site_id" );
+    IF @test = 1 THEN
+      -- drop the site_id foreign key and column
+      ALTER TABLE participant
+      DROP FOREIGN KEY fk_participant_site_id;
+      DROP INDEX fk_site_id ON participant;
+      ALTER TABLE participant DROP COLUMN site_id;
+    END IF;
+  END //
+DELIMITER ;
+
+-- now call the procedures and remove the procedures
+CALL patch_participant1();
+DROP PROCEDURE IF EXISTS patch_participant1;
+CALL patch_participant2();
+DROP PROCEDURE IF EXISTS patch_participant2;

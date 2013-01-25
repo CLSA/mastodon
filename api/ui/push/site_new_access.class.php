@@ -28,24 +28,6 @@ class site_new_access extends \cenozo\ui\push\site_new_access
   }
 
   /**
-   * Override the parent method to remove mastodon-only roles.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args An argument list, usually those passed to the push operation.
-   * @return array
-   * @access protected
-   */
-  protected function convert_to_noid( $args )
-  {
-    $args = parent::convert_to_noid( $args );
-
-    // remove typist from the role list, if it exists
-    foreach( $args['noid']['role_list'] as $index => $value )
-      if( 'typist' == $value['name'] ) unset( $args['noid']['role_list'][$index] );
-
-    return $args;
-  }
-
-  /**
    * Override the parent method to send a request to the appropriate application
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
@@ -53,10 +35,11 @@ class site_new_access extends \cenozo\ui\push\site_new_access
   protected function send_machine_request()
   {
     // there's a chance that the role list is empty, skip if it is
-    if( 0 == count( $this->machine_arguments['noid']['role_list'] ) ) return;
-
-    $this->set_machine_request_url( $this->get_record()->get_service()->get_url() );
-    parent::send_machine_request();
+    if( 0 < count( $this->machine_arguments['noid']['role_list'] ) )
+    {
+      $this->set_machine_request_url( $this->get_record()->get_service()->get_url() );
+      parent::send_machine_request();
+    }
   }
 }
 ?>

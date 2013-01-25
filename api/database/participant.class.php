@@ -91,16 +91,69 @@ class participant extends person
   }
 
   /**
-   * Get the default site that the participant belongs to.
+   * Get the preferred site that the participant belongs to for their cohort.
    * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\service $db_service If null then the participant's cohort's service is used
    * @return site
    * @access public
    */
-  public function get_default_site()
+  public function get_preferred_site( $db_service = NULL )
   {
+    // no primary key means no preferred siet
+    if( is_null( $this->id ) ) return NULL;
+
+    if( is_null( $db_service ) ) $db_service = $this->get_cohort()->get_service();
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'participant_id', '=', $this->id );
+    $modifier->where( 'service_id', '=', $db_service->id );
+    $sql = 'SELECT site_id FROM participant_preferred_site '.$modifier->get_sql();
+    $site_id = static::db()->get_one( $sql );
+
+    return $site_id ? lib::create( 'database\site', $site_id ) : NULL;
+  }
+
+  /**
+   * Sets the preferred site for a particular service.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\service $db_service If null then the participant's cohort's service is used
+   * @access public
+   */
+  public function set_preferred_site( $db_site, $db_service = NULL )
+  {
+    if( is_null( $db_service ) ) $db_service = $this->get_cohort()->get_service();
+
+    $sql = sprintf( !is_null( $db_site ) ?
+      'REPLACE INTO participant_preferred_site '.
+      '( participant_id, service_id, create_timestamp, site_id ) '.
+      'VALUES '.
+      '( %d, %d, NULL, %d )' :
+      'DELETE FROM participant_preferred_site '.
+      'WHERE participant_id = %d '.
+      'AND service_id = %d',
+      $this->id,
+      $db_service->id,
+      is_null( $db_site ) ? 0 : $db_site->id );
+
+    static::db()->execute( $sql );
+  }
+
+  /**
+   * Get the default site that the participant belongs to for their cohort.
+   * This depends on the type of grouping that the participant's cohort uses
+   * (region or jurisdition)
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\service $db_service If null then the participant's cohort's service is used
+   * @return site
+   * @access public
+   */
+  public function get_default_site( $db_service = NULL )
+  {
+    $db_cohort = is_null( $db_service ) ? $this->get_cohort() : $db_service->get_cohort();
+
     $db_site = NULL;
 
-    if( 'comprehensive' == $this->get_cohort()->name )
+    if( 'jurisdiction' == $db_cohort->grouping )
     {
       $db_address = $this->get_primary_address();
       if( !is_null( $db_address ) )
@@ -121,14 +174,19 @@ class participant extends person
   }
 
   /**
-   * Get the site that the participant belongs to.
+   * Get the site that the participant belongs to for their cohort.
+   * This method returns the participant's preferred site, or if they have no preferred site
+   * then it returns their default site.
    * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\service $db_service If null then the participant's cohort's service is used
    * @return site
    * @access public
    */
-  public function get_primary_site()
+  public function get_primary_site( $db_service = NULL )
   {
-    return is_null( $this->site_id ) ? $this->get_default_site() : $this->get_site();
+    $db_preferred_site = $this->get_preferred_site( $db_service );
+    return is_null( $db_preferred_site ) ?
+      $this->get_default_site( $db_service ) : $db_preferred_site;
   }
   
   /**
@@ -292,7 +350,7 @@ participant::customize_join( 'address', $address_mod );
 // define the join to the jurisdiction table
 $jurisdiction_mod = lib::create( 'database\modifier' );
 $jurisdiction_mod->where( 'participant.cohort_id', '=', 'cohort.id', false );
-$jurisdiction_mod->where( 'cohort.name', '=', 'comprehensive' );
+$jurisdiction_mod->where( 'cohort.grouping', '=', 'jurisdiction' );
 $jurisdiction_mod->where( 'participant.id', '=', 'participant_primary_address.participant_id', false );
 $jurisdiction_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
 $jurisdiction_mod->where( 'address.postcode', '=', 'jurisdiction.postcode', false );

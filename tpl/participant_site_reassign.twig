@@ -45,7 +45,7 @@
            <select id="{{ widget.full }}__site_id" class="ui-state-default">
             <option value="0">None</option>
             {% for site in sites %}
-              <option value="{{ site.id }}">{{ site.name }} ({{ site.cohort }})</option>
+              <option value="{{ site.id }}">{{ site.name }} ({{ site.service }})</option>
             {% endfor %}
            </select>
         </td>

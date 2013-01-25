@@ -36,9 +36,8 @@ class site_new extends \cenozo\ui\push\site_new
    */
   protected function send_machine_request()
   {
-    $db_service =
-      lib::create( 'database\service', $this->machine_arguments['columns']['service_id'] );
-    unset( $this->machine_arguments['columns']['service_id'] );
+    $db_service = lib::create( 'database\service', $this->arguments['columns']['service_id'] );
+    unset( $this->machine_arguments['noid']['columns']['service'] );
 
     if( $this->get_machine_application_name() != $db_service->name )
     {

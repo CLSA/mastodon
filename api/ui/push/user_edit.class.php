@@ -65,18 +65,15 @@ class user_edit extends \cenozo\ui\push\user_edit
    */
   protected function send_machine_request()
   {
-    if( 'beartooth' != $this->get_machine_application_name() )
+    $service_class_name = lib::get_class_name( 'database\service' );
+    foreach( $service_class_name::select() as $db_service )
     {
-      $this->set_machine_request_url( BEARTOOTH_URL );
-      $this->use_machine_credentials( true );
-      parent::send_machine_request();
-    }
-
-    if( 'sabretooth' != $this->get_machine_application_name() )
-    {
-      $this->set_machine_request_url( SABRETOOTH_URL );
-      $this->use_machine_credentials( true );
-      parent::send_machine_request();
+      if( $db_service->name != $this->get_machine_application_name() )
+      {
+        $this->set_machine_request_url( $db_service->get_url() );
+        $this->use_machine_credentials( true );
+        parent::send_machine_request();
+      }
     }
   }
 }

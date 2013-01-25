@@ -58,6 +58,8 @@ class participant_site_reassign extends \cenozo\ui\push
         $site_id = is_null( $db_site ) ? NULL : $db_site->id;
         $args = array( 'id' => $db_participant->id,
                        'columns' => array( 'site_id' => $site_id ) );
+        // this will work because the participant_edit operation overrides the default edit
+        // behaviour when site_id is included in the columns argument
         $operation = lib::create( 'ui\push\participant_edit', $args );
         $operation->process();
       }

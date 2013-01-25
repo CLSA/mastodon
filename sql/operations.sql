@@ -59,6 +59,22 @@ VALUES( "widget", "availability", "list", true, "Lists a participant's availabil
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "availability", "primary", true, "Retrieves base availability information." );
 
+-- cohort
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "cohort", "delete", true, "Removes a cohort from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "cohort", "edit", true, "Edits a cohort's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "cohort", "new", true, "Add a new cohort to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "cohort", "add", true, "View a form for creating a new cohort." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "cohort", "view", true, "View a cohort's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "cohort", "list", true, "List cohorts in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "cohort", "primary", true, "Retrieves base cohort information." );
+
 -- consent
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "consent", "delete", true, "Removes a participant's consent entry from the system." );
@@ -270,5 +286,21 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
+
+-- service
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "service", "delete", true, "Removes a service from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "service", "edit", true, "Edits a service's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "service", "new", true, "Add a new service to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "add", true, "View a form for creating a new service." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "view", true, "View a service's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "list", true, "List services in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "service", "primary", true, "Retrieves base service information." );
 
 COMMIT;

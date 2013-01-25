@@ -39,14 +39,17 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
   {
     parent::prepare();
     
-    // if restricted, show the site's name and service in the heading
-    $predicate = is_null( $this->db_restrict_site )
-               ? 'all sites'
-               : sprintf( '%s (%s)',
-                          $this->db_restrict_site->name,
-                          $this->db_restrict_site->get_service()->name );
-
-    $this->set_heading( $this->get_subject().' list for '.$predicate );
+    if( is_null( $this->get_heading() ) )
+    {
+      // if restricted, show the site's name and service in the heading
+      $predicate = is_null( $this->db_restrict_site )
+                 ? 'all sites'
+                 : sprintf( '%s (%s)',
+                            $this->db_restrict_site->name,
+                            $this->db_restrict_site->get_service()->name );
+  
+      $this->set_heading( $this->get_subject().' list for '.$predicate );
+    }
   }
   
   /**

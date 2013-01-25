@@ -26,13 +26,14 @@ abstract class base_participant_delete
   {
     // only send a machine request if the participant has been synched
     $this->set_machine_request_enabled(
-      !is_null( $db_participant_for_machine_requests ) &&
-      !is_null( $db_participant_for_machine_requests->sync_datetime ) );
+      !is_null( $this->db_participant_for_machine_requests ) &&
+      !is_null( $this->db_participant_for_machine_requests->sync_datetime ) );
 
     // send the request to the participant's primary site's service
     $this->set_machine_request_url(
-      !is_null( $db_participant_for_machine_requests ) ?
-      $db_participant_for_machine_requests->get_primary_site()->get_service()->get_url() : NULL );
+      !is_null( $this->db_participant_for_machine_requests ) ?
+      $this->db_participant_for_machine_requests->get_primary_site()->get_service()->get_url() :
+      NULL );
 
     parent::setup();
   }

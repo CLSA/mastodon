@@ -62,7 +62,6 @@ class quota_report extends \cenozo\ui\pull\base_report
     $region_class_name = lib::get_class_name( 'database\region' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $service_class_name = lib::get_class_name( 'database\service' );
 
     $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
     $site_breakdown = 'comprehensive' == $db_cohort->name;
@@ -86,7 +85,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     }   
 
     // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-    $db_service = $service_class_name::get_unique_record( 'cohort_id', $db_cohort->id );
+    $db_service = $db_cohort->get_service();
     $cenozo_manager = lib::create( 'business\cenozo_manager', $db_service->get_url() );
     $cenozo_manager->use_machine_credentials( true );
 
@@ -185,7 +184,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $column++;
 
       // reached and viable
-      if( 'tracking' == $db_cohort->name )
+      if( 'sabretooth' == $db_service->name )
       {
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
@@ -223,9 +222,9 @@ class quota_report extends \cenozo\ui\pull\base_report
           intval( $result->data );
       $column++;
 
-      if( 'comprehensive' == $db_cohort->name )
+      if( 'beartooth' == $db_service->name )
       {
-        // interview complete (comprehensive site interview)
+        // interview complete (beartooth site interview)
         $result = $cenozo_manager->pull( 'participant', 'list',
             array( 'count' => true,
                    'modifier' => $pull_mod,

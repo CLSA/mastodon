@@ -32,6 +32,23 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `age_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `age_group` ;
+
+CREATE  TABLE IF NOT EXISTS `age_group` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `lower` INT NOT NULL ,
+  `upper` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `uq_lower` (`lower` ASC) ,
+  UNIQUE INDEX `uq_upper` (`upper` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `cohort`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `cohort` ;
@@ -41,8 +58,69 @@ CREATE  TABLE IF NOT EXISTS `cohort` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
+  `grouping` ENUM('region','jurisdiction') NOT NULL DEFAULT 'region' ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `uq_name` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `participant`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `participant` ;
+
+CREATE  TABLE IF NOT EXISTS `participant` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `person_id` INT UNSIGNED NOT NULL ,
+  `active` TINYINT(1) NOT NULL DEFAULT true ,
+  `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
+  `source_id` INT UNSIGNED NULL DEFAULT NULL ,
+  `cohort_id` INT UNSIGNED NOT NULL ,
+  `first_name` VARCHAR(45) NOT NULL ,
+  `last_name` VARCHAR(45) NOT NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `date_of_birth` DATE NULL ,
+  `age_group_id` INT UNSIGNED NULL DEFAULT NULL ,
+  `status` ENUM('deceased','deaf','mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','sourcing required','unreachable','other') NULL DEFAULT NULL ,
+  `language` ENUM('en','fr') NULL DEFAULT NULL ,
+  `no_in_home` TINYINT(1) NOT NULL DEFAULT false ,
+  `use_informant` TINYINT(1) NULL DEFAULT NULL ,
+  `prior_contact_date` DATE NULL DEFAULT NULL ,
+  `email` VARCHAR(255) NULL DEFAULT NULL ,
+  `sync_datetime` DATETIME NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `dk_active` (`active` ASC) ,
+  INDEX `dk_status` (`status` ASC) ,
+  INDEX `dk_prior_contact_date` (`prior_contact_date` ASC) ,
+  UNIQUE INDEX `uq_uid` (`uid` ASC) ,
+  INDEX `dk_uid` (`uid` ASC) ,
+  INDEX `fk_person_id` (`person_id` ASC) ,
+  INDEX `fk_source_id` (`source_id` ASC) ,
+  UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
+  INDEX `fk_age_group_id` (`age_group_id` ASC) ,
+  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
+  CONSTRAINT `fk_participant_person_id`
+    FOREIGN KEY (`person_id` )
+    REFERENCES `person` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_source_id`
+    FOREIGN KEY (`source_id` )
+    REFERENCES `source` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_age_group_id`
+    FOREIGN KEY (`age_group_id` )
+    REFERENCES `age_group` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_cohort_id`
+    FOREIGN KEY (`cohort_id` )
+    REFERENCES `cohort` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -87,90 +165,6 @@ CREATE  TABLE IF NOT EXISTS `site` (
   CONSTRAINT `fk_site_service_id`
     FOREIGN KEY (`service_id` )
     REFERENCES `service` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `age_group`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `age_group` ;
-
-CREATE  TABLE IF NOT EXISTS `age_group` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `lower` INT NOT NULL ,
-  `upper` INT NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `uq_lower` (`lower` ASC) ,
-  UNIQUE INDEX `uq_upper` (`upper` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `participant`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `participant` ;
-
-CREATE  TABLE IF NOT EXISTS `participant` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `person_id` INT UNSIGNED NOT NULL ,
-  `active` TINYINT(1) NOT NULL DEFAULT true ,
-  `uid` VARCHAR(45) NOT NULL COMMENT 'External unique ID' ,
-  `source_id` INT UNSIGNED NULL DEFAULT NULL ,
-  `cohort_id` INT UNSIGNED NOT NULL ,
-  `first_name` VARCHAR(45) NOT NULL ,
-  `last_name` VARCHAR(45) NOT NULL ,
-  `gender` ENUM('male','female') NOT NULL ,
-  `date_of_birth` DATE NULL ,
-  `age_group_id` INT UNSIGNED NULL DEFAULT NULL ,
-  `status` ENUM('deceased','deaf','mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','sourcing required','unreachable','other') NULL DEFAULT NULL ,
-  `language` ENUM('en','fr') NULL DEFAULT NULL ,
-  `site_id` INT UNSIGNED NULL DEFAULT NULL ,
-  `no_in_home` TINYINT(1) NOT NULL DEFAULT false ,
-  `use_informant` TINYINT(1) NULL DEFAULT NULL ,
-  `prior_contact_date` DATE NULL DEFAULT NULL ,
-  `email` VARCHAR(255) NULL DEFAULT NULL ,
-  `sync_datetime` DATETIME NULL DEFAULT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `dk_active` (`active` ASC) ,
-  INDEX `dk_status` (`status` ASC) ,
-  INDEX `dk_prior_contact_date` (`prior_contact_date` ASC) ,
-  UNIQUE INDEX `uq_uid` (`uid` ASC) ,
-  INDEX `dk_uid` (`uid` ASC) ,
-  INDEX `fk_person_id` (`person_id` ASC) ,
-  INDEX `fk_source_id` (`source_id` ASC) ,
-  INDEX `fk_site_id` (`site_id` ASC) ,
-  UNIQUE INDEX `uq_person_id` (`person_id` ASC) ,
-  INDEX `fk_age_group_id` (`age_group_id` ASC) ,
-  INDEX `fk_cohort_id` (`cohort_id` ASC) ,
-  CONSTRAINT `fk_participant_person_id`
-    FOREIGN KEY (`person_id` )
-    REFERENCES `person` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_source_id`
-    FOREIGN KEY (`source_id` )
-    REFERENCES `source` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_site_id`
-    FOREIGN KEY (`site_id` )
-    REFERENCES `site` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_age_group_id`
-    FOREIGN KEY (`age_group_id` )
-    REFERENCES `age_group` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_participant_cohort_id`
-    FOREIGN KEY (`cohort_id` )
-    REFERENCES `cohort` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -949,6 +943,39 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `participant_preferred_site`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `participant_preferred_site` ;
+
+CREATE  TABLE IF NOT EXISTS `participant_preferred_site` (
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `service_id` INT UNSIGNED NOT NULL ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `site_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`participant_id`, `service_id`) ,
+  INDEX `fk_service_id` (`service_id` ASC) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  CONSTRAINT `fk_participant_preferred_site_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_preferred_site_service_id`
+    FOREIGN KEY (`service_id` )
+    REFERENCES `service` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_participant_preferred_site_site_id`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Placeholder table for view `person_first_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `person_first_address` (`person_id` INT, `address_id` INT);
@@ -1097,7 +1124,7 @@ CREATE  OR REPLACE VIEW `participant_site` AS
 SELECT participant.id AS participant_id, IF(
   ISNULL( participant.site_id ),
   IF(
-    cohort.name = "comprehensive",
+    cohort.grouping = "jurisdiction",
     jurisdiction.site_id,
     region.site_id
   ),

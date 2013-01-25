@@ -44,12 +44,6 @@ class participant_primary extends \cenozo\ui\pull\base_primary
       if( is_null( $db_participant ) )
         throw lib::create( 'exception\argument', 'uid', $this->arguments['uid'], __METHOD__ );
 
-      // make sure not to mix up comprehensive and tracking participants
-      if( $db_participant->cohort_id !=
-          lib::create( 'business\session' )->get_site()->get_service()->cohort_id )
-        throw lib::create( 'exception\runtime',
-          'Tried to get participant from wrong cohort.', __METHOD__ );
-
       $this->arguments['id'] = $db_participant->id;
     }
 
@@ -77,11 +71,6 @@ class participant_primary extends \cenozo\ui\pull\base_primary
     $this->data['source_name'] = is_null( $this->data['source_id'] )
                          ? NULL
                          : $db_participant->get_source()->name;
-
-    // convert site_id to site (name)
-    $this->data['site_name'] = is_null( $this->data['site_id'] )
-                         ? NULL
-                         : $db_participant->get_site()->name;
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )

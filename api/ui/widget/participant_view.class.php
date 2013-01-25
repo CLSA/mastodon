@@ -47,8 +47,15 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'last_name', 'string', 'Last Name' );
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'default_site', 'constant', 'Default Site' );
-    $this->add_item( 'site_id', 'enum', 'Prefered Site' );
+
+    // add an item for default and preferred sites for the service this
+    // participant's cohort belongs to
+    if( !is_null( $this->get_record()->get_cohort()->get_service() ) )
+    {
+      $this->add_item( 'default_site', 'constant', 'Default Site' );
+      $this->add_item( 'site_id', 'enum', 'Preferred Site' );
+    }
+
     $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
@@ -94,27 +101,14 @@ class participant_view extends \cenozo\ui\widget\base_view
 
     // create enum arrays
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $service_class_name = lib::get_class_name( 'database\service' );
     $record = $this->get_record();
-    $db_service = $service_class_name::get_unique_record( 'cohort_id', $record->cohort_id );
 
-    $sites = array();
-    $site_class_name = lib::get_class_name( 'database\site' );
-    $site_mod = lib::create( 'database\modifier' );
-    $site_mod->where( 'service_id', '=', $db_service->id );
-    foreach( $site_class_name::select( $site_mod ) as $db_site )
-      $sites[$db_site->id] = $db_site->name;
-    $db_site = $record->get_site();
-    $site_id = is_null( $db_site ) ? '' : $db_site->id;
     $genders = $participant_class_name::get_enum_values( 'gender' );
     $genders = array_combine( $genders, $genders );
     $languages = $participant_class_name::get_enum_values( 'language' );
     $languages = array_combine( $languages, $languages );
     $statuses = $participant_class_name::get_enum_values( 'status' );
     $statuses = array_combine( $statuses, $statuses );
-
-    $db_default_site = $this->get_record()->get_default_site();
-    $default_site = is_null( $db_default_site ) ? 'None' : $db_default_site->name;
 
     $age_group = '';
     if( !is_null( $record->age_group_id ) )
@@ -132,8 +126,25 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'last_name', $record->last_name );
     $this->set_item( 'language', $record->language, false, $languages );
     $this->set_item( 'status', $record->status, false, $statuses );
-    $this->set_item( 'default_site', $default_site );
-    $this->set_item( 'site_id', $site_id, false, $sites );
+
+    // set items for default and preferred sites for the service this
+    // participant's cohort belongs to
+    if( !is_null( $this->get_record()->get_cohort()->get_service() ) )
+    {
+      $sites = array();
+      $site_mod = lib::create( 'database\modifier' );
+      $site_mod->order( 'name' );
+      foreach( $record->get_cohort()->get_service()->get_site_list( $site_mod ) as $db_site )
+        $sites[$db_site->id] = $db_site->name;
+
+      $db_default_site = $record->get_default_site();
+      $this->set_item(
+        'default_site', is_null( $db_default_site ) ? '(none)' : $db_default_site->name );
+      $db_preferred_site = $record->get_preferred_site();
+      $this->set_item(
+        'site_id', is_null( $db_preferred_site ) ? '' : $db_preferred_site->id, false, $sites );
+    }
+
     $this->set_item( 'email', $record->email, false );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
@@ -183,7 +194,7 @@ class participant_view extends \cenozo\ui\widget\base_view
     }
     catch( \cenozo\exception\permission $e ) {}
   }
-  
+
   /**
    * The address list widget.
    * @var address_list

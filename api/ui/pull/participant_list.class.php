@@ -44,7 +44,6 @@ class participant_list extends \cenozo\ui\pull\base_list
 
     // convert primary ids to unique
     $item['source_id'] = $source_class_name::get_unique_from_primary_key( $item['source_id'] );
-    $item['site_id'] = $site_class_name::get_unique_from_primary_key( $item['site_id'] );
 
     // add full participant information if requested
     if( $this->get_argument( 'full', false ) )

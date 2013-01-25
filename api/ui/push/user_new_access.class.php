@@ -89,20 +89,23 @@ class user_new_access extends \cenozo\ui\push\user_new_access
     // there's a chance that the role list is empty, skip if it is
     if( 0 == count( $this->machine_arguments['noid']['role_list'] ) ) return;
 
-    // separate the sites by service_id, then send machine requests to each service
+    $service_class_name = lib::get_class_name( 'database\service' );
+
+    // separate the sites by service name, then send machine requests to each service
     $site_list = $this->machine_arguments['noid']['site_list'];
     $service_list = array();
     foreach( $site_list as $site )
     {
-      if( !array_key_exists( $site['service_id'], $service_list ) )
-        $service_list[$site['service_id']] = array();
-      $service_list[$site['service_id']][] = $site;
+      $service_name = $site['service_id']['name'];
+      if( !array_key_exists( $service_name, $service_list ) )
+        $service_list[$service_name] = array();
+      $service_list[$service_name][] = $site;
     }
 
     // now send site/role list as a group, one service at a time
-    foreach( $service_list as $service_id => $site_list )
+    foreach( $service_list as $service_name => $site_list )
     {
-      $db_service = lib::create( 'database/service', $service_id );
+      $db_service = $service_class_name::get_unique_record( 'name', $service_name );
       $this->machine_arguments['noid']['site_list'] = $site_list;
       $this->set_machine_request_url( $db_service->get_url() );
       parent::send_machine_request();
