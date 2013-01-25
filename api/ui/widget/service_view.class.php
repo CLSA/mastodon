@@ -42,6 +42,11 @@ class service_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'name', 'string', 'Name' );
     $this->add_item( 'cohort_id', 'enum', 'Cohort' );
     $this->add_item( 'sites', 'constant', 'Sites' );
+
+    // create the cohort sub-list widget
+    $this->cohort_list = lib::create( 'ui\widget\cohort_list', $this->arguments );
+    $this->cohort_list->set_parent( $this );
+    $this->cohort_list->set_heading( 'Additional Cohorts' );
   }
 
   /**
@@ -67,5 +72,19 @@ class service_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'name', $this->get_record()->name );
     $this->set_item( 'cohort_id', $this->get_record()->cohort_id, true, $cohorts );
     $this->set_item( 'sites', $this->get_record()->get_site_count() );
+
+    try
+    {
+      $this->cohort_list->process();
+      $this->set_variable( 'cohort_list', $this->cohort_list->get_variables() );
+    }
+    catch( \cenozo\exception\permission $e ) {}
   }
+
+  /**
+   * The cohort list widget.
+   * @var cohort_list
+   * @access protected
+   */
+  protected $cohort_list = NULL;
 }
