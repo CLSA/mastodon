@@ -58,7 +58,6 @@ class participant_edit extends base_participant_edit
       // in external applications
       if( 1 == count( $columns ) && (
           array_key_exists( 'cohort_id', $columns ) ||
-          array_key_exists( 'no_in_home', $columns ) ||
           array_key_exists( 'use_informant', $columns ) ) )
         $this->set_machine_request_enabled( false );
     }

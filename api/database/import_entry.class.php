@@ -181,7 +181,6 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
     $db_participant->status = NULL;
     $db_participant->language = $this->language;
-    $db_participant->no_in_home = false;
     $db_participant->prior_contact_date = NULL;
     $db_participant->email = $this->email;
 

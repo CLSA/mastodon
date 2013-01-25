@@ -85,7 +85,6 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `age_group_id` INT UNSIGNED NULL DEFAULT NULL ,
   `status` ENUM('deceased','deaf','mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','sourcing required','unreachable','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
-  `no_in_home` TINYINT(1) NOT NULL DEFAULT false ,
   `use_informant` TINYINT(1) NULL DEFAULT NULL ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
   `email` VARCHAR(255) NULL DEFAULT NULL ,

@@ -51,8 +51,28 @@ CREATE PROCEDURE patch_participant2()
   END //
 DELIMITER ;
 
+-- drop the no_in_home column
+DROP PROCEDURE IF EXISTS patch_participant3;
+DELIMITER //
+CREATE PROCEDURE patch_participant3()
+  BEGIN
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "participant"
+      AND COLUMN_NAME = "no_in_home" );
+    IF @test = 1 THEN
+      -- drop the no_in_home column
+      ALTER TABLE participant DROP COLUMN no_in_home;
+    END IF;
+  END //
+DELIMITER ;
+
 -- now call the procedures and remove the procedures
 CALL patch_participant1();
 DROP PROCEDURE IF EXISTS patch_participant1;
 CALL patch_participant2();
 DROP PROCEDURE IF EXISTS patch_participant2;
+CALL patch_participant3();
+DROP PROCEDURE IF EXISTS patch_participant3;

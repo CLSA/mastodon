@@ -147,7 +147,6 @@ class contact_form extends base_form
     $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
-    $db_participant->no_in_home = false;
     $db_participant->prior_contact_date = NULL;
     $db_participant->email = $db_contact_form_entry->email;
 

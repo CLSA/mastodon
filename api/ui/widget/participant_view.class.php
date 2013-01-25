@@ -61,7 +61,6 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'age_group', 'constant', 'Age Group' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
-    $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
 
     // create the address sub-list widget
     $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
@@ -150,7 +149,6 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'date_of_birth', $record->date_of_birth );
     $this->set_item( 'age_group', $age_group );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
-    $this->set_item( 'no_in_home', $record->no_in_home, true );
 
     // add a contact form download action
     $db_contact_form = $record->get_contact_form();
