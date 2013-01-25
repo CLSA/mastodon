@@ -109,4 +109,3 @@ class proxy_form_new extends \cenozo\ui\push\base_new
     }
   }
 }
-?>

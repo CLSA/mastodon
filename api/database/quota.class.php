@@ -13,4 +13,3 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * quota: record
  */
 class quota extends \cenozo\database\record {}
-?>

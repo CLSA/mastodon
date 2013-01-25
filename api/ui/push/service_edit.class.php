@@ -27,4 +27,3 @@ class service_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'service', $args );
   }
 }
-?>

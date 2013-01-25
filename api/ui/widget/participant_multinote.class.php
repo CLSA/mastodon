@@ -27,4 +27,3 @@ class participant_multinote extends \cenozo\ui\widget
     parent::__construct( 'participant', 'multinote', $args );
   }
 }
-?>

@@ -39,4 +39,3 @@ class phone_delete extends base_participant_delete
       $this->get_record()->get_person()->get_participant() );
   }
 }
-?>

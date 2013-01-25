@@ -45,4 +45,3 @@ class system_message_add extends \cenozo\ui\widget\system_message_add
       'site_id', $this->get_record()->site_id, false, $is_top_tier ? $sites : NULL );
   }
 }
-?>

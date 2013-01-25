@@ -13,4 +13,3 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * status: record
  */
 class status extends \cenozo\database\record {}
-?>

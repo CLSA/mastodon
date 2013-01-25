@@ -40,4 +40,3 @@ class site_edit extends \cenozo\ui\push\site_edit
     parent::send_machine_request();
   }
 }
-?>

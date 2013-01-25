@@ -49,4 +49,3 @@ class quota_report extends base_report
       'the system.' );
   }
 }
-?>

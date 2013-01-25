@@ -66,4 +66,3 @@ class participant_site_reassign extends \cenozo\ui\push
     }
   }
 }
-?>

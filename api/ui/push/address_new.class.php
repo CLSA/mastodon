@@ -129,4 +129,3 @@ class address_new extends base_participant_new
     return $args;
   }
 }
-?>

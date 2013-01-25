@@ -81,4 +81,3 @@ class proxy_form_list extends base_form_list
     return parent::determine_record_list( $modifier );
   }
 }
-?>

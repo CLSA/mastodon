@@ -137,4 +137,3 @@ abstract class site_restricted_list extends \cenozo\ui\widget\site_restricted_li
    */
   protected $extended_site_selection = false;
 }
-?>

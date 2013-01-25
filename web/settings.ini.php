@@ -45,4 +45,3 @@ $SETTINGS['db']['username'] = 'mastodon';
 $SETTINGS['db']['password'] = '';
 $SETTINGS['db']['database'] = 'mastodon';
 $SETTINGS['db']['prefix'] = '';
-?>

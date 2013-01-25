@@ -300,4 +300,3 @@ abstract class base_form_view
    */
   private $actions = array();
 }
-?>

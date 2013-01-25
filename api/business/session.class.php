@@ -50,4 +50,3 @@ final class session extends \cenozo\business\session
     }
   }
 }
-?>

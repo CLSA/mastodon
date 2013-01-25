@@ -122,4 +122,3 @@ class phone_new extends base_participant_new
     return $args;
   }
 }
-?>

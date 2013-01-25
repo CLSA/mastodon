@@ -48,4 +48,3 @@ class site_add extends \cenozo\ui\widget\site_add
     $this->set_item( 'service_id', key( $service_list ), true, $service_list );
   }
 }
-?>

@@ -61,4 +61,3 @@ class consent extends \cenozo\database\record
       $modifier->get_sql() );
   }
 }
-?>

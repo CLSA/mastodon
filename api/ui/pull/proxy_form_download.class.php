@@ -26,4 +26,3 @@ class proxy_form_download extends base_form_download
     parent::__construct( 'proxy', $args );
   }
 }
-?>

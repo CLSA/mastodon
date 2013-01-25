@@ -69,4 +69,3 @@ class service_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'sites', $this->get_record()->get_site_count() );
   }
 }
-?>

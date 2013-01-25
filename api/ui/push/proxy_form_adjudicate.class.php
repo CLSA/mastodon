@@ -27,4 +27,3 @@ class proxy_form_adjudicate extends base_form_adjudicate
     parent::__construct( 'proxy', $args );
   }
 }
-?>

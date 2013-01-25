@@ -61,4 +61,3 @@ class participant_multinote extends \cenozo\ui\push
     }
   }
 }
-?>

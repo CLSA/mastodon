@@ -63,4 +63,3 @@ class service_list extends \cenozo\ui\widget\base_list
     }
   }
 }
-?>

@@ -102,4 +102,3 @@ class import extends \cenozo\database\record
    */
   protected $data_value = NULL;
 }
-?>

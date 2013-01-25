@@ -27,4 +27,3 @@ class participant_delete extends base_participant_delete
     $this->set_participant_for_machine_requests( $this->get_record() );
   }
 }
-?>

@@ -13,4 +13,3 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * availability: record
  */
 class availability extends \cenozo\database\record {}
-?>

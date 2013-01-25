@@ -108,4 +108,3 @@ class phone_edit extends base_participant_edit
     return parent::convert_from_noid( $args );
   }
 }
-?>

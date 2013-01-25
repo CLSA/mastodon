@@ -64,4 +64,3 @@ class cohort_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'grouping', key( $groupings ), true, $groupings );
   }
 }
-?>

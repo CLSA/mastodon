@@ -90,4 +90,3 @@ class consent_form extends base_form
     $this->save();
   }
 }
-?>

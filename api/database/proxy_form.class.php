@@ -247,4 +247,3 @@ class proxy_form extends base_form
     $this->save();
   }
 }
-?>

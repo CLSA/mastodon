@@ -76,4 +76,3 @@ class participant_new extends base_participant_new
     }
   }
 }
-?>

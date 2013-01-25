@@ -230,4 +230,3 @@ class participant_view extends \cenozo\ui\widget\base_view
    */
   protected $alternate_list = NULL;
 }
-?>

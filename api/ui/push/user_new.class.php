@@ -109,4 +109,3 @@ class user_new extends \cenozo\ui\push\user_new
     }
   }
 }
-?>

@@ -66,4 +66,3 @@ class mailout_report extends base_report
     $this->set_parameter( 'mark_mailout', false, true );
   }
 }
-?>

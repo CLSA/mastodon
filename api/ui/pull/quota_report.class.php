@@ -338,4 +338,3 @@ class quota_report extends \cenozo\ui\pull\base_report
    */
   private $population_data;
 }
-?>

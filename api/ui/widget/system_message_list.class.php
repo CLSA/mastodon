@@ -116,4 +116,3 @@ class system_message_list extends site_restricted_list
     return $base_list_class_name::determine_record_list( $modifier );
   }
 }
-?>

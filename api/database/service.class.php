@@ -36,4 +36,3 @@ class service extends \cenozo\database\record
 
 // define the lower as the primary unique key
 service::set_primary_unique_key( 'uq_name' );
-?>

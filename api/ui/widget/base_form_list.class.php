@@ -150,4 +150,3 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
    */
   private $form_type;
 }
-?>

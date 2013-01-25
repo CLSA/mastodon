@@ -66,4 +66,3 @@ class cohort_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'participants', $this->get_record()->get_participant_count() );
   }
 }
-?>

@@ -59,4 +59,3 @@ class import_process extends \cenozo\ui\push\base_record
     $this->get_record()->save();
   }
 }
-?>

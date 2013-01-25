@@ -358,4 +358,3 @@ participant::customize_join( 'jurisdiction', $jurisdiction_mod );
 
 // define the uid as the primary unique key
 participant::set_primary_unique_key( 'uq_uid' );
-?>

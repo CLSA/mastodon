@@ -89,4 +89,3 @@ class note_new
    */
   private $db_participant_for_machine_requests = NULL;
 }
-?>

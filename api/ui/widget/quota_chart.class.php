@@ -105,4 +105,3 @@ class quota_chart extends \cenozo\ui\widget
     $this->set_variable( 'chart_data', $chart_data );
   }
 }
-?>

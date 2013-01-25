@@ -206,4 +206,3 @@ abstract class base_form extends \cenozo\database\record
    */
   protected $scan_value = NULL;
 }
-?>

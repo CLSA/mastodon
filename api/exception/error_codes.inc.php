@@ -152,4 +152,3 @@ define( 'RUNTIME__MASTODON_UI_WIDGET_PHONE_ADD__SETUP__ERRNO',
  * Since template errors already have codes this list is likely to stay empty.
  */
 
-?>

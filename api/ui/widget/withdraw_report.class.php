@@ -46,4 +46,3 @@ class withdraw_report extends base_report
       'withdraw occurred.' );
   }
 }
-?>

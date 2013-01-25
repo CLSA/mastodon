@@ -13,4 +13,3 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * jurisdiction: record
  */
 class jurisdiction extends \cenozo\database\record {}
-?>

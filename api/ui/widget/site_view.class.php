@@ -44,4 +44,3 @@ class site_view extends \cenozo\ui\widget\site_view
     $this->set_item( 'cohort', $db_service->get_cohort()->name );
   }
 }
-?>

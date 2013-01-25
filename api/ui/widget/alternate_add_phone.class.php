@@ -28,4 +28,3 @@ class alternate_add_phone extends \cenozo\ui\widget\base_add_record
     parent::__construct( 'alternate', 'phone', $args );
   }
 }
-?>

@@ -201,4 +201,3 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     return 'json';
   }
 }
-?>

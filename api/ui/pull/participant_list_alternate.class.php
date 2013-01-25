@@ -75,4 +75,3 @@ class participant_list_alternate extends \cenozo\ui\pull\base_list_record
     }
   }
 }
-?>

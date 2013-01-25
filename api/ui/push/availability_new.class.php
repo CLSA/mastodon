@@ -42,4 +42,3 @@ class availability_new extends base_participant_new
       lib::create( 'database\participant', $columns['participant_id'] ) );
   }
 }
-?>

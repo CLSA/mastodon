@@ -40,4 +40,3 @@ class availability_edit extends base_participant_edit
     $this->set_participant_for_machine_requests( $this->get_record()->get_participant() );
   }
 }
-?>

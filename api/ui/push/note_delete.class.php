@@ -151,4 +151,3 @@ class note_delete
    */
   private $db_participant_for_machine_requests = NULL;
 }
-?>

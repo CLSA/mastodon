@@ -75,4 +75,3 @@ class participant_delete_alternate extends \cenozo\ui\push\base_delete_record
    */
   private $db_person = NULL;
 }
-?>

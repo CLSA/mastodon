@@ -67,4 +67,3 @@ class service_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'cohort_id', key( $cohorts ), true, $cohorts );
   }
 }
-?>

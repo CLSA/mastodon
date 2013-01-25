@@ -112,4 +112,3 @@ class user_new_access extends \cenozo\ui\push\user_new_access
     }
   }
 }
-?>

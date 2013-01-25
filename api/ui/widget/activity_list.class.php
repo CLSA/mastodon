@@ -75,4 +75,3 @@ class activity_list extends site_restricted_list
     }
   }
 }
-?>

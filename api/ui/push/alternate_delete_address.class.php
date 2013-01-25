@@ -25,4 +25,3 @@ class alternate_delete_address extends \cenozo\ui\push\base_delete_record
     parent::__construct( 'alternate', 'address', $args );
   }
 }
-?>

@@ -46,4 +46,3 @@ class consent_form_view extends base_form_view
     $this->add_item( 'date', 'Date Signed' );
   }
 }
-?>

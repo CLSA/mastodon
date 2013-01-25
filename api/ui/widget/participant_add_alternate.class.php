@@ -28,4 +28,3 @@ class participant_add_alternate extends \cenozo\ui\widget\base_add_record
     parent::__construct( 'participant', 'alternate', $args );
   }
 }
-?>

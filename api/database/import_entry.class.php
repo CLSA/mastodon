@@ -420,4 +420,3 @@ class import_entry extends \cenozo\database\record
     $this->save();
   }
 }
-?>

@@ -58,4 +58,3 @@ class service_new extends \cenozo\ui\push\base_new
         'The service\'s name cannot be left blank.', __METHOD__ );
   }
 }
-?>

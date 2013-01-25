@@ -118,4 +118,3 @@ class participant_add extends \cenozo\ui\widget\base_view
    */
   protected $new_uid = NULL;
 }
-?>

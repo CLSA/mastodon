@@ -138,4 +138,3 @@ class participant_list extends \cenozo\ui\pull\base_list
     return $prepared_list;
   }
 }
-?>

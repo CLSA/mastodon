@@ -27,4 +27,3 @@ class cohort extends \cenozo\database\record
     return $service_class_name::get_unique_record( 'cohort_id', $this->id );
   }
 }
-?>

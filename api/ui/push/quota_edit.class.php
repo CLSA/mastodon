@@ -51,4 +51,3 @@ class quota_edit extends \cenozo\ui\push\base_edit
     parent::send_machine_request();
   }
 }
-?>

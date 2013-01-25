@@ -26,4 +26,3 @@ class cohort_primary extends \cenozo\ui\pull\base_primary
     parent::__construct( 'cohort', $args );
   }
 }
-?>

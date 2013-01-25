@@ -162,4 +162,3 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'note', $record->note, false );
   }
 }
-?>

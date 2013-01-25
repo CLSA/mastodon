@@ -58,4 +58,3 @@ class cohort_new extends \cenozo\ui\push\base_new
         'The cohort\'s name cannot be left blank.', __METHOD__ );
   }
 }
-?>

@@ -41,4 +41,3 @@ class alternate extends person
     return count( $proxy_form_list ) ? current( $proxy_form_list ) : NULL;
   }
 }
-?>

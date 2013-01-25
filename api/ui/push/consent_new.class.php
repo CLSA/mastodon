@@ -87,4 +87,3 @@ class consent_new extends base_participant_new
     }
   }
 }
-?>

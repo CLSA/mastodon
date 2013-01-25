@@ -75,4 +75,3 @@ class util extends \cenozo\util
     return $address;
   }
 }
-?>

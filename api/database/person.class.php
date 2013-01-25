@@ -224,4 +224,3 @@ class person extends \cenozo\database\has_note
     return lib::create( 'database\person_note', $id );
   }
 }
-?>

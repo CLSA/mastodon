@@ -13,4 +13,3 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * region: record
  */
 class region extends \cenozo\database\record {}
-?>

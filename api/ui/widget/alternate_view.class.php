@@ -111,4 +111,3 @@ class alternate_view extends \cenozo\ui\widget\base_view
    */
   protected $phone_list = NULL;
 }
-?>

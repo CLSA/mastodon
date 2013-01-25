@@ -85,4 +85,3 @@ class withdraw_report extends \cenozo\ui\pull\base_report
     $this->add_table( NULL, $header, $content );
   }
 }
-?>

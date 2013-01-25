@@ -143,4 +143,3 @@ class proxy_form_entry_view extends base_form_entry_view
     $this->set_item( 'date', $record->date, false );
   }
 }
-?>

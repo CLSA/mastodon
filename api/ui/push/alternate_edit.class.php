@@ -27,4 +27,3 @@ class alternate_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'alternate', $args );
   }
 }
-?>

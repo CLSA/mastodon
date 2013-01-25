@@ -49,4 +49,3 @@ class quota_delete extends \cenozo\ui\push\base_delete
     parent::send_machine_request();
   }
 }
-?>

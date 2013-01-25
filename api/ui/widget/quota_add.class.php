@@ -90,4 +90,3 @@ class quota_add extends \cenozo\ui\widget\base_view
     $this->set_item( 'population', 0 );
   }
 }
-?>

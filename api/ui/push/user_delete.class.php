@@ -76,4 +76,3 @@ class user_delete extends \cenozo\ui\push\user_delete
     }
   }
 }
-?>

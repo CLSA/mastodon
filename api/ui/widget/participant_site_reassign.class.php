@@ -49,4 +49,3 @@ class participant_site_reassign extends \cenozo\ui\widget
     $this->set_variable( 'sites', $sites );
   }
 }
-?>

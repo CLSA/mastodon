@@ -46,4 +46,3 @@ $SETTINGS['ldap']['base'] = 'put your ldap base here';
 $SETTINGS['ldap']['username'] = 'put your ldap username here';
 $SETTINGS['ldap']['password'] = 'put your ldap password here';
 $SETTINGS['ldap']['active_directory'] = true;
-?>

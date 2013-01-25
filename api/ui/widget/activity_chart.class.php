@@ -50,4 +50,3 @@ class activity_chart extends \cenozo\ui\widget\activity_chart
     $this->set_variable( 'year_columns', $year_columns );
   }
 }
-?>

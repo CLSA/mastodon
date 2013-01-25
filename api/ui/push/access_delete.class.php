@@ -63,4 +63,3 @@ class access_delete extends \cenozo\ui\push\access_delete
     parent::send_machine_request();
   }
 }
-?>

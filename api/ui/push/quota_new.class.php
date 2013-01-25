@@ -70,4 +70,3 @@ class quota_new extends \cenozo\ui\push\base_new
     parent::send_machine_request();
   }
 }
-?>

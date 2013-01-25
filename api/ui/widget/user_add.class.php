@@ -55,4 +55,3 @@ class user_add extends \cenozo\ui\widget\user_add
     $this->set_item( 'role_id', current( $roles ), true, $roles );
   }
 }
-?>

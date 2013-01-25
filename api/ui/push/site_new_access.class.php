@@ -42,4 +42,3 @@ class site_new_access extends \cenozo\ui\push\site_new_access
     }
   }
 }
-?>

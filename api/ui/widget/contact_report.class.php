@@ -59,4 +59,3 @@ class contact_report extends base_report
     $this->set_parameter( 'uid_list', '', true );
   }
 }
-?>

@@ -50,4 +50,3 @@ class participant_list_consent extends \cenozo\ui\pull\base_list_record
     parent::prepare();
   }
 }
-?>
