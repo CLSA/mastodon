@@ -9,7 +9,7 @@ CREATE PROCEDURE patch_import_entry()
       WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
       AND TABLE_NAME = "import_entry"
       AND COLUMN_NAME = "cohort" );
-    IF @test = 0 THEN
+    IF @test = 1 THEN
       ALTER TABLE import_entry
       MODIFY cohort VARCHAR(45) NOT NULL;
     END IF;
