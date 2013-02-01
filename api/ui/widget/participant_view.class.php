@@ -48,12 +48,14 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->add_item( 'language', 'enum', 'Preferred Language' );
     $this->add_item( 'status', 'enum', 'Condition' );
 
-    // add an item for default and preferred sites for the service this
-    // participant's cohort belongs to
-    if( !is_null( $this->get_record()->get_cohort()->get_service() ) )
+    // add an item for default and preferred sites for all services the participant's cohort
+    // belongs to
+    foreach( $this->get_record()->get_cohort()->get_service_list() as $db_service )
     {
-      $this->add_item( 'default_site', 'constant', 'Default Site' );
-      $this->add_item( 'site_id', 'enum', 'Preferred Site' );
+      $this->add_item(
+        sprintf( '%s_default_site', $db_service->name ), 'constant', 'Default Site' );
+      $this->add_item(
+        sprintf( '%s_site_id', $db_service->name ), 'enum', 'Preferred Site' );
     }
 
     $this->add_item( 'email', 'string', 'Email' );
@@ -126,22 +128,24 @@ class participant_view extends \cenozo\ui\widget\base_view
     $this->set_item( 'language', $record->language, false, $languages );
     $this->set_item( 'status', $record->status, false, $statuses );
 
-    // set items for default and preferred sites for the service this
-    // participant's cohort belongs to
-    if( !is_null( $this->get_record()->get_cohort()->get_service() ) )
+    // set items for default and preferred sites for all services the participant's cohort
+    // belongs to
+    foreach( $this->get_record()->get_cohort()->get_service_list() as $db_service )
     {
       $sites = array();
       $site_mod = lib::create( 'database\modifier' );
       $site_mod->order( 'name' );
-      foreach( $record->get_cohort()->get_service()->get_site_list( $site_mod ) as $db_site )
+      foreach( $db_service->get_site_list( $site_mod ) as $db_site )
         $sites[$db_site->id] = $db_site->name;
 
-      $db_default_site = $record->get_default_site();
+      $db_default_site = $record->get_default_site( $db_service );
       $this->set_item(
-        'default_site', is_null( $db_default_site ) ? '(none)' : $db_default_site->name );
-      $db_preferred_site = $record->get_preferred_site();
+        sprintf( '%s_default_site', $db_service->name ),
+        is_null( $db_default_site ) ? '(none)' : $db_default_site->name );
+      $db_preferred_site = $record->get_preferred_site( $db_service );
       $this->set_item(
-        'site_id', is_null( $db_preferred_site ) ? '' : $db_preferred_site->id, false, $sites );
+        sprintf( '%s_site_id', $db_service->name ),
+        is_null( $db_preferred_site ) ? '' : $db_preferred_site->id, false, $sites );
     }
 
     $this->set_item( 'email', $record->email, false );

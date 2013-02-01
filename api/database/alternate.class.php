@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * alternate: record
  */
-class alternate extends person
+class alternate extends \cenozo\database\alternate
 {
   /**
    * This is a convenience method to get a alternate's proxy form, if it exists.
