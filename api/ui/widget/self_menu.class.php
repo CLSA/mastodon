@@ -15,25 +15,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class self_menu extends \cenozo\ui\widget\self_menu
 {
   /**
-   * Processes arguments, preparing them for the operation.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @throws exception\notice
-   * @access protected
-   */
-  protected function prepare()
-  {
-    parent::prepare();
-
-    $this->exclude_list( array(
-      'address',
-      'alternate',
-      'availability',
-      'consent',
-      'phone' ) );
-  }
-
-  /**
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -54,22 +35,6 @@ class self_menu extends \cenozo\ui\widget\self_menu
                             'type' => 'widget',
                             'subject' => 'import',
                             'name' => 'add' );
-
-    // insert participant site reassign and multinote into the utilities
-    $db_operation =
-      $operation_class_name::get_operation( 'widget', 'participant', 'site_reassign' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $utilities[] = array( 'heading' => 'Participant Reassign',
-                            'type' => 'widget',
-                            'subject' => 'participant',
-                            'name' => 'site_reassign' );
-    $db_operation =
-      $operation_class_name::get_operation( 'widget', 'participant', 'multinote' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $utilities[] = array( 'heading' => 'Participant Multinote',
-                            'type' => 'widget',
-                            'subject' => 'participant',
-                            'name' => 'multinote' );
 
     $this->set_variable( 'utilities', $utilities );
   }
