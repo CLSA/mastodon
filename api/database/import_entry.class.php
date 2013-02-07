@@ -181,7 +181,6 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
     $db_participant->status = NULL;
     $db_participant->language = $this->language;
-    $db_participant->prior_contact_date = NULL;
     $db_participant->email = $this->email;
 
     // make sure that all tracking participants whose preferred language is french have
@@ -197,12 +196,9 @@ class import_entry extends \cenozo\database\record
 
     $db_participant->save();
 
-    // import data to the status table
-    $db_status = lib::create( 'database\status' );
-    $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = $this->date;
-    $db_status->event = 'imported by rdd';
-    $db_status->save();
+    // add the imported by rdd event to the participant
+    $db_event = $event_class_name::get_unique_record( 'name', 'imported by rdd' );
+    $db_participant->add_event( $db_event, $this->date );
     
     // import data to the address table
     $address = $this->street;

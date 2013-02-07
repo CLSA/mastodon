@@ -147,7 +147,6 @@ class contact_form extends base_form
     $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
-    $db_participant->prior_contact_date = NULL;
     $db_participant->email = $db_contact_form_entry->email;
 
     // make sure that all tracking participants whose preferred language is french have
@@ -174,14 +173,11 @@ class contact_form extends base_form
       $db_participant_note->save();
     }
 
-    // import data to the status table
-    $db_status = lib::create( 'database\status' );
-    $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = is_null( $db_contact_form_entry->date ) ?
+    // add the consent to contact received event to the participant
+    $db_event = $event_class_name::get_unique_record( 'name', 'consent to contact received' );
+    $datetime = is_null( $db_contact_form_entry->date ) ?
       util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
-
-    $db_status->event = 'consent to contact received';
-    $db_status->save();
+    $db_participant->add_event( $db_event, $datetime );
     
     // import data to the address table
     $db_address = lib::create( 'database\address' );
