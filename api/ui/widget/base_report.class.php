@@ -60,18 +60,11 @@ abstract class base_report extends \cenozo\ui\widget\base_report
       $participant_class_name = lib::get_class_name( 'database\participant' );
       $session = lib::create( 'business\session' );
 
-      if( 'administrator' == $session->get_role()->name )
-      {
-        $cohort_list = array( 0 => 'all' );
-        $class_name = lib::get_class_name( 'database\cohort' );
-        foreach( $class_name::select() as $db_cohort )
-          $cohort_list[ $db_cohort->id ] = $db_cohort->name;
-      }
-      else
-      {
-        $db_cohort = $session->get_site()->get_service()->get_cohort();
-        $cohort_list = array( $db_cohort->id => $db_cohort->name );
-      }
+      $cohort_list = array( 0 => 'all' );
+      $class_name = lib::get_class_name( 'database\cohort' );
+      foreach( $session->get_site()->get_service()->get_cohort_list as $db_cohort )
+        $cohort_list[ $db_cohort->id ] = $db_cohort->name;
+
       $this->set_parameter( 'restrict_cohort_id', key( $cohort_list ), true, $cohort_list );
     }
 

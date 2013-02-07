@@ -51,7 +51,7 @@ class contact_report extends \cenozo\ui\pull\base_report
       $db_address = $db_participant->get_first_address();
       if( is_null( $db_address ) ) continue;
 
-      $db_site = $db_participant->get_primary_site();
+      $db_site = $db_participant->get_effective_site();
       $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
       $db_region = $db_address->get_region();
       $address = $db_address->address1;
