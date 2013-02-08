@@ -61,7 +61,8 @@ abstract class base_form_list extends \cenozo\ui\widget\base_list
     
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $cohort_list = array( 0 => 'Any' );
-    foreach( $cohort_class_name as $db_cohort ) $cohort_list[$db_cohort->id] = $db_cohort->name;
+    foreach( $cohort_class_name::select() as $db_cohort )
+      $cohort_list[$db_cohort->id] = $db_cohort->name;
     $restrict_cohort_id = $this->get_argument( 'restrict_cohort_id', 0 );
     $this->set_variable( 'restrict_cohort_id', $restrict_cohort_id );
     $this->set_variable( 'cohort_list', $cohort_list );
