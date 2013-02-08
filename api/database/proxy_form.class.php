@@ -28,7 +28,7 @@ class proxy_form extends base_form
         'Tried to import invalid proxy form entry.', __METHOD__ );
     }
 
-    $event_class_name = lib::get_class_name( 'event\event' );
+    $event_class_name = lib::get_class_name( 'database\event' );
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
