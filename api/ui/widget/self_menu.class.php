@@ -15,6 +15,21 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class self_menu extends \cenozo\ui\widget\self_menu
 {
   /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+    
+    $this->exclude_list( array(
+      'setting' ) ); // mastodon has no settings
+  }
+
+  /**
    * Sets up the operation with any pre-execution instructions that may be necessary.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
