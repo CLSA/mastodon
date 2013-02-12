@@ -38,7 +38,9 @@ class consent_form extends base_form
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_consent_form_entry->uid );
     $event = sprintf( 'written %s', $db_consent_form_entry->option_1 ? 'accept' : 'deny' );
-    $date = util::get_datetime_object()->format( 'Y-m-d' );
+    $date = !is_null( $db_consent_form_entry->date )
+          ? $db_consent_form_entry->date
+          : util::get_datetime_object()->format( 'Y-m-d' );
 
     // look for duplicates
     $db_consent = NULL;

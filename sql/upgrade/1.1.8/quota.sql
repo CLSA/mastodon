@@ -26,10 +26,7 @@ CREATE PROCEDURE patch_quota()
       ON UPDATE NO ACTION;
       ALTER TABLE quota
       DROP INDEX uq_region_id_cohort_gender_age_group_id;
-      ALTER TABLE quota
-      ADD UNIQUE INDEX uq_region_id_site_id_gender_age_group_id
-      (region_id ASC, site_id ASC, gender ASC, age_group_id ASC);
-      ALTER TABLE quota DROP COLUMN cohort;
+      SELECT "> run quota_patch.sql" AS REMINDER;
 
       SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
       SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

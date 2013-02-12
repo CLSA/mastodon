@@ -119,6 +119,7 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       // pre-recruit (total participants)
       $participant_mod = lib::create( 'database\modifier' );
+      $participant_mod->where( 'cohort', '=', $cohort );
       $participant_mod->where(
         $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
@@ -154,6 +155,7 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       // open for access (synched participants)
       $participant_mod = lib::create( 'database\modifier' );
+      $participant_mod->where( 'cohort', '=', $cohort );
       $participant_mod->where(
         $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
       $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
