@@ -115,4 +115,12 @@ VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
 
+-- service participant_release
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "participant_release", true, "A form to release participants to other services." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "service", "participant_release", true, "Returns a summary of participants to be released to another service." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "service", "participant_release", true, "Releases participants to another service." );
+
 COMMIT;

@@ -3,8 +3,6 @@ DROP PROCEDURE IF EXISTS patch_role_has_operation;
 DELIMITER //
 CREATE PROCEDURE patch_role_has_operation()
   BEGIN
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
     SET @test = (
       SELECT COUNT(*)
       FROM information_schema.TABLES
