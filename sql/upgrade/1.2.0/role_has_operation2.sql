@@ -1,4 +1,3 @@
--- only add the new role_has_operation entries if the database hasn't yet been converted
 DROP PROCEDURE IF EXISTS update_role_has_operation;
 DELIMITER //
 CREATE PROCEDURE update_role_has_operation()
