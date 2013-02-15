@@ -221,7 +221,10 @@ class proxy_form extends base_form
     
     // import data to the participant table
     if( !is_null( $db_proxy_form_entry->informant_continue ) )
+    {
       $db_participant->use_informant = $db_proxy_form_entry->informant_continue;
+      $db_participant->save();
+    }
 
     // import data to the hin table
     if( !is_null( $db_proxy_form_entry->health_card ) )
