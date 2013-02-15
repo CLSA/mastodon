@@ -57,7 +57,8 @@ class contact_report extends \cenozo\ui\pull\base_report
       $address = $db_address->address1;
       if( !is_null( $db_address->address2 ) ) $address .= ' '.$db_address->address2;
       $db_consent = $db_participant->get_last_consent();
-      $consent = $db_consent ? $db_consent->event : 'None';
+      $consent = 'None';
+      $consent = is_null( $db_consent ) ? 'none' : $db_consent->to_string();
 
       $contents[] = array(
         $db_participant->get_cohort()->name,
