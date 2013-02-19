@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget quota report
  */
-class quota_report extends base_report
+class quota_report extends \cenozo\ui\widget\base_report
 {
   /**
    * Constructor
