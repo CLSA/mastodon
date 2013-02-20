@@ -43,3 +43,9 @@ INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "service", "participant_release", true, "Returns a summary of participants to be released to another service." );
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "service", "participant_release", true, "Releases participants to another service." );
+
+-- participant report
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "report", true, "Set up a participant report." );
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "participant", "report", true, "Download a participant report." );
