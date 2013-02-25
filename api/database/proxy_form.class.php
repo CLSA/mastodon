@@ -28,7 +28,7 @@ class proxy_form extends base_form
         'Tried to import invalid proxy form entry.', __METHOD__ );
     }
 
-    $event_class_name = lib::get_class_name( 'database\event' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
@@ -39,8 +39,9 @@ class proxy_form extends base_form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
 
     // add the proxy received event to the participant
-    $db_event = $event_class_name::get_unique_record( 'name', 'consent for proxy received' );
-    $db_participant->add_event( $db_event, $db_proxy_form_entry->date );
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent for proxy received' );
+    $db_participant->add_event( $db_event_type, $db_proxy_form_entry->date );
 
     if( $db_proxy_form_entry->proxy )
     {

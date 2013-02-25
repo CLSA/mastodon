@@ -36,7 +36,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
   protected function build()
   {
     $participant_class_name = lib::get_class_name( 'database\participant' );
-    $event_class_name = lib::get_class_name( 'database\event' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
 
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
@@ -44,7 +44,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
-    $db_event = $event_class_name::get_unique_record( 'name', 'package mailed' );
+    $db_event_type = $event_type_class_name::get_unique_record( 'name', 'package mailed' );
 
     if( is_null( $db_source ) )
     {
@@ -68,7 +68,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $participant_mod = lib::create( 'database\modifier' );
     if( $mailed_to )
     {
-      $participant_mod->order_desc( 'participant_event.datetime' );
+      $participant_mod->order_desc( 'event.datetime' );
       $participant_mod->where( 'sync_datetime', '=', NULL );
     }
     $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
@@ -76,7 +76,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
     $contents = array();
     $participant_list =
-      $participant_class_name::select_for_event( $db_event, $mailed_to, $participant_mod );
+      $participant_class_name::select_for_event( $db_event_type, $mailed_to, $participant_mod );
     foreach( $participant_list as $db_participant )
     {
       $db_address = $db_participant->get_first_address();
@@ -106,7 +106,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
-        $event_datetime_list = $db_participant->get_event_datetime_list( $db_event );
+        $event_datetime_list = $db_participant->get_event_datetime_list( $db_event_type );
         $db_site = $db_participant->get_effective_site();
         $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
         array_unshift( $row, $site_name );
@@ -119,7 +119,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
       // add packaged mailed event if requested to
       if( $mark_mailout )
         $db_participant->add_event(
-          $db_event, util::get_datetime_object()->format( 'Y-m-d H:i:s' ) );
+          $db_event_type, util::get_datetime_object()->format( 'Y-m-d H:i:s' ) );
     }
     
     $header = array(

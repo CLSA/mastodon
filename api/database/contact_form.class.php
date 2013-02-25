@@ -174,10 +174,11 @@ class contact_form extends base_form
     }
 
     // add the consent to contact received event to the participant
-    $db_event = $event_class_name::get_unique_record( 'name', 'consent to contact received' );
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent to contact received' );
     $datetime = is_null( $db_contact_form_entry->date ) ?
       util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
-    $db_participant->add_event( $db_event, $datetime );
+    $db_participant->add_event( $db_event_type, $datetime );
     
     // import data to the address table
     $db_address = lib::create( 'database\address' );
