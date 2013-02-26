@@ -340,7 +340,14 @@ CREATE  TABLE IF NOT EXISTS `hin` (
   `access` TINYINT(1) NULL DEFAULT NULL ,
   `future_access` TINYINT(1) NULL DEFAULT NULL ,
   `code` VARCHAR(45) NULL DEFAULT NULL ,
-  PRIMARY KEY (`uid`) )
+  `region_id` INT UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`uid`) ,
+  INDEX `fk_region_id` (`region_id` ASC) ,
+  CONSTRAINT `fk_hin_region_id`
+    FOREIGN KEY (`region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
