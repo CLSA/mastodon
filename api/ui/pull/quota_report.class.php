@@ -61,6 +61,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     $quota_class_name = lib::get_class_name( 'database\quota' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
+    $database_class_name = lib::get_class_name( 'database\database' );
 
     $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
     if( 'comprehensive' == $db_cohort->name )
@@ -113,6 +114,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     foreach( $quota_class_name::select( $quota_mod ) as $db_quota )
     {
       $column = 'B';
+      $no_interview_column_list = array();
 
       // determine the id of the site or region (based on breakdown)
       $site_region_id = $site_breakdown ? $db_quota->site_id : $db_quota->region_id;
@@ -132,34 +134,52 @@ class quota_report extends \cenozo\ui\pull\base_report
           $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
       if( !is_null( $db_source ) ) $base_mod->where( 'source_id', '=', $db_source->id );
 
-      // pre-recruit (total participants)
+      // sql to determine which participants in this category have completed the interview
+      $completed_sql = sprintf(
+        'SELECT participant.id FROM event '.
+        'WHERE event.participant_id = participant.id AND event.event_type_id = %s',
+        $database_class_name::format_string( $db_completed_event_type->id ) );
+
+      $completed_sql = '( '.$completed_sql.' )';
+
+      // pre-recruit (total participants) //////////////////////////////////////////////////////////
       $participant_mod = clone $base_mod;
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // open for access (released participants)
+      // open for access (released participants) ///////////////////////////////////////////////////
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // first attempt (Baseline for Sabretooth, Baseline Home for Beartooth)
+      // first attempt (Baseline for Sabretooth, Baseline Home for Beartooth) //////////////////////
       $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       $participant_mod->where( 'event.event_type_id', '=', $db_first_attempt_event_type->id );
+
+      // but has not completed the interview
+      $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+      $no_interview_column_list[] = $column;
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // reached and viable
+      // reached and viable ////////////////////////////////////////////////////////////////////////
       if( 'Sabretooth' == $db_service->name )
       {
         $participant_mod = clone $base_mod;
+        $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
         $participant_mod->where( 'event.event_type_id', '=', $db_reached_event_type->id );
 
         // and is eligible
@@ -169,14 +189,20 @@ class quota_report extends \cenozo\ui\pull\base_report
         $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
         $participant_mod->where_bracket( false );
 
+        // but has not completed the interview
+        $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+        $no_interview_column_list[] = $column;
+
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
             intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
 
-      // with appointment
+      // with appointment //////////////////////////////////////////////////////////////////////////
       $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       if( 'Sabretooth' == $db_service->name )
       { // sabretooth appointment with no reached status
         $participant_mod->where(
@@ -199,18 +225,20 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
       $participant_mod->where_bracket( false );
 
+      // but has not completed the interview
+      $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+      $no_interview_column_list[] = $column;
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // interview complete
-      $event_type_name =
-        sprintf( 'completed (%s)',
-                 'Sabretooth' == $db_service->name ? 'Baseline' : 'Baseline Home' );
-      $db_event_type = $event_type_class_name::get_unique_record( 'name', $event_type_name );
+      // interview complete ////////////////////////////////////////////////////////////////////////
       $participant_mod = clone $base_mod;
-      $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
       $participant_mod->where_bracket( true );
       $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
       $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
@@ -222,17 +250,26 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
       $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
       $participant_mod->where_bracket( false );
+      $count = intval( $participant_class_name::count( $participant_mod ) );
       $this->population_data
-        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $participant_class_name::count( $participant_mod ) );
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] = $count;
+
+      // add the completed interview count to those columns where they were removed above
+      foreach( $no_interview_column_list as $no_interview_column )
+        $this->population_data
+          [$site_region_id][$db_quota->age_group_id][$no_interview_column][$db_quota->gender] +=
+            $count;
+
       $column++;
 
       if( 'Beartooth' == $db_service->name )
       {
-        // interview complete (beartooth site interview)
+        // interview complete (beartooth site interview) ///////////////////////////////////////////
         $db_event_type =
           $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Site)' );
         $participant_mod = clone $base_mod;
+        $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
         $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
         $participant_mod->where_bracket( true );
         $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
@@ -244,19 +281,18 @@ class quota_report extends \cenozo\ui\pull\base_report
         $column++;
       }
 
-      // with consent
-      $event_type_name =
-        sprintf( 'completed (%s)',
-                 'Sabretooth' == $db_service->name ? 'Baseline' : 'Baseline Home' );
-      $db_event_type = $event_type_class_name::get_unique_record( 'name', $event_type_name );
+      // with consent //////////////////////////////////////////////////////////////////////////////
       $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
       $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // grab the quota data itself
+      // grab the quota data itself ////////////////////////////////////////////////////////////////
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $db_quota->population );
