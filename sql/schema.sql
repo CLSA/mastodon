@@ -575,6 +575,34 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`import_entry` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
+
+-- -----------------------------------------------------
+-- Placeholder table for view `mastodon`.`sabretooth_participant_last_appointment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mastodon`.`sabretooth_participant_last_appointment` (`id` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `mastodon`.`beartooth_participant_last_appointment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mastodon`.`beartooth_participant_last_appointment` (`id` INT);
+
+-- -----------------------------------------------------
+-- View `mastodon`.`sabretooth_participant_last_appointment`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `mastodon`.`sabretooth_participant_last_appointment` ;
+DROP TABLE IF EXISTS `mastodon`.`sabretooth_participant_last_appointment`;
+USE `mastodon`;
+CREATE  OR REPLACE VIEW `mastodon`.`sabretooth_participant_last_appointment` AS
+SELECT * FROM sabretooth.participant_last_appointment;
+
+-- -----------------------------------------------------
+-- View `mastodon`.`beartooth_participant_last_appointment`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `mastodon`.`beartooth_participant_last_appointment` ;
+DROP TABLE IF EXISTS `mastodon`.`beartooth_participant_last_appointment`;
+USE `mastodon`;
+CREATE  OR REPLACE VIEW `mastodon`.`beartooth_participant_last_appointment` AS
+SELECT * FROM beartooth.participant_last_appointment;
 USE `cenozo`;
 
 DELIMITER $$
