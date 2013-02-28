@@ -39,7 +39,7 @@ class quota_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
-    $this->add_restriction( 'cohort' );
+    $this->add_parameter( 'cohort_id', 'enum', 'Cohort' );
     $this->add_restriction( 'source' );
     $this->add_restriction( 'dates' );
 
@@ -47,5 +47,23 @@ class quota_report extends \cenozo\ui\widget\base_report
       'This report provides a list of all age and sex quotas broken down by province.  '.
       'The date options will restrict participants based on when they were imported into '.
       'the system.' );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
+
+    $cohort_list = array();
+    foreach( $cohort_class_name::select() as $db_cohort )
+      $cohort_list[$db_cohort->id] = $db_cohort->name;
+    $this->set_parameter( 'cohort_id', key( $cohort_list ), true, $cohort_list );
   }
 }

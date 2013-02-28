@@ -40,7 +40,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     parent::prepare();
 
     // check to see if a cohort-specific template exists for this report
-    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
     $filename = sprintf( '%s/report/%s_%s.xls',
                          DOC_PATH,
                          $this->get_full_name(),
@@ -57,14 +57,34 @@ class quota_report extends \cenozo\ui\pull\base_report
   {
     $this->report->set_orientation( 'landscape' );
 
+    $service_class_name = lib::get_class_name( 'database\service' );
     $quota_class_name = lib::get_class_name( 'database\quota' );
-    $site_class_name = lib::get_class_name( 'database\site' );
-    $region_class_name = lib::get_class_name( 'database\region' );
-    $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
 
-    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
-    $site_breakdown = 'comprehensive' == $db_cohort->name;
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
+    if( 'comprehensive' == $db_cohort->name )
+    {
+      $site_breakdown = true;
+      $db_service = $service_class_name::get_unique_record( 'name', 'Beartooth' );
+      $db_first_attempt_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'first attempt (Baseline Home)' );
+      $db_reached_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'reached (Baseline Home)' );
+      $db_completed_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Home)' );
+    }
+    else
+    {
+      $site_breakdown = false;
+      $db_service = $service_class_name::get_unique_record( 'name', 'Sabretooth' );
+      $db_first_attempt_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'first attempt (Baseline)' );
+      $db_reached_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'reached (Baseline)' );
+      $db_completed_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'completed (Baseline)' );
+    }
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -84,11 +104,6 @@ class quota_report extends \cenozo\ui\pull\base_report
       $end_datetime_obj = clone $temp_datetime_obj;
     }   
 
-    // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-    $db_service = $db_cohort->get_service();
-    $cenozo_manager = lib::create( 'business\cenozo_manager', $db_service->get_url() );
-    $cenozo_manager->use_machine_credentials( true );
-
     // loop through all quotas by region or site (based on breakdown), age group and gender
     $quota_mod = lib::create( 'database\modifier' );
     $quota_mod->where( 'site.service_id', '=', $db_service->id );
@@ -99,156 +114,146 @@ class quota_report extends \cenozo\ui\pull\base_report
     {
       $column = 'B';
 
-      // determine the unique key and id of the site or region (based on breakdown)
-      $site_region_key = $site_breakdown
-                       ? $site_class_name::get_unique_from_primary_key( $db_quota->site_id )
-                       : $region_class_name::get_unique_from_primary_key( $db_quota->region_id );
+      // determine the id of the site or region (based on breakdown)
       $site_region_id = $site_breakdown ? $db_quota->site_id : $db_quota->region_id;
 
-      // modifier used for the pull operations
-      $pull_mod = lib::create( 'database\modifier' );
-      $pull_mod->where( 'age_group.lower', '=', $db_quota->get_age_group()->lower );
-      $pull_mod->where( 'gender', '=', $db_quota->gender );
+      // common modifier used by all queries
+      $base_mod = lib::create( 'database\modifier' );
+      $base_mod->where( 'cohort_id', '=', $db_cohort->id );
+      $base_mod->where(
+        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
+      $base_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
+      $base_mod->where( 'gender', '=', $db_quota->gender );
       if( !is_null( $start_datetime_obj ) )
-        $pull_mod->where( 'participant.create_timestamp', '>=',
+        $base_mod->where( 'participant.create_timestamp', '>=',
           $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
       if( !is_null( $end_datetime_obj ) )
-        $pull_mod->where( 'participant.create_timestamp', '<=',
+        $base_mod->where( 'participant.create_timestamp', '<=',
           $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $db_source ) ) $pull_mod->where( 'source_id', '=', $db_source->id );
+      if( !is_null( $db_source ) ) $base_mod->where( 'source_id', '=', $db_source->id );
 
       // pre-recruit (total participants)
-      $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'cohort', '=', $cohort );
-      $participant_mod->where(
-        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
-      $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
-      $participant_mod->where( 'gender', '=', $db_quota->gender );
-      if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'participant.create_timestamp', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-      if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'participant.create_timestamp', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $start_datetime_obj ) )
-      {
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'participant.sync_datetime', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-        $participant_mod->where_bracket( false );
-      }
-      if( !is_null( $end_datetime_obj ) )
-      {
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'participant.sync_datetime', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-        $participant_mod->where_bracket( false );
-      }
-
-      if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+      $participant_mod = clone $base_mod;
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // open for access (synched participants)
-      $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'cohort', '=', $cohort );
-      $participant_mod->where(
-        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
-      $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
-      $participant_mod->where( 'gender', '=', $db_quota->gender );
-      if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'participant.sync_datetime', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-      if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'participant.sync_datetime', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
-      $participant_mod->where( 'sync_datetime', '!=', NULL );
+      // open for access (released participants)
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // contact attempted (at least one call made)
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // quota only involves the first qnaire
-                 'state' => 'contacted' ) );
+      // first attempt (Baseline for Sabretooth, Baseline Home for Beartooth)
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'event.event_type_id', '=', $db_first_attempt_event_type->id );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
       // reached and viable
-      if( 'sabretooth' == $db_service->name )
+      if( 'Sabretooth' == $db_service->name )
       {
-        $result = $cenozo_manager->pull( 'participant', 'list',
-            array( 'count' => true,
-                   'modifier' => $pull_mod,
-                   $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 1, // quota only involves the first qnaire
-                   'state' => 'reached' ) );
+        $participant_mod = clone $base_mod;
+        $participant_mod->where( 'event.event_type_id', '=', $db_reached_event_type->id );
+
+        // and is eligible
+        $participant_mod->where( 'participant.status', '=', NULL );
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+        $participant_mod->where_bracket( false );
+
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-            intval( $result->data );
+            intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
 
       // with appointment
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // quota only involves the first qnaire
-                 'state' => 'appointment' ) );
+      $participant_mod = clone $base_mod;
+      if( 'Sabretooth' == $db_service->name )
+      { // sabretooth appointment with no reached status
+        $participant_mod->where(
+          'sabretooth_participant_last_appointment.appointment_id', '!=', NULL );
+        $participant_mod->where(
+          'sabretooth_participant_last_appointment.reached', '=', NULL );
+      }
+      else
+      { // beartooth appointment which has not been completed
+        $participant_mod->where(
+          'beartooth_participant_last_appointment.appointment_id', '!=', NULL );
+        $participant_mod->where(
+          'beartooth_participant_last_appointment.completed', '=', false );
+      }
+
+      // and is eligible
+      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
       // interview complete
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // quota only involves the first qnaire
-                 'state' => 'completed' ) );
+      $event_type_name =
+        sprintf( 'completed (%s)',
+                 'Sabretooth' == $db_service->name ? 'Baseline' : 'Baseline Home' );
+      $db_event_type = $event_type_class_name::get_unique_record( 'name', $event_type_name );
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
+
+      // and is eligible
+      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      if( 'beartooth' == $db_service->name )
+      if( 'Beartooth' == $db_service->name )
       {
         // interview complete (beartooth site interview)
-        $result = $cenozo_manager->pull( 'participant', 'list',
-            array( 'count' => true,
-                   'modifier' => $pull_mod,
-                   $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 2, // comp quota also involves second qnaire
-                   'state' => 'completed' ) );
+        $db_event_type =
+          $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Site)' );
+        $participant_mod = clone $base_mod;
+        $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+        $participant_mod->where_bracket( false );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-            intval( $result->data );
+            intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
 
       // with consent
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // quota only involves the first qnaire
-                 'state' => 'consented' ) );
+      $event_type_name =
+        sprintf( 'completed (%s)',
+                 'Sabretooth' == $db_service->name ? 'Baseline' : 'Baseline Home' );
+      $db_event_type = $event_type_class_name::get_unique_record( 'name', $event_type_name );
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
       // grab the quota data itself
@@ -286,7 +291,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     }
     
     // set the titles
-    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $source = $source_id ? lib::create( 'database\source', $source_id )->name : 'all sources';
     $this->report->set_size( 16 );
