@@ -223,6 +223,22 @@ CREATE PROCEDURE convert_database()
       CREATE INDEX dk_subject ON operation ( subject );
       CREATE INDEX dk_name ON operation ( name );
 
+      -- sabretooth_participant_last_appointment ---------------------------------------------------
+      SET @sql = CONCAT(
+        "CREATE OR REPLACE VIEW sabretooth_participant_last_appointment AS ",
+        "SELECT * FROM ", @sabretooth, ".participant_last_appointment" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      -- beartooth_participant_last_appointment ----------------------------------------------------
+      SET @sql = CONCAT(
+        "CREATE OR REPLACE VIEW beartooth_participant_last_appointment AS ",
+        "SELECT * FROM ", @beartooth, ".participant_last_appointment" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+       
       -- drop tables which have been moved to the @cenozo database
       DROP TABLE access;
       DROP TABLE phone;
