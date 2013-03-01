@@ -122,8 +122,15 @@ class quota_report extends \cenozo\ui\pull\base_report
       // common modifier used by all queries
       $base_mod = lib::create( 'database\modifier' );
       $base_mod->where( 'cohort_id', '=', $db_cohort->id );
-      $base_mod->where(
-        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
+      if( $site_breakdown )
+      {
+        $base_mod->where( 'participant_site.site_id', '=', $site_region_id );
+      }
+      else
+      {
+        $base_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
+        $base_mod->where( 'address.region_id', '=', $site_region_id );
+      }
       $base_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
       $base_mod->where( 'gender', '=', $db_quota->gender );
       if( !is_null( $start_datetime_obj ) )
