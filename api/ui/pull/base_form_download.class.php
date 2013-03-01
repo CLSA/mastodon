@@ -67,4 +67,3 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
    */
   private $form_type;
 }
-?>

@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget contact report
  */
-class contact_report extends base_report
+class contact_report extends \cenozo\ui\widget\base_report
 {
   /**
    * Constructor
@@ -59,4 +59,3 @@ class contact_report extends base_report
     $this->set_parameter( 'uid_list', '', true );
   }
 }
-?>

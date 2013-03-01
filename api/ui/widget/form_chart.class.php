@@ -113,4 +113,3 @@ class form_chart extends \cenozo\ui\widget
     $this->set_variable( 'data', $data );
   }
 }
-?>

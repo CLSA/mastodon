@@ -121,4 +121,3 @@ class base_form_entry_list extends \cenozo\ui\widget\base_list
    */
   private $form_type;
 }
-?>

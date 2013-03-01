@@ -27,4 +27,3 @@ class proxy_form_entry_edit extends base_form_entry_edit
     parent::__construct( 'proxy', $args );
   }
 }
-?>

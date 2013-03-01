@@ -32,4 +32,3 @@ class proxy_form_entry extends \cenozo\database\record
     parent::__set( $column_name, $value );
   }
 }
-?>

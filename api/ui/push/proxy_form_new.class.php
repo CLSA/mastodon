@@ -67,9 +67,9 @@ class proxy_form_new extends \cenozo\ui\push\base_new
   /**
    * Executes the push.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function finish()
   {
     parent::finish();
 
@@ -109,4 +109,3 @@ class proxy_form_new extends \cenozo\ui\push\base_new
     }
   }
 }
-?>

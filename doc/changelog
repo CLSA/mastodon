@@ -1,4 +1,12 @@
 ====================================================================================================
+1.2.0
+====================================================================================================
+
+* Adding new cohort and service tables
+  - Cohorts are now dynamic and can grow beyond the old tracking/comprehensive pair
+  - Services are also now dynamic and linked to a particular cohort.
+
+====================================================================================================
 1.1.8
 ====================================================================================================
 
@@ -13,6 +21,7 @@
 * Quotas can now be defined by site as well as region
   - Tracking cohort quota report categorizes quotas by province
   - Comprehensive cohort quota report categorizes quotas by site
+  - Coordinators and supervisors now have read-only access to quotas and the quota report
 
 * No more than one participant from a single address in a single cohort
   - The data entry system now restricts contact forms to enforce this new policy

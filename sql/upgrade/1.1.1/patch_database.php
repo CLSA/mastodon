@@ -139,4 +139,3 @@ out( sprintf( 'Import complete (%s)',
      $error_count ?
      $error_count.' error'.( 1 < $error_count ? 's' : '' ) :
      'you may not delete the contact directory' ) );
-?>
