@@ -60,10 +60,14 @@ class quota_report extends \cenozo\ui\widget\base_report
     parent::setup();
 
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $session = lib::create( 'business\session' );
 
-    $cohort_list = array();
-    foreach( $cohort_class_name::select() as $db_cohort )
-      $cohort_list[$db_cohort->id] = $db_cohort->name;
-    $this->set_parameter( 'cohort_id', key( $cohort_list ), true, $cohort_list );
+    // restrict cohort list for non-admins
+    $cohort_list = 3 >= $session->get_role()->tier
+                 ? $session->get_site()->get_service()->get_cohort_list()
+                 : $cohort_class_name::select();
+    $cohorts = array();
+    foreach( $cohort_list as $db_cohort ) $cohorts[$db_cohort->id] = $db_cohort->name;
+    $this->set_parameter( 'cohort_id', key( $cohorts ), true, $cohorts );
   }
 }
