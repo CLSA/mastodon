@@ -22,8 +22,14 @@ CREATE PROCEDURE convert_database()
       -- determine the @cenozo database name
       SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
                             'cenozo' );
+      SET @sabretooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
+                            'sabretooth' );
+      SET @beartooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
+                            'beartooth' );
 
       -- activity ----------------------------------------------------------------------------------
+      SELECT "Processing activity" AS "";
+      ALTER TABLE activity DROP FOREIGN KEY fk_activity_user;
       DROP INDEX fk_activity_user ON activity;
       CREATE INDEX fk_user_id ON activity ( user_id );
       ALTER TABLE activity DROP FOREIGN KEY fk_activity_operation;
@@ -32,7 +38,6 @@ CREATE PROCEDURE convert_database()
       FOREIGN KEY ( operation_id ) REFERENCES operation ( id )
       ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-      ALTER TABLE activity DROP FOREIGN KEY fk_activity_user;
       SET @sql = CONCAT(
         "ALTER TABLE activity ",
         "ADD CONSTRAINT fk_activity_user_id ",
@@ -63,6 +68,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- role_has_operation ------------------------------------------------------------------------
+      SELECT "Processing role_has_operation" AS "";
       ALTER TABLE role_has_operation MODIFY COLUMN operation_id INT unsigned NOT NULL;
       ALTER TABLE role_has_operation DROP FOREIGN KEY fk_role_has_operation_operation;
       ALTER TABLE role_has_operation
@@ -81,6 +87,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- setting_value -----------------------------------------------------------------------------
+      SELECT "Processing setting_value" AS "";
       ALTER TABLE setting_value DROP FOREIGN KEY fk_setting_value_setting;
       ALTER TABLE setting_value
       ADD CONSTRAINT fk_setting_value_setting_id
@@ -98,6 +105,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- import_entry ------------------------------------------------------------------------------
+      SELECT "Processing import_entry" AS "";
       ALTER TABLE import_entry DROP FOREIGN KEY fk_import_entry_participant_id;
       SET @sql = CONCAT(
         "ALTER TABLE import_entry ",
@@ -109,6 +117,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- proxy_form_entry --------------------------------------------------------------------------
+      SELECT "Processing proxy_form_entry" AS "";
       ALTER TABLE proxy_form_entry DROP FOREIGN KEY fk_proxy_form_entry_user_id;
       SET @sql = CONCAT(
         "ALTER TABLE proxy_form_entry ",
@@ -140,6 +149,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- proxy_form --------------------------------------------------------------------------------
+      SELECT "Processing proxy_form" AS "";
       ALTER TABLE proxy_form DROP FOREIGN KEY fk_proxy_form_proxy_alternate_id;
       SET @sql = CONCAT(
         "ALTER TABLE proxy_form ",
@@ -161,6 +171,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- consent_form_entry ------------------------------------------------------------------------
+      SELECT "Processing consent_form_entry" AS "";
       ALTER TABLE consent_form_entry DROP FOREIGN KEY fk_consent_form_entry_user_id;
       SET @sql = CONCAT(
         "ALTER TABLE consent_form_entry ",
@@ -172,6 +183,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- consent_form ------------------------------------------------------------------------------
+      SELECT "Processing consent_form" AS "";
       ALTER TABLE consent_form DROP FOREIGN KEY fk_consent_form_consent_id;
       SET @sql = CONCAT(
         "ALTER TABLE consent_form ",
@@ -183,6 +195,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- contact_form_entry ------------------------------------------------------------------------
+      SELECT "Processing contact_form_entry" AS "";
       ALTER TABLE contact_form_entry DROP FOREIGN KEY fk_contact_form_entry_user_id;
       SET @sql = CONCAT(
         "ALTER TABLE contact_form_entry ",
@@ -204,6 +217,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- contact_form ------------------------------------------------------------------------------
+      SELECT "Processing contact_form" AS "";
       ALTER TABLE contact_form DROP FOREIGN KEY fk_contact_form_participant_id;
       SET @sql = CONCAT(
         "ALTER TABLE contact_form ",
@@ -214,16 +228,30 @@ CREATE PROCEDURE convert_database()
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
 
+      -- hin ---------------------------------------------------------------------------------------
+      SELECT "Processing hin" AS "";
+      ALTER TABLE hin DROP FOREIGN KEY fk_hin_region_id;
+      SET @sql = CONCAT(
+        "ALTER TABLE hin ",
+        "ADD CONSTRAINT fk_hin_region_id ",
+        "FOREIGN KEY ( region_id ) REFERENCES ", @cenozo, ".region ( id ) ",
+        "ON DELETE NO ACTION ON UPDATE NO ACTION" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
       SET SQL_MODE=@OLD_SQL_MODE;
       SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
       SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
       -- operation ---------------------------------------------------------------------------------
+      SELECT "Processing operation" AS "";
       CREATE INDEX dk_type ON operation ( type );
       CREATE INDEX dk_subject ON operation ( subject );
       CREATE INDEX dk_name ON operation ( name );
 
       -- sabretooth_participant_last_appointment ---------------------------------------------------
+      SELECT "Processing sabretooth_participant_last_appointment" AS "";
       SET @sql = CONCAT(
         "CREATE OR REPLACE VIEW sabretooth_participant_last_appointment AS ",
         "SELECT * FROM ", @sabretooth, ".participant_last_appointment" );
@@ -232,6 +260,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
 
       -- beartooth_participant_last_appointment ----------------------------------------------------
+      SELECT "Processing beartooth_participant_last_appointment" AS "";
       SET @sql = CONCAT(
         "CREATE OR REPLACE VIEW beartooth_participant_last_appointment AS ",
         "SELECT * FROM ", @beartooth, ".participant_last_appointment" );
@@ -240,6 +269,7 @@ CREATE PROCEDURE convert_database()
       DEALLOCATE PREPARE statement;
        
       -- drop tables which have been moved to the @cenozo database
+      SELECT "Dropping old tables" AS "";
       DROP TABLE access;
       DROP TABLE phone;
       DROP VIEW alternate_first_address;
