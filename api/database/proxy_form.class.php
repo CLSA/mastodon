@@ -34,6 +34,7 @@ class proxy_form extends base_form
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_proxy_form_entry->uid );
+    $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
 
     // link to the form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
@@ -41,7 +42,8 @@ class proxy_form extends base_form
     // add the proxy received event to the participant
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent for proxy received' );
-    $db_participant->add_event( $db_event_type, $db_proxy_form_entry->date );
+    $db_participant->add_event(
+      $db_event_type, !is_null( $db_proxy_form_entry->date ) ? $db_proxy_form_entry->date : $now );
 
     if( $db_proxy_form_entry->proxy )
     {
@@ -88,7 +90,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->proxy_note;
         $db_participant_note->save();
       }
@@ -175,7 +177,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->informant_note;
         $db_participant_note->save();
       }
