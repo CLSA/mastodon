@@ -33,6 +33,7 @@ class proxy_form extends base_form
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_proxy_form_entry->uid );
+    $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
 
     // link to the form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
@@ -40,7 +41,9 @@ class proxy_form extends base_form
     // import data to the status table
     $db_status = lib::create( 'database\status' );
     $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = $db_proxy_form_entry->date;
+    $db_status->datetime = !is_null( $db_proxy_form_entry->date )
+                         ? $db_proxy_form_entry->date
+                         : $now;
     $db_status->event = 'consent for proxy received';
     $db_status->save();
 
@@ -89,7 +92,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->proxy_note;
         $db_participant_note->save();
       }
@@ -176,7 +179,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->informant_note;
         $db_participant_note->save();
       }
