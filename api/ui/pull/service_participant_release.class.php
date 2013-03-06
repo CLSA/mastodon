@@ -85,7 +85,8 @@ class service_participant_release extends \cenozo\ui\pull
       $availability_count += $db_participant->get_availability_count();
       $note_count += $db_participant->get_note_count();
 
-      $site_name = $db_participant->get_effective_site( $db_service )->name;
+      $db_site = $db_participant->get_effective_site( $db_service );
+      $site_name = is_null( $db_site ) ? 'none' : $db_site->name;
       if( !array_key_exists( $site_name, $participant_count ) ) $participant_count[$site_name] = 0;
       $participant_count[$site_name]++;
     }
