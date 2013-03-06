@@ -40,6 +40,7 @@ class form_chart extends \cenozo\ui\widget
     $contact_form_class_name = lib::get_class_name( 'database\contact_form' );
     $consent_form_class_name = lib::get_class_name( 'database\consent_form' );
     $proxy_form_class_name = lib::get_class_name( 'database\proxy_form' );
+    $session = lib::create( 'business\session' );
 
     $data = array();
 
@@ -109,6 +110,7 @@ class form_chart extends \cenozo\ui\widget
       'one' => $one,
       'two' => $two );
 
+    $this->set_variable( 'service_title', $session->get_service()->title );
     $this->set_variable( 'title', 'Data Entry System: Incomplete Form Status' );
     $this->set_variable( 'data', $data );
   }

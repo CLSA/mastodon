@@ -32,15 +32,15 @@ final class session extends \cenozo\business\session
     // try and use the requested site and role, if necessary
     if( !is_null( $site_name ) && !is_null( $role_name ) )
     {
-      // make sure there is an application name in the header
-      if( !array_key_exists( 'HTTP_APPLICATION_NAME', $_SERVER ) )
+      // make sure there is a service name in the header
+      if( !array_key_exists( 'HTTP_SERVICE_NAME', $_SERVER ) )
         throw lib::create( 'exception\runtime',
           'Application name missing, unable to process requested site and role', __METHOD__ );
 
       $service_class_name = lib::get_class_name( 'database\service' );
       $site_class_name = lib::get_class_name( 'database\site' );
       $db_service =
-        $service_class_name::get_unique_record( 'name', $_SERVER['HTTP_APPLICATION_NAME'] );
+        $service_class_name::get_unique_record( 'name', $_SERVER['HTTP_SERVICE_NAME'] );
       $this->requested_site = $site_class_name::get_unique_record(
         array( 'service_id', 'name' ),
         array( $db_service->id, $site_name ) );
