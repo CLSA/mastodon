@@ -51,6 +51,18 @@ CREATE PROCEDURE patch_role_has_operation()
       SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
           operation_id = ( SELECT id FROM operation WHERE
             type = "push" AND subject = "service" AND name = "delete_cohort" );
+      INSERT IGNORE INTO role_has_operation
+      SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+          operation_id = ( SELECT id FROM operation WHERE
+            type = "widget" AND subject = "service" AND name = "add_role" );
+      INSERT IGNORE INTO role_has_operation
+      SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+          operation_id = ( SELECT id FROM operation WHERE
+            type = "push" AND subject = "service" AND name = "new_role" );
+      INSERT IGNORE INTO role_has_operation
+      SET role_id = ( SELECT id FROM role WHERE name = "administrator" ),
+          operation_id = ( SELECT id FROM operation WHERE
+            type = "push" AND subject = "service" AND name = "delete_role" );
 
       -- cohort
       INSERT IGNORE INTO role_has_operation
