@@ -579,16 +579,6 @@ AND role.name IN ( "administrator", "coordinator", "interviewer", "supervisor" )
 
 INSERT INTO role_has_operation( role_id, operation_id )
 SELECT role.id, operation.id FROM cenozo.role, operation
-WHERE type = "pull" AND subject = "participant" AND operation.name = "list_alternate"
-AND role.name IN ( "administrator", "coordinator", "interviewer", "operator", "supervisor" );
-
-INSERT INTO role_has_operation( role_id, operation_id )
-SELECT role.id, operation.id FROM cenozo.role, operation
-WHERE type = "pull" AND subject = "participant" AND operation.name = "list_consent"
-AND role.name IN ( "administrator", "coordinator", "interviewer", "operator", "supervisor" );
-
-INSERT INTO role_has_operation( role_id, operation_id )
-SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "push" AND subject = "participant" AND operation.name = "multinote"
 AND role.name IN ( "administrator" );
 

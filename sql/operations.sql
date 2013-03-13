@@ -33,6 +33,12 @@ VALUES( "pull", "consent_form_entry", "validate", true, "Validates the entry val
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "consent_form_entry", "view", true, "View the details of entry values for a consent form." );
 
+-- contact
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "contact", "report", true, "Set up a contact report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "contact", "report", true, "Download a contact report." );
+
 -- contact_form
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "contact_form", "adjudicate", true, "Adjudicates conflicts between two entries for a contact form." );
@@ -63,11 +69,17 @@ VALUES( "widget", "contact_form_entry", "view", true, "View the details of entry
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "import", "add", true, "Displays a widget for participant import files to be uploaded." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "import", "new", true, "Imports new participants from a CSV file." );
-INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "import", "delete", true, "Deletes a CSV import file." );
 INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "import", "new", true, "Imports new participants from a CSV file." );
+INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "import", "process", true, "Processes entries imported from a CSV file." );
+
+-- mailout
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
 
 -- proxy_form
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -97,30 +109,24 @@ VALUES( "pull", "proxy_form_entry", "validate", true, "Validates the entry value
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "proxy_form_entry", "view", true, "View the details of entry values for a proxy form." );
 
--- reports
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "contact", "report", true, "Set up a contact report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "contact", "report", true, "Download a contact report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "mailout", "report", true, "Set up a mailout report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "mailout", "report", true, "Download a mailout report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "quota", "report", true, "Set up a quota report." );
+-- quota
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "quota", "report", true, "Download a quota report." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
+VALUES( "widget", "quota", "report", true, "Set up a quota report." );
 
 -- service participant_release
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "service", "participant_release", true, "A form to release participants to other services." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "service", "participant_release", true, "Returns a summary of participants to be released to another service." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "service", "participant_release", true, "Releases participants to another service." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "participant_release", true, "A form to release participants to other services." );
+
+-- withdraw
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
 
 COMMIT;

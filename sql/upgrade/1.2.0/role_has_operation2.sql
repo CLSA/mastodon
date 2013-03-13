@@ -1,43 +1,31 @@
-DROP PROCEDURE IF EXISTS update_role_has_operation;
+-- only remove role_has_operation entries if the database hasn't yet been converted
+DROP PROCEDURE IF EXISTS patch_role_has_operation2;
 DELIMITER //
-CREATE PROCEDURE update_role_has_operation()
+CREATE PROCEDURE patch_role_has_operation2()
   BEGIN
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.TABLES
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "user" );
+    IF @test = 1 THEN
 
-    -- determine the @cenozo database name
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
+      -- remove operation list
+      DELETE FROM role_has_operation WHERE operation_id IN (
+        SELECT id FROM operation
+        WHERE subject = "operation"
+        AND name = "list" );
 
-    -- service participant release
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO role_has_operation ",
-      "SET role_id = ( SELECT id FROM ", @cenozo, ".role WHERE name = 'administrator' ), ",
-          "operation_id = ( SELECT id FROM operation WHERE ",
-            "type = 'widget' AND subject = 'service' AND name = 'participant_release' ); " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
-    
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO role_has_operation ",
-      "SET role_id = ( SELECT id FROM ", @cenozo, ".role WHERE name = 'administrator' ), ",
-          "operation_id = ( SELECT id FROM operation WHERE ",
-            "type = 'pull' AND subject = 'service' AND name = 'participant_release' ); " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+      -- remove all "primary" operations (except for partiicpant primary)
+      DELETE FROM role_has_operation WHERE operation_id IN (
+        SELECT id FROM operation
+        WHERE name = "primary"
+        AND subject != "participant" );
 
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO role_has_operation ",
-      "SET role_id = ( SELECT id FROM ", @cenozo, ".role WHERE name = 'administrator' ), ",
-          "operation_id = ( SELECT id FROM operation WHERE ",
-            "type = 'push' AND subject = 'service' AND name = 'participant_release' ); " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
-
+    END IF;
   END //
 DELIMITER ;
 
 -- now call the procedure and remove the procedure
-CALL update_role_has_operation();
-DROP PROCEDURE IF EXISTS update_role_has_operation;
+CALL patch_role_has_operation2();
+DROP PROCEDURE IF EXISTS patch_role_has_operation2;
