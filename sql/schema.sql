@@ -152,30 +152,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mastodon`.`hin`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `mastodon`.`hin` ;
-
-CREATE  TABLE IF NOT EXISTS `mastodon`.`hin` (
-  `uid` VARCHAR(45) NOT NULL ,
-  `update_timestamp` TIMESTAMP NOT NULL ,
-  `create_timestamp` TIMESTAMP NOT NULL ,
-  `access` TINYINT(1) NULL DEFAULT NULL ,
-  `future_access` TINYINT(1) NULL DEFAULT NULL ,
-  `code` VARCHAR(45) NULL DEFAULT NULL ,
-  `region_id` INT UNSIGNED NULL DEFAULT NULL ,
-  PRIMARY KEY (`uid`) ,
-  INDEX `fk_region_id` (`region_id` ASC) ,
-  CONSTRAINT `fk_hin_region_id`
-    FOREIGN KEY (`region_id` )
-    REFERENCES `cenozo`.`region` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
 -- Table `mastodon`.`contact_form`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `mastodon`.`contact_form` ;

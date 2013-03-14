@@ -15,10 +15,14 @@ CREATE PROCEDURE patch_operation2()
       WHERE subject = "operation"
       AND name = "list";
 
-      -- remove all "primary" operations (except for partiicpant primary)
+      -- remove all "primary" operations
       DELETE FROM operation
-      WHERE name = "primary"
-      AND subject != "participant";
+      WHERE name = "primary";
+
+      -- remove the quota chart operation
+      DELETE FROM operation
+      WHERE subject = "quota"
+      AND name = "chart";
 
     END IF;
   END //

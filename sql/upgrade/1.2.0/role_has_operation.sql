@@ -12,37 +12,37 @@ CREATE PROCEDURE patch_role_has_operation()
 
       -- cohort
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "cohort" AND operation.name = "add"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "cohort" AND operation.name = "delete"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "cohort" AND operation.name = "edit"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "cohort" AND operation.name = "list"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "cohort" AND operation.name = "new"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "pull" AND subject = "cohort" AND operation.name = "primary"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "cohort" AND operation.name = "view"
       AND role.name IN ( "administrator" );
@@ -88,104 +88,109 @@ CREATE PROCEDURE patch_role_has_operation()
 
       -- participant
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "participant" AND operation.name = "add_event"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "participant" AND operation.name = "delete_event"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
+      SELECT role.id, operation.id FROM cenozo.role, operation
+      WHERE type = "widget" AND subject = "participant" AND operation.name = "hin"
+      AND role.name IN( "administrator", "operator", "supervisor" );
+
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "pull" AND subject = "participant" AND operation.name = "report"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "participant" AND operation.name = "report"
       AND role.name IN ( "administrator" );
 
       -- service
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "add"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "add_cohort"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "add_role"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "delete"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "delete_cohort"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "delete_role"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "edit"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "list"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "new"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "new_cohort"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "new_role"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "push" AND subject = "service" AND operation.name = "participant_release"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "pull" AND subject = "service" AND operation.name = "participant_release"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "participant_release"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "pull" AND subject = "service" AND operation.name = "primary"
       AND role.name IN ( "administrator" );
 
-      INSERT INTO role_has_operation( role_id, operation_id )
+      INSERT IGNORE INTO role_has_operation( role_id, operation_id )
       SELECT role.id, operation.id FROM role, operation
       WHERE type = "widget" AND subject = "service" AND operation.name = "view"
       AND role.name IN ( "administrator" );

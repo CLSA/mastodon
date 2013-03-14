@@ -29,6 +29,12 @@ CREATE PROCEDURE patch_activity()
         SELECT id FROM operation
         WHERE name = "primary" );
 
+      -- remove the quota chart operation
+      DELETE FROM activity WHERE operation_id IN (
+        SELECT id FROM operation
+        WHERE subject = "quota"
+        AND name = "chart" );
+
     END IF;
   END //
 DELIMITER ;

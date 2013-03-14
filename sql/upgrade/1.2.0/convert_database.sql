@@ -228,22 +228,6 @@ CREATE PROCEDURE convert_database()
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
 
-      -- hin ---------------------------------------------------------------------------------------
-      SELECT "Processing hin" AS "";
-      ALTER TABLE hin DROP FOREIGN KEY fk_hin_region_id;
-      SET @sql = CONCAT(
-        "ALTER TABLE hin ",
-        "ADD CONSTRAINT fk_hin_region_id ",
-        "FOREIGN KEY ( region_id ) REFERENCES ", @cenozo, ".region ( id ) ",
-        "ON DELETE NO ACTION ON UPDATE NO ACTION" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
-
-      SET SQL_MODE=@OLD_SQL_MODE;
-      SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-      SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
       -- operation ---------------------------------------------------------------------------------
       SELECT "Processing operation" AS "";
       CREATE INDEX dk_type ON operation ( type );
@@ -270,6 +254,7 @@ CREATE PROCEDURE convert_database()
        
       -- drop tables which have been moved to the @cenozo database
       SELECT "Dropping old tables" AS "";
+      DROP TABLE hin;
       DROP TABLE access;
       DROP TABLE phone;
       DROP VIEW alternate_first_address;

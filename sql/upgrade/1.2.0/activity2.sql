@@ -33,7 +33,7 @@ CREATE PROCEDURE patch_activity2()
         SELECT "Warning: failed to convert participant_sync operations to service_participant_release.";
       ELSE
         SET @sql = CONCAT(
-          "INSERT INTO activity( update_timestamp, create_timestamp, ",
+          "INSERT IGNORE INTO activity( update_timestamp, create_timestamp, ",
                                 "user_id, site_id, role_id, operation_id, ",
                                 "query, elapsed, error_code, datetime ) ",
           "SELECT sactivity.update_timestamp, sactivity.create_timestamp, ",
@@ -60,7 +60,7 @@ CREATE PROCEDURE patch_activity2()
         DEALLOCATE PREPARE statement;
 
         SET @sql = CONCAT(
-          "INSERT INTO activity( update_timestamp, create_timestamp, ",
+          "INSERT IGNORE INTO activity( update_timestamp, create_timestamp, ",
                                 "user_id, site_id, role_id, operation_id, ",
                                 "query, elapsed, error_code, datetime ) ",
           "SELECT sactivity.update_timestamp, sactivity.create_timestamp, ",
