@@ -212,8 +212,6 @@ print <<<OUTPUT
  * Since template errors already have codes this list is likely to stay empty.
  */
 
-?>
 
 OUTPUT;
 
-?>

@@ -27,4 +27,3 @@ class contact_form_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'contact_form', $args );
   }
 }
-?>

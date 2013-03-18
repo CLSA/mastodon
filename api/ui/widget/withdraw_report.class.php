@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget withdraw report
  */
-class withdraw_report extends base_report
+class withdraw_report extends \cenozo\ui\widget\base_report
 {
   /**
    * Constructor
@@ -46,4 +46,3 @@ class withdraw_report extends base_report
       'withdraw occurred.' );
   }
 }
-?>

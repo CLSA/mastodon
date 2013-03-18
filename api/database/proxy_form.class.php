@@ -28,21 +28,22 @@ class proxy_form extends base_form
         'Tried to import invalid proxy form entry.', __METHOD__ );
     }
 
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_proxy_form_entry->uid );
+    $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
 
     // link to the form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
 
-    // import data to the status table
-    $db_status = lib::create( 'database\status' );
-    $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = $db_proxy_form_entry->date;
-    $db_status->event = 'consent for proxy received';
-    $db_status->save();
+    // add the proxy received event to the participant
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent for proxy received' );
+    $db_participant->add_event(
+      $db_event_type, !is_null( $db_proxy_form_entry->date ) ? $db_proxy_form_entry->date : $now );
 
     if( $db_proxy_form_entry->proxy )
     {
@@ -89,7 +90,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->proxy_note;
         $db_participant_note->save();
       }
@@ -176,7 +177,7 @@ class proxy_form extends base_form
         $db_participant_note = lib::create( 'database\person_note' );
         $db_participant_note->person_id = $db_person->id;
         $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_participant_note->datetime = $now;
         $db_participant_note->note = $db_proxy_form_entry->informant_note;
         $db_participant_note->save();
       }
@@ -221,7 +222,10 @@ class proxy_form extends base_form
     
     // import data to the participant table
     if( !is_null( $db_proxy_form_entry->informant_continue ) )
+    {
       $db_participant->use_informant = $db_proxy_form_entry->informant_continue;
+      $db_participant->save();
+    }
 
     // import data to the hin table
     if( !is_null( $db_proxy_form_entry->health_card ) )
@@ -247,4 +251,3 @@ class proxy_form extends base_form
     $this->save();
   }
 }
-?>

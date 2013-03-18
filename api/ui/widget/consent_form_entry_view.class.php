@@ -64,4 +64,3 @@ class consent_form_entry_view extends base_form_entry_view
     $this->set_item( 'date', $this->get_record()->date, false );
   }
 }
-?>

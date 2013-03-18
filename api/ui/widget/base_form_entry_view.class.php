@@ -78,4 +78,3 @@ abstract class base_form_entry_view extends \cenozo\ui\widget\base_view
    */
   private $form_type;
 }
-?>

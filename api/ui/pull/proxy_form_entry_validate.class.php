@@ -159,9 +159,6 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
         $errors['informant_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
-    if( is_null( $record->date ) )
-      $errors['date'] = 'This value cannot be left blank.';
-
     $this->data = $errors;
   }
 
@@ -176,4 +173,3 @@ class proxy_form_entry_validate extends \cenozo\ui\pull\base_record
     return 'json';
   }
 }
-?>

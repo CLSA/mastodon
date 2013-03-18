@@ -95,4 +95,3 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
    */
   private $form_mod;
 }
-?>

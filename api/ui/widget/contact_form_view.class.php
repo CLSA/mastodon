@@ -80,8 +80,7 @@ class contact_form_view extends base_form_view
     $this->add_item( 'language', 'Language' );
     $this->add_item( 'signed', 'Signed' );
     $this->add_item( 'date', 'Date Signed' );
-    $this->add_item( 'cohort', 'Cohort' );
+    $this->add_item( 'cohort_id', 'Cohort' );
     $this->add_item( 'note', 'Note' );
   }
 }
-?>
