@@ -33,5 +33,8 @@ class participant_list extends \cenozo\ui\widget\participant_list
         $this->add_action( 'import', 'Import', $db_operation,
           'Import participants from an external CSV file' );
     }
+
+    // remove the site column since it is meaningless here
+    $this->remove_column( 'site' );
   }
 }
