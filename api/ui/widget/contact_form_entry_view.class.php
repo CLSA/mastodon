@@ -101,6 +101,7 @@ class contact_form_entry_view extends base_form_entry_view
     // create enum arrays
     $region_mod = lib::create( 'database\modifier' );
     $region_mod->where( 'country', '=', 'Canada' );
+    $region_mod->order( 'name' );
     $region_list = array();
     foreach( $region_class_name::select( $region_mod ) as $db_region )
       $region_list[$db_region->id] = $db_region->name.', '.$db_region->country;
