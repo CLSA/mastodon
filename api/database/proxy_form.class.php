@@ -43,7 +43,7 @@ class proxy_form extends base_form
 
     // add the proxy received event to the participant
     $db_event_type =
-      $event_type_class_name::get_unique_record( 'name', 'consent for proxy received' );
+      $event_type_class_name::get_unique_record( 'name', 'consent for proxy signed' );
     $db_participant->add_event(
       $db_event_type, !is_null( $db_proxy_form_entry->date ) ? $db_proxy_form_entry->date : $now );
 

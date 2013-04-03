@@ -173,9 +173,9 @@ class contact_form extends base_form
       $db_participant_note->save();
     }
 
-    // add the consent to contact received event to the participant
+    // add the consent to contact signed event to the participant
     $db_event_type =
-      $event_type_class_name::get_unique_record( 'name', 'consent to contact received' );
+      $event_type_class_name::get_unique_record( 'name', 'consent to contact signed' );
     $datetime = is_null( $db_contact_form_entry->date ) ?
       util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
     $db_participant->add_event( $db_event_type, $datetime );
