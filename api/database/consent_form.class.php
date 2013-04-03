@@ -30,6 +30,7 @@ class consent_form extends base_form
 
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $hin_class_name = lib::get_class_name( 'database\hin' );
 
     // link to the form
     $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
@@ -80,12 +81,10 @@ class consent_form extends base_form
     }
 
     // import the data to the hin table
-    static::db()->execute( sprintf(
-      'INSERT INTO hin SET uid = %s, access = %s '.
-      'ON DUPLICATE KEY '.
-      'UPDATE uid = VALUES( uid ), access = VALUES( access )',
-      $database_class_name::format_string( $db_consent_form_entry->uid ),
-      $database_class_name::format_string( $db_consent_form_entry->option_2 ) ) );
+    $db_hin = $hin_class_name::get_unique_record( 'participant_id', $db_participant->id );
+    if( is_null( $db_hin ) ) $db_hin = lib::create( 'database\hin' );
+    $db_hin->access = $db_consent_form_entry->option_2;
+    $db_hin->save();
 
     // save the new consent record to the form
     $this->complete = true;
