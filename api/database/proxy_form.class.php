@@ -41,7 +41,7 @@ class proxy_form extends base_form
     // link to the form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
 
-    // add the proxy received event to the participant
+    // add the proxy signed event to the participant
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent for proxy signed' );
     $db_participant->add_event(

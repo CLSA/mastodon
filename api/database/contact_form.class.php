@@ -35,6 +35,7 @@ class contact_form extends base_form
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $service_class_name = lib::get_class_name( 'database\service' );
     $site_class_name = lib::get_class_name( 'database\site' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
 
     // start by checking for address duplicates in the same cohort
     $address = util::parse_address(

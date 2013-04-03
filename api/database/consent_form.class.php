@@ -28,12 +28,19 @@ class consent_form extends base_form
         'Tried to import invalid consent form entry.', __METHOD__ );
     }
 
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $hin_class_name = lib::get_class_name( 'database\hin' );
 
     // link to the form
     $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
+
+    // add the consent signed event to the participant
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent signed' );
+    $db_participant->add_event(
+      $db_event_type, !is_null( $db_consent_form_entry->date ) ? $db_consent_form_entry->date : $now );
 
     // import the data to the consent table
     $db_participant =
