@@ -159,7 +159,7 @@ abstract class base_form_view
           }
           else if( 'cohort_id' == $item_id )
           {
-            $db_cohort = lib::create( 'database\cohort', $this->form_entry_1->$item_id );
+            $db_cohort = lib::create( 'database\cohort', $this->form_entry_2->$item_id );
             $entry['value'] = $db_cohort->name;
           }
           else $entry['value'] = $this->form_entry_2->$item_id;
