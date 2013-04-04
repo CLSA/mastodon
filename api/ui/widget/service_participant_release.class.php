@@ -25,13 +25,10 @@ class service_participant_release extends \cenozo\ui\widget
   public function __construct( $args )
   {
     parent::__construct( 'service', 'participant_release', $args );
-
-    $this->service_name = lib::create( 'business\session' )->get_site()->get_service()->name;
-    $this->set_heading( 'Release Participants to '.$this->service_name );
   }
 
   /**
-   * Finish setting the variables in a widget.
+   * Sets up necessary site-based variables.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
@@ -40,13 +37,24 @@ class service_participant_release extends \cenozo\ui\widget
   {
     parent::setup();
 
-    $this->set_variable( 'service_name', $this->service_name );
-  }
+    $service_class_name = lib::get_class_name( 'database\service' );
 
-  /**
-   * The name of the service being released to.
-   * @var string
-   * @access protected
-   */
-  protected $service_name;
+    // create a list of services with each of that service's sites
+    $services = array();
+    foreach( $service_class_name::select() as $db_service )
+    {
+      $service = array( 'id' => $db_service->id,
+                        'name' => $db_service->name,
+                        'sites' => array() );
+
+      $site_mod = lib::create( 'database\modifier' );
+      $site_mod->order( 'name' );
+      foreach( $db_service->get_site_list( $site_mod ) as $db_site )
+        $service['sites'][] = array( 'id' => $db_site->id, 'name' => $db_site->name );
+
+      if( count( $service['sites'] ) ) $services[] = $service;
+    }
+
+    $this->set_variable( 'services', $services );
+  }
 }

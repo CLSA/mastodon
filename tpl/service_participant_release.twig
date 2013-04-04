@@ -77,7 +77,7 @@
   <div id="{{ widget.full }}_form" class="ui-widget ui-widget-content app-widget-content">
     <div class="spacer">
       <p>
-        Provide a list of participants which you wish to release to {{ service_name }}.
+        Provide a list of participants which you wish to release to another application.
         UIDs must be separated by a comma or space and may be qualified by single
         or double quotes (ie: A123456 B123456 C123456).  Clicking the "update"
         button will display a summary of changes to be performed which should be
@@ -88,6 +88,24 @@
       </p>
     </div>
     <table>
+      {% if 1 < services|length %}
+        <tr>
+          <td class="heading">
+            <span class="title">Service:</span>
+          </td>
+          <td class="content">
+             <select id="{{ widget.full }}__service_id" style="width: 100%" class="ui-state-default">
+              {% for service in services %}
+                <option value="{{ service.id }}">{{ service.name }}</option>
+              {% endfor %}
+             </select>
+          </td>
+        </tr>
+      {% else %}
+        {% for service in services %}
+          <input id="{{ widget.full }}__service_id" type="hidden" value="{{ service.id }}" />
+        {% endfor %}
+      {% endif %}
       <tr>
         <td class="heading">
           <span class="title">UID list:</span>
