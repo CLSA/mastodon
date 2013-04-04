@@ -233,7 +233,11 @@ class proxy_form extends base_form
     if( !is_null( $db_proxy_form_entry->health_card ) )
     {
       $db_hin = $hin_class_name::get_unique_record( 'participant_id', $db_participant->id );
-      if( is_null( $db_hin ) ) $db_hin = lib::create( 'database\hin' );
+      if( is_null( $db_hin ) )
+      {
+        $db_hin = lib::create( 'database\hin' );
+        $db_hin->participant_id = $db_participant->id;
+      }
       $db_hin->future_access = $db_proxy_form_entry->health_card;
       $db_hin->save();
     }
