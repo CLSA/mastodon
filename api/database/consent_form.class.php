@@ -33,6 +33,9 @@ class consent_form extends base_form
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $hin_class_name = lib::get_class_name( 'database\hin' );
 
+    $db_participant =
+      $participant_class_name::get_unique_record( 'uid', $db_consent_form_entry->uid );
+
     // link to the form
     $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
 
@@ -43,8 +46,6 @@ class consent_form extends base_form
       $db_event_type, !is_null( $db_consent_form_entry->date ) ? $db_consent_form_entry->date : $now );
 
     // import the data to the consent table
-    $db_participant =
-      $participant_class_name::get_unique_record( 'uid', $db_consent_form_entry->uid );
     $accept = $db_consent_form_entry->option_1;
     $date = !is_null( $db_consent_form_entry->date )
           ? $db_consent_form_entry->date
