@@ -68,6 +68,6 @@ class service_participant_release extends \cenozo\ui\push
       $service_mod->where( 'uid', 'IN', $uid_list );
     }
 
-    $db_service->participant_release( $service_mod );
+    $db_service->release_participant( $service_mod );
   }
 }

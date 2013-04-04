@@ -76,7 +76,7 @@ class service_participant_release extends \cenozo\ui\pull
       $service_mod->where( 'uid', 'IN', $uid_list );
     }
 
-    // get a list of all unparticipant_releasehed participants
+    // get a list of all unreleased participants
     foreach( $db_service->release_participant( $service_mod, true ) as $db_participant )
     {
       $address_count += $db_participant->get_address_count();

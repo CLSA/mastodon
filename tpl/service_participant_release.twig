@@ -51,7 +51,11 @@
                                ? ( $(this).is( ":checked" ) ? 1 : 0 )
                                : $(this).val();
           } );
-          if( ajax_push( "service", "participant_release", args ) ) slot_prev( {{ slot }} );
+          if( ajax_push( "service", "participant_release", args ) ) {
+            // let the user know the operation is complete and delete the proceed button
+            $(this).remove();
+            alert( "The operation was successful." );
+          }
         } );
       } );
 
