@@ -140,6 +140,7 @@ class import_entry extends \cenozo\database\record
       return;
     }
     
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
