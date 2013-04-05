@@ -24,11 +24,10 @@ class import_entry extends \cenozo\database\record
   public function validate()
   {
     $region_class_name = lib::get_class_name( 'database\region' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
-    $address_class_name = lib::get_class_name( 'database\address' );
     $postcode_class_name = lib::get_class_name( 'database\postcode' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
-    $service_class_name = lib::get_class_name( 'database\service' );
+    $address_class_name = lib::get_class_name( 'database\address' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
       $this->apartment_error = true;
@@ -140,13 +139,14 @@ class import_entry extends \cenozo\database\record
       return;
     }
     
-    $event_type_class_name = lib::get_class_name( 'database\event_type' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
-    $region_class_name = lib::get_class_name( 'database\region' );
-    $site_class_name = lib::get_class_name( 'database\site' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $service_class_name = lib::get_class_name( 'database\service' );
+    $site_class_name = lib::get_class_name( 'database\site' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
+    $region_class_name = lib::get_class_name( 'database\region' );
 
     // all participants are from the rdd source
     $db_source = $source_class_name::get_unique_record( 'name', 'rdd' );
@@ -203,7 +203,7 @@ class import_entry extends \cenozo\database\record
         $cohort_mod = lib::create( 'database\modifier' );
         $cohort_mod->where( 'cohort.name', '=', $db_participant->get_cohort()->name );
         if( 0 < $db_service->get_cohort_count( $cohort_mod ) )
-          $db_participant->set_preferred_site( $db_service->id, $db_french_site->id );
+          $db_participant->set_preferred_site( $db_service, $db_french_site );
       }
     }
 

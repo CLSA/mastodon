@@ -29,10 +29,9 @@ class contact_form extends base_form
     }
 
     $address_class_name = lib::get_class_name( 'database\address' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
-    $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $service_class_name = lib::get_class_name( 'database\service' );
     $site_class_name = lib::get_class_name( 'database\site' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
@@ -168,7 +167,7 @@ class contact_form extends base_form
         $cohort_mod = lib::create( 'database\modifier' );
         $cohort_mod->where( 'cohort.name', '=', $db_participant->get_cohort()->name );
         if( 0 < $db_service->get_cohort_count( $cohort_mod ) )
-          $db_participant->set_preferred_site( $db_service->id, $db_french_site->id );
+          $db_participant->set_preferred_site( $db_service, $db_french_site );
       }
     }
 
