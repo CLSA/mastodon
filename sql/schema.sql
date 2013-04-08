@@ -560,6 +560,35 @@ DEFAULT CHARACTER SET = latin1;
 
 
 -- -----------------------------------------------------
+-- Table `mastodon`.`system_message`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `mastodon`.`system_message` ;
+
+CREATE  TABLE IF NOT EXISTS `mastodon`.`system_message` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `site_id` INT UNSIGNED NULL ,
+  `role_id` INT UNSIGNED NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `note` TEXT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  INDEX `fk_role_id` (`role_id` ASC) ,
+  CONSTRAINT `fk_system_message_site_id`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `cenozo`.`site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_system_message_role_id`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `cenozo`.`role` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Placeholder table for view `mastodon`.`sabretooth_participant_last_appointment`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mastodon`.`sabretooth_participant_last_appointment` (`id` INT);
