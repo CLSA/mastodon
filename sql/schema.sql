@@ -233,6 +233,8 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`contact_form_entry` (
   `time_18_19` TINYINT(1) NOT NULL DEFAULT 0 ,
   `time_19_20` TINYINT(1) NOT NULL DEFAULT 0 ,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT 0 ,
+  `high_school` TINYINT(1) NULL DEFAULT NULL ,
+  `post_secondary` TINYINT(1) NULL DEFAULT NULL ,
   `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either' ,
   `cohort_id` INT UNSIGNED NULL DEFAULT NULL ,
   `signed` TINYINT(1) NOT NULL DEFAULT 0 ,

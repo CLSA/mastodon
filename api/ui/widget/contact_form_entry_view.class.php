@@ -77,6 +77,8 @@ class contact_form_entry_view extends base_form_entry_view
     $this->add_item( 'time_18_19', 'boolean', '6pm to 7pm' );
     $this->add_item( 'time_19_20', 'boolean', '7pm to 8pm' );
     $this->add_item( 'time_20_21', 'boolean', '8pm to 9pm' );
+    $this->add_item( 'high_school', 'boolean', 'High School or Lower' );
+    $this->add_item( 'post_secondary', 'boolean', 'Post-Secondary' );
     $this->add_item( 'language', 'enum', 'Language' );
     $this->add_item( 'signed', 'boolean', 'Signed' );
     $this->add_item( 'date', 'date', 'Date Signed' );
@@ -156,6 +158,8 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'time_18_19', $record->time_18_19, true );
     $this->set_item( 'time_19_20', $record->time_19_20, true );
     $this->set_item( 'time_20_21', $record->time_20_21, true );
+    $this->set_item( 'high_school', $record->high_school, false );
+    $this->set_item( 'post_secondary', $record->post_secondary, false );
     $this->set_item( 'language', $record->language, true, $language_list );
     $this->set_item( 'signed', $this->get_record()->signed, true );
     $this->set_item( 'date', $record->date, false );
