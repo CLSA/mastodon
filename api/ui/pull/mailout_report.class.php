@@ -118,8 +118,13 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
       // add packaged mailed event if requested to
       if( $mark_mailout )
-        $db_participant->add_event(
-          $db_event_type, util::get_datetime_object()->format( 'Y-m-d H:i:s' ) );
+      {
+        $db_event = lib::create( 'database\event' );
+        $db_event->participant_id = $db_participant->id;
+        $db_event->event_type_id = $db_event_type->id;
+        $db_event->datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
+        $db_event->save();
+      }
     }
     
     $header = array(

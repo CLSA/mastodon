@@ -209,7 +209,14 @@ class import_entry extends \cenozo\database\record
 
     // add the imported by rdd event to the participant
     $db_event_type = $event_type_class_name::get_unique_record( 'name', 'imported by rdd' );
-    $db_participant->add_event( $db_event_type, $this->date );
+    if( !is_null( $db_event_type ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = $this->date;
+      $db_event->save();
+    }
     
     // import data to the address table
     $address = $this->street;

@@ -42,8 +42,16 @@ class consent_form extends base_form
     // add the consent signed event to the participant
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent signed' );
-    $db_participant->add_event(
-      $db_event_type, !is_null( $db_consent_form_entry->date ) ? $db_consent_form_entry->date : $now );
+    if( !is_null( $db_event_type ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = !is_null( $db_consent_form_entry->date )
+                          ? $db_consent_form_entry->date
+                          : $now;
+      $db_event->save();
+    }
 
     // import the data to the consent table
     $accept = $db_consent_form_entry->option_1;

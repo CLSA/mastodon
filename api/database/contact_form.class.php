@@ -186,9 +186,16 @@ class contact_form extends base_form
     // add the consent to contact signed event to the participant
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent to contact signed' );
-    $datetime = is_null( $db_contact_form_entry->date ) ?
-      util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
-    $db_participant->add_event( $db_event_type, $datetime );
+    if( !is_null( $db_event_type ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = is_null( $db_contact_form_entry->date )
+                          ? util::get_datetime_object()->format( 'Y-m-d H:i:s' )
+                          : $db_contact_form_entry->date;
+      $db_event->save();
+    }
     
     // import data to the address table
     $db_address = lib::create( 'database\address' );
