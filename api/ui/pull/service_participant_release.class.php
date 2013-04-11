@@ -45,7 +45,7 @@ class service_participant_release extends \cenozo\ui\pull
     $availability_count = 0;
     $note_count = 0;
     
-    $db_service = lib::create( 'business\session' )->get_site()->get_service();
+    $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
     $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
     $uid_list_string = trim( $uid_list_string );
     $start_date = $this->get_argument( 'start_date', '' );
@@ -76,7 +76,7 @@ class service_participant_release extends \cenozo\ui\pull
       $service_mod->where( 'uid', 'IN', $uid_list );
     }
 
-    // get a list of all unparticipant_releasehed participants
+    // get a list of all unreleased participants
     foreach( $db_service->release_participant( $service_mod, true ) as $db_participant )
     {
       $address_count += $db_participant->get_address_count();
@@ -92,7 +92,9 @@ class service_participant_release extends \cenozo\ui\pull
     }
 
     $this->data = array();
-    foreach( $participant_count as $site => $count )
+    if( 0 == count( $participant_count ) )
+      $this->data['New participants'] = 0;
+    else foreach( $participant_count as $site => $count )
       $this->data['New participants ('.$site.')'] = $count;
     $this->data['Addresses'] = $address_count;
     $this->data['Phone numbers'] = $phone_count;

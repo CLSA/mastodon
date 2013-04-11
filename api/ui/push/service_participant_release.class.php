@@ -37,7 +37,7 @@ class service_participant_release extends \cenozo\ui\push
   {
     parent::execute();
 
-    $db_service = lib::create( 'business\session' )->get_site()->get_service();
+    $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
     $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
     $uid_list_string = trim( $uid_list_string );
     $start_date = $this->get_argument( 'start_date', '' );
@@ -68,6 +68,6 @@ class service_participant_release extends \cenozo\ui\push
       $service_mod->where( 'uid', 'IN', $uid_list );
     }
 
-    $db_service->participant_release( $service_mod );
+    $db_service->release_participant( $service_mod );
   }
 }

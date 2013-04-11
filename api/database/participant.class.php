@@ -19,13 +19,14 @@ class participant extends \cenozo\database\participant
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
+   * @param boolean $distinct Whether to use the DISTINCT sql keyword
    * @param boolean $full Do not use, parameter ignored.
    * @access public
    * @static
    */
-  public static function select( $modifier = NULL, $count = false, $full = false )
+  public static function select( $modifier = NULL, $count = false, $distinct = true, $full = false )
   {
-    return parent::select( $modifier, $count, true );
+    return parent::select( $modifier, $count, $distinct, true );
   }
 
   /**
@@ -36,14 +37,14 @@ class participant extends \cenozo\database\participant
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string|array $column A column with the unique key property (or array of columns)
    * @param string|array $value The value of the column to match (or array of values)
+   * @param boolean $full Ignore this parameter (see parent class for details)
    * @return database\record
    * @static
    * @access public
    */
-  public static function get_unique_record( $column, $value )
+  public static function get_unique_record( $column, $value, $full = true )
   {
-    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
-    return $grand_parent::get_unique_record( $column, $value );
+    return parent::get_unique_record( $column, $value, $full );
   }
 
   /**

@@ -1,4 +1,5 @@
 -- change the cohort column to a foreign key to the cohort table
+-- add new high_school and post_secondary columns
 DROP PROCEDURE IF EXISTS patch_contact_form_entry;
 DELIMITER //
 CREATE PROCEDURE patch_contact_form_entry()
@@ -40,6 +41,19 @@ CREATE PROCEDURE patch_contact_form_entry()
 
       -- now drop the cohort column
       ALTER TABLE contact_form_entry DROP COLUMN cohort;
+    END IF;
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ( SELECT DATABASE() )
+      AND TABLE_NAME = "contact_form_entry"
+      AND COLUMN_NAME = "high_school" );
+    IF @test = 0 THEN
+      ALTER TABLE contact_form_entry
+      ADD COLUMN high_school TINYINT(1) NULL DEFAULT NULL AFTER time_20_21;
+      ALTER TABLE contact_form_entry
+      ADD COLUMN post_secondary TINYINT(1) NULL DEFAULT NULL AFTER high_school;
     END IF;
   END //
 DELIMITER ;

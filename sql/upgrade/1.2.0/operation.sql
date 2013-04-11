@@ -51,10 +51,14 @@ CREATE PROCEDURE patch_operation()
       VALUES( "push", "participant", "delete_event", true, "Remove a participant's event entry." );
       INSERT IGNORE INTO operation( type, subject, name, restricted, description )
       VALUES( "widget", "participant", "hin", true, "View a participant's HIN details." );
+      INSERT INTO operation( type, subject, name, restricted, description )
+      VALUES( "pull", "participant", "multinote", true, "Gets a summary of participants affected by a multinote operation." );
       INSERT IGNORE INTO operation( type, subject, name, restricted, description )
       VALUES( "widget", "participant", "report", true, "Set up a participant report." );
       INSERT IGNORE INTO operation( type, subject, name, restricted, description )
       VALUES( "pull", "participant", "report", true, "Download a participant report." );
+      INSERT INTO operation( type, subject, name, restricted, description )
+      VALUES( "pull", "participant", "site_reassign", true, "Gets a summary of participants affected by a site reassign operation." );
 
       -- service
       INSERT IGNORE INTO operation( type, subject, name, restricted, description )
@@ -81,6 +85,16 @@ CREATE PROCEDURE patch_operation()
       VALUES( "push", "service", "new_role", true, "Add a role to a service." );
       INSERT IGNORE INTO operation( type, subject, name, restricted, description )
       VALUES( "push", "service", "delete_role", true, "Remove a service's role." );
+      INSERT INTO operation( type, subject, name, restricted, description )
+      VALUES( "pull", "service", "participant_release", true, "Returns a summary of participants to be released to another service." );
+      INSERT INTO operation( type, subject, name, restricted, description )
+      VALUES( "push", "service", "participant_release", true, "Releases participants to another service." );
+      INSERT INTO operation( type, subject, name, restricted, description )
+      VALUES( "widget", "service", "participant_release", true, "A form to release participants to other services." );
+
+      -- system message
+      INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+      VALUES( "widget", "system_message", "show", false, "Displays appropriate system messages to the user." );
 
     END IF;
   END //

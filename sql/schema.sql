@@ -233,6 +233,8 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`contact_form_entry` (
   `time_18_19` TINYINT(1) NOT NULL DEFAULT 0 ,
   `time_19_20` TINYINT(1) NOT NULL DEFAULT 0 ,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT 0 ,
+  `high_school` TINYINT(1) NULL DEFAULT NULL ,
+  `post_secondary` TINYINT(1) NULL DEFAULT NULL ,
   `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either' ,
   `cohort_id` INT UNSIGNED NULL DEFAULT NULL ,
   `signed` TINYINT(1) NOT NULL DEFAULT 0 ,
@@ -557,6 +559,35 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`import_entry` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `mastodon`.`system_message`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `mastodon`.`system_message` ;
+
+CREATE  TABLE IF NOT EXISTS `mastodon`.`system_message` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `site_id` INT UNSIGNED NULL ,
+  `role_id` INT UNSIGNED NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `note` TEXT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_site_id` (`site_id` ASC) ,
+  INDEX `fk_role_id` (`role_id` ASC) ,
+  CONSTRAINT `fk_system_message_site_id`
+    FOREIGN KEY (`site_id` )
+    REFERENCES `cenozo`.`site` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_system_message_role_id`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `cenozo`.`role` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------

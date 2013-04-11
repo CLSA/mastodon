@@ -32,6 +32,8 @@ class proxy_form extends base_form
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $alternate_class_name = lib::get_class_name( 'database\alternate' );
+    $hin_class_name = lib::get_class_name( 'database\hin' );
+
     $db_participant =
       $participant_class_name::get_unique_record( 'uid', $db_proxy_form_entry->uid );
     $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
@@ -39,11 +41,19 @@ class proxy_form extends base_form
     // link to the form
     $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
 
-    // add the proxy received event to the participant
+    // add the proxy signed event to the participant
     $db_event_type =
-      $event_type_class_name::get_unique_record( 'name', 'consent for proxy received' );
-    $db_participant->add_event(
-      $db_event_type, !is_null( $db_proxy_form_entry->date ) ? $db_proxy_form_entry->date : $now );
+      $event_type_class_name::get_unique_record( 'name', 'consent for proxy signed' );
+    if( !is_null( $db_event_type ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = !is_null( $db_proxy_form_entry->date )
+                          ? $db_proxy_form_entry->date
+                          : $now;
+      $db_event->save();
+    }
 
     if( $db_proxy_form_entry->proxy )
     {
@@ -230,12 +240,14 @@ class proxy_form extends base_form
     // import data to the hin table
     if( !is_null( $db_proxy_form_entry->health_card ) )
     {
-      static::db()->execute( sprintf(
-        'INSERT INTO hin SET uid = %s, future_access = %s '.
-        'ON DUPLICATE KEY '.
-        'UPDATE uid = VALUES( uid ), future_access = VALUES( future_access )',
-        $database_class_name::format_string( $db_proxy_form_entry->uid ),
-        $database_class_name::format_string( $db_proxy_form_entry->health_card ) ) );
+      $db_hin = $hin_class_name::get_unique_record( 'participant_id', $db_participant->id );
+      if( is_null( $db_hin ) )
+      {
+        $db_hin = lib::create( 'database\hin' );
+        $db_hin->participant_id = $db_participant->id;
+      }
+      $db_hin->future_access = $db_proxy_form_entry->health_card;
+      $db_hin->save();
     }
 
     // save the new alternate record to the form
