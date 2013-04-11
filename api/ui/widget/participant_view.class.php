@@ -41,20 +41,20 @@ class participant_view extends \cenozo\ui\widget\base_view
     // create an associative array with everything we want to display about the participant
     $this->add_item( 'active', 'boolean', 'Active' );
     $this->add_item( 'uid', 'constant', 'Unique ID' );
+    $this->add_item( 'cohort', 'constant', 'Cohort' );
+    $this->add_item( 'source', 'constant', 'Source' );
     $this->add_item( 'first_name', 'string', 'First Name' );
     $this->add_item( 'last_name', 'string', 'Last Name' );
-    $this->add_item( 'source', 'constant', 'Source' );
-    $this->add_item( 'cohort', 'constant', 'Cohort' );
+    $this->add_item( 'language', 'enum', 'Preferred Language' );
+    $this->add_item( 'status', 'enum', 'Condition' );
     $this->add_item( 'default_site', 'constant', 'Default Site' );
     $this->add_item( 'site_id', 'enum', 'Prefered Site' );
+    $this->add_item( 'email', 'string', 'Email' );
     $this->add_item( 'gender', 'enum', 'Gender' );
     $this->add_item( 'date_of_birth', 'date', 'Date of Birth' );
     $this->add_item( 'age_group', 'constant', 'Age Group' );
-    $this->add_item( 'language', 'enum', 'Preferred Language' );
-    $this->add_item( 'email', 'string', 'Email' );
-    $this->add_item( 'status', 'enum', 'Condition' );
-    $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
     $this->add_item( 'prior_contact_date', 'date', 'Prior Contact Date' );
+    $this->add_item( 'no_in_home', 'boolean', 'No in Home' );
 
     // create the address sub-list widget
     $this->address_list = lib::create( 'ui\widget\address_list', $this->arguments );
@@ -124,20 +124,20 @@ class participant_view extends \cenozo\ui\widget\base_view
     // set the view's items
     $this->set_item( 'active', $record->active, true );
     $this->set_item( 'uid', $record->uid, true );
+    $this->set_item( 'cohort', $record->cohort );
+    $this->set_item( 'source', $record->get_source()->name );
     $this->set_item( 'first_name', $record->first_name );
     $this->set_item( 'last_name', $record->last_name );
-    $this->set_item( 'source', $record->get_source()->name );
-    $this->set_item( 'cohort', $record->cohort );
+    $this->set_item( 'language', $record->language, false, $languages );
+    $this->set_item( 'status', $record->status, false, $statuses );
     $this->set_item( 'default_site', $default_site );
     $this->set_item( 'site_id', $site_id, false, $sites );
+    $this->set_item( 'email', $record->email, false );
     $this->set_item( 'gender', $record->gender, true, $genders );
     $this->set_item( 'date_of_birth', $record->date_of_birth );
     $this->set_item( 'age_group', $age_group );
-    $this->set_item( 'language', $record->language, false, $languages );
-    $this->set_item( 'email', $record->email, false );
-    $this->set_item( 'status', $record->status, false, $statuses );
-    $this->set_item( 'no_in_home', $record->no_in_home, true );
     $this->set_item( 'prior_contact_date', $record->prior_contact_date, false );
+    $this->set_item( 'no_in_home', $record->no_in_home, true );
 
     // add a contact form download action
     $db_contact_form = $record->get_contact_form();

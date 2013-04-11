@@ -29,15 +29,12 @@ class mailout_report extends \cenozo\ui\pull\base_report
   }
 
   /**
-   * Sets up the operation with any pre-execution instructions that may be necessary.
-   * 
+   * Builds the report.
    * @author Dean Inglis <inglisd@mcmaster.ca>
    * @access protected
    */
-  protected function setup()
+  protected function build()
   {
-    parent::setup();
-
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
     $cohort = $this->get_argument( 'restrict_cohort' );

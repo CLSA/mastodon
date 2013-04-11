@@ -72,7 +72,8 @@ class import_add extends \cenozo\ui\widget
       $entry_mod->where( 'postcode_error', '=', false );
       $entry_mod->where( 'home_phone_error', '=', false );
       $entry_mod->where( 'mobile_phone_error', '=', false );
-      $entry_mod->where( 'duplicate_error', '=', false );
+      $entry_mod->where( 'duplicate_participant_error', '=', false );
+      $entry_mod->where( 'duplicate_address_error', '=', false );
       $entry_mod->where( 'gender_error', '=', false );
       $entry_mod->where( 'date_of_birth_error', '=', false );
       $entry_mod->where( 'language_error', '=', false );
@@ -135,14 +136,23 @@ class import_add extends \cenozo\ui\widget
         $mobile_phone_error_list[] = $db_entry->row;
       $this->set_variable( 'mobile_phone_error_list', $mobile_phone_error_list );
 
-      // get all duplicate error rows
-      $duplicate_error_list = array();
+      // get all duplicate participant error rows
+      $duplicate_participant_error_list = array();
       $entry_mod = lib::create( 'database\modifier' );
-      $entry_mod->where( 'duplicate_error', '=', true );
+      $entry_mod->where( 'duplicate_participant_error', '=', true );
       $entry_mod->limit( 20 );
       foreach( $db_import->get_import_entry_list( $entry_mod ) as $db_entry )
-        $duplicate_error_list[] = $db_entry->row;
-      $this->set_variable( 'duplicate_error_list', $duplicate_error_list );
+        $duplicate_participant_error_list[] = $db_entry->row;
+      $this->set_variable( 'duplicate_participant_error_list', $duplicate_participant_error_list );
+
+      // get all duplicate address error rows
+      $duplicate_address_error_list = array();
+      $entry_mod = lib::create( 'database\modifier' );
+      $entry_mod->where( 'duplicate_address_error', '=', true );
+      $entry_mod->limit( 20 );
+      foreach( $db_import->get_import_entry_list( $entry_mod ) as $db_entry )
+        $duplicate_address_error_list[] = $db_entry->row;
+      $this->set_variable( 'duplicate_address_error_list', $duplicate_address_error_list );
 
       // get all gender error rows
       $gender_error_list = array();

@@ -1,6 +1,6 @@
 <?php
 /**
- * alternate_report.class.php
+ * withdraw_report.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,9 +10,9 @@ namespace mastodon\ui\widget;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * widget alternate report
+ * widget withdraw report
  */
-class alternate_report extends base_report
+class withdraw_report extends base_report
 {
   /**
    * Constructor
@@ -24,7 +24,7 @@ class alternate_report extends base_report
    */
   public function __construct( $args )
   {
-    parent::__construct( 'alternate', $args );
+    parent::__construct( 'withdraw', $args );
   }
 
   /**
@@ -38,9 +38,12 @@ class alternate_report extends base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'cohort' );
+    $this->add_restriction( 'source' );
+    
     $this->set_variable( 'description',
-      'This report provides a list of all participants who have an alternate contact with '.
-      'missing, incomplete or invalid information.' );
+      'This report provides a list of all withdraws by province and month that the '.
+      'withdraw occurred.' );
   }
 }
 ?>

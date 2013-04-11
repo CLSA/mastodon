@@ -9,6 +9,41 @@
 
 {% from 'macros.twig' import note_widget %}
 
+{% block javascript %}
+  {{ parent() }}
+
+  {% if conditions is defined %}
+    <script type="text/javascript">
+      $( function() {
+        // reload page if condition selector is changed
+        $( "#{{ widget.full }}__restrict_condition" ).change( function() {
+          var condition = $( "#{{ widget.full }}__restrict_condition option:selected" ).val();
+          slot_load( {{ slot }}, "{{ widget.subject }}", "{{ widget.name }}", 
+                     { "restrict_condition": condition } );
+        } );
+      } );
+    </script>
+  {% endif %}
+
+{% endblock javascript %}
+
+{% block prelist %}
+  
+  {% set restrict_condition = restrict_condition|default("") %}
+  <label for="{{ widget.full }}__restrict_condition">Restrict to condition:</label>
+  <select id="{{ widget.full }}__restrict_condition" class="ui-state-default"
+          style="margin-top:4px;margin-bottom:4px;">
+    <option {% if "" == restrict_condition %}selected{% endif %}
+            value="">No restriction</option>
+    {% for name in conditions %}
+      <option {% if name == restrict_condition %}selected{% endif %}
+              value="{{ name }}">{{ name }}</option>
+    {% endfor %}
+  </select>
+  {{ parent() }}
+
+{% endblock prelist %}
+
 {% block header_button_columns %}
   <th width="1%"></th>
 {% endblock header_button_columns %}

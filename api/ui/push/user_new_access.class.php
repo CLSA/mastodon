@@ -77,24 +77,6 @@ class user_new_access extends \cenozo\ui\push\user_new_access
   }
 
   /**
-   * Override the parent method to remove mastodon-only roles.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $args An argument list, usually those passed to the push operation.
-   * @return array
-   * @access protected
-   */
-  protected function convert_to_noid( $args )
-  {
-    $args = parent::convert_to_noid( $args );
-
-    // remove typist from the role list, if it exists
-    foreach( $args['noid']['role_list'] as $index => $value )
-      if( 'typist' == $value['name'] ) unset( $args['noid']['role_list'][$index] );
-
-    return $args;
-  }
-
-  /**
    * Override the parent method to send a request to Beartooth or Sabretooth
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected

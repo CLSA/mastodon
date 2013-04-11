@@ -11,14 +11,14 @@ global $SETTINGS;
 
 // tagged version
 $SETTINGS['general']['application_name'] = 'mastodon';
-$SETTINGS['general']['version'] = '1.1.6';
+$SETTINGS['general']['version'] = '1.1.8';
 
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;
 
 // Defines the username and password used by mastodon when communicating as a machine
-$SETTINGS['general']['machine_user'] = 'mastodon';
-$SETTINGS['general']['machine_password'] = '1qaz2wsx';
+$SETTINGS['general']['machine_user'] = NULL;
+$SETTINGS['general']['machine_password'] = NULL;
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
@@ -45,13 +45,4 @@ $SETTINGS['db']['username'] = 'mastodon';
 $SETTINGS['db']['password'] = '';
 $SETTINGS['db']['database'] = 'mastodon';
 $SETTINGS['db']['prefix'] = '';
-
-// audit database settings (false values use the limesurvey database settings)
-$SETTINGS['audit_db']['enabled'] = false;
-$SETTINGS['audit_db']['driver'] = false;
-$SETTINGS['audit_db']['server'] = false;
-$SETTINGS['audit_db']['username'] = false;
-$SETTINGS['audit_db']['password'] = false;
-$SETTINGS['audit_db']['database'] = false;
-$SETTINGS['audit_db']['prefix'] = 'audit_';
 ?>

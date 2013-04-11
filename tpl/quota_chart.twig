@@ -1,0 +1,49 @@
+{##
+ # quota_chart.twig
+ # 
+ # @author Patrick Emond <emondpd@mcmaster.ca>
+ #}
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>{{ constant('APPNAME')|ucwords }}</title>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    google.load( "visualization", "1", {packages:["gauge"]} );
+    google.setOnLoadCallback( drawChart );
+    function drawChart() {
+      var options = {
+        minorTicks: 5,
+        majorTicks: [0, 25, 50, 75, 100, 125],
+        max: 125,
+        yellowFrom: 100, yellowTo: 115,
+        redFrom: 115, redTo: 125,
+        height: 150
+      };
+
+      {% for group in chart_data %}
+        var data{{ loop.index }} = new google.visualization.arrayToDataTable( [
+          ['Label', 'Value'],
+          {% for row in group %}
+            ['{{ row.category }}', {{ row.value }}]{{ loop.last ? "" : "," }}
+          {% endfor %}
+        ] );
+
+        var chart{{ loop.index }} =
+          new google.visualization.Gauge( document.getElementById( 'chart{{ loop.index }}' ) );
+        chart{{ loop.index }}.draw( data{{ loop.index }}, options );
+      {% endfor %}
+    }
+  </script>
+</head>
+<body>
+  {% for title, group in chart_data %}
+    <div>
+      <h3>{{ title }}</h3>
+      <div id="chart{{ loop.index }}"></div>
+    </div>
+  {% endfor %}
+</body>
+
+</html>

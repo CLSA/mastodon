@@ -156,13 +156,23 @@
               </td>
             </tr>
           {% endif %}
-          {% if duplicate_error_list|length %}
+          {% if duplicate_participant_error_list|length %}
             <tr>
               <td class="heading">Duplicate Participant:</td>
               <td class="content">
-                row{{ 1 < duplicate_error_list|length ? "s" : "" }}
-                {% for row in duplicate_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
-                {% if 20 == duplicate_error_list|length %}, etc...{% endif %}
+                row{{ 1 < duplicate_participant_error_list|length ? "s" : "" }}
+                {% for row in duplicate_participant_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+                {% if 20 == duplicate_participant_error_list|length %}, etc...{% endif %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if duplicate_address_error_list|length %}
+            <tr>
+              <td class="heading">Duplicate Address:</td>
+              <td class="content">
+                row{{ 1 < duplicate_address_error_list|length ? "s" : "" }}
+                {% for row in duplicate_address_error_list %}{{ row }}{{ loop.last ? "" : ", " }}{% endfor %}
+                {% if 20 == duplicate_address_error_list|length %}, etc...{% endif %}
               </td>
             </tr>
           {% endif %}

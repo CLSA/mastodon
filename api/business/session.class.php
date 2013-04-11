@@ -41,40 +41,5 @@ final class session extends \cenozo\business\session
       $this->requested_role = $role_class_name::get_unique_record( 'name', $role_name );
     }
   }
-  
-  /**
-   * Get the audit database.
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return database
-   * @access public
-   */
-  public function get_audit_database()
-  {
-    // create the database if it doesn't exist yet
-    if( is_null( $this->audit_database ) )
-    {
-      $setting_manager = lib::create( 'business\setting_manager' );
-      if( $setting_manager->get_setting( 'audit_db', 'enabled' ) )
-      {
-        $this->audit_database = lib::create( 'database\database',
-          $setting_manager->get_setting( 'audit_db', 'driver' ),
-          $setting_manager->get_setting( 'audit_db', 'server' ),
-          $setting_manager->get_setting( 'audit_db', 'username' ),
-          $setting_manager->get_setting( 'audit_db', 'password' ),
-          $setting_manager->get_setting( 'audit_db', 'database' ),
-          $setting_manager->get_setting( 'audit_db', 'prefix' ) );
-      }
-    }
-
-    return $this->audit_database;
-  }
-
-  /**
-   * The audit database object.
-   * @var database
-   * @access private
-   */
-  private $audit_database = NULL;
 }
 ?>

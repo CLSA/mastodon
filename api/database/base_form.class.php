@@ -151,6 +151,39 @@ abstract class base_form extends \cenozo\database\record
   }
 
   /**
+   * Get the number of forms which have a certain number of entries associated with it
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param integer $entries The number of entries to test for
+   * @param string $comparison An integer-based comparison operator (eg: <, >, >=, =, etc)
+   * @access public
+   */
+  static public function count_for_entries( $entries, $comparison = '=', $modifier = NULL )
+  {
+    // requires custom sql
+    return static::db()->get_one( sprintf(
+      'SELECT COUNT(*) '.
+      'FROM ( '.
+      '  SELECT %s.id, IF( %s_entry.id IS NULL, 0, COUNT(*) ) count '.
+      '  FROM %s '.
+      '  LEFT JOIN %s_entry ON %s.id = %s_entry.%s_id '.
+      '  %s '.
+      '  GROUP BY %s.id '.
+      '  HAVING count %s %d '.
+      ') temp',
+      static::get_table_name(),
+      static::get_table_name(),
+      static::get_table_name(),
+      static::get_table_name(),
+      static::get_table_name(),
+      static::get_table_name(),
+      static::get_table_name(),
+      is_null( $modifier ) ? '' : $modifier->get_sql(),
+      static::get_table_name(),
+      $comparison,
+      $entries ) );
+  }
+
+  /**
    * Imports the form into the system.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
