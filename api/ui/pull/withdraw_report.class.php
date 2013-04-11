@@ -41,8 +41,8 @@ class withdraw_report extends \cenozo\ui\pull\base_report
 
     $data = array();
 
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    $source_id = $this->get_argument( 'restrict_source_id' );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $db_source = lib::create( 'database\source', $this->get_argument( 'restrict_source_id' ) );
 
     // loop through all canadian provinces
     $region_mod = lib::create( 'database\modifier' );
@@ -57,8 +57,8 @@ class withdraw_report extends \cenozo\ui\pull\base_report
       while( '2000' == $datetime_obj->format( 'Y' ) )
       {
         $consent_mod = lib::create( 'database\modifier' );
-        $consent_mod->where( 'participant.cohort', '=', $cohort );
-        if( $source_id ) $consent_mod->where( 'participant.source_id', '=', $source_id );
+        if( $db_cohort->id ) $consent_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
+        if( $db_source->id ) $consent_mod->where( 'participant.source_id', '=', $db_source->id );
         $consent_mod->where( 'region.id', '=', $db_region->id );
         $consent_mod->where( 'MONTH( consent.date )', '=', $datetime_obj->format( 'n' ) );
         
@@ -85,4 +85,3 @@ class withdraw_report extends \cenozo\ui\pull\base_report
     $this->add_table( NULL, $header, $content );
   }
 }
-?>

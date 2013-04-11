@@ -27,4 +27,3 @@ class contact_form_adjudicate extends base_form_adjudicate
     parent::__construct( 'contact', $args );
   }
 }
-?>

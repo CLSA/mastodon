@@ -27,4 +27,3 @@ class consent_form_edit extends \cenozo\ui\push\base_edit
     parent::__construct( 'consent_form', $args );
   }
 }
-?>

@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget user list
  */
-class user_list extends site_restricted_list
+class user_list extends \cenozo\ui\widget\site_restricted_list
 {
   /**
    * Constructor
@@ -60,12 +60,11 @@ class user_list extends site_restricted_list
       // determine the role
       $modifier = lib::create( 'database\modifier' );
       if( !is_null( $this->db_restrict_site ) )
-        $modifier->where( 'site_id', '=', $this->db_restrict_site->id );
+        $modifier->where( 'access.site_id', '=', $this->db_restrict_site->id );
 
       $site = 'none';
       $db_sites = $record->get_site_list();
-      if( 1 == count( $db_sites ) )
-        $site = sprintf( '%s (%s)', $db_sites[0]->name, $db_sites[0]->cohort ); // only one site?
+      if( 1 == count( $db_sites ) ) $site = $db_sites[0]->get_full_name(); // only one site?
       else if( 1 < count( $db_sites ) ) $site = 'multiple'; // multiple sites?
       
       $role = 'none';
@@ -97,13 +96,18 @@ class user_list extends site_restricted_list
    */
   public function determine_record_count( $modifier = NULL )
   {
-    if( !is_null( $this->db_restrict_site ) )
-    {
-      if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
-      $modifier->where( 'site_id', '=', $this->db_restrict_site->id );
-    }
+    // only include users who have access to a role belonging to this service
+    $db_service = lib::create( 'business\session' )->get_service();
+    if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'access.role_id', '=', 'service_has_role.role_id', false );
+    $modifier->where( 'service_has_role.service_id', '=', $db_service->id );
 
-    return parent::determine_record_count( $modifier );
+    if( !is_null( $this->db_restrict_site ) )
+      $modifier->where( 'access.site_id', '=', $this->db_restrict_site->id );
+
+    // skip the parent method
+    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
+    return $grand_parent::determine_record_count( $modifier );
   }
   
   /**
@@ -116,13 +120,17 @@ class user_list extends site_restricted_list
    */
   public function determine_record_list( $modifier = NULL )
   {
-    if( !is_null( $this->db_restrict_site ) )
-    {
-      if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
-      $modifier->where( 'site_id', '=', $this->db_restrict_site->id );
-    }
+    // only include users who have access to a role belonging to this service
+    $db_service = lib::create( 'business\session' )->get_service();
+    if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'access.role_id', '=', 'service_has_role.role_id', false );
+    $modifier->where( 'service_has_role.service_id', '=', $db_service->id );
 
-    return parent::determine_record_list( $modifier );
+    if( !is_null( $this->db_restrict_site ) )
+      $modifier->where( 'access.site_id', '=', $this->db_restrict_site->id );
+
+    // skip the parent method
+    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
+    return $grand_parent::determine_record_list( $modifier );
   }
 }
-?>

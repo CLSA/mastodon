@@ -116,9 +116,10 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     foreach( $address_class_name::select( $address_mod ) as $db_address )
     {
       $db_participant = $db_address->get_person()->get_participant();
-      if( $db_participant && $db_participant->cohort == $record->cohort )
+      if( $db_participant && $db_participant->cohort_id == $record->cohort_id )
       {
-        $message = sprintf( 'A %s participant already exists at this address.', $record->cohort );
+        $message = sprintf( 'A %s participant already exists at this address.',
+                            $record->get_cohort()->name );
         $errors['apartment_number'] = $message;
         $errors['street_number'] = $message;
         $errors['street_name'] = $message;
@@ -183,8 +184,8 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     if( is_null( $record->age_bracket ) )
       $errors['age_bracket'] = 'This value cannot be left blank.';
 
-    if( is_null( $record->cohort ) )
-      $errors['cohort'] = 'This value cannot be left blank.';
+    if( is_null( $record->cohort_id ) )
+      $errors['cohort_id'] = 'This value cannot be left blank.';
 
     $this->data = $errors;
   }
@@ -200,4 +201,3 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     return 'json';
   }
 }
-?>

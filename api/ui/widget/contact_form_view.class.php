@@ -77,11 +77,12 @@ class contact_form_view extends base_form_view
     $this->add_item( 'time_18_19', '6pm to 7pm' );
     $this->add_item( 'time_19_20', '7pm to 8pm' );
     $this->add_item( 'time_20_21', '8pm to 9pm' );
+    $this->add_item( 'high_school', 'High School or Lower' );
+    $this->add_item( 'post_secondary', 'Post-Secondary' );
     $this->add_item( 'language', 'Language' );
     $this->add_item( 'signed', 'Signed' );
     $this->add_item( 'date', 'Date Signed' );
-    $this->add_item( 'cohort', 'Cohort' );
+    $this->add_item( 'cohort_id', 'Cohort' );
     $this->add_item( 'note', 'Note' );
   }
 }
-?>

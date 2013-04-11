@@ -24,13 +24,9 @@ class self_menu extends \cenozo\ui\widget\self_menu
   protected function prepare()
   {
     parent::prepare();
-
+    
     $this->exclude_list( array(
-      'address',
-      'alternate',
-      'availability',
-      'consent',
-      'phone' ) );
+      'setting' ) ); // mastodon has no settings
   }
 
   /**
@@ -55,23 +51,14 @@ class self_menu extends \cenozo\ui\widget\self_menu
                             'subject' => 'import',
                             'name' => 'add' );
 
-    // insert participant site reassign and multinote into the utilities
-    $db_operation =
-      $operation_class_name::get_operation( 'widget', 'participant', 'site_reassign' );
+    // insert service participant_release into the utlities
+    $db_operation = $operation_class_name::get_operation( 'widget', 'service', 'participant_release' );
     if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $utilities[] = array( 'heading' => 'Participant Reassign',
+      $utilities[] = array( 'heading' => 'Participant Release',
                             'type' => 'widget',
-                            'subject' => 'participant',
-                            'name' => 'site_reassign' );
-    $db_operation =
-      $operation_class_name::get_operation( 'widget', 'participant', 'multinote' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
-      $utilities[] = array( 'heading' => 'Participant Multinote',
-                            'type' => 'widget',
-                            'subject' => 'participant',
-                            'name' => 'multinote' );
+                            'subject' => 'service',
+                            'name' => 'participant_release' );
 
     $this->set_variable( 'utilities', $utilities );
   }
 }
-?>

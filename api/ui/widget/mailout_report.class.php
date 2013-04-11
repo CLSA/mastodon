@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget mailout report
  */
-class mailout_report extends base_report
+class mailout_report extends \cenozo\ui\widget\base_report
 {
   /**
    * Constructor
@@ -66,4 +66,3 @@ class mailout_report extends base_report
     $this->set_parameter( 'mark_mailout', false, true );
   }
 }
-?>

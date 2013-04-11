@@ -120,4 +120,3 @@ abstract class base_form_adjudicate extends \cenozo\ui\push\base_record
    */
   private $form_type;
 }
-?>

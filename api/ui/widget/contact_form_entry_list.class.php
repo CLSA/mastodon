@@ -25,4 +25,3 @@ class contact_form_entry_list extends base_form_entry_list
     parent::__construct( 'contact', $args );
   }
 }
-?>
