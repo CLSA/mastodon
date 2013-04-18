@@ -64,8 +64,8 @@ class quota_report extends \cenozo\ui\widget\base_report
 
     // restrict cohort list for non-admins
     $cohort_list = 3 >= $session->get_role()->tier
-                 ? $session->get_site()->get_service()->get_cohort_list()
-                 : $cohort_class_name::select();
+                 ? $cohort_class_name::select()
+                 : $session->get_site()->get_service()->get_cohort_list();
     $cohorts = array();
     foreach( $cohort_list as $db_cohort ) $cohorts[$db_cohort->id] = $db_cohort->name;
     $this->set_parameter( 'cohort_id', key( $cohorts ), true, $cohorts );

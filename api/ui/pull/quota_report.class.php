@@ -182,7 +182,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $column++;
 
       // reached and viable ////////////////////////////////////////////////////////////////////////
-      if( 'Sabretooth' == $db_service->name )
+      if( 'sabretooth' == $db_service->name )
       {
         $participant_mod = clone $base_mod;
         $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
@@ -210,7 +210,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
-      if( 'Sabretooth' == $db_service->name )
+      if( 'sabretooth' == $db_service->name )
       { // sabretooth appointment with no reached status
         $participant_mod->where(
           'sabretooth_participant_last_appointment.appointment_id', '!=', NULL );
@@ -269,7 +269,7 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       $column++;
 
-      if( 'Beartooth' == $db_service->name )
+      if( 'beartooth' == $db_service->name )
       {
         // interview complete (beartooth site interview) ///////////////////////////////////////////
         $db_event_type =
