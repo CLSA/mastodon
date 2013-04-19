@@ -35,50 +35,88 @@ class mailout_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
-    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $database_class_name = lib::get_class_name( 'database\database' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
 
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
-    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
+    $cohort_id = $this->get_argument( 'restrict_cohort_id' );
+    $db_cohort = $cohort_id ? lib::create( 'database\cohort', $cohort_id ) : NULL;
+    $service_id = $this->get_argument( 'restrict_service_id' );
+    $db_service = $service_id ? lib::create( 'database\service', $service_id ) : NULL;
+    $released = $this->get_argument( 'released' );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
     $db_event_type = $event_type_class_name::get_unique_record( 'name', 'package mailed' );
 
-    if( is_null( $db_source ) )
+    $title = 'List of all ';
+    if( !is_null( $db_cohort ) )
     {
-      $this->add_title( 
-        sprintf( $mailed_to ?
-                 'List of all unsynched %s participants who have been mailed to.' :
-                 'List of all %s participants who require a package mailed out.',
-                 $db_cohort->name ) );
+      $title .= sprintf( '%s ', $db_cohort->name );
     }
-    else
+    $title .= 'participants ';
+    if( !is_null( $db_service ) )
     {
-      $this->add_title( 
-        sprintf( $mailed_to ?
-                 'List of all unsynched %s participants whose source is %s who have been mailed to.' :
-                 'List of all %s participants whose source is %s and require a package mailed out.',
-                 $db_cohort->name,
-                 $db_source->name ) );
+      if( 0 == strcasecmp( 'either', $released ) )
+      {
+        $title .= sprintf( 'belonging to %s', $db_service->title );
+      }
+      else
+      {
+        $title .= 0 == strcasecmp( 'yes', $released ) ? '' : 'not ';
+        $title .= sprintf( 'released to %s ', $db_service->title );
+      }
     }
-    
-    // modifiers common to each iteration of the following loops
+    if( !is_null( $db_source ) )
+    {
+      $title .= sprintf( 'whose source is %s and ', $db_source->name );
+    }
+    $title .= sprintf( 'who have %shad a package mailed to', $mailed_to ? '' : 'not' );
+    $this->add_title( $title );
+
     $participant_mod = lib::create( 'database\modifier' );
+    if( !is_null( $db_cohort ) ) $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
+    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+
+    $sql = sprintf(
+      'SELECT DISTINCT participant.id FROM participant '.
+      'JOIN event ON participant.id = event.participant_id '.
+      'AND event.event_type_id = %s ',
+      $database_class_name::format_string( $db_event_type->id ) );
+
     if( $mailed_to )
     {
       $participant_mod->order_desc( 'event.datetime' );
-      $participant_mod->where( 'sync_datetime', '=', NULL );
     }
-    $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
-    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+    else // invert the query
+    {
+      $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
+      $sql = 'SELECT id FROM participant ';
+    }
+
+    if( !is_null( $db_service ) )
+    {
+      $sql .= sprintf(
+        'LEFT JOIN service_has_participant '.
+        'ON service_has_participant.participant_id = participant.id '.
+        'AND service_has_participant.service_id = %s ',
+        $database_class_name::format_string( $db_service->id ) );
+
+      if( 0 == strcasecmp( 'yes', $released ) )
+        $sql .= 'AND service_has_participant.datetime IS NOT NULL ';
+      else if( 0 == strcasecmp( 'no', $released ) )
+        $sql .= 'AND service_has_participant.datetime IS NULL ';
+    }
+
+    $sql .= $participant_mod->get_sql();
 
     $contents = array();
-    $participant_list =
-      $participant_class_name::select_for_event( $db_event_type, $mailed_to, $participant_mod );
-    foreach( $participant_list as $db_participant )
+    $participant_id_list = $participant_class_name::db()->get_col( $sql );
+    foreach( $participant_id_list as $participant_id )
     {
+      $db_participant = lib::create( 'database\participant', $participant_id );
       $db_address = $db_participant->get_first_address();
       if( is_null( $db_address ) ) continue;
       $db_region = $db_address->get_region();
