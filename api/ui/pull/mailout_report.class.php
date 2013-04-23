@@ -77,8 +77,10 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $this->add_title( $title );
 
     $participant_mod = lib::create( 'database\modifier' );
-    if( !is_null( $db_cohort ) ) $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
-    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+    if( !is_null( $db_cohort ) )
+      $participant_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
+    if( !is_null( $db_source ) )
+      $participant_mod->where( 'participant.source_id', '=', $db_source->id );
 
     $sql = sprintf(
       'SELECT DISTINCT participant.id FROM participant '.
@@ -99,9 +101,13 @@ class mailout_report extends \cenozo\ui\pull\base_report
     if( !is_null( $db_service ) )
     {
       $sql .= sprintf(
+        'JOIN service_has_cohort '.
+        'ON service_has_cohort.service_id = %s '.
+        'AND service_has_cohort.cohort_id = participant.cohort_id '.
         'LEFT JOIN service_has_participant '.
         'ON service_has_participant.participant_id = participant.id '.
         'AND service_has_participant.service_id = %s ',
+        $database_class_name::format_string( $db_service->id ),
         $database_class_name::format_string( $db_service->id ) );
 
       if( 0 == strcasecmp( 'yes', $released ) )
