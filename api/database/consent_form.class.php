@@ -40,6 +40,7 @@ class consent_form extends base_form
     $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
 
     // add the consent signed event to the participant
+    $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent signed' );
     if( !is_null( $db_event_type ) )
