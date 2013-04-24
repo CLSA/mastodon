@@ -23,7 +23,6 @@ CREATE PROCEDURE patch_role()
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
 
-      DEALLOCATE PREPARE statement;
       SET @sql = CONCAT(
         "UPDATE ", @cenozo, ".role ",
         "SET all_sites = 1 ",
