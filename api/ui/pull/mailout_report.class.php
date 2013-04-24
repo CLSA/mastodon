@@ -77,8 +77,10 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $this->add_title( $title );
 
     $participant_mod = lib::create( 'database\modifier' );
-    if( !is_null( $db_cohort ) ) $participant_mod->where( 'cohort_id', '=', $db_cohort->id );
-    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+    if( !is_null( $db_cohort ) )
+      $participant_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
+    if( !is_null( $db_source ) )
+      $participant_mod->where( 'participant.source_id', '=', $db_source->id );
 
     $sql = sprintf(
       'SELECT DISTINCT participant.id FROM participant '.
@@ -99,15 +101,19 @@ class mailout_report extends \cenozo\ui\pull\base_report
     if( !is_null( $db_service ) )
     {
       $sql .= sprintf(
+        'JOIN service_has_cohort '.
+        'ON service_has_cohort.service_id = %s '.
+        'AND service_has_cohort.cohort_id = participant.cohort_id '.
         'LEFT JOIN service_has_participant '.
         'ON service_has_participant.participant_id = participant.id '.
         'AND service_has_participant.service_id = %s ',
+        $database_class_name::format_string( $db_service->id ),
         $database_class_name::format_string( $db_service->id ) );
 
       if( 0 == strcasecmp( 'yes', $released ) )
-        $sql .= 'AND service_has_participant.datetime IS NOT NULL ';
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       else if( 0 == strcasecmp( 'no', $released ) )
-        $sql .= 'AND service_has_participant.datetime IS NULL ';
+        $participant_mod->where( 'service_has_participant.datetime', '=', NULL );
     }
 
     $sql .= $participant_mod->get_sql();
@@ -144,10 +150,14 @@ class mailout_report extends \cenozo\ui\pull\base_report
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
+        if( !is_null( $db_service ) )
+        {
+          $db_site = $db_participant->get_effective_site( $db_service );
+          $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
+          array_unshift( $row, $site_name );
+        }
+
         $event_datetime_list = $db_participant->get_event_datetime_list( $db_event_type );
-        $db_site = $db_participant->get_effective_site();
-        $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
-        array_unshift( $row, $site_name );
         array_unshift( $row, strstr( end( $event_datetime_list ), ' ', true ) );
         array_pop( $row );
       }
@@ -178,7 +188,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     
     if( $mailed_to )
     { // include the mailout date and site columns
-      array_unshift( $header, 'Site' );
+      if( !is_null( $db_service ) ) array_unshift( $header, 'Site' );
       array_unshift( $header, 'Mailout Date' );
       array_pop( $header );
     }
