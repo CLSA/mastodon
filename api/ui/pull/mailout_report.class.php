@@ -111,9 +111,9 @@ class mailout_report extends \cenozo\ui\pull\base_report
         $database_class_name::format_string( $db_service->id ) );
 
       if( 0 == strcasecmp( 'yes', $released ) )
-        $sql .= 'AND service_has_participant.datetime IS NOT NULL ';
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       else if( 0 == strcasecmp( 'no', $released ) )
-        $sql .= 'AND service_has_participant.datetime IS NULL ';
+        $participant_mod->where( 'service_has_participant.datetime', '=', NULL );
     }
 
     $sql .= $participant_mod->get_sql();
