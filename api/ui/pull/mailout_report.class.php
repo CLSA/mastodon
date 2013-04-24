@@ -150,10 +150,14 @@ class mailout_report extends \cenozo\ui\pull\base_report
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
+        if( !is_null( $db_service ) )
+        {
+          $db_site = $db_participant->get_effective_site( $db_service );
+          $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
+          array_unshift( $row, $site_name );
+        }
+
         $event_datetime_list = $db_participant->get_event_datetime_list( $db_event_type );
-        $db_site = $db_participant->get_effective_site();
-        $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
-        array_unshift( $row, $site_name );
         array_unshift( $row, strstr( end( $event_datetime_list ), ' ', true ) );
         array_pop( $row );
       }
@@ -184,7 +188,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     
     if( $mailed_to )
     { // include the mailout date and site columns
-      array_unshift( $header, 'Site' );
+      if( !is_null( $db_service ) ) array_unshift( $header, 'Site' );
       array_unshift( $header, 'Mailout Date' );
       array_pop( $header );
     }
