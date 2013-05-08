@@ -28,7 +28,7 @@
           } );
           args.id = {{ id }};
           args.columns = columns;
-          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
+          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev_clip( {{ slot }} );
         } );
       {% endif %}
 
@@ -41,7 +41,7 @@
           function() {
             if( ajax_push( "{{ widget.subject }}", "edit",
                            { id: {{ id }}, columns: { invalid: 1 } } ) )
-              slot_prev( {{ slot }} );
+              slot_prev_clip( {{ slot }} );
           }
         );
       } );
