@@ -9,6 +9,12 @@
 
 * Adding "duplicate" to possible participant condition list
 
+* Adding new de-link action to the participant's view
+  - only administrators can perform this operation
+  - copies the participant's name, address and phone information, marks them as having a negative
+    consent, blanks out the name, address and phone information from the old entry, leaves a note
+    saying they have been de-linked and marks them as inactive
+
 ====================================================================================================
 1.2.0
 ====================================================================================================

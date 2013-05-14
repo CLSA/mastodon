@@ -21,6 +21,20 @@
         $( "#{{ widget.full }}__contact_form" ).button( { 'disabled': true } );
       {% endif %}
     } );
+
+    {% if allow_delink %}
+      // delink button
+      $( "#{{ widget.full }}__delink" ).click( function() {
+        confirm_dialog(
+          "De-link participant?",
+          "Are you sure you want to de-link this participant? THIS CANNOT BE UN-DONE!",
+          function() {
+            if( ajax_push( "participant", "delink", { "id": {{ id }} } ) )
+              window.location.reload();
+          }
+        );
+      } );
+    {% endif %}
   </script>
 
 {% endblock javascript %}

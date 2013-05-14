@@ -8,6 +8,17 @@ CREATE PROCEDURE patch_role_has_operation()
                           'cenozo' );
 
     SELECT "Adding new operations to roles" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_operation( role_id, operation_id ) "
+      "SELECT role.id, operation.id FROM ", @cenozo, ".role, operation "
+      "WHERE type = 'push' AND subject = 'participant' AND operation.name = 'delink' "
+      "AND operation.restricted = true ",
+      "AND role.name = 'administrator'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_operation( role_id, operation_id ) ",
       "SELECT role.id, operation.id FROM ", @cenozo, ".role, operation ",
