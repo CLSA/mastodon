@@ -30,6 +30,13 @@ class participant_delink extends \cenozo\ui\push\participant_delink
     $address_class_name = lib::get_class_name( 'database\address' );
     $util_class_name = lib::get_class_name( 'util' );
 
+    // re-associate the import entry with the new participant
+    foreach( $this->get_record()->get_import_entry_list() as $db_import_entry )
+    {
+      $db_import_entry->participant_id = $this->db_new_participant->id;
+      $db_import_entry->save();
+    }
+
     // re-associate the contact form with the new participant
     foreach( $this->get_record()->get_contact_form_list() as $db_contact_form )
     {
