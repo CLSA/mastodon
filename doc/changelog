@@ -7,6 +7,8 @@
   - Used to determine whether a role should be restricted to a single site or not
   - Many old references to "tier" have been replaced 
 
+* Adding "duplicate" to possible participant condition list
+
 ====================================================================================================
 1.2.0
 ====================================================================================================
