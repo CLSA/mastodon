@@ -124,7 +124,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $base_mod->where( 'cohort_id', '=', $db_cohort->id );
       if( $site_breakdown )
       {
-        $base_mod->where( 'participant_default_site.site_id', '=', $site_region_id );
+        $base_mod->where( 'participant_site.site_id', '=', $site_region_id );
       }
       else
       {
