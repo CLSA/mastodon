@@ -51,17 +51,15 @@ class contact_report extends \cenozo\ui\pull\base_report
       $db_address = $db_participant->get_first_address();
       if( is_null( $db_address ) ) continue;
 
-      $db_site = $db_participant->get_primary_site();
-      $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
       $db_region = $db_address->get_region();
       $address = $db_address->address1;
       if( !is_null( $db_address->address2 ) ) $address .= ' '.$db_address->address2;
       $db_consent = $db_participant->get_last_consent();
-      $consent = $db_consent ? $db_consent->event : 'None';
+      $consent = 'None';
+      $consent = is_null( $db_consent ) ? 'none' : $db_consent->to_string();
 
       $contents[] = array(
-        $db_participant->cohort,
-        $site_name,
+        $db_participant->get_cohort()->name,
         'fr' == $db_participant->language ? 'fr' : 'en', // english if not set
         $db_participant->uid,
         $db_participant->first_name,
@@ -77,7 +75,6 @@ class contact_report extends \cenozo\ui\pull\base_report
     
     $header = array(
       'Cohort',
-      'Site',
       'Language',
       'CLSA ID',
       'First Name',
@@ -93,4 +90,3 @@ class contact_report extends \cenozo\ui\pull\base_report
     $this->add_table( NULL, $header, $contents, NULL );
   }
 }
-?>

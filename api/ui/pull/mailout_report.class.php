@@ -35,47 +35,94 @@ class mailout_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
+    $database_class_name = lib::get_class_name( 'database\database' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
-    $cohort = $this->get_argument( 'restrict_cohort' );
+    $cohort_id = $this->get_argument( 'restrict_cohort_id' );
+    $db_cohort = $cohort_id ? lib::create( 'database\cohort', $cohort_id ) : NULL;
+    $service_id = $this->get_argument( 'restrict_service_id' );
+    $db_service = $service_id ? lib::create( 'database\service', $service_id ) : NULL;
+    $released = $this->get_argument( 'released' );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
+    $db_event_type = $event_type_class_name::get_unique_record( 'name', 'package mailed' );
 
-    if( is_null( $db_source ) )
+    $title = 'List of all ';
+    if( !is_null( $db_cohort ) )
     {
-      $this->add_title( 
-        sprintf( $mailed_to ?
-                 'List of all unsynched %s participants who have been mailed to.' :
-                 'List of all %s participants who require a package mailed out.',
-                 $cohort ) );
+      $title .= sprintf( '%s ', $db_cohort->name );
     }
-    else
+    $title .= 'participants ';
+    if( !is_null( $db_service ) )
     {
-      $this->add_title( 
-        sprintf( $mailed_to ?
-                 'List of all unsynched %s participants whose source is %s who have been mailed to.' :
-                 'List of all %s participants whose source is %s and require a package mailed out.',
-                 $cohort,
-                 $db_source->name ) );
+      if( 0 == strcasecmp( 'either', $released ) )
+      {
+        $title .= sprintf( 'belonging to %s', $db_service->title );
+      }
+      else
+      {
+        $title .= 0 == strcasecmp( 'yes', $released ) ? '' : 'not ';
+        $title .= sprintf( 'released to %s ', $db_service->title );
+      }
     }
-    
-    // modifiers common to each iteration of the following loops
+    if( !is_null( $db_source ) )
+    {
+      $title .= sprintf( 'whose source is %s and ', $db_source->name );
+    }
+    $title .= sprintf( 'who have %shad a package mailed to', $mailed_to ? '' : 'not' );
+    $this->add_title( $title );
+
     $participant_mod = lib::create( 'database\modifier' );
+    if( !is_null( $db_cohort ) )
+      $participant_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
+    if( !is_null( $db_source ) )
+      $participant_mod->where( 'participant.source_id', '=', $db_source->id );
+
+    $sql = sprintf(
+      'SELECT DISTINCT participant.id FROM participant '.
+      'JOIN event ON participant.id = event.participant_id '.
+      'AND event.event_type_id = %s ',
+      $database_class_name::format_string( $db_event_type->id ) );
+
     if( $mailed_to )
     {
-      $participant_mod->order_desc( 'status.datetime' );
-      $participant_mod->where( 'sync_datetime', '=', NULL );
+      $participant_mod->order_desc( 'event.datetime' );
     }
-    $participant_mod->where( 'cohort', '=', $cohort );
-    if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+    else // invert the query
+    {
+      $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
+      $sql = 'SELECT id FROM participant ';
+    }
+
+    if( !is_null( $db_service ) )
+    {
+      $sql .= sprintf(
+        'JOIN service_has_cohort '.
+        'ON service_has_cohort.service_id = %s '.
+        'AND service_has_cohort.cohort_id = participant.cohort_id '.
+        'LEFT JOIN service_has_participant '.
+        'ON service_has_participant.participant_id = participant.id '.
+        'AND service_has_participant.service_id = %s ',
+        $database_class_name::format_string( $db_service->id ),
+        $database_class_name::format_string( $db_service->id ) );
+
+      if( 0 == strcasecmp( 'yes', $released ) )
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      else if( 0 == strcasecmp( 'no', $released ) )
+        $participant_mod->where( 'service_has_participant.datetime', '=', NULL );
+    }
+
+    $sql .= $participant_mod->get_sql();
 
     $contents = array();
-    $participant_list =
-      $participant_class_name::select_for_event( 'package mailed', $mailed_to, $participant_mod );
-    foreach( $participant_list as $db_participant )
+    $participant_id_list = $participant_class_name::db()->get_col( $sql );
+    foreach( $participant_id_list as $participant_id )
     {
+      $db_participant = lib::create( 'database\participant', $participant_id );
       $db_address = $db_participant->get_first_address();
       if( is_null( $db_address ) ) continue;
       $db_region = $db_address->get_region();
@@ -103,29 +150,28 @@ class mailout_report extends \cenozo\ui\pull\base_report
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
-        $status_mod = lib::create( 'database\modifier' );
-        $status_mod->where( 'event', '=', 'package mailed' );
-        $status_mod->order_desc( 'datetime' );
-        $status_mod->limit( 1 );
-        $status_list = $db_participant->get_status_list( $status_mod );
-        $db_site = $db_participant->get_primary_site();
-        $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
-        $db_status = current( $status_list );
-        array_unshift( $row, $site_name );
-        array_unshift( $row, strstr( $db_status->datetime, ' ', true ) );
+        if( !is_null( $db_service ) )
+        {
+          $db_site = $db_participant->get_effective_site( $db_service );
+          $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
+          array_unshift( $row, $site_name );
+        }
+
+        $event_datetime_list = $db_participant->get_event_datetime_list( $db_event_type );
+        array_unshift( $row, strstr( end( $event_datetime_list ), ' ', true ) );
         array_pop( $row );
       }
 
       $contents[] = $row;
 
-      // add packaged mailed status if requested to
+      // add packaged mailed event if requested to
       if( $mark_mailout )
       {
-        $db_status = lib::create( 'database\status' );
-        $db_status->participant_id = $db_participant->id;
-        $db_status->datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
-        $db_status->event = 'package mailed';
-        $db_status->save();
+        $db_event = lib::create( 'database\event' );
+        $db_event->participant_id = $db_participant->id;
+        $db_event->event_type_id = $db_event_type->id;
+        $db_event->datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
+        $db_event->save();
       }
     }
     
@@ -142,7 +188,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     
     if( $mailed_to )
     { // include the mailout date and site columns
-      array_unshift( $header, 'Site' );
+      if( !is_null( $db_service ) ) array_unshift( $header, 'Site' );
       array_unshift( $header, 'Mailout Date' );
       array_pop( $header );
     }
@@ -150,4 +196,3 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $this->add_table( NULL, $header, $contents, NULL );
   }
 }
-?>

@@ -27,4 +27,3 @@ class contact_form_entry_new extends base_form_entry_new
     parent::__construct( 'contact', $args );
   }
 }
-?>

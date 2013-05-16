@@ -77,10 +77,12 @@ class contact_form_entry_view extends base_form_entry_view
     $this->add_item( 'time_18_19', 'boolean', '6pm to 7pm' );
     $this->add_item( 'time_19_20', 'boolean', '7pm to 8pm' );
     $this->add_item( 'time_20_21', 'boolean', '8pm to 9pm' );
+    $this->add_item( 'high_school', 'boolean', 'High School or Lower' );
+    $this->add_item( 'post_secondary', 'boolean', 'Post-Secondary' );
     $this->add_item( 'language', 'enum', 'Language' );
     $this->add_item( 'signed', 'boolean', 'Signed' );
     $this->add_item( 'date', 'date', 'Date Signed' );
-    $this->add_item( 'cohort', 'enum', 'Cohort' );
+    $this->add_item( 'cohort_id', 'enum', 'Cohort' );
     $this->add_item( 'note', 'text', 'Note' );
   }
 
@@ -95,11 +97,13 @@ class contact_form_entry_view extends base_form_entry_view
     parent::setup();
 
     $region_class_name = lib::get_class_name( 'database\region' );
+    $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $contact_form_entry_class_name = lib::get_class_name( 'database\contact_form_entry' );
 
     // create enum arrays
     $region_mod = lib::create( 'database\modifier' );
     $region_mod->where( 'country', '=', 'Canada' );
+    $region_mod->order( 'name' );
     $region_list = array();
     foreach( $region_class_name::select( $region_mod ) as $db_region )
       $region_list[$db_region->id] = $db_region->name.', '.$db_region->country;
@@ -111,8 +115,8 @@ class contact_form_entry_view extends base_form_entry_view
     $age_bracket_list = array_combine( $age_bracket_list, $age_bracket_list );
     $language_list = $contact_form_entry_class_name::get_enum_values( 'language' );
     $language_list = array_combine( $language_list, $language_list );
-    $cohort_list = $contact_form_entry_class_name::get_enum_values( 'cohort' );
-    $cohort_list = array_combine( $cohort_list, $cohort_list );
+    foreach( $cohort_class_name::select() as $db_cohort )
+      $cohort_list[$db_cohort->id] = $db_cohort->name;
 
     // set the entry values
     $record = $this->get_record();
@@ -154,11 +158,12 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'time_18_19', $record->time_18_19, true );
     $this->set_item( 'time_19_20', $record->time_19_20, true );
     $this->set_item( 'time_20_21', $record->time_20_21, true );
+    $this->set_item( 'high_school', $record->high_school, false );
+    $this->set_item( 'post_secondary', $record->post_secondary, false );
     $this->set_item( 'language', $record->language, true, $language_list );
     $this->set_item( 'signed', $this->get_record()->signed, true );
     $this->set_item( 'date', $record->date, false );
-    $this->set_item( 'cohort', $record->cohort, false, $cohort_list );
+    $this->set_item( 'cohort_id', $record->cohort_id, false, $cohort_list );
     $this->set_item( 'note', $record->note, false );
   }
 }
-?>

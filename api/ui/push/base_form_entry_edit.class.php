@@ -122,4 +122,3 @@ abstract class base_form_entry_edit extends \cenozo\ui\push\base_edit
    */
   private $form_type;
 }
-?>

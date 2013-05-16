@@ -13,10 +13,10 @@
   <script type="text/javascript">
     $( function() {
       // reload page if cohort selector is changed
-      $( "#{{ widget.full }}__restrict_cohort" ).change( function() {
-        var cohort = $( "#{{ widget.full }}__restrict_cohort option:selected" ).val();
+      $( "#{{ widget.full }}__restrict_cohort_id" ).change( function() {
+        var cohort_id = $( "#{{ widget.full }}__restrict_cohort_id option:selected" ).val();
         slot_load( {{ slot }}, "{{ widget.subject }}", "{{ widget.name }}",
-                   { "restrict_cohort": cohort } );
+                   { "restrict_cohort_id": cohort_id } );
       } );
     } );
   </script>
@@ -28,12 +28,11 @@
   <div style="padding-top: 4px; padding-bottom: 4px;">
     <span>
       Restrict to cohort:
-      <select id="{{ widget.full }}__restrict_cohort" class="ui-state-default">
-        <option value="any">Any</option>
-        <option {% if 'comprehensive' == restrict_cohort %}selected{% endif %}
-                value="comprehensive">Comprehensive</option>
-        <option {% if 'tracking' == restrict_cohort %}selected{% endif %}
-                value="tracking">Tracking</option>
+      <select id="{{ widget.full }}__restrict_cohort_id" class="ui-state-default">
+        {% for id, name in cohort_list %}
+          <option {{ id == restrict_cohort_id ? "selected" : "" }}
+                  value="{{ id }}">{{ name }}</option>
+        {% endfor %}
       </select>
     </span>
   </div>

@@ -40,4 +40,3 @@ class import_delete extends \cenozo\ui\push\base_delete
       $db_import_entry->delete();
   }
 }
-?>

@@ -40,8 +40,11 @@ class quota_report extends \cenozo\ui\pull\base_report
     parent::prepare();
 
     // check to see if a cohort-specific template exists for this report
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    $filename = sprintf( '%s/report/%s_%s.xls', DOC_PATH, $this->get_full_name(), $cohort );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
+    $filename = sprintf( '%s/report/%s_%s.xls',
+                         DOC_PATH,
+                         $this->get_full_name(),
+                         $db_cohort->name );
     if( file_exists( $filename ) ) $this->report = lib::create( 'business\report', $filename );
   }
 
@@ -54,14 +57,35 @@ class quota_report extends \cenozo\ui\pull\base_report
   {
     $this->report->set_orientation( 'landscape' );
 
+    $service_class_name = lib::get_class_name( 'database\service' );
     $quota_class_name = lib::get_class_name( 'database\quota' );
-    $site_class_name = lib::get_class_name( 'database\site' );
-    $region_class_name = lib::get_class_name( 'database\region' );
-    $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
+    $database_class_name = lib::get_class_name( 'database\database' );
 
-    $cohort = $this->get_argument( 'restrict_cohort' );
-    $site_breakdown = 'comprehensive' == $cohort;
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
+    if( 'comprehensive' == $db_cohort->name )
+    {
+      $site_breakdown = true;
+      $db_service = $service_class_name::get_unique_record( 'name', 'Beartooth' );
+      $db_first_attempt_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'first attempt (Baseline Home)' );
+      $db_reached_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'reached (Baseline Home)' );
+      $db_completed_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Home)' );
+    }
+    else
+    {
+      $site_breakdown = false;
+      $db_service = $service_class_name::get_unique_record( 'name', 'Sabretooth' );
+      $db_first_attempt_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'first attempt (Baseline)' );
+      $db_reached_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'reached (Baseline)' );
+      $db_completed_event_type =
+        $event_type_class_name::get_unique_record( 'name', 'completed (Baseline)' );
+    }
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -81,174 +105,201 @@ class quota_report extends \cenozo\ui\pull\base_report
       $end_datetime_obj = clone $temp_datetime_obj;
     }   
 
-    // admin user may not actually have access to Beartooth/Sabretooth, use machine credentials
-    $url = 'tracking' == $cohort ? SABRETOOTH_URL : BEARTOOTH_URL;
-    $cenozo_manager = lib::create( 'business\cenozo_manager', $url );
-    $cenozo_manager->use_machine_credentials( true );
-
     // loop through all quotas by region or site (based on breakdown), age group and gender
     $quota_mod = lib::create( 'database\modifier' );
-    $quota_mod->where( 'site.cohort', '=', $cohort );
+    $quota_mod->where( 'site.service_id', '=', $db_service->id );
     $quota_mod->order( $site_breakdown ? 'site.name' : 'region.name' );
     $quota_mod->order( 'age_group.lower' );
     $quota_mod->order( 'gender' );
     foreach( $quota_class_name::select( $quota_mod ) as $db_quota )
     {
       $column = 'B';
+      $no_interview_column_list = array();
 
-      // determine the unique key and id of the site or region (based on breakdown)
-      $site_region_key = $site_breakdown
-                       ? $site_class_name::get_unique_from_primary_key( $db_quota->site_id )
-                       : $region_class_name::get_unique_from_primary_key( $db_quota->region_id );
+      // determine the id of the site or region (based on breakdown)
       $site_region_id = $site_breakdown ? $db_quota->site_id : $db_quota->region_id;
 
-      // modifier used for the pull operations
-      $pull_mod = lib::create( 'database\modifier' );
-      $pull_mod->where( 'age_group.lower', '=', $db_quota->get_age_group()->lower );
-      $pull_mod->where( 'gender', '=', $db_quota->gender );
-      if( !is_null( $start_datetime_obj ) )
-        $pull_mod->where( 'participant.create_timestamp', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-      if( !is_null( $end_datetime_obj ) )
-        $pull_mod->where( 'participant.create_timestamp', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $db_source ) ) $pull_mod->where( 'source_id', '=', $db_source->id );
-
-      // pre-recruit (total participants)
-      $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'cohort', '=', $cohort );
-      $participant_mod->where(
-        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
-      $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
-      $participant_mod->where( 'gender', '=', $db_quota->gender );
-      if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'participant.create_timestamp', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-      if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'participant.create_timestamp', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $start_datetime_obj ) )
+      // common modifier used by all queries
+      $base_mod = lib::create( 'database\modifier' );
+      $base_mod->where( 'cohort_id', '=', $db_cohort->id );
+      if( $site_breakdown )
       {
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'participant.sync_datetime', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-        $participant_mod->where_bracket( false );
+        $base_mod->where( 'participant_site.site_id', '=', $site_region_id );
       }
-      if( !is_null( $end_datetime_obj ) )
+      else
       {
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant.sync_datetime', '=', NULL );
-        $participant_mod->or_where( 'participant.sync_datetime', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-        $participant_mod->where_bracket( false );
+        $base_mod->where( 'participant_primary_address.address_id', '=', 'address.id', false );
+        $base_mod->where( 'address.region_id', '=', $site_region_id );
       }
+      $base_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
+      $base_mod->where( 'gender', '=', $db_quota->gender );
+      if( !is_null( $start_datetime_obj ) )
+        $base_mod->where( 'participant.create_timestamp', '>=',
+          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
+      if( !is_null( $end_datetime_obj ) )
+        $base_mod->where( 'participant.create_timestamp', '<=',
+          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
+      if( !is_null( $db_source ) ) $base_mod->where( 'source_id', '=', $db_source->id );
 
-      if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
+      // sql to determine which participants in this category have completed the interview
+      $completed_sql = sprintf(
+        'SELECT participant.id FROM event '.
+        'WHERE event.participant_id = participant.id AND event.event_type_id = %s',
+        $database_class_name::format_string( $db_completed_event_type->id ) );
+
+      $completed_sql = '( '.$completed_sql.' )';
+
+      // pre-recruit (total participants) //////////////////////////////////////////////////////////
+      $participant_mod = clone $base_mod;
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // open for access (synched participants)
-      $participant_mod = lib::create( 'database\modifier' );
-      $participant_mod->where( 'cohort', '=', $cohort );
-      $participant_mod->where(
-        $site_breakdown ? 'participant_site.site_id' : 'address.region_id', '=', $site_region_id );
-      $participant_mod->where( 'age_group_id', '=', $db_quota->age_group_id );
-      $participant_mod->where( 'gender', '=', $db_quota->gender );
-      if( !is_null( $start_datetime_obj ) )
-        $participant_mod->where( 'participant.sync_datetime', '>=',
-          $start_datetime_obj->format( 'Y-m-d 00:00:00' ) );
-      if( !is_null( $end_datetime_obj ) )
-        $participant_mod->where( 'participant.sync_datetime', '<=',
-          $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
-      if( !is_null( $db_source ) ) $participant_mod->where( 'source_id', '=', $db_source->id );
-      $participant_mod->where( 'sync_datetime', '!=', NULL );
+      // open for access (released participants) ///////////////////////////////////////////////////
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // contact attempted (at least one call made)
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'state' => 'contacted' ) );
+      // first attempt (Baseline for Sabretooth, Baseline Home for Beartooth) //////////////////////
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'event.event_type_id', '=', $db_first_attempt_event_type->id );
+
+      // but has not completed the interview
+      $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+      $no_interview_column_list[] = $column;
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // reached and viable
-      if( 'tracking' == $cohort )
+      // reached and viable ////////////////////////////////////////////////////////////////////////
+      if( 'sabretooth' == $db_service->name )
       {
-        $result = $cenozo_manager->pull( 'participant', 'list',
-            array( 'count' => true,
-                   'modifier' => $pull_mod,
-                   $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                   'state' => 'reached' ) );
+        $participant_mod = clone $base_mod;
+        $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+        $participant_mod->where( 'event.event_type_id', '=', $db_reached_event_type->id );
+
+        // and is eligible
+        $participant_mod->where( 'participant.status', '=', NULL );
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+        $participant_mod->where_bracket( false );
+
+        // but has not completed the interview
+        $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+        $no_interview_column_list[] = $column;
+
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-            intval( $result->data );
+            intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
 
-      // with appointment
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'state' => 'appointment' ) );
+      // with appointment //////////////////////////////////////////////////////////////////////////
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      if( 'sabretooth' == $db_service->name )
+      { // sabretooth appointment with no reached status
+        $participant_mod->where(
+          'sabretooth_participant_last_appointment.appointment_id', '!=', NULL );
+        $participant_mod->where(
+          'sabretooth_participant_last_appointment.reached', '=', NULL );
+      }
+      else
+      { // beartooth appointment which has not been completed
+        $participant_mod->where(
+          'beartooth_participant_last_appointment.appointment_id', '!=', NULL );
+        $participant_mod->where(
+          'beartooth_participant_last_appointment.completed', '=', false );
+      }
+
+      // and is eligible
+      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
+
+      // but has not completed the interview
+      $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
+      $no_interview_column_list[] = $column;
+
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // interview complete
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'state' => 'completed' ) );
+      // interview complete ////////////////////////////////////////////////////////////////////////
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
+
+      // and is eligible
+      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where_bracket( true );
+      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+      $participant_mod->where_bracket( false );
+      $count = intval( $participant_class_name::count( $participant_mod ) );
       $this->population_data
-        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] = $count;
+
+      // add the completed interview count to those columns where they were removed above
+      foreach( $no_interview_column_list as $no_interview_column )
+        $this->population_data
+          [$site_region_id][$db_quota->age_group_id][$no_interview_column][$db_quota->gender] +=
+            $count;
+
       $column++;
 
-      if( 'comprehensive' == $cohort )
+      if( 'beartooth' == $db_service->name )
       {
-        // interview complete (comprehensive site interview)
-        $result = $cenozo_manager->pull( 'participant', 'list',
-            array( 'count' => true,
-                   'modifier' => $pull_mod,
-                   $site_breakdown ? 'site' : 'region' => $site_region_key,
-                   'qnaire_rank' => 2, // TODO: constant needs to be made a report paramter
-                   'state' => 'completed' ) );
+        // interview complete (beartooth site interview) ///////////////////////////////////////////
+        $db_event_type =
+          $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Site)' );
+        $participant_mod = clone $base_mod;
+        $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+        $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
+        $participant_mod->where_bracket( true );
+        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
+        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
+        $participant_mod->where_bracket( false );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-            intval( $result->data );
+            intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
 
-      // with consent
-      $result = $cenozo_manager->pull( 'participant', 'list',
-          array( 'count' => true,
-                 'modifier' => $pull_mod,
-                 $site_breakdown ? 'site' : 'region' => $site_region_key,
-                 'qnaire_rank' => 1, // TODO: constant needs to be made a report paramter
-                 'state' => 'consented' ) );
+      // with consent //////////////////////////////////////////////////////////////////////////////
+      $participant_mod = clone $base_mod;
+      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
+      $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $result->data );
+          intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // grab the quota data itself
+      // grab the quota data itself ////////////////////////////////////////////////////////////////
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
           intval( $db_quota->population );
@@ -283,7 +334,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     }
     
     // set the titles
-    $cohort = $this->get_argument( 'restrict_cohort' );
+    $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $source = $source_id ? lib::create( 'database\source', $source_id )->name : 'all sources';
     $this->report->set_size( 16 );
@@ -291,7 +342,11 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->report->set_horizontal_alignment( 'center' );
     $this->report->merge_cells( 'A1:M1' );
     $this->report->set_cell(
-      'A1', sprintf( '%s Quota Report for %s', ucwords( $cohort ), ucwords( $source ) ), false );
+      'A1',
+      sprintf( '%s Quota Report for %s',
+               ucwords( $db_cohort->name ),
+               ucwords( $source ) ),
+      false );
 
     $now_datetime_obj = util::get_datetime_object();
     $this->report->merge_cells( 'A2:M2' );
@@ -333,4 +388,3 @@ class quota_report extends \cenozo\ui\pull\base_report
    */
   private $population_data;
 }
-?>

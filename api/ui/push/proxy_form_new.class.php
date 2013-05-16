@@ -67,9 +67,9 @@ class proxy_form_new extends \cenozo\ui\push\base_new
   /**
    * Executes the push.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
+   * @access protected
    */
-  public function finish()
+  protected function finish()
   {
     parent::finish();
 
@@ -104,9 +104,15 @@ class proxy_form_new extends \cenozo\ui\push\base_new
       $op_validate->process();
       $errors = $op_validate->get_data();
 
-      // no errors, so import the entry
-      if( 0 == count( $errors ) ) $this->get_record()->import( $db_proxy_form_entry );
+      // if there are no errors import the entry
+      if( 0 == count( $errors ) )
+      {
+        // do not import the form if proxy is false and a proxy was provided
+        if( $db_proxy_form_entry->proxy ||
+            !( trim( $db_proxy_form_entry->proxy_first_name ) ||
+               trim( $db_proxy_form_entry->proxy_last_name ) ) )
+          $this->get_record()->import( $db_proxy_form_entry );
+      }
     }
   }
 }
-?>

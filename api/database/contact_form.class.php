@@ -29,14 +29,12 @@ class contact_form extends base_form
     }
 
     $address_class_name = lib::get_class_name( 'database\address' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
     $source_class_name = lib::get_class_name( 'database\source' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
+    $service_class_name = lib::get_class_name( 'database\service' );
     $site_class_name = lib::get_class_name( 'database\site' );
-
-    $db_french_site = $site_class_name::get_unique_record(
-      array( 'name', 'cohort' ),
-      array( 'Sherbrooke', 'tracking' ) );
+    $event_type_class_name = lib::get_class_name( 'database\event_type' );
 
     // start by checking for address duplicates in the same cohort
     $address = util::parse_address(
@@ -61,11 +59,12 @@ class contact_form extends base_form
     foreach( $address_class_name::select( $address_mod ) as $db_address )
     {
       $db_participant = $db_address->get_person()->get_participant();
-      if( $db_participant && $db_participant->cohort == $db_contact_form_entry->cohort )
+      if( $db_participant && $db_participant->cohort_id == $db_contact_form_entry->cohort_id )
       {
         throw lib::create( 'exception\notice',
-          'Unable to import contact form because an existing participant from the '.
-          $db_contact_form_entry->cohort.' cohort shares the same address.',
+          sprintf( 'Unable to import contact form because a %s participant already exists '.
+                   'at the given address.',
+                   $db_contact_form_entry->get_cohort()->name ),
           __METHOD__ );
       }
     }
@@ -139,7 +138,7 @@ class contact_form extends base_form
     $db_participant->active = true;
     $db_participant->uid = $uid;
     $db_participant->source_id = $db_source->id;
-    $db_participant->cohort = $db_contact_form_entry->cohort;
+    $db_participant->cohort_id = $db_contact_form_entry->cohort_id;
     $db_participant->first_name = $db_contact_form_entry->first_name;
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
@@ -148,18 +147,30 @@ class contact_form extends base_form
     $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
-    $db_participant->no_in_home = false;
-    $db_participant->prior_contact_date = NULL;
     $db_participant->email = $db_contact_form_entry->email;
-
-    // make sure that all tracking participants whose preferred language is french have
-    // their preferred site set to Sherbrooke
-    // TODO: this custom code needs to be made more generic
-    if( 'tracking' == $db_participant->cohort &&
-        0 == strcasecmp( 'fr', $db_participant->language ) )
-      $db_participant->site_id = $db_french_site->id;
-
     $db_participant->save();
+
+    // for all French participants make sure to set their preferred site to Sherbrooke
+    // for all Sabretooth-based applications
+    // TODO: code is not generic since there is no way to define language-specific sites
+    if( 0 == strcasecmp( 'fr', $db_participant->language ) )
+    {
+      $service_mod = lib::create( 'database\modifier' );
+      $service_mod->where( 'name', 'like', '%sabretooth%' );
+      foreach( $service_class_name::select( $service_mod ) as $db_service )
+      {
+        $db_french_site = $site_class_name::get_unique_record(
+          array( 'name', 'service_id' ),
+          array( 'Sherbrooke', $db_service->id ) );
+  
+        // only set the preferred site if the service has access to the participant's cohort
+        $cohort_mod = lib::create( 'database\modifier' );
+        $cohort_mod->where( 'cohort.name', '=', $db_participant->get_cohort()->name );
+        if( 0 < $db_service->get_cohort_count( $cohort_mod ) )
+          $db_participant->set_preferred_site( $db_service, $db_french_site );
+      }
+    }
+
 
     if( !is_null( $db_contact_form_entry->note ) )
     {
@@ -172,14 +183,19 @@ class contact_form extends base_form
       $db_participant_note->save();
     }
 
-    // import data to the status table
-    $db_status = lib::create( 'database\status' );
-    $db_status->participant_id = $db_participant->id;
-    $db_status->datetime = is_null( $db_contact_form_entry->date ) ?
-      util::get_datetime_object()->format( 'Y-m-d H:i:s' ) : $db_contact_form_entry->date;
-
-    $db_status->event = 'consent to contact received';
-    $db_status->save();
+    // add the consent to contact signed event to the participant
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent to contact signed' );
+    if( !is_null( $db_event_type ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = is_null( $db_contact_form_entry->date )
+                          ? util::get_datetime_object()->format( 'Y-m-d H:i:s' )
+                          : $db_contact_form_entry->date;
+      $db_event->save();
+    }
     
     // import data to the address table
     $db_address = lib::create( 'database\address' );
@@ -391,4 +407,3 @@ class contact_form extends base_form
     $this->save();
   }
 }
-?>

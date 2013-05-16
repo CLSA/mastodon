@@ -172,4 +172,3 @@ class import_new extends \cenozo\ui\push
     }
   }
 }
-?>

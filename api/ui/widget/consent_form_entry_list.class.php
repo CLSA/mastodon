@@ -25,4 +25,3 @@ class consent_form_entry_list extends base_form_entry_list
     parent::__construct( 'consent', $args );
   }
 }
-?>
