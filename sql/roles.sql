@@ -1066,4 +1066,16 @@ SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "widget" AND subject = "withdraw" AND operation.name = "report"
 AND role.name IN ( "administrator" );
 
+-- mailout
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "pull" AND subject = "withdraw_mailout" AND operation.name = "report"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "withdraw_mailout" AND operation.name = "report"
+AND role.name IN ( "administrator" );
+
 COMMIT;
