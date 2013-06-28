@@ -129,4 +129,10 @@ VALUES( "pull", "withdraw", "report", true, "Download a withdraw report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "withdraw", "report", true, "Set up a withdraw report." );
 
+-- withdraw_mailout
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "withdraw_mailout", "report", true, "Download a withdraw mailout report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "withdraw_mailout", "report", true, "Set up a withdraw mailout report." );
+
 COMMIT;

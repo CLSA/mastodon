@@ -70,11 +70,9 @@ class service_participant_release extends \cenozo\ui\pull
       $service_mod->where_bracket( false );
     }
     
-    if( 0 < strlen( $uid_list_string ) && 0 != strcasecmp( 'all', $uid_list_string ) )
-    { // include participants in the list only
-      $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
-      $service_mod->where( 'uid', 'IN', $uid_list );
-    }
+    // include participants in the list only
+    $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
+    $service_mod->where( 'uid', 'IN', $uid_list );
 
     // get a list of all unreleased participants
     foreach( $db_service->release_participant( $service_mod, true ) as $db_participant )

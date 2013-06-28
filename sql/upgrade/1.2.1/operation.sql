@@ -12,6 +12,13 @@ CREATE PROCEDURE patch_operation()
     INSERT IGNORE INTO operation( type, subject, name, restricted, description )
     VALUES( "push", "participant", "delink", true,
             "Permanently removes the link between a participant and their current unique identifier." );
+    INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+    VALUES( "pull", "withdraw_mailout", "report", true,
+            "Download a withdraw mailout report." );
+    INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+    VALUES( "widget", "withdraw_mailout", "report", true,
+            "Set up a withdraw mailout report." );
+
   END //
 DELIMITER ;
 
