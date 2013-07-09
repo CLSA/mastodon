@@ -6,5 +6,6 @@ SOURCE operation.sql
 SOURCE role.sql
 SOURCE role_has_operation.sql
 SOURCE participant.sql
+SOURCE event_type.sql
 
 COMMIT;
