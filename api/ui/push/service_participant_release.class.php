@@ -44,6 +44,13 @@ class service_participant_release extends \cenozo\ui\push
     $end_date = $this->get_argument( 'end_date', '' );
     
     $service_mod = lib::create( 'database\modifier' );
+
+    // include participants in the list only
+    $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
+    if( 1 == count( $uid_list ) && '' == $uid_list[0] ) $uid_list = array();
+
+    if( 0 < count( $uid_list ) ) $service_mod->where( 'uid', 'IN', $uid_list );
+
     if( 0 < strlen( $start_date ) || 0 < strlen( $end_date ) )
     { // use start/end date to select participants
       $service_mod->where_bracket( true );
@@ -61,13 +68,11 @@ class service_participant_release extends \cenozo\ui\push
       $service_mod->where_bracket( false );
       $service_mod->where_bracket( false );
     }
-    
-    if( 0 < strlen( $uid_list_string ) && 0 != strcasecmp( 'all', $uid_list_string ) )
-    { // include participants in the list only
-      $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
-      $service_mod->where( 'uid', 'IN', $uid_list );
+    else
+    { // do not allow all participants if there is no date span
+      if( 0 == count( $uid_list ) ) $service_mod->where( 'uid', 'IN', array() );
     }
-
+    
     $db_service->release_participant( $service_mod );
   }
 }
