@@ -38,6 +38,15 @@ CREATE PROCEDURE patch_contact_form_entry()
       ALTER TABLE contact_form_entry
       ADD COLUMN code ENUM('T','T*','T*2','T*3','T*4','T*5','T*6','T*7','C','C2','C3','C4','C5','CLE1','CLE2','CLE4','CLE5') NULL DEFAULT NULL
       AFTER cohort_id;
+
+      -- fill in the grouping based on cohort
+      SET @sql = CONCAT(
+        "UPDATE contact_form_entry ",
+        "JOIN ", @cenozo, ".cohort ON contact_form_entry.cohort_id = cohort.id ",
+        "SET code = UPPER( SUBSTR( cohort.name, 1, 1 ) ) " );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
     END IF;
 
   END //
