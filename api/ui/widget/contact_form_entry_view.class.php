@@ -81,8 +81,10 @@ class contact_form_entry_view extends base_form_entry_view
     $this->add_item( 'post_secondary', 'boolean', 'Post-Secondary' );
     $this->add_item( 'language', 'enum', 'Language' );
     $this->add_item( 'signed', 'boolean', 'Signed' );
-    $this->add_item( 'date', 'date', 'Date Signed' );
+    $this->add_item( 'participant_date', 'date', 'Date Signed' );
+    $this->add_item( 'stamped_date', 'date', 'Date Stamped' );
     $this->add_item( 'cohort_id', 'enum', 'Cohort' );
+    $this->add_item( 'code', 'enum', 'Code (bottom left)' );
     $this->add_item( 'note', 'text', 'Note' );
   }
 
@@ -117,6 +119,8 @@ class contact_form_entry_view extends base_form_entry_view
     $language_list = array_combine( $language_list, $language_list );
     foreach( $cohort_class_name::select() as $db_cohort )
       $cohort_list[$db_cohort->id] = $db_cohort->name;
+    $code_list = $contact_form_entry_class_name::get_enum_values( 'code' );
+    $code_list = array_combine( $code_list, $code_list );
 
     // set the entry values
     $record = $this->get_record();
@@ -162,8 +166,10 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'post_secondary', $record->post_secondary, false );
     $this->set_item( 'language', $record->language, true, $language_list );
     $this->set_item( 'signed', $this->get_record()->signed, true );
-    $this->set_item( 'date', $record->date, false );
+    $this->set_item( 'participant_date', $record->participant_date, false );
+    $this->set_item( 'stamped_date', $record->stamped_date, false );
     $this->set_item( 'cohort_id', $record->cohort_id, false, $cohort_list );
+    $this->set_item( 'code', $record->code, false, $code_list );
     $this->set_item( 'note', $record->note, false );
   }
 }
