@@ -73,7 +73,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     {
       $title .= sprintf( 'whose source is %s and ', $db_source->name );
     }
-    $title .= sprintf( 'who have %shad a package mailed to', $mailed_to ? '' : 'not' );
+    $title .= sprintf( 'who have %shad a package mailed to', $mailed_to ? '' : ' not' );
     $this->add_title( $title );
 
     $participant_mod = lib::create( 'database\modifier' );
@@ -137,6 +137,21 @@ class mailout_report extends \cenozo\ui\pull\base_report
         $age = util::get_interval( $dob_datetime_obj )->y;
       }
 
+      $high_school = '';
+      $post_secondary = '';
+      $db_contact_form = $db_participant->get_contact_form();
+      if( !is_null( $db_contact_form ) &&
+          !is_null( $db_contact_form->validated_contact_form_entry_id ) )
+      {
+        $db_contact_form_entry =
+          lib::create( 'database\contact_form_entry',
+                       $db_contact_form->validated_contact_form_entry_id );
+        if( !is_null( $db_contact_form_entry->high_school ) )
+          $high_school = $db_contact_form_entry->high_school ? 'yes' : 'no';
+        if( !is_null( $db_contact_form_entry->post_secondary ) )
+          $post_secondary = $db_contact_form_entry->post_secondary ? 'yes' : 'no';
+      }
+
       $row = array(
         'fr' == $db_participant->language ? 'fr' : 'en', // english if not set
         $db_participant->uid,
@@ -146,7 +161,9 @@ class mailout_report extends \cenozo\ui\pull\base_report
         $db_address->city,
         $db_region->name,
         $db_address->postcode,
-        $age );
+        $age,
+        $high_school,
+        $post_secondary );
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
@@ -184,7 +201,9 @@ class mailout_report extends \cenozo\ui\pull\base_report
       'City',
       'Province',
       'Postal Code',
-      'Age' );
+      'Age',
+      'High School',
+      'Post Secondary' );
     
     if( $mailed_to )
     { // include the mailout date and site columns
