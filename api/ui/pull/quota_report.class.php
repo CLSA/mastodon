@@ -166,7 +166,7 @@ class quota_report extends \cenozo\ui\pull\base_report
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // first attempt (Baseline for Sabretooth, Baseline Home for Beartooth) //////////////////////
+      // contact attempted (Baseline for Sabretooth, Baseline Home for Beartooth) //////////////////
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
@@ -191,10 +191,7 @@ class quota_report extends \cenozo\ui\pull\base_report
 
         // and is eligible
         $participant_mod->where( 'participant.status', '=', NULL );
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
-        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
-        $participant_mod->where_bracket( false );
+        $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
 
         // but has not completed the interview
         $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
@@ -227,10 +224,7 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       // and is eligible
       $participant_mod->where( 'participant.status', '=', NULL );
-      $participant_mod->where_bracket( true );
-      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
-      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
-      $participant_mod->where_bracket( false );
+      $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
 
       // but has not completed the interview
       $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
@@ -241,22 +235,15 @@ class quota_report extends \cenozo\ui\pull\base_report
           intval( $participant_class_name::count( $participant_mod ) );
       $column++;
 
-      // interview complete ////////////////////////////////////////////////////////////////////////
+      // interview complete (Baseline for Sabretooth, Baseline Home for Beartooth) /////////////////
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
       $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
-      $participant_mod->where_bracket( true );
-      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
-      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
-      $participant_mod->where_bracket( false );
 
-      // and is eligible
+      // and is eligible to continue
       $participant_mod->where( 'participant.status', '=', NULL );
-      $participant_mod->where_bracket( true );
-      $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
-      $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
-      $participant_mod->where_bracket( false );
+      $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
       $count = intval( $participant_class_name::count( $participant_mod ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] = $count;
@@ -278,26 +265,24 @@ class quota_report extends \cenozo\ui\pull\base_report
         $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
         $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
         $participant_mod->where( 'event.event_type_id', '=', $db_event_type->id );
-        $participant_mod->where_bracket( true );
-        $participant_mod->where( 'participant_last_consent.accept', '=', NULL );
-        $participant_mod->or_where( 'participant_last_consent.accept', '=', true );
-        $participant_mod->where_bracket( false );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
             intval( $participant_class_name::count( $participant_mod ) );
         $column++;
       }
-
-      // with consent //////////////////////////////////////////////////////////////////////////////
-      $participant_mod = clone $base_mod;
-      $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
-      $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
-      $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
-      $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
-      $this->population_data
-        [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
-          intval( $participant_class_name::count( $participant_mod ) );
-      $column++;
+      else
+      {
+        // with consent //////////////////////////////////////////////////////////////////////////////
+        $participant_mod = clone $base_mod;
+        $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+        $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
+        $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
+        $this->population_data
+          [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
+            intval( $participant_class_name::count( $participant_mod ) );
+        $column++;
+      }
 
       // grab the quota data itself ////////////////////////////////////////////////////////////////
       $this->population_data
