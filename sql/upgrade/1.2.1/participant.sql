@@ -7,20 +7,21 @@ CREATE PROCEDURE patch_participant()
     SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
                           'cenozo' );
 
-    SELECT "Adding 'duplicate' to participant.status enum column" AS "";
+    SELECT "Adding new values to participant.status enum column" AS "";
     SET @test = (
       SELECT COUNT(*)
       FROM information_schema.COLUMNS
       WHERE TABLE_SCHEMA = @cenozo
       AND TABLE_NAME = "participant"
       AND COLUMN_NAME = "status"
-      AND COLUMN_TYPE NOT LIKE "%duplicate%" );
+      AND COLUMN_TYPE NOT LIKE "%consent unavailable%" );
     IF @test = 1 THEN
       SET @sql = CONCAT(
         "ALTER TABLE ", @cenozo, ".participant ",
         "MODIFY COLUMN status ENUM('deceased','deaf','mentally unfit','language barrier',",
           "'age range','not canadian','federal reserve','armed forces','institutionalized',",
-          "'noncompliant','sourcing required','unreachable','duplicate','other') NULL DEFAULT NULL" );
+          "'noncompliant','sourcing required','unreachable','consent unavailable','duplicate',",
+          "'other') NULL DEFAULT NULL" );
       PREPARE statement FROM @sql;
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
