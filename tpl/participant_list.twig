@@ -29,17 +29,19 @@
 
 {% block prelist %}
   
-  {% set restrict_condition = restrict_condition|default("") %}
-  <label for="{{ widget.full }}__restrict_condition">Restrict to condition:</label>
-  <select id="{{ widget.full }}__restrict_condition" class="ui-state-default"
-          style="margin-top:4px;margin-bottom:4px;">
-    <option {% if "" == restrict_condition %}selected{% endif %}
-            value="">No restriction</option>
-    {% for name in conditions %}
-      <option {% if name == restrict_condition %}selected{% endif %}
-              value="{{ name }}">{{ name }}</option>
-    {% endfor %}
-  </select>
+  {% if conditions is defined %}
+    {% set restrict_condition = restrict_condition|default("") %}
+    <label for="{{ widget.full }}__restrict_condition">Restrict to condition:</label>
+    <select id="{{ widget.full }}__restrict_condition" class="ui-state-default"
+            style="margin-top:4px;margin-bottom:4px;">
+      <option {% if "" == restrict_condition %}selected{% endif %}
+              value="">No restriction</option>
+      {% for name in conditions %}
+        <option {% if name == restrict_condition %}selected{% endif %}
+                value="{{ name }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+  {% endif %}
   {{ parent() }}
 
 {% endblock prelist %}
