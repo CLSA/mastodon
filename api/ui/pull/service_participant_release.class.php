@@ -78,7 +78,7 @@ class service_participant_release extends \cenozo\ui\pull
     }
     else
     { // do not allow all participants if there is no date span
-      if( 0 == count( $uid_list ) ) $service_mod->where( 'uid', 'IN', array() );
+      if( 0 == count( $uid_list ) ) $service_mod->where( 'uid', 'IN', array('') );
     }
 
     // get a list of all unreleased participants
