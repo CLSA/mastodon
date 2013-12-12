@@ -4,8 +4,7 @@ CREATE PROCEDURE patch_participant()
   BEGIN
 
     -- determine the @cenozo database name
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
+    SET @cenozo = REPLACE( DATABASE(), 'mastodon', 'cenozo' );
 
     SELECT "Adding new participant.override_quota column" AS "";
 
