@@ -4,8 +4,7 @@ DROP PROCEDURE IF EXISTS patch_contact_form_entry;
 DELIMITER //
 CREATE PROCEDURE patch_contact_form_entry()
   BEGIN
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
+    SET @cenozo = REPLACE( DATABASE(), 'mastodon', 'cenozo' );
     SET @test = (
       SELECT COUNT(*)
       FROM information_schema.COLUMNS

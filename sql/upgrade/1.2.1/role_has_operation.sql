@@ -4,8 +4,7 @@ CREATE PROCEDURE patch_role_has_operation()
   BEGIN
 
     -- determine the @cenozo database name
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
+    SET @cenozo = REPLACE( DATABASE(), 'mastodon', 'cenozo' );
 
     SELECT "Adding new operations to roles" AS "";
 

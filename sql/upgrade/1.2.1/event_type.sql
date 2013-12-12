@@ -4,8 +4,7 @@ CREATE PROCEDURE patch_event_type()
   BEGIN
 
     -- determine the @cenozo database name
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
+    SET @cenozo = REPLACE( DATABASE(), 'mastodon', 'cenozo' );
 
     -- add the new withdraw mailout event type
     SELECT "Adding new event type" AS "";

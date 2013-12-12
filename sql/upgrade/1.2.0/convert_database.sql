@@ -20,12 +20,9 @@ CREATE PROCEDURE convert_database()
       SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='';
 
       -- determine the @cenozo database name
-      SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                            'cenozo' );
-      SET @sabretooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                            'sabretooth' );
-      SET @beartooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                            'beartooth' );
+      SET @cenozo = REPLACE( DATABASE(), 'mastodon', 'cenozo' );
+      SET @sabretooth = REPLACE( DATABASE(), 'mastodon', 'sabretooth' );
+      SET @beartooth = REPLACE( DATABASE(), 'mastodon', 'beartooth' );
 
       -- activity ----------------------------------------------------------------------------------
       SELECT "Processing activity" AS "";
