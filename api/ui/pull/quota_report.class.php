@@ -64,6 +64,7 @@ class quota_report extends \cenozo\ui\pull\base_report
     $database_class_name = lib::get_class_name( 'database\database' );
 
     $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'cohort_id' ) );
+    $low_education = $this->get_argument( 'low_education', false );
     if( 'comprehensive' == $db_cohort->name )
     {
       $site_breakdown = true;
@@ -122,6 +123,12 @@ class quota_report extends \cenozo\ui\pull\base_report
       // common modifier used by all queries
       $base_mod = lib::create( 'database\modifier' );
       $base_mod->where( 'cohort_id', '=', $db_cohort->id );
+
+      // the following is temporary
+      if( $low_education && $participant_class_name::column_exists( 'low_education', true ) )
+        $base_mod->where( 'low_education', '=', true );
+      // //////////////////////////
+
       if( $site_breakdown )
       {
         $base_mod->where( 'participant_site.site_id', '=', $site_region_id );
