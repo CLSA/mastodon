@@ -1,4 +1,15 @@
 ====================================================================================================
+1.2.3
+====================================================================================================
+
+* Adding new service "release_based" functionality
+  - It is now possible to define a service as not requiring participants to be explicitely released
+    before they are available to that service.
+
+* Adding new search participant utility
+  - Allows for complex search of participant based on address, phone, participant and note details
+
+====================================================================================================
 1.2.2
 ====================================================================================================
 
