@@ -257,7 +257,7 @@ class proxy_form extends base_form
 
     if( $db_proxy_form_entry->proxy && $db_proxy_form_entry->same_as_proxy )
       $this->informant_alternate_id = $db_proxy_alternate->id;
-    else if( $db_proxy_form_entry->informant )
+    else if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
       $this->informant_alternate_id = $db_informant_alternate->id;
 
     $this->save();
