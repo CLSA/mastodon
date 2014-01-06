@@ -16,6 +16,24 @@ INSERT IGNORE INTO cenozo.role( name, tier, all_sites ) VALUES
 ( "supervisor", 2, false ),
 ( "typist", 1, true );
 
+-- add states to roles
+INSERT IGNORE INTO cenozo.role_has_state( role_id, state_id )
+SELECT role.id, state.id
+FROM role, state
+WHERE state.name NOT IN( "unreachable", "consent unavailable" );
+
+INSERT IGNORE INTO cenozo.role_has_state( role_id, state_id )
+SELECT role.id, state.id
+FROM role, state
+WHERE state.name = "unreachable"
+AND role.name IN ( "administrator", "curator", "supervisor" );
+
+INSERT IGNORE INTO cenozo.role_has_state( role_id, state_id )
+SELECT role.id, state.id
+FROM role, state
+WHERE state.name = "consent unavailable"
+AND role.name IN ( "administrator", "curator" );
+
 -- access
 
 INSERT INTO role_has_operation( role_id, operation_id )

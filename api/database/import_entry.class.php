@@ -181,7 +181,6 @@ class import_entry extends \cenozo\database\record
     $db_participant->gender = $this->gender;
     $db_participant->date_of_birth = $this->date_of_birth;
     if( $db_age_group ) $db_participant->age_group_id = $db_age_group->id;
-    $db_participant->status = NULL;
     $db_participant->language = $this->language;
     $db_participant->email = $this->email;
     $db_participant->save();

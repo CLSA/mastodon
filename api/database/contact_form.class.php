@@ -145,7 +145,6 @@ class contact_form extends base_form
     $db_participant->gender = $db_contact_form_entry->gender;
     $db_participant->date_of_birth = $dob;
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
-    $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
     $db_participant->email = $db_contact_form_entry->email;

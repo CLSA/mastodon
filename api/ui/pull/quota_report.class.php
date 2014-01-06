@@ -197,7 +197,7 @@ class quota_report extends \cenozo\ui\pull\base_report
         $participant_mod->where( 'event.event_type_id', '=', $db_reached_event_type->id );
 
         // and is eligible
-        $participant_mod->where( 'participant.status', '=', NULL );
+        $participant_mod->where( 'participant.state_id', '=', NULL );
         $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
 
         // but has not completed the interview
@@ -230,7 +230,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       }
 
       // and is eligible
-      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where( 'participant.state_id', '=', NULL );
       $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
 
       // but has not completed the interview
@@ -249,7 +249,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
 
       // and is eligible to continue
-      $participant_mod->where( 'participant.status', '=', NULL );
+      $participant_mod->where( 'participant.state_id', '=', NULL );
       $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
       $count = intval( $participant_class_name::count( $participant_mod ) );
       $this->population_data
