@@ -139,7 +139,6 @@ class import_entry extends \cenozo\database\record
       return;
     }
     
-    $source_class_name = lib::get_class_name( 'database\source' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
@@ -147,9 +146,6 @@ class import_entry extends \cenozo\database\record
     $site_class_name = lib::get_class_name( 'database\site' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $region_class_name = lib::get_class_name( 'database\region' );
-
-    // all participants are from the rdd source
-    $db_source = $source_class_name::get_unique_record( 'name', 'rdd' );
 
     // make sure there is a uid available
     $uid = $participant_class_name::get_new_uid();
@@ -173,7 +169,7 @@ class import_entry extends \cenozo\database\record
     $db_participant->person_id = $db_person->id;
     $db_participant->active = true;
     $db_participant->uid = $uid;
-    $db_participant->source_id = $db_source->id;
+    $db_participant->source_id = $this->source_id;
     $db_cohort = $cohort_class_name::get_unique_record( 'name', $this->cohort );
     $db_participant->cohort_id = $db_cohort->id;
     $db_participant->first_name = $this->first_name;
@@ -181,7 +177,6 @@ class import_entry extends \cenozo\database\record
     $db_participant->gender = $this->gender;
     $db_participant->date_of_birth = $this->date_of_birth;
     if( $db_age_group ) $db_participant->age_group_id = $db_age_group->id;
-    $db_participant->status = NULL;
     $db_participant->language = $this->language;
     $db_participant->email = $this->email;
     $db_participant->save();
@@ -277,6 +272,17 @@ class import_entry extends \cenozo\database\record
       $db_mobile_phone->save();
       $db_home_phone->rank = 2;
       $db_home_phone->save();
+    }
+
+    // import data to the person_note table
+    if( !is_null( $this->note ) )
+    {
+      $db_participant_note = lib::create( 'database\person_note' );
+      $db_participant_note->person_id = $db_person->id;
+      $db_participant_note->user_id = lib::create( 'business\session' )->get_user()->id;
+      $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+      $db_participant_note->note = $this->note;
+      $db_participant_note->save();
     }
 
     // import data to the availability table

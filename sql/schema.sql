@@ -493,6 +493,7 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   `update_timestamp` TIMESTAMP NOT NULL ,
   `create_timestamp` TIMESTAMP NOT NULL ,
   `import_id` INT UNSIGNED NOT NULL ,
+  `source_id` INT UNSIGNED NOT NULL,
   `row` INT NOT NULL ,
   `participant_id` INT UNSIGNED NULL DEFAULT NULL ,
   `apartment_error` TINYINT(1) NOT NULL DEFAULT 0 ,
@@ -544,11 +545,13 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   `cohort` VARCHAR(45) NOT NULL ,
   `signed` TINYINT(1) NOT NULL DEFAULT 0 ,
   `date` DATE NOT NULL ,
+  `note` TEXT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_import_id` (`import_id` ASC) ,
   INDEX `fk_participant_id` (`participant_id` ASC) ,
   UNIQUE INDEX `uq_participant_id` (`participant_id` ASC) ,
   UNIQUE INDEX `uq_import_id_row` (`import_id` ASC, `row` ASC) ,
+  INDEX `fk_source_id` (`source_id` ASC),
   CONSTRAINT `fk_import_entry_import_id`
     FOREIGN KEY (`import_id` )
     REFERENCES `mastodon`.`import` (`id` )
@@ -557,6 +560,11 @@ CREATE  TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   CONSTRAINT `fk_import_entry_participant_id`
     FOREIGN KEY (`participant_id` )
     REFERENCES `cenozo`.`participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_import_entry_source_id`
+    FOREIGN KEY (`source_id`)
+    REFERENCES `cenozo`.`source` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
