@@ -110,7 +110,7 @@ class import_new extends \cenozo\ui\push
       // skip header line(s)
       if( 'first_name' == $values[0] ||
           'last_name' == $values[0] ||
-          'TRA_PR_INFO_FULLNAME [FIRST_NAME]' == $values[0] ) continue;
+          'TRA_PR_' == substr( $values[0], 0, 7 ) ) continue;
 
       if( 35 == count( $values ) )
       {
@@ -173,12 +173,12 @@ class import_new extends \cenozo\ui\push
             sprintf( 'There was a problem importing row %d.', $row ), __METHOD__, $e );
         }
       }
-      else if( 17 == count( $values ) )
+      else if( 13 == count( $values ) )
       { // limesurvey export csv file
         // check for an empty line
-        if( 0 == strlen( $values[0] ) && 0 == strlen( $values[1] ) ) continue;
+        if( 0 == strlen( $values[1] ) && 0 == strlen( $values[2] ) ) continue;
 
-        $appartment = trim( preg_replace( '/apt\.?/i', '', $values[6] ) );
+        $appartment = trim( preg_replace( '/apt\.?/i', '', $values[4] ) );
         if( 0 == strlen( $appartment ) ||
             '--' == $appartment ||
             '---' == $appartment ||
@@ -186,23 +186,22 @@ class import_new extends \cenozo\ui\push
             0 == strcasecmp( 'na', $appartment ) ||
             0 == strcasecmp( 'n/a', $appartment ) ) $appartment = NULL;
             
-        $address_number = trim( $values[7] );
-        if( '--' == $address_number ||
-            '---' == $address_number ||
-            0 == strcasecmp( 'aucun', $address_number ) ||
-            0 == strcasecmp( 'na', $address_number ) ||
-            0 == strcasecmp( 'n/a', $address_number ) ) $address = '';
+        $address1 = trim( $values[5] );
+        if( '--' == $address1 ||
+            '---' == $address1 ||
+            0 == strcasecmp( 'aucun', $address1 ) ||
+            0 == strcasecmp( 'na', $address1 ) ||
+            0 == strcasecmp( 'n/a', $address1 ) ) $address = '';
 
-        $address_street = trim( $values[8] );
-        if( '--' == $address_street ||
-            '---' == $address_street ||
-            0 == strcasecmp( 'aucun', $address_street ) ||
-            0 == strcasecmp( 'na', $address_street ) ||
-            0 == strcasecmp( 'n/a', $address_street ) ) $address_street = '';
+        $address2 = trim( $values[6] );
+        if( '--' == $address2 ||
+            '---' == $address2 ||
+            0 == strcasecmp( 'aucun', $address2 ) ||
+            0 == strcasecmp( 'na', $address2 ) ||
+            0 == strcasecmp( 'n/a', $address2 ) ||
+            $address1 == $address2 ) $address2 = '';
 
-        $address = trim( $address_number.' '.$address_street );
-
-        $region = $values[10];
+        $region = $values[8];
         $db_region = $region_class_name::get_unique_record( 'abbreviation', $region );
         if( is_null( $db_region ) )
           $db_region = $region_class_name::get_unique_record( 'name', $region );
@@ -212,30 +211,48 @@ class import_new extends \cenozo\ui\push
         $db_import_entry->import_id = $db_import->id;
         $db_import_entry->source_id = $db_source->id;
         $db_import_entry->row = $row;
-        $db_import_entry->first_name = $values[0];
-        $db_import_entry->last_name = $values[1];
+        $db_import_entry->first_name = $values[1];
+        $db_import_entry->last_name = $values[2];
         $db_import_entry->apartment = $appartment;
-        $db_import_entry->street = $address;
-        $db_import_entry->address_other = NULL;
-        $db_import_entry->city = $values[9];
+        $db_import_entry->street = $address1;
+        $db_import_entry->address_other = 0 == strlen( $address2 ) ? NULL : $address2;
+        $db_import_entry->city = $values[7];
         $db_import_entry->province = is_null( $db_region ) ? NULL : $db_region->abbreviation;
-        $db_import_entry->postcode = trim( $values[11] );
+        $db_import_entry->postcode = trim( $values[9] );
         if( 6 == strlen( $db_import_entry->postcode ) )
           $db_import_entry->postcode = substr( $db_import_entry->postcode, 0, 3 ).' '
                                      . substr( $db_import_entry->postcode, 3, 3 );
         $db_import_entry->home_phone =
-          0 == strlen( $values[12] ) || '999-999-9999' == $values[12] ?
-          NULL : $values[12];
+          0 == strlen( $values[10] ) ||
+          0 === strpos( preg_replace( '/[^0-9]/', '', $values[10] ), '9999999' ) ?
+          NULL : $values[10];
         $db_import_entry->mobile_phone =
-          0 == strlen( $values[13] ) || '999-999-9999' == $values[13] || $values[12] == $values[13] ?
-          NULL : $values[13];
+          0 == strlen( $values[11] ) ||
+          0 === strpos( preg_replace( '/[^0-9]/', '', $values[11] ), '9999999' ) ||
+          $values[10] == $values[11] ?
+          NULL : $values[11];
 
         $db_import_entry->phone_preference = 'home';
 
-        $db_import_entry->email = 'Yes' == $values[15] && 0 < strlen( $values[16] )
-                                ? $values[16] : NULL;
-        $db_import_entry->gender = 0 == strcasecmp( 'female', $values[4] ) ? 'female' : 'male';
-        $db_import_entry->date_of_birth = substr( $values[3], 0, 10 );
+        $email = $values[12];
+        $db_import_entry->email = util::validate_email( $email ) ? $email : NULL;
+
+        // column index 2 has "GENDER XX-XX" (sex age-group)
+        $parts = explode( ' ', $values[3] );
+        if( 2 == count( $parts ) )
+        {
+          $db_import_entry->gender = $parts[0];
+
+          $year = date( 'Y' );
+          if( '45-54' == $parts[1] )
+            $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 50 );
+          else if( '55-64' == $parts[1] )
+            $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 60 );
+          else if( '65-74' == $parts[1] )
+            $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 70 );
+          else if( '75-85' == $parts[1] )
+            $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 80 );
+        }
         $db_import_entry->monday = false;
         $db_import_entry->tuesday = false;
         $db_import_entry->wednesday = false;
@@ -254,7 +271,7 @@ class import_new extends \cenozo\ui\push
         $db_import_entry->time_18_19 = false;
         $db_import_entry->time_19_20 = false;
         $db_import_entry->time_20_21 = false;
-        $db_import_entry->language = 0 == strcasecmp( 'french', $values[14] ) ? 'fr' : 'en';
+        $db_import_entry->language = 0 == strcasecmp( 'french', $values[0] ) ? 'fr' : 'en';
         $db_import_entry->cohort = 'tracking';
         $db_import_entry->date = util::get_datetime_object()->format( 'Y-m-d' );
         $db_import_entry->note = 'Pre-recruitment UID unknown';
