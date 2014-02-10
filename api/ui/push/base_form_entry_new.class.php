@@ -26,8 +26,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     parent::__construct( $form_type.'_form_entry', $args );
     $this->form_type = $form_type;
 
-    // we can't use a transaction, otherwise the semaphore in the finish() method won't work right
-    lib::create( 'business\session' )->set_use_transaction( false );
+    $session = lib::create( 'business\session' );
 
     // get the form and form_entry (dynamic) names
     $form_name = $this->form_type.'_form';
@@ -36,17 +35,10 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     $form_class_name = lib::get_class_name( 'database\\'.$form_name );
     $form_entry_count_method_name = sprintf( 'get_%s_count', $this->get_subject() );
 
-    $db_user = lib::create( 'business\session' )->get_user();
+    $db_user = $session->get_user();
 
     // we need to use a semaphore to avoid race conditions
-    $semaphore = sem_get( getmyinode() );
-    if( !sem_acquire( $semaphore ) )
-    {
-      log::err( sprintf( 'Unable to aquire semaphore for user "%s"', $db_user()->name ) );
-      throw lib::create( 'exception\notice',
-        'The server is busy, please wait a few seconds then click the refresh button.',
-        __METHOD__ );
-    }
+    $session->acquire_semaphore();
 
     // This new operation is different from others.  Instead of providing an ID the system must
     // instead search for one, reporting a notice if none are available
@@ -76,9 +68,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
                str_replace( '_', ' ', $this->get_subject() ) ),
       __METHOD__ );
 
-    // release the semaphore
-    if( !sem_release( $semaphore ) )
-      log::err( sprintf( 'Unable to release semaphore for user %s', $db_user->name ) );
+    $session->release_semaphore();
   }
 
   /**
