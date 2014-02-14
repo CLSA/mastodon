@@ -110,8 +110,7 @@ class import_new extends \cenozo\ui\push
       // skip header line(s)
       if( 'first_name' == $values[0] ||
           'last_name' == $values[0] ||
-          'id' == $values[0] ||
-          'TRA_PR_' == substr( $values[3], 0, 7 ) ) continue;
+          'id' == $values[0] ) continue;
 
       if( 35 == count( $values ) )
       {
