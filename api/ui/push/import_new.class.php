@@ -110,7 +110,7 @@ class import_new extends \cenozo\ui\push
       // skip header line(s)
       if( 'first_name' == $values[0] ||
           'last_name' == $values[0] ||
-          'TRA_PR_' == substr( $values[0], 0, 7 ) ) continue;
+          'id' == $values[0] ) continue;
 
       if( 35 == count( $values ) )
       {
@@ -173,12 +173,12 @@ class import_new extends \cenozo\ui\push
             sprintf( 'There was a problem importing row %d.', $row ), __METHOD__, $e );
         }
       }
-      else if( 13 == count( $values ) )
+      else if( 18 == count( $values ) )
       { // limesurvey export csv file
         // check for an empty line
-        if( 0 == strlen( $values[1] ) && 0 == strlen( $values[2] ) ) continue;
+        if( 0 == strlen( $values[3] ) && 0 == strlen( $values[4] ) ) continue;
 
-        $appartment = trim( preg_replace( '/apt\.?/i', '', $values[4] ) );
+        $appartment = trim( preg_replace( '/apt\.?/i', '', $values[6] ) );
         if( 0 == strlen( $appartment ) ||
             '--' == $appartment ||
             '---' == $appartment ||
@@ -186,14 +186,14 @@ class import_new extends \cenozo\ui\push
             0 == strcasecmp( 'na', $appartment ) ||
             0 == strcasecmp( 'n/a', $appartment ) ) $appartment = NULL;
             
-        $address1 = trim( $values[5] );
+        $address1 = trim( $values[7] );
         if( '--' == $address1 ||
             '---' == $address1 ||
             0 == strcasecmp( 'aucun', $address1 ) ||
             0 == strcasecmp( 'na', $address1 ) ||
             0 == strcasecmp( 'n/a', $address1 ) ) $address = '';
 
-        $address2 = trim( $values[6] );
+        $address2 = trim( $values[8] );
         if( '--' == $address2 ||
             '---' == $address2 ||
             0 == strcasecmp( 'aucun', $address2 ) ||
@@ -201,7 +201,13 @@ class import_new extends \cenozo\ui\push
             0 == strcasecmp( 'n/a', $address2 ) ||
             $address1 == $address2 ) $address2 = '';
 
-        $region = $values[8];
+        if( 0 == strlen( $address1 ) && 0 < strlen( $address2 ) )
+        {
+          $address1 = $address2;
+          $address2 = '';
+        }
+
+        $region = $values[10];
         $db_region = $region_class_name::get_unique_record( 'abbreviation', $region );
         if( is_null( $db_region ) )
           $db_region = $region_class_name::get_unique_record( 'name', $region );
@@ -211,37 +217,37 @@ class import_new extends \cenozo\ui\push
         $db_import_entry->import_id = $db_import->id;
         $db_import_entry->source_id = $db_source->id;
         $db_import_entry->row = $row;
-        $db_import_entry->first_name = $values[1];
-        $db_import_entry->last_name = $values[2];
+        $db_import_entry->first_name = $values[3];
+        $db_import_entry->last_name = $values[4];
         $db_import_entry->apartment = $appartment;
         $db_import_entry->street = $address1;
         $db_import_entry->address_other = 0 == strlen( $address2 ) ? NULL : $address2;
-        $db_import_entry->city = $values[7];
+        $db_import_entry->city = $values[9];
         $db_import_entry->province = is_null( $db_region ) ? NULL : $db_region->abbreviation;
-        $db_import_entry->postcode = trim( $values[9] );
+        $db_import_entry->postcode = trim( $values[11] );
         if( 6 == strlen( $db_import_entry->postcode ) )
           $db_import_entry->postcode = substr( $db_import_entry->postcode, 0, 3 ).' '
                                      . substr( $db_import_entry->postcode, 3, 3 );
         $db_import_entry->home_phone =
-          0 == strlen( $values[10] ) ||
-          0 === strpos( preg_replace( '/[^0-9]/', '', $values[10] ), '9999999' ) ?
-          NULL : $values[10];
+          0 == strlen( $values[12] ) ||
+          0 === strpos( preg_replace( '/[^0-9]/', '', $values[12] ), '9999999' ) ?
+          NULL : $values[12];
         $db_import_entry->mobile_phone =
-          0 == strlen( $values[11] ) ||
-          0 === strpos( preg_replace( '/[^0-9]/', '', $values[11] ), '9999999' ) ||
-          $values[10] == $values[11] ?
-          NULL : $values[11];
+          0 == strlen( $values[13] ) ||
+          0 === strpos( preg_replace( '/[^0-9]/', '', $values[13] ), '9999999' ) ||
+          $values[12] == $values[13] ?
+          NULL : $values[13];
 
         $db_import_entry->phone_preference = 'home';
 
-        $email = $values[12];
+        $email = $values[14];
         $db_import_entry->email = util::validate_email( $email ) ? $email : NULL;
 
         // column index 2 has "GENDER XX-XX" (sex age-group)
-        $parts = explode( ' ', $values[3] );
+        $parts = explode( ' ', $values[5] );
         if( 2 == count( $parts ) )
         {
-          $db_import_entry->gender = $parts[0];
+          $db_import_entry->gender = strtolower( $parts[0] );
 
           $year = date( 'Y' );
           if( '45-54' == $parts[1] )
@@ -271,10 +277,17 @@ class import_new extends \cenozo\ui\push
         $db_import_entry->time_18_19 = false;
         $db_import_entry->time_19_20 = false;
         $db_import_entry->time_20_21 = false;
-        $db_import_entry->language = 0 == strcasecmp( 'french', $values[0] ) ? 'fr' : 'en';
+        $db_import_entry->language = 0 == strcasecmp( 'french', $values[2] ) ? 'fr' : 'en';
         $db_import_entry->cohort = 'tracking';
         $db_import_entry->date = util::get_datetime_object()->format( 'Y-m-d' );
-        $db_import_entry->note = 'Pre-recruitment UID unknown';
+        $operator_first = $values[15];
+        $operator_last = $values[16];
+        $operator = trim( $operator_first.' '.$operator_last );
+        $uid = $values[17];
+        $db_import_entry->note = sprintf(
+          'Pre-recruitment UID %s, operator %s',
+          $uid ? $uid : 'unknown',
+          $operator ? $operator : 'unknown' );
         $db_import_entry->validate();
         try
         {
@@ -282,8 +295,13 @@ class import_new extends \cenozo\ui\push
         }
         catch( \cenozo\exception\database $e )
         {
-          throw lib::create( 'exception\notice',
-            sprintf( 'There was a problem importing row %d.', $row ), __METHOD__, $e );
+          $output = $e->get_message();
+          $parts = explode( $output[0], $output );
+            
+          $message = sprintf( 'There was a problem importing row %d%s',
+                              $row,
+                              array_key_exists( 2, $parts ) ? ' ('.$parts[2].')' : '' );
+          throw lib::create( 'exception\notice', $message, __METHOD__, $e );
         }
       }
 
