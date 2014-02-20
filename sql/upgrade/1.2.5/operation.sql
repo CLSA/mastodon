@@ -23,3 +23,7 @@ VALUES( "push", "source", "new", true,
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "source", "view", true,
 "View a source's details." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "self", "temporary_file", false,
+"Upload a temporary file to the server." );
