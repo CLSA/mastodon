@@ -81,8 +81,10 @@ class contact_form_view extends base_form_view
     $this->add_item( 'post_secondary', 'Post-Secondary' );
     $this->add_item( 'language', 'Language' );
     $this->add_item( 'signed', 'Signed' );
-    $this->add_item( 'date', 'Date Signed' );
+    $this->add_item( 'participant_date', 'Date Signed' );
+    $this->add_item( 'stamped_date', 'Date Stamped' );
     $this->add_item( 'cohort_id', 'Cohort' );
+    $this->add_item( 'code', 'Code (bottom left)' );
     $this->add_item( 'note', 'Note' );
   }
 }

@@ -21,6 +21,20 @@
         $( "#{{ widget.full }}__contact_form" ).button( { 'disabled': true } );
       {% endif %}
     } );
+
+    {% if allow_delink %}
+      // delink button
+      $( "#{{ widget.full }}__delink" ).click( function() {
+        confirm_dialog(
+          "De-link participant?",
+          "Are you sure you want to de-link this participant? THIS CANNOT BE UN-DONE!",
+          function() {
+            if( ajax_push( "participant", "delink", { "id": {{ id }} } ) )
+              window.location.reload();
+          }
+        );
+      } );
+    {% endif %}
   </script>
 
 {% endblock javascript %}
@@ -37,3 +51,21 @@
   {{ include_list( 'event', event_list|default(false), true ) }}
 
 {% endblock record %}
+
+{% block actions %}
+  {% from 'macros.twig' import note_widget %}
+  
+  <tr><td colspan="2"><hr class="ui-widget ui-widget-content"></td></tr>
+  <tr>
+    <td class="heading"><span class="title">Actions:</span></td>
+    <td class="content">
+      {{ note_widget( widget.full, "participant", id, false, "Notes" ) }}
+      {% for action_id, action in actions %}
+        <button {% if action.description|default(false) %}
+                  title="{{ action.description }}"
+                {% endif %}
+                id="{{ widget.full }}__{{ action_id }}">{{ action.heading }}</button>
+      {% endfor %}
+    </td>
+  </tr>
+{% endblock actions %}

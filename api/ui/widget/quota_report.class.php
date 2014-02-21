@@ -39,8 +39,12 @@ class quota_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
     $this->add_parameter( 'cohort_id', 'enum', 'Cohort' );
     $this->add_restriction( 'source' );
+    if( $participant_class_name::column_exists( 'low_education', true ) )
+      $this->add_parameter( 'low_education', 'boolean', 'Low Education' );
     $this->add_restriction( 'dates' );
 
     $this->set_variable( 'description',
@@ -59,15 +63,18 @@ class quota_report extends \cenozo\ui\widget\base_report
   {
     parent::setup();
 
+    $participant_class_name = lib::get_class_name( 'database\participant' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $session = lib::create( 'business\session' );
 
-    // restrict cohort list for non-admins
-    $cohort_list = 3 >= $session->get_role()->tier
+    // restrict cohort list to all-site roles only
+    $cohort_list = $session->get_role()->all_sites
                  ? $cohort_class_name::select()
                  : $session->get_site()->get_service()->get_cohort_list();
     $cohorts = array();
     foreach( $cohort_list as $db_cohort ) $cohorts[$db_cohort->id] = $db_cohort->name;
     $this->set_parameter( 'cohort_id', key( $cohorts ), true, $cohorts );
+    if( $participant_class_name::column_exists( 'low_education', true ) )
+      $this->set_parameter( 'low_education', false, true );
   }
 }

@@ -24,6 +24,7 @@
                              : $(this).val();
         } );
 
+        var allow_proceed = false;
         var data = ajax_pull( "service", "participant_release", args );
         if( undefined != data ) {
           var html = '<table style="width:34%; margin-left:33%; margin-right:33%">';
@@ -32,10 +33,13 @@
             html += '<tr><td class="heading">' + key +
                     '</td><td>' + data[key] +
                     '</td></tr>';
+            if( 0 < data[key] ) allow_proceed = true;
           }
           html += '</table>' +
                   '<div class="spacer" style="text-align: right">' +
-                  '<button id="{{ widget.full }}__proceed" style="width:120px">Proceed</button>' +
+                  '<button id="{{ widget.full }}__proceed" style="width:120px"' +
+                  ( allow_proceed ? '' : ' disabled' ) +
+                  '>Proceed</button>' +
                   '</div>';
           $( "#{{ widget.full }}__results" ).html( html );
           $( "#{{ widget.full }}__proceed" ).button();
@@ -82,9 +86,6 @@
         or double quotes (ie: A123456 B123456 C123456).  Clicking the "update"
         button will display a summary of changes to be performed which should be
         carefully reviewed before proceeding with the release.
-      </p>
-      <p>
-        If you wish to release all participants leave the UID empty or type the word "all".
       </p>
     </div>
     <table>

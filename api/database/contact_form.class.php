@@ -139,12 +139,12 @@ class contact_form extends base_form
     $db_participant->uid = $uid;
     $db_participant->source_id = $db_source->id;
     $db_participant->cohort_id = $db_contact_form_entry->cohort_id;
+    $db_participant->grouping = $db_contact_form_entry->code;
     $db_participant->first_name = $db_contact_form_entry->first_name;
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
     $db_participant->date_of_birth = $dob;
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
-    $db_participant->status = NULL;
     if( 'either' != $db_contact_form_entry->language )
       $db_participant->language = $db_contact_form_entry->language;
     $db_participant->email = $db_contact_form_entry->email;
@@ -191,9 +191,21 @@ class contact_form extends base_form
       $db_event = lib::create( 'database\event' );
       $db_event->participant_id = $db_participant->id;
       $db_event->event_type_id = $db_event_type->id;
-      $db_event->datetime = is_null( $db_contact_form_entry->date )
+      $db_event->datetime = is_null( $db_contact_form_entry->participant_date )
                           ? util::get_datetime_object()->format( 'Y-m-d H:i:s' )
-                          : $db_contact_form_entry->date;
+                          : $db_contact_form_entry->participant_date;
+      $db_event->save();
+    }
+
+    // add the consent to contact stamped event to the participant
+    $db_event_type =
+      $event_type_class_name::get_unique_record( 'name', 'consent to contact stamped' );
+    if( !is_null( $db_event_type ) && !is_null( $db_contact_form_entry->stamped_date ) )
+    {
+      $db_event = lib::create( 'database\event' );
+      $db_event->participant_id = $db_participant->id;
+      $db_event->event_type_id = $db_event_type->id;
+      $db_event->datetime = $db_contact_form_entry->stamped_date;
       $db_event->save();
     }
     

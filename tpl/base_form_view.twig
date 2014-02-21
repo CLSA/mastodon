@@ -28,7 +28,7 @@
           } );
           args.id = {{ id }};
           args.columns = columns;
-          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev( {{ slot }} );
+          if( ajax_push( "{{ widget.subject }}", "adjudicate", args ) ) slot_prev_clip( {{ slot }} );
         } );
       {% endif %}
 
@@ -41,7 +41,7 @@
           function() {
             if( ajax_push( "{{ widget.subject }}", "edit",
                            { id: {{ id }}, columns: { invalid: 1 } } ) )
-              slot_prev( {{ slot }} );
+              slot_prev_clip( {{ slot }} );
           }
         );
       } );
@@ -140,7 +140,7 @@
       {% endif %}
     {% endfor %}
     {% if actions|length %}
-      <tr><td colspan="22"><hr class="ui-widget ui-widget-content"></td></tr>
+      <tr><td colspan="2"><hr class="ui-widget ui-widget-content"></td></tr>
       <tr>
         <td class="heading"><span class="title">Actions:</span></td>
         <td colspan="3" class="content">

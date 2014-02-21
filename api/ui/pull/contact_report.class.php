@@ -57,6 +57,7 @@ class contact_report extends \cenozo\ui\pull\base_report
       $db_consent = $db_participant->get_last_consent();
       $consent = 'None';
       $consent = is_null( $db_consent ) ? 'none' : $db_consent->to_string();
+      $db_state = $db_participant->get_state();
 
       $contents[] = array(
         $db_participant->get_cohort()->name,
@@ -69,7 +70,7 @@ class contact_report extends \cenozo\ui\pull\base_report
         $db_region->name,
         $db_address->postcode,
         $db_region->country,
-        is_null( $db_participant->status ) ? 'None' : $db_participant->status,
+        is_null( $db_state ) ? 'None' : $db_state->name,
         $consent );
     }
     

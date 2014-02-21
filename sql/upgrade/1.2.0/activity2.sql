@@ -5,12 +5,13 @@ CREATE PROCEDURE patch_activity2()
   BEGIN
 
     -- determine the @cenozo database name
-    SET @cenozo = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'cenozo' );
-    SET @beartooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'beartooth' );
-    SET @sabretooth = CONCAT( SUBSTRING( DATABASE(), 1, LOCATE( 'mastodon', DATABASE() ) - 1 ),
-                          'sabretooth' );
+    SET @cenozo = (
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_role_has_operation_role_id" );
+    SET @beartooth = REPLACE( DATABASE(), 'mastodon', 'beartooth' );
+    SET @sabretooth = REPLACE( DATABASE(), 'mastodon', 'sabretooth' );
 
     SET @test = (
       SELECT COUNT(*)

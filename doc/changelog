@@ -1,4 +1,53 @@
 ====================================================================================================
+1.2.4
+====================================================================================================
+
+* Tracking changes to participant email addresses
+  - email addresses are now validated using simple word@word.word validation
+  - any change to a participant's email address is tracked by date and time
+  - a new email report has been created which provides a list of all participants with new email
+    addresses
+
+* Replacing participant.status with new state table
+  - Participant conditions (states) can now be managed by administrators
+  - Each role can be restricted to only setting certain states
+
+====================================================================================================
+1.2.3
+====================================================================================================
+
+* Adding new service "release_based" functionality
+  - It is now possible to define a service as not requiring participants to be explicitely released
+    before they are available to that service.
+
+* Adding new search participant utility
+  - Allows for complex search of participant based on address, phone, participant and note details
+
+====================================================================================================
+1.2.2
+====================================================================================================
+
+* Adding new participant multiedit operations
+  - Certain roles may now edit multiple participants in a single operation
+
+====================================================================================================
+1.2.1
+====================================================================================================
+
+* Adding new role.all_sites column
+
+  - Used to determine whether a role should be restricted to a single site or not
+  - Many old references to "tier" have been replaced 
+
+* Adding "duplicate" to possible participant condition list
+
+* Adding new de-link action to the participant's view
+  - only administrators can perform this operation
+  - copies the participant's name, address and phone information, marks them as having a negative
+    consent, blanks out the name, address and phone information from the old entry, leaves a note
+    saying they have been de-linked and marks them as inactive
+
+====================================================================================================
 1.2.0
 ====================================================================================================
 

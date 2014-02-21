@@ -187,6 +187,26 @@ class contact_form_entry_validate extends \cenozo\ui\pull\base_record
     if( is_null( $record->cohort_id ) )
       $errors['cohort_id'] = 'This value cannot be left blank.';
 
+    if( is_null( $record->code ) )
+      $errors['code'] = 'This value cannot be left blank.';
+
+    // make sure the cohort/code match
+    if( !is_null( $record->cohort_id ) && !is_null( $record->code ) )
+    {
+      $cohort = $record->get_cohort()->name;
+
+      // all comprehensive codes start with C, all tracking codes start with T
+      if( 0 != strcasecmp( substr( $cohort, 0, 1 ), substr( $record->code, 0, 1 ) ) )
+      {
+        $error = sprintf(
+          'Either the cohort or code is incorrect (all %s codes must begin with a "%s")',
+          $cohort,
+          strtoupper( substr( $cohort, 0, 1 ) ) );
+        $errors['cohort_id'] = $error;
+        $errors['code'] = $error;
+      }
+    }
+
     $this->data = $errors;
   }
 

@@ -36,14 +36,15 @@ class service extends \cenozo\database\service
    * @param modifier $modifier A modifier to apply to the list or count.
    * @param boolean $inverted Whether to invert the count (count records NOT in the joining table).
    * @param boolean $count If true then this method returns the count instead of list of records.
+   * @param boolean $distinct Whether to use the DISTINCT sql keyword
    * @return array( record ) | int
    * @access protected
    */
   protected function get_record_list(
-    $record_type, $modifier = NULL, $inverted = false, $count = false )
+    $record_type, $modifier = NULL, $inverted = false, $count = false, $distinct = true )
   {
     $grand_parent = get_parent_class( get_parent_class( get_class() ) );
-    return $grand_parent::get_record_list( $record_type, $modifier, $inverted, $count );
+    return $grand_parent::get_record_list( $record_type, $modifier, $inverted, $count, $distinct );
   }
 
   /**
