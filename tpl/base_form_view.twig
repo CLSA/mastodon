@@ -22,7 +22,7 @@
           var args = new Object();
           var columns = new Object();
           $( "#{{ widget.full }}__edit_form input:radio:checked" ).each( function() {
-            var id_string = $(this).attr( "name" );
+            var id_string = $(this).prop( "name" );
             var column_name = id_string.substring( id_string.lastIndexOf('__') + 2 );
             columns[column_name] = $(this).val();
           } );
@@ -75,7 +75,7 @@
         $( "#{{ widget.full }}__edit_form input:radio" ).click( function() {
           var enable = true;
           $( "#{{ widget.full }}__edit_form input:radio" ).each( function() {
-            name = $(this).attr( "name" );
+            name = $(this).prop( "name" );
             if( 0 == $( "input:radio[name=" + name + "]:checked" ).length ) enable = false;
           } );
 
