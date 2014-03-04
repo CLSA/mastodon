@@ -4,5 +4,6 @@ SET AUTOCOMMIT=0;
 
 SOURCE operation.sql
 SOURCE role_has_operation.sql
+SOURCE jurisdiction.sql
 
 COMMIT;
