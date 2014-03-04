@@ -15,7 +15,7 @@ CREATE PROCEDURE patch_role_has_operation()
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_operation( role_id, operation_id ) ",
       "SELECT role.id, operation.id FROM ", @cenozo, ".role, operation ",
-      "WHERE subject = 'region_site' ",
+      "WHERE subject IN( 'region_site', 'jurisdiction' ) ",
       "AND role.name = 'administrator'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
@@ -25,7 +25,7 @@ CREATE PROCEDURE patch_role_has_operation()
       "INSERT IGNORE INTO role_has_operation( role_id, operation_id ) ",
       "SELECT role.id, operation.id FROM ", @cenozo, ".role, operation ",
       "WHERE subject = 'service' ",
-      "AND operation.name LIKE '%region_site' ",
+      "AND ( operation.name LIKE '%region_site' OR operation.name LIKE '%jurisdiction' )",
       "AND role.name = 'administrator'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;

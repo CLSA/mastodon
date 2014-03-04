@@ -31,3 +31,35 @@ VALUES( "widget", "service", "add_region_site", true,
 INSERT IGNORE INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "service", "delete_region_site", true,
 "Remove a service's association between region and site." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "jurisdiction", "add", true,
+"View a form for creating new association between postcodes and sites." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "jurisdiction", "delete", true,
+"Removes an association between a postcode and a site from the system." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "jurisdiction", "edit", true,
+"Edits an association between a postcode and a site." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "jurisdiction", "list", true,
+"List associations between postcodes and sites in the system." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "jurisdiction", "new", true,
+"Add a new association between a postcode and a site to the system." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "jurisdiction", "view", true,
+"View an association between a postcode and a site." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "service", "add_jurisdiction", true,
+"A form to create a new association between postcode and site for a service." );
+
+INSERT IGNORE INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "service", "delete_jurisdiction", true,
+"Remove a service's association between postcode and site." );
