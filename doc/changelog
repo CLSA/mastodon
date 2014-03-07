@@ -2,9 +2,9 @@
 1.2.6
 ====================================================================================================
 
-* Adding management of a service's region-site associations
-  - adminstrators can now add/edit/delete which sites a region is assigned to for a particular
-    service
+* Adding management of a service's jurisdiction and region-site associations
+  - adminstrators can now add/edit/delete which postcode or sites a region is assigned to for a
+    particular service
 
 ====================================================================================================
 1.2.5
