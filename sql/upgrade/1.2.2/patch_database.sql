@@ -8,4 +8,6 @@ SOURCE participant.sql
 SOURCE region_site.sql
 SOURCE person_primary_address.sql
 
+SOURCE update_version_number.sql
+
 COMMIT;

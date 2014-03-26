@@ -8,4 +8,6 @@ SOURCE service.sql
 SOURCE import_entry.sql
 SOURCE source.sql
 
+SOURCE update_version_number.sql
+
 COMMIT;
