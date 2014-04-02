@@ -28,4 +28,18 @@ class role extends \cenozo\database\role
   {
     return parent::select( $modifier, $count, $distinct, true );
   }
+
+  /** 
+   * Call parent method without restricting records by service.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string|array $column A column with the unique key property (or array of columns)
+   * @param string|array $value The value of the column to match (or array of values)
+   * @return database\record
+   * @static
+   * @access public
+   */
+  public static function get_unique_record( $column, $value, $full = false )
+  {
+    return parent::get_unique_record( $column, $value, true );
+  }
 }
