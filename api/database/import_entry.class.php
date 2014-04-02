@@ -53,17 +53,19 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $this->mobile_phone ) && !util::validate_phone_number( $this->mobile_phone ) )
       $this->mobile_phone_error = true;
 
-    // look for duplicate participants
-    $participant_mod = lib::create( 'database\modifier' );
-    $participant_mod->where( 'first_name', '=', $this->first_name );
-    $participant_mod->where( 'last_name', '=', $this->last_name );
-    foreach( $participant_class_name::select( $participant_mod ) as $db_participant )
+    // look for duplicate participants (same number and cohort)
+    $phone_mod = lib::create( 'database\modifier' );
+    if( !is_null( $this->home_phone ) )
+      $phone_mod->where( 'number', '=', $this->home_phone );
+    if( !is_null( $this->mobile_phone ) )
+      $phone_mod->or_where( 'number', '=', $this->mobile_phone );
+    foreach( $phone_class_name::select( $phone_mod ) as $db_phone )
     {
-      foreach( $db_participant->get_phone_list() as $db_phone )
+      $db_participant = $db_phone->get_person()->get_participant();
+      if( $db_participant && $db_participant->get_cohort()->name == $this->cohort )
       {
-        if( !is_null( $this->home_phone ) && $this->home_phone == $db_phone->number ||
-            !is_null( $this->mobile_phone ) && $this->mobile_phone == $db_phone->number )
-          $this->duplicate_participant_error = true;
+        $this->duplicate_participant_error = true;
+        break;
       }
     }
 
@@ -76,7 +78,7 @@ class import_entry extends \cenozo\database\record
     if( !in_array( $this->cohort, $cohort_names ) ) $this->cohort_error = true;
     if( !util::validate_date( $this->date ) ) $this->date_error = true;
 
-    // look for duplicate addresses
+    // look for duplicate addresses (same address and cohort)
     if( !$this->apartment_error &&
         !$this->address_error &&
         !$this->province_error &&
