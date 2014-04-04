@@ -27,6 +27,7 @@ class import_entry extends \cenozo\database\record
     $postcode_class_name = lib::get_class_name( 'database\postcode' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
+    $phone_class_name = lib::get_class_name( 'database\phone' );
     $address_class_name = lib::get_class_name( 'database\address' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
