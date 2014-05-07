@@ -1,4 +1,14 @@
 ====================================================================================================
+1.2.6
+====================================================================================================
+
+* Adding management of a service's jurisdiction and region-site associations
+  - adminstrators can now add/edit/delete which postcode or sites a region is assigned to for a
+    particular service
+
+* Event system now tracks when participants are released to services
+
+====================================================================================================
 1.2.5
 ====================================================================================================
 

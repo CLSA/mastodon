@@ -29,6 +29,20 @@ class service extends \cenozo\database\service
     return parent::select( $modifier, $count, $distinct, true );
   }
 
+  /** 
+   * Call parent method without restricting records by service.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string|array $column A column with the unique key property (or array of columns)
+   * @param string|array $value The value of the column to match (or array of values)
+   * @return database\record
+   * @static
+   * @access public
+   */
+  public static function get_unique_record( $column, $value, $full = false )
+  {
+    return parent::get_unique_record( $column, $value, true );
+  }
+
   /**
    * Override parent method so that records are not restricted by service.
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -45,6 +59,44 @@ class service extends \cenozo\database\service
   {
     $grand_parent = get_parent_class( get_parent_class( get_class() ) );
     return $grand_parent::get_record_list( $record_type, $modifier, $inverted, $count, $distinct );
+  }
+
+  /**
+   * Returns the service's release event-type
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return database\event_type
+   * @access public
+   */
+  public function get_release_event_type()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to get release entry_type from service with no id.' );
+      return;
+    }
+    
+    return lib::create( 'database\event_type', $this->release_event_type_id );
+  }
+
+  /**
+   * Update this service's release event_type based on the service's name and title
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function update_release_event_type()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to get update release entry_type for service with no id.' );
+      return;
+    }
+    
+    $db_release_event_type = $this->get_release_event_type();
+    $db_release_event_type->name = sprintf( 'released to %s', $this->name );
+    $db_release_event_type->description = sprintf( 'Released the participant to %s', $this->title );
+    $db_release_event_type->save();
   }
 
   /**
@@ -67,15 +119,22 @@ class service extends \cenozo\database\service
 
     $datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
 
-    $sql = $get_unreleased
-         ? 'SELECT DISTINCT participant.id '
-         : sprintf( 'INSERT INTO service_has_participant'.
-                    '( service_id, participant_id, create_timestamp, datetime ) '.
-                    'SELECT %s, participant.id, NULL, %s ',
-                    $database_class_name::format_string( $this->id ),
-                    $database_class_name::format_string( $datetime ) );
+    $select_sql = 'SELECT DISTINCT participant.id ';
 
-    $sql .= sprintf(
+    $insert_sql = sprintf(
+      'INSERT INTO service_has_participant'.
+      '( service_id, participant_id, create_timestamp, datetime ) '.
+      'SELECT %s, participant.id, NULL, %s ',
+      $database_class_name::format_string( $this->id ),
+      $database_class_name::format_string( $datetime ) );
+
+    $event_sql = sprintf(
+      'INSERT INTO event( participant_id, event_type_id, datetime ) '.
+      'SELECT DISTINCT participant.id, %s, %s ',
+      $database_class_name::format_string( $this->release_event_type_id ),
+      $database_class_name::format_string( $datetime ) );
+
+    $table_sql = sprintf(
       'FROM participant '.
       'JOIN service_has_cohort '.
       'ON service_has_cohort.cohort_id = participant.cohort_id '.
@@ -90,21 +149,27 @@ class service extends \cenozo\database\service
       $database_class_name::format_string( $this->id ),
       $database_class_name::format_string( $this->id ),
       $modifier->get_sql() );
-    
-    if( !$get_unreleased )
-      $sql .= sprintf( ' ON DUPLICATE KEY UPDATE datetime = %s',
-                       $database_class_name::format_string( $datetime ) );
+
+    $select_sql .= $table_sql;
+    $insert_sql .= $table_sql
+                .  sprintf( ' ON DUPLICATE KEY UPDATE datetime = %s',
+                            $database_class_name::format_string( $datetime ) );
+    $event_sql .= $table_sql;
 
     if( $get_unreleased )
     {
-      $id_list = static::db()->get_col( $sql );
+      $id_list = static::db()->get_col( $select_sql );
       $records = array();
       foreach( $id_list as $id ) $records[] = lib::create( 'database\participant', $id );
       return $records;
     }
     else
     {
-      static::db()->execute( $sql );
+      // add the release event to each participant
+      static::db()->execute( $event_sql );
+
+      // insert them into the service_has_participant table
+      static::db()->execute( $insert_sql );
     }
   }
 }

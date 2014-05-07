@@ -6,4 +6,6 @@ SOURCE operation.sql
 SOURCE role_has_operation.sql
 SOURCE source.sql
 
+SOURCE update_version_number.sql
+
 COMMIT;

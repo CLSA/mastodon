@@ -9,4 +9,6 @@ SOURCE participant.sql
 SOURCE event_type.sql
 SOURCE contact_form_entry.sql
 
+SOURCE update_version_number.sql
+
 COMMIT;
