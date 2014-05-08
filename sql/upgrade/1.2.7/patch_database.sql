@@ -4,4 +4,6 @@ SET AUTOCOMMIT=0;
 
 SOURCE forms.sql
 
+SOURCE update_version_number.sql
+
 COMMIT;
