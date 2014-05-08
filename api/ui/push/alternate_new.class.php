@@ -39,9 +39,11 @@ class alternate_new extends \cenozo\ui\push\alternate_new
       if( $record->proxy ) $db_proxy_form->proxy_alternate_id = $record->id;
       if( $record->informant ) $db_proxy_form->informant_alternate_id = $record->id;
       $db_proxy_form->date = util::get_datetime_object()->format( 'Y-m-d' );
-      $db_proxy_form->scan = $form_decoded;
       $db_proxy_form->complete = true;
       $db_proxy_form->save();
+
+      // now write the form
+      $db_proxy_form->write_form( $form_decoded );
     }
   }
 }

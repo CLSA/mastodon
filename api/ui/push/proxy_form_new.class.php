@@ -82,8 +82,7 @@ class proxy_form_new extends \cenozo\ui\push\base_new
         throw lib::create( 'exception\runtime', 'Unable to decode form argument.', __METHOD__ );
 
       // create a new proxy form
-      $this->get_record()->scan = $form_decoded;
-      $this->get_record()->save();
+      $this->get_record()->write_form( $form_decoded );
     }
 
     // if an entry was included add it and try importing the form immediately
@@ -93,7 +92,7 @@ class proxy_form_new extends \cenozo\ui\push\base_new
       $db_proxy_form_entry = lib::create( 'database\proxy_form_entry' );
       $db_proxy_form_entry->proxy_form_id = $this->get_record()->id;
       $db_proxy_form_entry->deferred = false;
-      $db_proxy_form_entry->signed = !is_null( $this->get_record()->scan );
+      $db_proxy_form_entry->signed = !is_null( $form );
       foreach( $entry as $column => $value ) $db_proxy_form_entry->$column = $value;
 
       $db_proxy_form_entry->save();
