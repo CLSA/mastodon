@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * This is a special script used when upgrading to version 1.1.1
+ * This is a special script used when upgrading to version 1.2.7
  * This script should be run once and only one after running patch_database.sql
  * It exports all PDF contact forms from the database to the filesystem.
  * 
