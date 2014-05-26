@@ -29,6 +29,7 @@ class import_entry extends \cenozo\database\record
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $phone_class_name = lib::get_class_name( 'database\phone' );
     $address_class_name = lib::get_class_name( 'database\address' );
+    $language_class_name = lib::get_class_name( 'database\language' );
     
     if( 0 != preg_match( '/apt|apartment|#/i', $this->apartment ) )
       $this->apartment_error = true;
@@ -75,7 +76,9 @@ class import_entry extends \cenozo\database\record
     foreach( $cohort_class_name::select() as $db_cohort ) $cohort_names[] = $db_cohort->name;
     if( 0 == preg_match( '/^male|female$/', $this->gender ) ) $this->gender_error = true;
     if( !util::validate_date( $this->date_of_birth ) ) $this->date_of_birth_error = true;
-    if( 0 == preg_match( '/^en|fr$/', $this->language ) ) $this->language_error = true;
+    if( !is_null( $this->language ) &&
+        is_null( $language_class_name::get_unique_record( 'code', $this->language ) ) )
+      $this->language_error = true;
     if( !in_array( $this->cohort, $cohort_names ) ) $this->cohort_error = true;
     if( !util::validate_date( $this->date ) ) $this->date_error = true;
 
@@ -149,6 +152,7 @@ class import_entry extends \cenozo\database\record
     $site_class_name = lib::get_class_name( 'database\site' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $region_class_name = lib::get_class_name( 'database\region' );
+    $language_class_name = lib::get_class_name( 'database\language' );
 
     // make sure there is a uid available
     $uid = $participant_class_name::get_new_uid();
@@ -156,6 +160,10 @@ class import_entry extends \cenozo\database\record
       'There are no new UIDs available, please report this to an administrator immediately!',
       __METHOD__ );
     
+    $db_language = is_null( $this->language )
+                 ? NULL
+                 : $language_class_name::get_unique_record( 'code', $this->language );
+
     // get the age group based on the date of birth
     $interval = util::get_interval( $this->date_of_birth );
     $age_group_mod = lib::create( 'database\modifier' );
@@ -180,7 +188,7 @@ class import_entry extends \cenozo\database\record
     $db_participant->gender = $this->gender;
     $db_participant->date_of_birth = $this->date_of_birth;
     if( $db_age_group ) $db_participant->age_group_id = $db_age_group->id;
-    $db_participant->language = $this->language;
+    $db_participant->language_id = is_null( $db_language ) ? NULL : $db_language->id;
     $db_participant->low_education = true == $this->low_education;
     $db_participant->email = $this->email;
     $db_participant->save();
@@ -188,7 +196,7 @@ class import_entry extends \cenozo\database\record
     // for all French participants make sure to set their preferred site to Sherbrooke
     // for all Sabretooth-based applications
     // TODO: code is not generic since there is no way to define language-specific sites
-    if( 0 == strcasecmp( 'fr', $db_participant->language ) )
+    if( !is_null( $db_language ) && 'fr' == $db_language->code )
     {
       $service_mod = lib::create( 'database\modifier' );
       $service_mod->where( 'name', 'like', '%sabretooth%' );

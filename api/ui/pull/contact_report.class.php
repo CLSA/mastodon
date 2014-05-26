@@ -59,9 +59,13 @@ class contact_report extends \cenozo\ui\pull\base_report
       $consent = is_null( $db_consent ) ? 'none' : $db_consent->to_string();
       $db_state = $db_participant->get_state();
 
+      $db_language = $db_participant->get_language();
+      if( is_null( $db_language ) )
+        $db_language = lib::create( 'business\session' )->get_service()->get_language();
+
       $contents[] = array(
         $db_participant->get_cohort()->name,
-        'fr' == $db_participant->language ? 'fr' : 'en', // english if not set
+        $db_language->code,
         $db_participant->uid,
         $db_participant->first_name,
         $db_participant->last_name,

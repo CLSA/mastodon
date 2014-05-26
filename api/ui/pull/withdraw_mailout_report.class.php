@@ -66,8 +66,12 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
       $address = $db_address->address1;
       if( !is_null( $db_address->address2 ) ) $address .= ' '.$db_address->address2;
 
+      $db_language = $db_participant->get_language();
+      if( is_null( $db_language ) )
+        $db_language = lib::create( 'business\session' )->get_service()->get_language();
+
       $content[] = array(
-        $db_participant->language ? $db_participant->language : 'en',
+        $db_language->code,
         $db_participant->first_name,
         $db_participant->last_name,
         $address,

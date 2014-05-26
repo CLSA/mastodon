@@ -145,15 +145,15 @@ class contact_form extends base_form
     $db_participant->gender = $db_contact_form_entry->gender;
     $db_participant->date_of_birth = $dob;
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
-    if( 'either' != $db_contact_form_entry->language )
-      $db_participant->language = $db_contact_form_entry->language;
+    $db_participant->language_id = $db_contact_form_entry->language_id;
     $db_participant->email = $db_contact_form_entry->email;
     $db_participant->save();
 
     // for all French participants make sure to set their preferred site to Sherbrooke
     // for all Sabretooth-based applications
     // TODO: code is not generic since there is no way to define language-specific sites
-    if( 0 == strcasecmp( 'fr', $db_participant->language ) )
+    $db_language = $db_contact_form_entry->get_language();
+    if( !is_null( $db_language ) && 'fr' == $db_language->code )
     {
       $service_mod = lib::create( 'database\modifier' );
       $service_mod->where( 'name', 'like', '%sabretooth%' );
