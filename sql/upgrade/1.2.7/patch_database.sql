@@ -3,11 +3,6 @@
 SET AUTOCOMMIT=0;
 
 SOURCE forms.sql
-SOURCE language.sql
-SOURCE user_has_language.sql
-SOURCE user.sql
-SOURCE participant.sql
-SOURCE service.sql
 SOURCE contact_form_entry.sql
 SOURCE import_entry.sql
 SOURCE operation.sql

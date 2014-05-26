@@ -19,8 +19,8 @@ CREATE PROCEDURE patch_forms()
     IF @test > 0 THEN
       SELECT "Table 'consent_form' has a column 'scan' which is now defunct." AS "" UNION
       SELECT CONCAT(
-        "Please run the script 'patch_database.php' then, if the script completes without any errors, run ",
-        "the following sql statements: " ) AS "";
+        "*** ATTENTION *** Please run the script 'patch_database.php' then, if the script completes ",
+        "without any errors, run the following sql statements: " ) AS "";
       SELECT "ALTER TABLE consent_form DROP COLUMN scan;" AS "" UNION
       SELECT "ALTER TABLE contact_form DROP COLUMN scan;" AS "" UNION
       SELECT "ALTER TABLE proxy_form DROP COLUMN scan;" AS "";
