@@ -498,6 +498,38 @@ SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "push" AND subject = "import" AND operation.name = "process"
 AND role.name IN ( "administrator", "curator" );
 
+-- jurisdiction
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "jurisdiction" AND operation.name = "add"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "jurisdiction" AND operation.name = "delete"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "jurisdiction" AND operation.name = "edit"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "jurisdiction" AND operation.name = "list"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "jurisdiction" AND operation.name = "new"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "jurisdiction" AND operation.name = "view"
+AND role.name IN ( "administrator" );
+
 -- language
 
 INSERT INTO role_has_operation( role_id, operation_id )
@@ -864,6 +896,38 @@ SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "widget" AND subject = "quota" AND operation.name = "view"
 AND role.name IN ( "administrator", "coordinator", "supervisor" );
 
+-- region_site
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "region_site" AND operation.name = "add"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "region_site" AND operation.name = "delete"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "region_site" AND operation.name = "edit"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "region_site" AND operation.name = "list"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "region_site" AND operation.name = "new"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "region_site" AND operation.name = "view"
+AND role.name IN ( "administrator" );
+
 -- role
 
 INSERT INTO role_has_operation( role_id, operation_id )
@@ -885,6 +949,16 @@ AND role.name IN ( "administrator" );
 
 INSERT INTO role_has_operation( role_id, operation_id )
 SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "service" AND operation.name = "add_jurisdiction"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "widget" AND subject = "service" AND operation.name = "add_region_site"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "widget" AND subject = "service" AND operation.name = "add_role"
 AND role.name IN ( "administrator" );
 
@@ -896,6 +970,16 @@ AND role.name IN ( "administrator" );
 INSERT INTO role_has_operation( role_id, operation_id )
 SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "push" AND subject = "service" AND operation.name = "delete_cohort"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "service" AND operation.name = "delete_jurisdiction"
+AND role.name IN ( "administrator" );
+
+INSERT INTO role_has_operation( role_id, operation_id )
+SELECT role.id, operation.id FROM cenozo.role, operation
+WHERE type = "push" AND subject = "service" AND operation.name = "delete_region_site"
 AND role.name IN ( "administrator" );
 
 INSERT INTO role_has_operation( role_id, operation_id )
