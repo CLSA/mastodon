@@ -149,29 +149,6 @@ class contact_form extends base_form
     $db_participant->email = $db_contact_form_entry->email;
     $db_participant->save();
 
-    // for all French participants make sure to set their preferred site to Sherbrooke
-    // for all Sabretooth-based applications
-    // TODO: code is not generic since there is no way to define language-specific sites
-    $db_language = $db_contact_form_entry->get_language();
-    if( !is_null( $db_language ) && 'fr' == $db_language->code )
-    {
-      $service_mod = lib::create( 'database\modifier' );
-      $service_mod->where( 'name', 'like', '%sabretooth%' );
-      foreach( $service_class_name::select( $service_mod ) as $db_service )
-      {
-        $db_french_site = $site_class_name::get_unique_record(
-          array( 'name', 'service_id' ),
-          array( 'Sherbrooke', $db_service->id ) );
-  
-        // only set the preferred site if the service has access to the participant's cohort
-        $cohort_mod = lib::create( 'database\modifier' );
-        $cohort_mod->where( 'cohort.name', '=', $db_participant->get_cohort()->name );
-        if( 0 < $db_service->get_cohort_count( $cohort_mod ) )
-          $db_participant->set_preferred_site( $db_service, $db_french_site );
-      }
-    }
-
-
     if( !is_null( $db_contact_form_entry->note ) )
     {
       // import data to the person_note table
