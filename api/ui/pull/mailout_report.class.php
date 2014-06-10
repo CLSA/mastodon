@@ -152,8 +152,12 @@ class mailout_report extends \cenozo\ui\pull\base_report
           $post_secondary = $db_contact_form_entry->post_secondary ? 'yes' : 'no';
       }
 
+      // get default language if participant doesn't have a preference
+      $db_language = $db_participant->get_language();
+      if( is_null( $db_language ) )
+        $db_language = lib::create( 'business\session' )->get_service()->get_language();
       $row = array(
-        'fr' == $db_participant->language ? 'fr' : 'en', // english if not set
+        $db_language->code,
         $db_participant->uid,
         $db_participant->first_name,
         $db_participant->last_name,

@@ -165,7 +165,6 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`contact_form` (
   `participant_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'The participant created by this form.',
   `validated_contact_form_entry_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'The entry data which has been validated and accepted.',
   `date` DATE NOT NULL,
-  `scan` MEDIUMBLOB NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_participant_id` (`participant_id` ASC),
   INDEX `fk_validated_contact_form_entry_id` (`validated_contact_form_entry_id` ASC),
@@ -235,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`contact_form_entry` (
   `time_20_21` TINYINT(1) NOT NULL DEFAULT 0,
   `high_school` TINYINT(1) NULL DEFAULT NULL,
   `post_secondary` TINYINT(1) NULL DEFAULT NULL,
-  `language` ENUM('either','en','fr') NOT NULL DEFAULT 'either',
+  `language_id` INT UNSIGNED NULL,
   `cohort_id` INT UNSIGNED NULL DEFAULT NULL,
   `code` ENUM('T','T*','T*2','T*3','T*4','T*5','T*6','T*7','C','C2','C3','C4','C5','CLE1','CLE2','CLE4','CLE5') NULL DEFAULT NULL,
   `signed` TINYINT(1) NOT NULL DEFAULT 0,
@@ -248,6 +247,7 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`contact_form_entry` (
   INDEX `fk_region_id` (`region_id` ASC),
   UNIQUE INDEX `uq_contact_form_id_user_id` (`contact_form_id` ASC, `user_id` ASC),
   INDEX `fk_cohort_id` (`cohort_id` ASC),
+  INDEX `fk_language_id` (`language_id` ASC),
   CONSTRAINT `fk_contact_form_entry_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `cenozo`.`user` (`id`)
@@ -266,6 +266,11 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`contact_form_entry` (
   CONSTRAINT `fk_contact_form_entry_cohort_id`
     FOREIGN KEY (`cohort_id`)
     REFERENCES `cenozo`.`cohort` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contact_form_entry_language_id`
+    FOREIGN KEY (`language_id`)
+    REFERENCES `cenozo`.`language` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -286,7 +291,6 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`consent_form` (
   `consent_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'The consent created by this form.',
   `validated_consent_form_entry_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'The entry data which has been validated and accepted.',
   `date` DATE NOT NULL,
-  `scan` MEDIUMBLOB NOT NULL COMMENT 'A PDF file',
   PRIMARY KEY (`id`),
   INDEX `fk_consent_id` (`consent_id` ASC),
   INDEX `fk_validated_consent_form_entry_id` (`validated_consent_form_entry_id` ASC),
@@ -356,7 +360,6 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`proxy_form` (
   `informant_alternate_id` INT UNSIGNED NULL DEFAULT NULL,
   `validated_proxy_form_entry_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'The entry data which has been validated and accepted.',
   `date` DATE NOT NULL,
-  `scan` MEDIUMBLOB NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_proxy_alternate_id` (`proxy_alternate_id` ASC),
   INDEX `fk_validated_proxy_form_entry_id` (`validated_proxy_form_entry_id` ASC),
@@ -541,7 +544,7 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   `time_18_19` TINYINT(1) NOT NULL DEFAULT 0,
   `time_19_20` TINYINT(1) NOT NULL DEFAULT 0,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT 0,
-  `language` ENUM('en','fr') NULL DEFAULT NULL,
+  `language_id` INT UNSIGNED NULL,
   `low_education` TINYINT(1) NULL DEFAULT NULL,
   `cohort` VARCHAR(45) NOT NULL,
   `date` DATE NOT NULL,
@@ -552,6 +555,7 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   UNIQUE INDEX `uq_participant_id` (`participant_id` ASC),
   UNIQUE INDEX `uq_import_id_row` (`import_id` ASC, `row` ASC),
   INDEX `fk_source_id` (`source_id` ASC),
+  INDEX `fk_language_id` (`language_id` ASC),
   CONSTRAINT `fk_import_entry_import_id`
     FOREIGN KEY (`import_id`)
     REFERENCES `mastodon`.`import` (`id`)
@@ -565,6 +569,11 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   CONSTRAINT `fk_import_entry_source_id`
     FOREIGN KEY (`source_id`)
     REFERENCES `cenozo`.`source` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_import_entry_language_id`
+    FOREIGN KEY (`language_id`)
+    REFERENCES `cenozo`.`language` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

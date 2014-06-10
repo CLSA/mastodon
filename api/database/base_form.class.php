@@ -185,6 +185,49 @@ abstract class base_form extends \cenozo\database\record
   }
 
   /**
+   * Gets the file associated with this form
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+  public function get_filename()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning(
+        'Tried to get filename of form without a primary id.' );
+      return NULL;
+    }
+
+    $path_constant = sprintf( '%s_DATA_PATH', strtoupper( static::get_table_name() ) );
+    $path = constant( $path_constant );
+    $padded_id = str_pad( $this->id, 7, '0', STR_PAD_LEFT );
+    $filename = sprintf( '%s/%s/%s/%s.pdf',
+                         $path,
+                         substr( $padded_id, 0, 3 ),
+                         substr( $padded_id, 3, 2 ),
+                         substr( $padded_id, 5 ) );
+
+    return $filename;
+  }
+
+  /**
+   * Writes the file associciated with this form to the disk
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param string The contents of the form (as a binary string)
+   * @abstract
+   * @access public
+   */
+  public function write_form( $contents )
+  {
+    $resource = fopen( $this->get_filename(), 'w' );
+    fwrite( $resource, $contents );
+    fclose( $resource );
+  }
+
+  /**
    * Imports the form into the system.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.

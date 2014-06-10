@@ -299,7 +299,7 @@ class import_new extends \cenozo\ui\push
           $db_import_entry->time_19_20 = false;
           $db_import_entry->time_20_21 = false;
           $db_import_entry->low_education = NULL; // no low-ed information
-          $db_import_entry->language = 0 == strcasecmp( 'french', $values[2] ) ? 'fr' : 'en';
+          $db_import_entry->language = 0 == strlen( $values[2] ) ? NULL : $values[2];
           $db_import_entry->cohort = 'tracking';
           $db_import_entry->date = util::get_datetime_object()->format( 'Y-m-d' );
           $operator_first = $values[15];

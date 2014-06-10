@@ -79,7 +79,7 @@ class contact_form_entry_view extends base_form_entry_view
     $this->add_item( 'time_20_21', 'boolean', '8pm to 9pm' );
     $this->add_item( 'high_school', 'boolean', 'High School or Lower' );
     $this->add_item( 'post_secondary', 'boolean', 'Post-Secondary' );
-    $this->add_item( 'language', 'enum', 'Language' );
+    $this->add_item( 'language_id', 'enum', 'Language' );
     $this->add_item( 'signed', 'boolean', 'Signed' );
     $this->add_item( 'participant_date', 'date', 'Date Signed' );
     $this->add_item( 'stamped_date', 'date', 'Date Stamped' );
@@ -99,6 +99,7 @@ class contact_form_entry_view extends base_form_entry_view
     parent::setup();
 
     $region_class_name = lib::get_class_name( 'database\region' );
+    $language_class_name = lib::get_class_name( 'database\language' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
     $contact_form_entry_class_name = lib::get_class_name( 'database\contact_form_entry' );
 
@@ -115,8 +116,12 @@ class contact_form_entry_view extends base_form_entry_view
     $gender_list = array_combine( $gender_list, $gender_list );
     $age_bracket_list = $contact_form_entry_class_name::get_enum_values( 'age_bracket' );
     $age_bracket_list = array_combine( $age_bracket_list, $age_bracket_list );
-    $language_list = $contact_form_entry_class_name::get_enum_values( 'language' );
-    $language_list = array_combine( $language_list, $language_list );
+    $language_mod = lib::create( 'database\modifier' );
+    $language_mod->where( 'active', '=', true );
+    $language_mod->order( 'name' );
+    $language_list = array();
+    foreach( $language_class_name::select( $language_mod ) as $db_language )
+      $language_list[$db_language->id] = $db_language->name;
     foreach( $cohort_class_name::select() as $db_cohort )
       $cohort_list[$db_cohort->id] = $db_cohort->name;
     $code_list = $contact_form_entry_class_name::get_enum_values( 'code' );
@@ -164,7 +169,7 @@ class contact_form_entry_view extends base_form_entry_view
     $this->set_item( 'time_20_21', $record->time_20_21, true );
     $this->set_item( 'high_school', $record->high_school, false );
     $this->set_item( 'post_secondary', $record->post_secondary, false );
-    $this->set_item( 'language', $record->language, true, $language_list );
+    $this->set_item( 'language_id', $record->language_id, false, $language_list );
     $this->set_item( 'signed', $this->get_record()->signed, true );
     $this->set_item( 'participant_date', $record->participant_date, false );
     $this->set_item( 'stamped_date', $record->stamped_date, false );

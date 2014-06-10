@@ -36,7 +36,13 @@ abstract class base_form_download extends \cenozo\ui\pull\base_record
    */
   protected function execute()
   {
-    $this->data = $this->get_record()->scan;
+    $filename = $this->get_record()->get_filename();
+    $this->data = file_get_contents( $filename );
+    if( false === $this->data )
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Failed to load form contents from disk (%s)',
+                 $filename ),
+        __METHOD__ );
   }
 
   /**

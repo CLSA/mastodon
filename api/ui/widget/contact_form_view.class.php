@@ -79,7 +79,7 @@ class contact_form_view extends base_form_view
     $this->add_item( 'time_20_21', '8pm to 9pm' );
     $this->add_item( 'high_school', 'High School or Lower' );
     $this->add_item( 'post_secondary', 'Post-Secondary' );
-    $this->add_item( 'language', 'Language' );
+    $this->add_item( 'language_id', 'Language' );
     $this->add_item( 'signed', 'Signed' );
     $this->add_item( 'participant_date', 'Date Signed' );
     $this->add_item( 'stamped_date', 'Date Stamped' );

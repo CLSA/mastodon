@@ -1,4 +1,17 @@
 ====================================================================================================
+1.2.7
+====================================================================================================
+
+* Removing PDF files from database
+  - this change is meant to reduce the size of the database for easier maintenance
+
+* Adding better internationalization support
+  - A list of 184 languages have been added and can now be activated
+  - Services must now have a default language
+  - Users can be restricted to any activited language
+  - Participants can have their preferred language set to any active language
+
+====================================================================================================
 1.2.6
 ====================================================================================================
 
