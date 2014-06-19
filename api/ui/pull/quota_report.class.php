@@ -75,6 +75,14 @@ class quota_report extends \cenozo\ui\pull\base_report
         $event_type_class_name::get_unique_record( 'name', 'reached (Baseline Home)' );
       $db_completed_event_type =
         $event_type_class_name::get_unique_record( 'name', 'completed (Baseline Home)' );
+
+      // create a temporary last appointment table
+      $participant_class_name::db()->execute(
+        'CREATE TEMPORARY TABLE temp_last_appointment '.
+        'SELECT * FROM beartooth_participant_last_appointment' );
+      $participant_class_name::db()->execute(
+        'ALTER TABLE temp_last_appointment '.
+        'ADD INDEX dk_participant_id ( participant_id )' );
     }
     else
     {
@@ -86,7 +94,24 @@ class quota_report extends \cenozo\ui\pull\base_report
         $event_type_class_name::get_unique_record( 'name', 'reached (Baseline)' );
       $db_completed_event_type =
         $event_type_class_name::get_unique_record( 'name', 'completed (Baseline)' );
+
+      // create a temporary last appointment table
+      $participant_class_name::db()->execute(
+        'CREATE TEMPORARY TABLE temp_last_appointment '.
+        'SELECT * FROM sabretooth_participant_last_appointment' );
+      $participant_class_name::db()->execute(
+        'ALTER TABLE temp_last_appointment '.
+        'ADD INDEX dk_participant_id ( participant_id )' );
+
+      // create a temporary last written consent table
+      $participant_class_name::db()->execute(
+        'CREATE TEMPORARY TABLE temp_last_written_consent '.
+        'SELECT * FROM participant_last_written_consent' );
+      $participant_class_name::db()->execute(
+        'ALTER TABLE temp_last_written_consent '.
+        'ADD INDEX dk_participant_id ( participant_id )' );
     }
+
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -105,6 +130,25 @@ class quota_report extends \cenozo\ui\pull\base_report
       $start_datetime_obj = clone $end_datetime_obj;
       $end_datetime_obj = clone $temp_datetime_obj;
     }   
+
+    if( $site_breakdown )
+    {
+      // create a temporary last consent table
+      $participant_class_name::db()->execute(
+        'CREATE TEMPORARY TABLE temp_site '.
+        'SELECT * FROM participant_site' );
+      $participant_class_name::db()->execute(
+        'ALTER TABLE temp_site '.
+        'ADD INDEX dk_participant_id_site_id ( participant_id, site_id )' );
+    }
+
+    // create a temporary last consent table
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_last_consent '.
+      'SELECT * FROM participant_last_consent' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_last_consent '.
+      'ADD INDEX dk_participant_id ( participant_id )' );
 
     // loop through all quotas by region or site (based on breakdown), age group and gender
     $quota_mod = lib::create( 'database\modifier' );
@@ -131,7 +175,8 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       if( $site_breakdown )
       {
-        $base_mod->where( 'participant_site.site_id', '=', $site_region_id );
+        $base_mod->where( 'participant.id', '=', 'temp_site.participant_id', false );
+        $base_mod->where( 'temp_site.site_id', '=', $site_region_id );
       }
       else
       {
@@ -198,7 +243,8 @@ class quota_report extends \cenozo\ui\pull\base_report
 
         // and is eligible
         $participant_mod->where( 'participant.state_id', '=', NULL );
-        $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
+        $participant_mod->where( 'participant.id', '=', 'temp_last_consent.participant_id', false );
+        $participant_mod->where( 'IFNULL( temp_last_consent.accept, true )', '=', true );
 
         // but has not completed the interview
         $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
@@ -214,24 +260,21 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+      $participant_mod->where( 'participant.id', '=', 'temp_last_appointment.appointment_id', false );
+      $participant_mod->where( 'temp_last_appointment.appointment_id', '!=', NULL );
       if( 'sabretooth' == $db_service->name )
       { // sabretooth appointment with no reached status
-        $participant_mod->where(
-          'sabretooth_participant_last_appointment.appointment_id', '!=', NULL );
-        $participant_mod->where(
-          'sabretooth_participant_last_appointment.reached', '=', NULL );
+        $participant_mod->where( 'temp_last_appointment.reached', '=', NULL );
       }
       else
       { // beartooth appointment which has not been completed
-        $participant_mod->where(
-          'beartooth_participant_last_appointment.appointment_id', '!=', NULL );
-        $participant_mod->where(
-          'beartooth_participant_last_appointment.completed', '=', false );
+        $participant_mod->where( 'temp_last_appointment.completed', '=', false );
       }
 
       // and is eligible
       $participant_mod->where( 'participant.state_id', '=', NULL );
-      $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
+      $participant_mod->where( 'participant.id', '=', 'temp_last_consent.participant_id', false );
+      $participant_mod->where( 'IFNULL( temp_last_consent.accept, true )', '=', true );
 
       // but has not completed the interview
       $participant_mod->where( 'participant.id', 'NOT IN', $completed_sql, false );
@@ -250,7 +293,8 @@ class quota_report extends \cenozo\ui\pull\base_report
 
       // and is eligible to continue
       $participant_mod->where( 'participant.state_id', '=', NULL );
-      $participant_mod->where( 'IFNULL( participant_last_consent.accept, true )', '=', true );
+      $participant_mod->where( 'participant.id', '=', 'temp_last_consent.participant_id', false );
+      $participant_mod->where( 'IFNULL( temp_last_consent.accept, true )', '=', true );
       $count = intval( $participant_class_name::count( $participant_mod ) );
       $this->population_data
         [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] = $count;
@@ -284,7 +328,9 @@ class quota_report extends \cenozo\ui\pull\base_report
         $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
         $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
         $participant_mod->where( 'event.event_type_id', '=', $db_completed_event_type->id );
-        $participant_mod->where( 'participant_last_written_consent.accept', '=', true );
+        $participant_mod->where(
+          'participant.id', '=', 'temp_last_written_consent.participant_id', false );
+        $participant_mod->where( 'temp_last_written_consent.accept', '=', true );
         $this->population_data
           [$site_region_id][$db_quota->age_group_id][$column][$db_quota->gender] =
             intval( $participant_class_name::count( $participant_mod ) );
