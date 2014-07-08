@@ -167,7 +167,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
         $db_address->postcode,
         $age,
         $high_school,
-        $post_secondary );
+        $post_secondary,
+        $db_participant->low_education ? 'yes' : 'no' );
       
       if( $mailed_to )
       { // remove the age column and include the mailout date and site columns
@@ -207,7 +208,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
       'Postal Code',
       'Age',
       'High School',
-      'Post Secondary' );
+      'Post Secondary',
+      'Low Education' );
     
     if( $mailed_to )
     { // include the mailout date and site columns

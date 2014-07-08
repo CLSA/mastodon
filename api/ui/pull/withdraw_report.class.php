@@ -36,50 +36,76 @@ class withdraw_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
-    $region_class_name = lib::get_class_name( 'database\region' );
-    $consent_class_name = lib::get_class_name( 'database\consent' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
 
     $data = array();
 
     $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
     $db_source = lib::create( 'database\source', $this->get_argument( 'restrict_source_id' ) );
 
-    // loop through all canadian provinces
-    $region_mod = lib::create( 'database\modifier' );
-    $region_mod->where( 'country', '=', 'canada' );
-    $region_mod->order( 'abbreviation' );
-    foreach( $region_class_name::select( $region_mod ) as $db_region )
-    {
-      $data[$db_region->abbreviation] = array();
+    // create temporary table of last consent
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_last_consent '.
+      'SELECT * FROM participant_last_consent' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_last_consent '.
+      'ADD INDEX dk_participant_id_consent_id ( participant_id, consent_id )' );
 
-      // loop through all months of the year
-      $datetime_obj = util::get_datetime_object( '2000-01-01' );
-      while( '2000' == $datetime_obj->format( 'Y' ) )
-      {
-        $consent_mod = lib::create( 'database\modifier' );
-        if( $db_cohort->id ) $consent_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
-        if( $db_source->id ) $consent_mod->where( 'participant.source_id', '=', $db_source->id );
-        $consent_mod->where( 'region.id', '=', $db_region->id );
-        $consent_mod->where( 'MONTH( consent.date )', '=', $datetime_obj->format( 'n' ) );
-        
-        $data[$db_region->abbreviation][$datetime_obj->format( 'F' )] = 
-          $consent_class_name::get_withdraw_count( $consent_mod );
-        $datetime_obj->add( new \DateInterval( 'P1M' ) );
-      }
-    }
+    // create temporary table of last written consent
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_last_written_consent '.
+      'SELECT * FROM participant_last_written_consent' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_last_written_consent '.
+      'ADD INDEX dk_participant_id ( participant_id )' );
 
-    // create the content and header arrays using the data
+    // create temporary table of last written consent
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_primary_address '.
+      'SELECT * FROM participant_primary_address' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_primary_address '.
+      'ADD INDEX dk_participant_id_address_id ( participant_id, address_id )' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'temp_last_written_consent.accept', '=', true );
+    if( $db_cohort->id ) $modifier->where( 'participant.cohort_id', '=', $db_cohort->id );
+    if( $db_source->id ) $modifier->where( 'participant.source_id', '=', $db_source->id );
+    $modifier->where( 'temp_last_consent.accept', '=', false );
+    $modifier->group( 'region.id' );
+    $modifier->group( 'MONTH( consent.date )' );
+
+    $sql =
+      'SELECT region.name AS region, '.
+             'MONTHNAME( consent.date ) AS month, '.
+             'COUNT( DISTINCT participant.id ) AS total '.
+      'FROM participant '.
+      'JOIN temp_last_consent ON participant.id = temp_last_consent.participant_id '.
+      'JOIN consent ON temp_last_consent.consent_id = consent.id '.
+      'JOIN temp_last_written_consent ON participant.id = temp_last_written_consent.participant_id '.
+      'JOIN temp_primary_address ON participant.id = temp_primary_address.participant_id '.
+      'JOIN address ON temp_primary_address.address_id = address.id '.
+      'JOIN region ON address.region_id = region.id '.
+      $modifier->get_sql();
+    
+    // start by creating the header
     $header = array( '' );
+    foreach( $participant_class_name::db()->get_all( $sql ) as $row )
+      if( !in_array( $row['region'], $header ) ) $header[] = $row['region'];
+
+    // now create the content, making sure to initialize numbers as 0
     $content = array();
-    foreach( $data as $region => $subdata )
+    foreach( $participant_class_name::db()->get_all( $sql ) as $row )
     {
-      $header[] = $region;
-      foreach( $subdata as $month => $value )
+      if( !array_key_exists( $row['month'], $content ) )
       {
-        if( !array_key_exists( $month, $content ) ) $content[$month] = array();
-        $content[$month][0] = $month;
-        $content[$month][$region] = $value;
+        $content[$row['month']] = array();
+        foreach( $header as $region ) $content[$row['month']][$region] = 0;
+        $content[$row['month']][''] = $row['month'];
       }
+
+      // now set the value
+      $content[$row['month']][$row['region']] = $row['total'];
     }
 
     $this->add_table( NULL, $header, $content );
