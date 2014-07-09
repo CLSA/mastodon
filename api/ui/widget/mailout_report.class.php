@@ -38,6 +38,7 @@ class mailout_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'collection' );
     $this->add_parameter( 'mailed_to', 'boolean', 'Mailed To' );
     $this->add_restriction( 'cohort' );
     $this->add_restriction( 'service' );

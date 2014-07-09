@@ -38,6 +38,7 @@ class withdraw_mailout_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'collection' );
     $this->add_parameter( 'mark_mailout', 'boolean', 'Mark mailouts as complete' );
     
     $this->set_variable( 'description',

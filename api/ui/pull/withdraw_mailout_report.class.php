@@ -40,6 +40,8 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
     $database_class_name = lib::get_class_name( 'database\database' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
+    $collection_id = $this->get_argument( 'restrict_collection_id' );
+    $db_collection = $collection_id ? lib::create( 'database\collection', $collection_id ) : NULL;
     $mark_mailout = $this->get_argument( 'mark_mailout' );
     $db_event_type = $event_type_class_name::get_unique_record( 'name', 'withdraw mailed' );
 
@@ -51,6 +53,9 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
 
     // create the participant modifier based on the withdraw script
     $participant_mod = lib::create( 'database\modifier' );
+    if( !is_null( $db_collection ) )
+      $participant_mod->where(
+        'collection_has_participant.collection_id', '=', $db_collection->id );
     $participant_mod->where( 'withdraw_letter', '!=', NULL );
     $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
     $participant_mod->order( 'uid' );

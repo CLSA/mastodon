@@ -38,6 +38,7 @@ class withdraw_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
+    $this->add_restriction( 'collection' );
     $this->add_restriction( 'cohort' );
     $this->add_restriction( 'source' );
     

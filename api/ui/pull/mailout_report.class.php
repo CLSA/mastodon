@@ -41,6 +41,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
     // get the report arguments
     $mailed_to = $this->get_argument( 'mailed_to' );
+    $collection_id = $this->get_argument( 'restrict_collection_id' );
+    $db_collection = $collection_id ? lib::create( 'database\collection', $collection_id ) : NULL;
     $cohort_id = $this->get_argument( 'restrict_cohort_id' );
     $db_cohort = $cohort_id ? lib::create( 'database\cohort', $cohort_id ) : NULL;
     $service_id = $this->get_argument( 'restrict_service_id' );
@@ -57,6 +59,10 @@ class mailout_report extends \cenozo\ui\pull\base_report
       $title .= sprintf( '%s ', $db_cohort->name );
     }
     $title .= 'participants ';
+    if( !is_null( $db_collection ) )
+    {
+      $title .= sprintf( 'who belong to the "%s" collection', $db_collection->name );
+    }
     if( !is_null( $db_service ) )
     {
       if( 0 == strcasecmp( 'either', $released ) )
@@ -77,6 +83,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $this->add_title( $title );
 
     $participant_mod = lib::create( 'database\modifier' );
+    if( !is_null( $db_collection ) )
+      $participant_mod->where( 'collection_has_participant.collection_id', '=', $db_collection->id );
     if( !is_null( $db_cohort ) )
       $participant_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
     if( !is_null( $db_source ) )
@@ -97,6 +105,10 @@ class mailout_report extends \cenozo\ui\pull\base_report
       $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
       $sql = 'SELECT id FROM participant ';
     }
+
+    if( !is_null( $db_collection ) )
+      $sql .= 'JOIN collection_has_participant '.
+              'ON participant.id = collection_has_participant.participant_id ';
 
     if( !is_null( $db_service ) )
     {

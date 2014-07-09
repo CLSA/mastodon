@@ -41,6 +41,7 @@ class quota_report extends \cenozo\ui\widget\base_report
 
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
+    $this->add_restriction( 'collection' );
     $this->add_parameter( 'cohort_id', 'enum', 'Cohort' );
     $this->add_restriction( 'source' );
     if( $participant_class_name::column_exists( 'low_education', true ) )

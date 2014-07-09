@@ -112,6 +112,8 @@ class quota_report extends \cenozo\ui\pull\base_report
         'ADD INDEX dk_participant_id ( participant_id )' );
     }
 
+    $collection_id = $this->get_argument( 'restrict_collection_id' );
+    $db_collection = $collection_id ? lib::create( 'database\collection', $collection_id ) : NULL;
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
     $restrict_start_date = $this->get_argument( 'restrict_start_date' );
@@ -191,6 +193,8 @@ class quota_report extends \cenozo\ui\pull\base_report
       if( !is_null( $end_datetime_obj ) )
         $base_mod->where( 'participant.create_timestamp', '<=',
           $end_datetime_obj->format( 'Y-m-d 23:59:59' ) );
+      if( !is_null( $db_collection ) )
+        $base_mod->where( 'collection_has_participant.collection_id', '=', $db_collection->id );
       if( !is_null( $db_source ) ) $base_mod->where( 'source_id', '=', $db_source->id );
 
       // sql to determine which participants in this category have completed the interview
@@ -379,12 +383,17 @@ class quota_report extends \cenozo\ui\pull\base_report
     $this->report->set_bold( true );
     $this->report->set_horizontal_alignment( 'center' );
     $this->report->merge_cells( 'A1:M1' );
-    $this->report->set_cell(
-      'A1',
-      sprintf( '%s Quota Report for %s',
-               ucwords( $db_cohort->name ),
-               ucwords( $source ) ),
-      false );
+    
+    $title = sprintf( '%s Quota Report for %s',
+                      ucwords( $db_cohort->name ),
+                      ucwords( $source ) );
+    $collection_id = $this->get_argument( 'restrict_collection_id' );
+    if( $collection_id )
+    {
+      $db_collection = lib::create( 'database\collection', $collection_id );
+      $title .= sprintf( ' (for the "%s" collection)', $db_collection->name );
+    }
+    $this->report->set_cell( 'A1', $title, false );
 
     $now_datetime_obj = util::get_datetime_object();
     $this->report->merge_cells( 'A2:M2' );
