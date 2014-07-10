@@ -52,6 +52,8 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
     // create the participant modifier based on the withdraw script
     $participant_mod = lib::create( 'database\modifier' );
     $participant_mod->where( 'withdraw_letter', '!=', NULL );
+    $participant_mod->where( 'withdraw_letter', '<', 'o' );
+    $participant_mod->where( 'withdraw_letter', '!=', '0' );
     $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
     $participant_mod->order( 'uid' );
 
