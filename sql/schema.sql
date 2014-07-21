@@ -544,7 +544,7 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   `time_18_19` TINYINT(1) NOT NULL DEFAULT 0,
   `time_19_20` TINYINT(1) NOT NULL DEFAULT 0,
   `time_20_21` TINYINT(1) NOT NULL DEFAULT 0,
-  `language_id` INT UNSIGNED NULL,
+  `language` VARCHAR(2) NULL DEFAULT NULL,
   `low_education` TINYINT(1) NULL DEFAULT NULL,
   `cohort` VARCHAR(45) NOT NULL,
   `date` DATE NOT NULL,
@@ -555,7 +555,6 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   UNIQUE INDEX `uq_participant_id` (`participant_id` ASC),
   UNIQUE INDEX `uq_import_id_row` (`import_id` ASC, `row` ASC),
   INDEX `fk_source_id` (`source_id` ASC),
-  INDEX `fk_language_id` (`language_id` ASC),
   CONSTRAINT `fk_import_entry_import_id`
     FOREIGN KEY (`import_id`)
     REFERENCES `mastodon`.`import` (`id`)
@@ -569,11 +568,6 @@ CREATE TABLE IF NOT EXISTS `mastodon`.`import_entry` (
   CONSTRAINT `fk_import_entry_source_id`
     FOREIGN KEY (`source_id`)
     REFERENCES `cenozo`.`source` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_import_entry_language_id`
-    FOREIGN KEY (`language_id`)
-    REFERENCES `cenozo`.`language` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

@@ -57,6 +57,8 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
       $participant_mod->where(
         'collection_has_participant.collection_id', '=', $db_collection->id );
     $participant_mod->where( 'withdraw_letter', '!=', NULL );
+    $participant_mod->where( 'withdraw_letter', '<', 'o' );
+    $participant_mod->where( 'withdraw_letter', '!=', '0' );
     $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
     $participant_mod->order( 'uid' );
 
