@@ -150,8 +150,28 @@ abstract class base_form extends \cenozo\database\record
    */
   public function write_form( $contents )
   {
+    $filename = $this->get_filename();
+    $table_name = static::get_table_name();
+    $type = substr( $table_name, 0, strrpos( $table_name, '_' ) );
+
+    // create directory if necessary
+    $directory = substr( $filename, 0, strrpos( $filename, '/' ) );
+    if( !is_dir( $directory ) )
+      if( false === mkdir( $directory, 0777, true ) )
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Unable to create directory for %s form pdf file "%s"',
+                   $type,
+                   $filename ),
+          __METHOD__ );
+
     $resource = fopen( $this->get_filename(), 'w' );
-    fwrite( $resource, $contents );
+    if( false === fwrite( $resource, $contents ) )
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Unable to write %s form pdf file "%s"',
+                 $type,
+                 $filename ),
+        __METHOD__ );
+
     fclose( $resource );
   }
 

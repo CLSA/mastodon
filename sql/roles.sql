@@ -602,7 +602,7 @@ AND role.name IN ( "administrator" );
 INSERT INTO role_has_operation( role_id, operation_id )
 SELECT role.id, operation.id FROM cenozo.role, operation
 WHERE type = "widget" AND subject = "language" AND operation.name = "list"
-AND role.name IN ( "administrator" );
+AND role.name IN ( "administrator", "coordinator", "supervisor" );
 
 INSERT INTO role_has_operation( role_id, operation_id )
 SELECT role.id, operation.id FROM cenozo.role, operation
