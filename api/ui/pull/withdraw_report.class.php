@@ -40,6 +40,8 @@ class withdraw_report extends \cenozo\ui\pull\base_report
 
     $data = array();
 
+    $collection_id = $this->get_argument( 'restrict_collection_id' );
+    $db_collection = $collection_id ? lib::create( 'database\collection', $collection_id ) : NULL;
     $db_cohort = lib::create( 'database\cohort', $this->get_argument( 'restrict_cohort_id' ) );
     $db_source = lib::create( 'database\source', $this->get_argument( 'restrict_source_id' ) );
 
@@ -69,6 +71,8 @@ class withdraw_report extends \cenozo\ui\pull\base_report
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'temp_last_written_consent.accept', '=', true );
+    if( $db_collection->id )
+      $modifier->where( 'collection_has_participant.collection_id', '=', $db_collection->id );
     if( $db_cohort->id ) $modifier->where( 'participant.cohort_id', '=', $db_cohort->id );
     if( $db_source->id ) $modifier->where( 'participant.source_id', '=', $db_source->id );
     $modifier->where( 'temp_last_consent.accept', '=', false );
@@ -85,8 +89,13 @@ class withdraw_report extends \cenozo\ui\pull\base_report
       'JOIN temp_last_written_consent ON participant.id = temp_last_written_consent.participant_id '.
       'JOIN temp_primary_address ON participant.id = temp_primary_address.participant_id '.
       'JOIN address ON temp_primary_address.address_id = address.id '.
-      'JOIN region ON address.region_id = region.id '.
-      $modifier->get_sql();
+      'JOIN region ON address.region_id = region.id ';
+
+    if( !is_null( $db_collection ) )
+      $sql .= 'JOIN collection_has_participant '.
+              'ON participant.id = collection_has_participant.participant_id ';
+
+    $sql .= $modifier->get_sql();
     
     // start by creating the header
     $header = array( '' );
