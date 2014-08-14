@@ -264,7 +264,7 @@ class quota_report extends \cenozo\ui\pull\base_report
       $participant_mod = clone $base_mod;
       $participant_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
       $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
-      $participant_mod->where( 'participant.id', '=', 'temp_last_appointment.appointment_id', false );
+      $participant_mod->where( 'participant.id', '=', 'temp_last_appointment.participant_id', false );
       $participant_mod->where( 'temp_last_appointment.appointment_id', '!=', NULL );
       if( 'sabretooth' == $db_service->name )
       { // sabretooth appointment with no reached status
