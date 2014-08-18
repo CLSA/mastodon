@@ -38,7 +38,7 @@ class contact_report extends \cenozo\ui\widget\base_report
   {
     parent::prepare();
 
-    $this->add_parameter( 'uid_list', 'text', 'UID List' );
+    $this->add_restriction( 'uid_list' );
     
     $this->set_variable( 'description',
       'This report serves as a utility to provide the active mailing address for an arbitrary '.
@@ -55,7 +55,5 @@ class contact_report extends \cenozo\ui\widget\base_report
   protected function setup()
   {
     parent::setup();
-
-    $this->set_parameter( 'uid_list', '', true );
   }
 }
