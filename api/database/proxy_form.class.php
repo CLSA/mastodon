@@ -85,7 +85,6 @@ class proxy_form extends base_form
       }
 
       $db_proxy_alternate->participant_id = $db_participant->id;
-      $db_proxy_alternate->alternate = false;
       $db_proxy_alternate->informant =
         $db_proxy_form_entry->same_as_proxy && $db_proxy_form_entry->informant;
       $db_proxy_alternate->proxy = true;
@@ -173,9 +172,7 @@ class proxy_form extends base_form
       }
 
       $db_informant_alternate->participant_id = $db_participant->id;
-      $db_informant_alternate->alternate = false;
       $db_informant_alternate->informant = true;
-      $db_informant_alternate->proxy = false;
       $db_informant_alternate->first_name = $db_proxy_form_entry->informant_first_name;
       $db_informant_alternate->last_name = $db_proxy_form_entry->informant_last_name;
       $db_informant_alternate->association = 'Unknown';
