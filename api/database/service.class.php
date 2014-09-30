@@ -20,13 +20,15 @@ class service extends \cenozo\database\service
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
    * @param boolean $distinct Whether to use the DISTINCT sql keyword
+   * @param boolean $id_only Whether to return a list of primary ids instead of active records
    * @param boolean $full Do not use, parameter ignored.
    * @access public
    * @static
    */
-  public static function select( $modifier = NULL, $count = false, $distinct = true, $full = false )
+  public static function select(
+    $modifier = NULL, $count = false, $distinct = true, $id_only = false, $full = false )
   {
-    return parent::select( $modifier, $count, $distinct, true );
+    return parent::select( $modifier, $count, $distinct, $id_only, true );
   }
 
   /** 
@@ -51,14 +53,21 @@ class service extends \cenozo\database\service
    * @param boolean $inverted Whether to invert the count (count records NOT in the joining table).
    * @param boolean $count If true then this method returns the count instead of list of records.
    * @param boolean $distinct Whether to use the DISTINCT sql keyword
-   * @return array( record ) | int
+   * @param boolean $id_only Whether to return a list of primary ids instead of active records
+   * @return array( record ) | array( int ) | int
    * @access protected
    */
-  protected function get_record_list(
-    $record_type, $modifier = NULL, $inverted = false, $count = false, $distinct = true )
+  public function get_record_list(
+    $record_type,
+    $modifier = NULL,
+    $inverted = false,
+    $count = false,
+    $distinct = true,
+    $id_only = false )
   {
     $grand_parent = get_parent_class( get_parent_class( get_class() ) );
-    return $grand_parent::get_record_list( $record_type, $modifier, $inverted, $count, $distinct );
+    return $grand_parent::get_record_list(
+      $record_type, $modifier, $inverted, $count, $distinct, $id_only );
   }
 
   /**

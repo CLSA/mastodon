@@ -37,61 +37,71 @@ class contact_report extends \cenozo\ui\pull\base_report
   {
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
-    // get the report arguments
-    $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
-    $uid_list_string = trim( $uid_list_string );
-    $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'service.id', '=', lib::create( 'business\session' )->get_service()->id );
+    $modifier->where( 'uid', 'IN', $this->uid_list );
 
-    $contents = array();
-    foreach( $uid_list as $uid )
-    {
-      // determine the participant record and make sure it is valid and has a valid address
-      $db_participant = $participant_class_name::get_unique_record( 'uid', $uid );
-      if( is_null( $db_participant ) ) continue;
-      $db_address = $db_participant->get_first_address();
-      if( is_null( $db_address ) ) continue;
+    // create temporary table of last address
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_first_address '.
+      'SELECT * FROM participant_first_address' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_first_address '.
+      'ADD INDEX dk_participant_id_address_id ( participant_id, address_id )' );
 
-      $db_region = $db_address->get_region();
-      $address = $db_address->address1;
-      if( !is_null( $db_address->address2 ) ) $address .= ' '.$db_address->address2;
-      $db_consent = $db_participant->get_last_consent();
-      $consent = 'None';
-      $consent = is_null( $db_consent ) ? 'none' : $db_consent->to_string();
-      $db_state = $db_participant->get_state();
+    // create temporary table of last consent
+    $participant_class_name::db()->execute(
+      'CREATE TEMPORARY TABLE temp_last_consent '.
+      'SELECT * FROM participant_last_consent' );
+    $participant_class_name::db()->execute(
+      'ALTER TABLE temp_last_consent '.
+      'ADD INDEX dk_participant_id_consent_id ( participant_id, consent_id )' );
 
-      $db_language = $db_participant->get_language();
-      if( is_null( $db_language ) )
-        $db_language = lib::create( 'business\session' )->get_service()->get_language();
-
-      $contents[] = array(
-        $db_participant->get_cohort()->name,
-        $db_language->code,
-        $db_participant->uid,
-        $db_participant->first_name,
-        $db_participant->last_name,
-        $address,
-        $db_address->city,
-        $db_region->name,
-        $db_address->postcode,
-        $db_region->country,
-        is_null( $db_state ) ? 'None' : $db_state->name,
-        $consent );
-    }
+    $sql =
+      'SELECT cohort.name AS cohort, '.
+             'IFNULL( language.code, service_language.code ) AS language, '.
+             'uid, '.
+             'first_name, '.
+             'last_name, '.
+             'IF( address2 IS NULL, address1, CONCAT( address1, ", ", address2 ) ) AS address, '.
+             'city, '.
+             'region.abbreviation AS province, '.
+             'postcode, '.
+             'region.country, '.
+             'IFNULL( state.name, "None" ) AS state, '.
+             'IF( temp_last_consent.consent_id IS NULL, '.
+                 '"None", '.
+                 'CONCAT( '.
+                   'IF( written, "Written ", "Verbal " ), '.
+                   'IF( accept, "Accept", "Deny" ) '.
+                 ') '.
+             ') AS consent '.
+      'FROM service '.
+      'CROSS JOIN participant '.
+      'JOIN language AS service_language ON service.language_id = service_language.id '.
+      'JOIN cohort ON participant.cohort_id = cohort.id '.
+      'LEFT JOIN language ON participant.language_id = language.id '.
+      'JOIN temp_first_address ON participant.id = temp_first_address.participant_id '.
+      'JOIN address ON temp_first_address.address_id = address.id '.
+      'JOIN region ON address.region_id = region.id '.
+      'LEFT JOIN state ON participant.state_id = state.id '.
+      'JOIN temp_last_consent ON participant.id = temp_last_consent.participant_id '.
+      $modifier->get_sql();
     
-    $header = array(
-      'Cohort',
-      'Language',
-      'CLSA ID',
-      'First Name',
-      'Last Name',
-      'Address',
-      'City',
-      'Prov/State',
-      'Postal Code',
-      'Country',
-      'Status',
-      'Consent' );
-    
-    $this->add_table( NULL, $header, $contents, NULL );
+    $rows = $participant_class_name::db()->get_all( $sql );
+
+    $header = array();
+    $content = array();
+    foreach( $rows as $row )
+    {   
+      // set up the header
+      if( 0 == count( $header ) ) 
+        foreach( $row as $column => $value )
+          $header[] = ucwords( str_replace( '_', ' ', $column ) );
+
+      $content[] = array_values( $row );
+    }   
+
+    $this->add_table( NULL, $header, $content, NULL );
   }
 }
