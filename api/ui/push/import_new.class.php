@@ -111,7 +111,8 @@ class import_new extends \cenozo\ui\push
       // use the header line to identify the import file type
       if( 0 == $row )
       {
-        if( 'first_name' == $values[0] ) $import_type = 'leger';
+        if( in_array( 'nuage_id', $values ) ) $import_type = 'nuage';
+        else if( 'first_name' == $values[0] ) $import_type = 'leger';
       }
       else if( 18 == count( $values ) )
       {
@@ -162,6 +163,76 @@ class import_new extends \cenozo\ui\push
             $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 70 );
           else if( '75-85' == $values[17] )
             $db_import_entry->date_of_birth = sprintf( '%d-01-01', $year - 80 );
+
+          $db_import_entry->monday = false;
+          $db_import_entry->tuesday = false;
+          $db_import_entry->wednesday = false;
+          $db_import_entry->thursday = false;
+          $db_import_entry->friday = false;
+          $db_import_entry->saturday = false;
+          $db_import_entry->time_9_10 = false;
+          $db_import_entry->time_10_11 = false;
+          $db_import_entry->time_11_12 = false;
+          $db_import_entry->time_12_13 = false;
+          $db_import_entry->time_13_14 = false;
+          $db_import_entry->time_14_15 = false;
+          $db_import_entry->time_15_16 = false;
+          $db_import_entry->time_16_17 = false;
+          $db_import_entry->time_17_18 = false;
+          $db_import_entry->time_18_19 = false;
+          $db_import_entry->time_19_20 = false;
+          $db_import_entry->time_20_21 = false;
+
+          $db_import_entry->validate();
+          try
+          {
+            $db_import_entry->save();
+          }
+          catch( \cenozo\exception\database $e )
+          {
+            throw lib::create( 'exception\notice',
+              sprintf( 'There was a problem importing row %d.', $row ), __METHOD__, $e );
+          }
+        }
+      }
+      else if( 17 == count( $values ) )
+      {
+        if( 'nuage' == $import_type )
+        { // nuage import file
+          $db_source = $source_class_name::get_unique_record( 'name', 'nuage' );
+          $db_import_entry = lib::create( 'database\import_entry' );
+          $db_import_entry->import_id = $db_import->id;
+          $db_import_entry->source_id = $db_source->id;
+          $db_import_entry->row = $row;
+          $db_import_entry->first_name = $values[0];
+          $db_import_entry->last_name = $values[1];
+          $db_import_entry->apartment = 0 == strlen( $values[2] ) ? NULL : $values[2];
+          $db_import_entry->street = $values[3];
+          $db_import_entry->address_other = 0 == strlen( $values[4] ) ? NULL : $values[4];
+          $db_import_entry->city = $values[5];
+          $db_import_entry->province = $values[6];
+          $db_import_entry->postcode = $values[7];
+          $db_import_entry->home_phone = $values[8];
+          // null mobile phone entries may be 999-999-9999
+          $db_import_entry->mobile_phone =
+            0 == strlen( $values[9] ) || '999-999-9999' == $values[9] || $values[8] == $values[9] ?
+            NULL : $values[9];
+          if( 0 == strcasecmp( 'home', $values[10] ) )
+            $db_import_entry->phone_preference = 'home';
+          else if( 0 == strcasecmp( 'cell', $values[10] ) )
+            $db_import_entry->phone_preference = 'mobile';
+          $db_import_entry->email = 0 == strlen( $values[11] ) ? NULL : $values[11];
+          if( 0 == strcasecmp( 'f', $values[12] ) ) $db_import_entry->gender = 'female';
+          else if( 0 == strcasecmp( 'm', $values[12] ) ) $db_import_entry->gender = 'male';
+          else $db_import_entry->gender = '';
+
+          $db_import_entry->date_of_birth = $values[13];
+
+          $db_import_entry->language = 0 == strlen( $values[14] ) ? NULL : $values[14];
+          $db_import_entry->cohort = 'comprehensive';
+          $db_import_entry->date = $values[15];
+          
+          $db_import_entry->low_education = 'Any Post-Secondary Education' != $values[16];
 
           $db_import_entry->monday = false;
           $db_import_entry->tuesday = false;
