@@ -193,8 +193,8 @@ class import_entry extends \cenozo\database\record
     $db_participant->email = $this->email;
     $db_participant->save();
 
-    // add the imported by rdd event to the participant
-    $db_event_type = $event_type_class_name::get_unique_record( 'name', 'imported by rdd' );
+    // add the imported event to the participant
+    $db_event_type = $event_type_class_name::get_unique_record( 'name', 'imported' );
     if( !is_null( $db_event_type ) )
     {
       $db_event = lib::create( 'database\event' );
