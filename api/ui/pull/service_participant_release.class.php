@@ -48,8 +48,8 @@ class service_participant_release extends \cenozo\ui\pull
     $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
     $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
     $uid_list_string = trim( $uid_list_string );
-    $start_date = $this->get_argument( 'start_date', '' );
-    $end_date = $this->get_argument( 'end_date', '' );
+    $start_date = $this->get_argument( 'start_date', NULL );
+    $end_date = $this->get_argument( 'end_date', NULL );
     
     $service_mod = lib::create( 'database\modifier' );
 
@@ -59,22 +59,20 @@ class service_participant_release extends \cenozo\ui\pull
 
     if( 0 < count( $uid_list ) ) $service_mod->where( 'uid', 'IN', $uid_list );
     
-    if( 0 < strlen( $start_date ) || 0 < strlen( $end_date ) )
+    if( !is_null( $start_date ) || !is_null( $end_date ) )
     { // use start/end date to select participants
-      $service_mod->where_bracket( true );
-      $service_mod->where_bracket( true );
-      if( 0 < strlen( $start_date ) )
-        $service_mod->where( 'import_entry.date', '>=', $start_date );
-      if( 0 < strlen( $end_date ) )
-        $service_mod->where( 'import_entry.date', '<=', $end_date );
-      $service_mod->where_bracket( false );
-      $service_mod->where_bracket( true, true ); // or
-      if( 0 < strlen( $start_date ) )
-        $service_mod->where( 'contact_form.date', '>=', $start_date );
-      if( 0 < strlen( $end_date ) )
-        $service_mod->where( 'contact_form.date', '<=', $end_date );
-      $service_mod->where_bracket( false );
-      $service_mod->where_bracket( false );
+      if( !is_null( $start_date ) )
+      {
+        // convert from server datetime since create_timestamp is written in local server time
+        $datetime_string = util::from_server_datetime( $start_date );
+        $service_mod->where( 'participant.create_timestamp', '>=', $datetime_string );
+      }
+      if( !is_null( $end_date ) )
+      {
+        // convert from server datetime since create_timestamp is written in local server time
+        $datetime_string = util::from_server_datetime( $end_date );
+        $service_mod->where( 'participant.create_timestamp', '<=', $datetime_string );
+      }
     }
     else
     { // do not allow all participants if there is no date span
