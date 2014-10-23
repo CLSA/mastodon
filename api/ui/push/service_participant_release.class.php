@@ -40,8 +40,8 @@ class service_participant_release extends \cenozo\ui\push
     $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
     $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
     $uid_list_string = trim( $uid_list_string );
-    $start_date = $this->get_argument( 'start_date', NULL );
-    $end_date = $this->get_argument( 'end_date', NULL );
+    $start_date = $this->get_argument( 'start_date', '' );
+    $end_date = $this->get_argument( 'end_date', '' );
     
     $service_mod = lib::create( 'database\modifier' );
 
@@ -51,15 +51,15 @@ class service_participant_release extends \cenozo\ui\push
 
     if( 0 < count( $uid_list ) ) $service_mod->where( 'uid', 'IN', $uid_list );
 
-    if( !is_null( $start_date ) || !is_null( $end_date ) )
+    if( 0 < strlen( $start_date ) || 0 < strlen( $end_date ) )
     { // use start/end date to select participants
-      if( !is_null( $start_date ) )
+      if( 0 < strlen( $start_date ) )
       {
         // convert from server datetime since create_timestamp is written in local server time
         $datetime_string = util::from_server_datetime( $start_date );
         $service_mod->where( 'participant.create_timestamp', '>=', $datetime_string );
       }
-      if( !is_null( $end_date ) )
+      if( 0 < strlen( $end_date ) )
       {
         // convert from server datetime since create_timestamp is written in local server time
         $datetime_string = util::from_server_datetime( $end_date );
