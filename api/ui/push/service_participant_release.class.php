@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  *
  * Syncs service information between Sabretooth and Mastodon
  */
-class service_participant_release extends \cenozo\ui\push
+class service_participant_release extends \cenozo\ui\push\base_participant_multi
 {
   /**
    * Constructor.
@@ -24,7 +24,9 @@ class service_participant_release extends \cenozo\ui\push
    */
   public function __construct( $args )
   {
-    parent::__construct( 'service', 'participant_release', $args );
+    // the parent class assumes that the subject is always "participant"
+    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
+    $grand_parent::__construct( 'service', 'participant_release', $args );
   }
 
   /**
@@ -38,18 +40,13 @@ class service_participant_release extends \cenozo\ui\push
     parent::execute();
 
     $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
-    $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
-    $uid_list_string = trim( $uid_list_string );
     $start_date = $this->get_argument( 'start_date', '' );
     $end_date = $this->get_argument( 'end_date', '' );
     
-    $service_mod = lib::create( 'database\modifier' );
-
-    // include participants in the list only
-    $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
-    if( 1 == count( $uid_list ) && '' == $uid_list[0] ) $uid_list = array();
-
-    if( 0 < count( $uid_list ) ) $service_mod->where( 'uid', 'IN', $uid_list );
+    // include participants in the list, but only if one is provided
+    $service_mod = 0 < count( $this->uid_list )
+                 ? clone $this->modifier
+                 : lib::create( 'database\modifier' );
 
     if( 0 < strlen( $start_date ) || 0 < strlen( $end_date ) )
     { // use start/end date to select participants
@@ -68,7 +65,7 @@ class service_participant_release extends \cenozo\ui\push
     }
     else
     { // do not allow all participants if there is no date span
-      if( 0 == count( $uid_list ) ) $service_mod->where( 'uid', 'IN', array() );
+      if( 0 == count( $this->uid_list ) ) $service_mod->where( 'uid', 'IN', array() );
     }
     
     $db_service->release_participant( $service_mod );

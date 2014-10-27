@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * widget service participant_release
  */
-class service_participant_release extends \cenozo\ui\widget
+class service_participant_release extends \cenozo\ui\widget\base_participant_multi
 {
   /**
    * Constructor
@@ -24,7 +24,27 @@ class service_participant_release extends \cenozo\ui\widget
    */
   public function __construct( $args )
   {
-    parent::__construct( 'service', 'participant_release', $args );
+    // the parent class assumes that the subject is always "participant"
+    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
+    $grand_parent::__construct( 'service', 'participant_release', $args );
+  }
+
+  /**
+   * Processes arguments, preparing them for the operation.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws exception\notice
+   * @access protected
+   */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    $this->add_parameter( 'service_id', 'enum', 'Service' );
+    $this->add_parameter( 'start_date', 'date', 'Start Date',
+      'Restricts the operation to participants who were imported on or after the given date.' );
+    $this->add_parameter( 'end_date', 'date', 'End Date',
+      'Restricts the operation to participants who were imported on or before the given date.' );
   }
 
   /**
@@ -39,22 +59,17 @@ class service_participant_release extends \cenozo\ui\widget
 
     $service_class_name = lib::get_class_name( 'database\service' );
 
-    // create a list of services with each of that service's sites
-    $services = array();
-    foreach( $service_class_name::select() as $db_service )
-    {
-      $service = array( 'id' => $db_service->id,
-                        'name' => $db_service->name,
-                        'sites' => array() );
+    // define all enum values
+    $service_list = array();
+    $service_mod = lib::create( 'database\modifier' );
+    $service_mod->where( 'id', '!=', lib::create( 'business\session' )->get_service()->id );
+    $service_mod->where( 'release_based', '=', true );
+    $service_mod->order( 'title' );
+    foreach( $service_class_name::select( $service_mod ) as $db_service )
+      $service_list[$db_service->id] = $db_service->title;
 
-      $site_mod = lib::create( 'database\modifier' );
-      $site_mod->order( 'name' );
-      foreach( $db_service->get_site_list( $site_mod ) as $db_site )
-        $service['sites'][] = array( 'id' => $db_site->id, 'name' => $db_site->name );
-
-      if( count( $service['sites'] ) ) $services[] = $service;
-    }
-
-    $this->set_variable( 'services', $services );
+    $this->set_parameter( 'service_id', current( $service_list ), true, $service_list );
+    $this->set_parameter( 'start_date', '', false );
+    $this->set_parameter( 'end_date', '', false );
   }
 }
