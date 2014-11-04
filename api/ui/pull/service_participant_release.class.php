@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @abstract
  */
-class service_participant_release extends \cenozo\ui\pull
+class service_participant_release extends \cenozo\ui\pull\base_participant_multi
 {
   /**
    * Constructor
@@ -25,7 +25,9 @@ class service_participant_release extends \cenozo\ui\pull
    */
   public function __construct( $args )
   {
-    parent::__construct( 'service', 'participant_release', $args );
+    // the parent class assumes that the subject is always "participant"
+    $grand_parent = get_parent_class( get_parent_class( get_class() ) );
+    $grand_parent::__construct( 'service', 'participant_release', $args );
   }
 
   /**
@@ -46,39 +48,32 @@ class service_participant_release extends \cenozo\ui\pull
     $note_count = 0;
     
     $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
-    $uid_list_string = preg_replace( '/[^a-zA-Z0-9]/', ' ', $this->get_argument( 'uid_list' ) );
-    $uid_list_string = trim( $uid_list_string );
     $start_date = $this->get_argument( 'start_date', '' );
     $end_date = $this->get_argument( 'end_date', '' );
     
-    $service_mod = lib::create( 'database\modifier' );
+    // include participants in the list, but only if one is provided
+    $service_mod = 0 < count( $this->uid_list )
+                 ? clone $this->modifier
+                 : lib::create( 'database\modifier' );
 
-    // include participants in the list only
-    $uid_list = array_unique( preg_split( '/\s+/', $uid_list_string ) );
-    if( 1 == count( $uid_list ) && '' == $uid_list[0] ) $uid_list = array();
-
-    if( 0 < count( $uid_list ) ) $service_mod->where( 'uid', 'IN', $uid_list );
-    
     if( 0 < strlen( $start_date ) || 0 < strlen( $end_date ) )
     { // use start/end date to select participants
-      $service_mod->where_bracket( true );
-      $service_mod->where_bracket( true );
       if( 0 < strlen( $start_date ) )
-        $service_mod->where( 'import_entry.date', '>=', $start_date );
+      {
+        // convert from server datetime since create_timestamp is written in local server time
+        $datetime_string = util::from_server_datetime( $start_date );
+        $service_mod->where( 'participant.create_timestamp', '>=', $datetime_string );
+      }
       if( 0 < strlen( $end_date ) )
-        $service_mod->where( 'import_entry.date', '<=', $end_date );
-      $service_mod->where_bracket( false );
-      $service_mod->where_bracket( true, true ); // or
-      if( 0 < strlen( $start_date ) )
-        $service_mod->where( 'contact_form.date', '>=', $start_date );
-      if( 0 < strlen( $end_date ) )
-        $service_mod->where( 'contact_form.date', '<=', $end_date );
-      $service_mod->where_bracket( false );
-      $service_mod->where_bracket( false );
+      {
+        // convert from server datetime since create_timestamp is written in local server time
+        $datetime_string = util::from_server_datetime( $end_date );
+        $service_mod->where( 'participant.create_timestamp', '<=', $datetime_string );
+      }
     }
     else
     { // do not allow all participants if there is no date span
-      if( 0 == count( $uid_list ) ) $service_mod->where( 'uid', 'IN', array('') );
+      if( 0 == count( $this->uid_list ) ) $service_mod->where( 'uid', 'IN', array('') );
     }
 
     // get a list of all unreleased participants

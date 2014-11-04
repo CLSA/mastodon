@@ -150,11 +150,7 @@ class service extends \cenozo\database\service
       'AND service_has_cohort.service_id = %s '.
       'LEFT JOIN service_has_participant '.
       'ON service_has_participant.service_id = %s '.
-      'AND service_has_participant.participant_id = participant.id '.
-      'LEFT JOIN import_entry '.
-      'ON import_entry.participant_id = participant.id '.
-      'LEFT JOIN contact_form '.
-      'ON contact_form.participant_id = participant.id %s',
+      'AND service_has_participant.participant_id = participant.id %s',
       $database_class_name::format_string( $this->id ),
       $database_class_name::format_string( $this->id ),
       $modifier->get_sql() );
