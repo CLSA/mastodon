@@ -141,6 +141,7 @@ class contact_form extends base_form
     $db_participant->cohort_id = $db_contact_form_entry->cohort_id;
     $db_participant->grouping = $db_contact_form_entry->code;
     $db_participant->first_name = $db_contact_form_entry->first_name;
+    $db_participant->other_name = '';
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
     $db_participant->date_of_birth = $dob;
