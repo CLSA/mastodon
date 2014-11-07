@@ -31,6 +31,44 @@ class service_participant_release extends \cenozo\ui\pull\base_participant_multi
   }
 
   /**
+   * Validate the operation.  If validation fails this method will throw a notice exception.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @throws excpetion\argument, exception\permission
+   * @access protected
+   */
+  protected function validate()
+  { 
+    try
+    {
+      parent::validate();
+    }
+    catch( \cenozo\exception\notice $e )
+    {
+      $throw = true;
+
+      // The parent class will throw a notice of the UID list is empty, however, we can allow
+      // this so long as a date span has been choosen
+      if( 'No participants have been selected.' == $e->get_raw_message() )
+      {
+        if( 0 < strlen( $this->get_argument( 'start_date', '' ) ) ||
+            0 < strlen( $this->get_argument( 'end_date', '' ) ) )
+        { // squelch the exception, we can allow the uid list to be empty in this instance
+          $throw = false;
+        }
+        else
+        { // be more specific in the notice text
+          $e = lib::create( 'exception\notice',
+            'You must either provide a list of participants or specify a start and/or end date.',
+            __NOTICE__ );
+        }
+      }
+
+      if( $throw ) throw $e;
+    }
+  }
+
+  /**
    * This method executes the operation's purpose.
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
