@@ -40,11 +40,14 @@ class proxy_form_list extends base_form_list
     if( 0 < $restrict_cohort_id )
     {
       $sub_mod = lib::create( 'database\modifier' );
+      $sub_mod->join(
+        'participant',
+        'proxy_form_entry.uid',
+        'participant.uid' );
       $sub_mod->where( 'proxy_form_id', '=', 'proxy_form.id', false );
-      $sub_mod->where( 'proxy_form_entry.uid', '=', 'participant.uid', false );
       $sub_mod->where( 'participant.cohort_id', '=', $restrict_cohort_id );
       $min_proxy_form_entry_sql = sprintf(
-        '( SELECT MIN( proxy_form_entry.id ) FROM proxy_form_entry, participant %s )',
+        '( SELECT MIN( proxy_form_entry.id ) FROM proxy_form_entry %s )',
         $sub_mod->get_sql() );
       if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
       $modifier->where( 'proxy_form_entry.id', '=', $min_proxy_form_entry_sql, false );
@@ -68,11 +71,14 @@ class proxy_form_list extends base_form_list
     if( 0 < $restrict_cohort_id )
     {
       $sub_mod = lib::create( 'database\modifier' );
+      $sub_mod->join(
+        'participant',
+        'proxy_form_entry.uid',
+        'participant.uid' );
       $sub_mod->where( 'proxy_form_id', '=', 'proxy_form.id', false );
-      $sub_mod->where( 'proxy_form_entry.uid', '=', 'participant.uid', false );
       $sub_mod->where( 'participant.cohort_id', '=', $restrict_cohort_id );
       $min_proxy_form_entry_sql = sprintf(
-        '( SELECT MIN( proxy_form_entry.id ) FROM proxy_form_entry, participant %s )',
+        '( SELECT MIN( proxy_form_entry.id ) FROM proxy_form_entry %s )',
         $sub_mod->get_sql() );
       if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
       $modifier->where( 'proxy_form_entry.id', '=', $min_proxy_form_entry_sql, false );

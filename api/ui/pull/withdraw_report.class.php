@@ -79,23 +79,29 @@ class withdraw_report extends \cenozo\ui\pull\base_report
     $modifier->group( 'region.id' );
     $modifier->group( 'MONTH( consent.date )' );
 
+    $modifier->join(
+      'temp_last_consent', 'participant.id', 'temp_last_consent.participant_id' );
+    $modifier->join(
+      'consent', 'temp_last_consent.consent_id', 'consent.id' );
+    $modifier->join(
+      'temp_last_written_consent', 'participant.id', 'temp_last_written_consent.participant_id' );
+    $modifier->join(
+      'temp_primary_address', 'participant.id', 'temp_primary_address.participant_id' );
+    $modifier->join(
+      'address', 'temp_primary_address.address_id', 'address.id' );
+    $modifier->join(
+      'region', 'address.region_id', 'region.id' );
+    if( !is_null( $db_collection ) )
+      $modifier->join(
+        'collection_has_participant',
+        'participant.id',
+        'collection_has_participant.participant_id' );
+
     $sql =
       'SELECT region.name AS region, '.
              'MONTHNAME( consent.date ) AS month, '.
              'COUNT( DISTINCT participant.id ) AS total '.
-      'FROM participant '.
-      'JOIN temp_last_consent ON participant.id = temp_last_consent.participant_id '.
-      'JOIN consent ON temp_last_consent.consent_id = consent.id '.
-      'JOIN temp_last_written_consent ON participant.id = temp_last_written_consent.participant_id '.
-      'JOIN temp_primary_address ON participant.id = temp_primary_address.participant_id '.
-      'JOIN address ON temp_primary_address.address_id = address.id '.
-      'JOIN region ON address.region_id = region.id ';
-
-    if( !is_null( $db_collection ) )
-      $sql .= 'JOIN collection_has_participant '.
-              'ON participant.id = collection_has_participant.participant_id ';
-
-    $sql .= $modifier->get_sql();
+      'FROM participant '.$modifier->get_sql();
     
     // start by creating the header
     $header = array( '' );
