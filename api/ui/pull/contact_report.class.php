@@ -57,6 +57,16 @@ class contact_report extends \cenozo\ui\pull\base_report
       'ALTER TABLE temp_last_consent '.
       'ADD INDEX dk_participant_id_consent_id ( participant_id, consent_id )' );
 
+    $modifier->cross_join( 'participant' );
+    $modifier->join( 'language AS service_language', 'service.language_id', 'service_language.id' );
+    $modifier->join( 'cohort', 'participant.cohort_id', 'cohort.id' );
+    $modifier->left_join( 'language', 'participant.language_id', 'language.id' );
+    $modifier->join( 'temp_first_address', 'participant.id', 'temp_first_address.participant_id' );
+    $modifier->join( 'address', 'temp_first_address.address_id', 'address.id' );
+    $modifier->join( 'region', 'address.region_id', 'region.id' );
+    $modifier->left_join( 'state', 'participant.state_id', 'state.id' );
+    $modifier->join( 'temp_last_consent', 'participant.id', 'temp_last_consent.participant_id' );
+  
     $sql =
       'SELECT cohort.name AS cohort, '.
              'IFNULL( language.code, service_language.code ) AS language, '.
@@ -77,17 +87,8 @@ class contact_report extends \cenozo\ui\pull\base_report
                  ') '.
              ') AS consent '.
       'FROM service '.
-      'CROSS JOIN participant '.
-      'JOIN language AS service_language ON service.language_id = service_language.id '.
-      'JOIN cohort ON participant.cohort_id = cohort.id '.
-      'LEFT JOIN language ON participant.language_id = language.id '.
-      'JOIN temp_first_address ON participant.id = temp_first_address.participant_id '.
-      'JOIN address ON temp_first_address.address_id = address.id '.
-      'JOIN region ON address.region_id = region.id '.
-      'LEFT JOIN state ON participant.state_id = state.id '.
-      'JOIN temp_last_consent ON participant.id = temp_last_consent.participant_id '.
       $modifier->get_sql();
-    
+
     $rows = $participant_class_name::db()->get_all( $sql );
 
     $header = array();

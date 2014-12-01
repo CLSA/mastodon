@@ -82,53 +82,55 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $title .= sprintf( 'who have %shad a package mailed to', $mailed_to ? '' : ' not' );
     $this->add_title( $title );
 
-    $participant_mod = lib::create( 'database\modifier' );
+    $modifier = lib::create( 'database\modifier' );
     if( !is_null( $db_collection ) )
-      $participant_mod->where( 'collection_has_participant.collection_id', '=', $db_collection->id );
+      $modifier->where( 'collection_has_participant.collection_id', '=', $db_collection->id );
     if( !is_null( $db_cohort ) )
-      $participant_mod->where( 'participant.cohort_id', '=', $db_cohort->id );
+      $modifier->where( 'participant.cohort_id', '=', $db_cohort->id );
     if( !is_null( $db_source ) )
-      $participant_mod->where( 'participant.source_id', '=', $db_source->id );
+      $modifier->where( 'participant.source_id', '=', $db_source->id );
 
-    $sql = sprintf(
-      'SELECT DISTINCT participant.id FROM participant '.
-      'JOIN event ON participant.id = event.participant_id '.
-      'AND event.event_type_id = %s ',
-      $database_class_name::format_string( $db_event_type->id ) );
+    $sql = 'SELECT DISTINCT participant.id FROM participant ';
+
+    // this will be used in either the following if or else blocks
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'participant.id', '=', 'event.participant_id', false );
+    $join_mod->where( 'event.event_type_id', '=', $db_event_type->id );
 
     if( $mailed_to )
     {
-      $participant_mod->order_desc( 'event.datetime' );
+      $modifier->join( 'event', $join_mod );
+      $modifier->order_desc( 'event.datetime' );
     }
     else // invert the query
     {
-      $participant_mod->where( 'id', 'NOT IN', sprintf( '( %s )', $sql ), false );
-      $sql = 'SELECT id FROM participant ';
+      $temp_mod = lib::create( 'database\modifier' );
+      $temp_mod->join( 'event', $join_mod );
+      $modifier->where( 'id', 'NOT IN', sprintf( '( %s )', $sql.$temp_mod->get_sql() ), false );
     }
 
     if( !is_null( $db_collection ) )
-      $sql .= 'JOIN collection_has_participant '.
-              'ON participant.id = collection_has_participant.participant_id ';
+      $modifier->join( 'collection_has_participant',
+        'participant.id', 'collection_has_participant.participant_id' );
 
     if( !is_null( $db_service ) )
     {
-      $sql .= sprintf(
-        'JOIN service_has_cohort '.
-        'ON service_has_cohort.service_id = %s '.
-        'AND service_has_cohort.cohort_id = participant.cohort_id '.
-        'LEFT JOIN service_has_participant '.
-        'ON service_has_participant.participant_id = participant.id '.
-        'AND service_has_participant.service_id = %s ',
-        $database_class_name::format_string( $db_service->id ),
-        $database_class_name::format_string( $db_service->id ) );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'service_has_cohort.cohort_id', '=', 'participant.cohort_id', false );
+      $join_mod->where( 'service_has_cohort.service_id', '=', $db_service->id );
+      $modifier->join( 'service_has_cohort', $join_mod );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'service_has_participant.participant_id', '=', 'participant.id', false );
+      $join_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
+      $modifier->left_join( 'service_has_participant', $join_mod );
 
       if( 0 == strcasecmp( 'yes', $released ) )
-        $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
+        $modifier->where( 'service_has_participant.datetime', '!=', NULL );
       else if( 0 == strcasecmp( 'no', $released ) )
-        $participant_mod->where( 'service_has_participant.datetime', '=', NULL );
+        $modifier->where( 'service_has_participant.datetime', '=', NULL );
     }
 
-    $sql .= $participant_mod->get_sql();
+    $sql .= $modifier->get_sql();
 
     $contents = array();
     $participant_id_list = $participant_class_name::db()->get_col( $sql );
