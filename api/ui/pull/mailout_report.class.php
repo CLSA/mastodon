@@ -99,13 +99,13 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
     if( $mailed_to )
     {
-      $modifier->join( 'event', $join_mod );
+      $modifier->join_modifier( 'event', $join_mod );
       $modifier->order_desc( 'event.datetime' );
     }
     else // invert the query
     {
       $temp_mod = lib::create( 'database\modifier' );
-      $temp_mod->join( 'event', $join_mod );
+      $temp_mod->join_modifier( 'event', $join_mod );
       $modifier->where( 'id', 'NOT IN', sprintf( '( %s )', $sql.$temp_mod->get_sql() ), false );
     }
 
@@ -118,11 +118,11 @@ class mailout_report extends \cenozo\ui\pull\base_report
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'service_has_cohort.cohort_id', '=', 'participant.cohort_id', false );
       $join_mod->where( 'service_has_cohort.service_id', '=', $db_service->id );
-      $modifier->join( 'service_has_cohort', $join_mod );
+      $modifier->join_modifier( 'service_has_cohort', $join_mod );
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'service_has_participant.participant_id', '=', 'participant.id', false );
       $join_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
-      $modifier->left_join( 'service_has_participant', $join_mod );
+      $modifier->left_join_modifier( 'service_has_participant', $join_mod );
 
       if( 0 == strcasecmp( 'yes', $released ) )
         $modifier->where( 'service_has_participant.datetime', '!=', NULL );
