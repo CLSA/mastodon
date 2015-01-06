@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE operation.sql
 SOURCE update_version_number.sql
 
 COMMIT;

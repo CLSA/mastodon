@@ -38,7 +38,8 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
     $db_user = $session->get_user();
 
     // we need to use a semaphore to avoid race conditions
-    $session->acquire_semaphore();
+    $semaphore = lib::create( 'business\semaphore' );
+    $semaphore->acquire();
 
     // This new operation is different from others.  Instead of providing an ID the system must
     // instead search for one, reporting a notice if none are available
@@ -68,7 +69,7 @@ abstract class base_form_entry_new extends \cenozo\ui\push\base_new
                str_replace( '_', ' ', $this->get_subject() ) ),
       __METHOD__ );
 
-    $session->release_semaphore();
+    $semaphore->release();
   }
 
   /**
