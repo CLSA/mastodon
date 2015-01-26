@@ -148,7 +148,7 @@ class import_entry extends \cenozo\database\record
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
     $cohort_class_name = lib::get_class_name( 'database\cohort' );
-    $service_class_name = lib::get_class_name( 'database\service' );
+    $application_class_name = lib::get_class_name( 'database\application' );
     $site_class_name = lib::get_class_name( 'database\site' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $region_class_name = lib::get_class_name( 'database\region' );

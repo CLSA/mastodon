@@ -45,8 +45,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
     $db_collection = $collection_id ? lib::create( 'database\collection', $collection_id ) : NULL;
     $cohort_id = $this->get_argument( 'restrict_cohort_id' );
     $db_cohort = $cohort_id ? lib::create( 'database\cohort', $cohort_id ) : NULL;
-    $service_id = $this->get_argument( 'restrict_service_id' );
-    $db_service = $service_id ? lib::create( 'database\service', $service_id ) : NULL;
+    $application_id = $this->get_argument( 'restrict_application_id' );
+    $db_application = $application_id ? lib::create( 'database\application', $application_id ) : NULL;
     $released = $this->get_argument( 'released' );
     $source_id = $this->get_argument( 'restrict_source_id' );
     $db_source = $source_id ? lib::create( 'database\source', $source_id ) : NULL;
@@ -63,16 +63,16 @@ class mailout_report extends \cenozo\ui\pull\base_report
     {
       $title .= sprintf( 'who belong to the "%s" collection', $db_collection->name );
     }
-    if( !is_null( $db_service ) )
+    if( !is_null( $db_application ) )
     {
       if( 0 == strcasecmp( 'either', $released ) )
       {
-        $title .= sprintf( 'belonging to %s', $db_service->title );
+        $title .= sprintf( 'belonging to %s', $db_application->title );
       }
       else
       {
         $title .= 0 == strcasecmp( 'yes', $released ) ? '' : 'not ';
-        $title .= sprintf( 'released to %s ', $db_service->title );
+        $title .= sprintf( 'released to %s ', $db_application->title );
       }
     }
     if( !is_null( $db_source ) )
@@ -113,21 +113,21 @@ class mailout_report extends \cenozo\ui\pull\base_report
       $modifier->join( 'collection_has_participant',
         'participant.id', 'collection_has_participant.participant_id' );
 
-    if( !is_null( $db_service ) )
+    if( !is_null( $db_application ) )
     {
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'service_has_cohort.cohort_id', '=', 'participant.cohort_id', false );
-      $join_mod->where( 'service_has_cohort.service_id', '=', $db_service->id );
-      $modifier->join_modifier( 'service_has_cohort', $join_mod );
+      $join_mod->where( 'application_has_cohort.cohort_id', '=', 'participant.cohort_id', false );
+      $join_mod->where( 'application_has_cohort.application_id', '=', $db_application->id );
+      $modifier->join_modifier( 'application_has_cohort', $join_mod );
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'service_has_participant.participant_id', '=', 'participant.id', false );
-      $join_mod->where( 'service_has_participant.service_id', '=', $db_service->id );
-      $modifier->left_join_modifier( 'service_has_participant', $join_mod );
+      $join_mod->where( 'application_has_participant.participant_id', '=', 'participant.id', false );
+      $join_mod->where( 'application_has_participant.application_id', '=', $db_application->id );
+      $modifier->left_join_modifier( 'application_has_participant', $join_mod );
 
       if( 0 == strcasecmp( 'yes', $released ) )
-        $modifier->where( 'service_has_participant.datetime', '!=', NULL );
+        $modifier->where( 'application_has_participant.datetime', '!=', NULL );
       else if( 0 == strcasecmp( 'no', $released ) )
-        $modifier->where( 'service_has_participant.datetime', '=', NULL );
+        $modifier->where( 'application_has_participant.datetime', '=', NULL );
     }
 
     $sql .= $modifier->get_sql();
@@ -169,7 +169,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
       // get default language if participant doesn't have a preference
       $db_language = $db_participant->get_language();
       if( is_null( $db_language ) )
-        $db_language = lib::create( 'business\session' )->get_service()->get_language();
+        $db_language = lib::create( 'business\session' )->get_application()->get_language();
       $row = array(
         $db_language->code,
         $db_participant->uid,
@@ -186,9 +186,9 @@ class mailout_report extends \cenozo\ui\pull\base_report
       
       if( $mailed_to )
       { // include the mailout date and site columns
-        if( !is_null( $db_service ) )
+        if( !is_null( $db_application ) )
         {
-          $db_site = $db_participant->get_effective_site( $db_service );
+          $db_site = $db_participant->get_effective_site( $db_application );
           $site_name = is_null( $db_site ) ? 'None' : $db_site->name;
           array_unshift( $row, $site_name );
         }
@@ -226,7 +226,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
     
     if( $mailed_to )
     { // include the mailout date and site columns
-      if( !is_null( $db_service ) ) array_unshift( $header, 'Site' );
+      if( !is_null( $db_application ) ) array_unshift( $header, 'Site' );
       array_unshift( $header, 'Mailout Date' );
     }
 

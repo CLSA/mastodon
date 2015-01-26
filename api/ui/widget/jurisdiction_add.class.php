@@ -25,7 +25,7 @@ class jurisdiction_add extends \cenozo\ui\widget\jurisdiction_add
   {
     parent::prepare();
     
-    // specify in the heading which service this jurisdiction belongs to
+    // specify in the heading which application this jurisdiction belongs to
     $this->set_heading(
       sprintf( '%s for %s',
                $this->get_heading(),

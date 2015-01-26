@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class site extends \cenozo\database\site
 {
   /**
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
@@ -32,7 +32,7 @@ class site extends \cenozo\database\site
   }
 
   /** 
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string|array $column A column with the unique key property (or array of columns)
    * @param string|array $value The value of the column to match (or array of values)
@@ -46,14 +46,14 @@ class site extends \cenozo\database\site
   }
 
   /**
-   * Gives a complete name for the site in the form of "name (service)"
+   * Gives a complete name for the site in the form of "name (application)"
    * 
    * @author Patrick Emond <emondpd@mcamster.ca>
    * @access public
    */
   public function get_full_name()
   { 
-    $db_service = $this->get_service();
-    return sprintf( '%s (%s)', $this->name, is_null( $db_service ) ? 'none' : $this->get_service()->name );
+    $db_application = $this->get_application();
+    return sprintf( '%s (%s)', $this->name, is_null( $db_application ) ? 'none' : $this->get_application()->name );
   }  
 }

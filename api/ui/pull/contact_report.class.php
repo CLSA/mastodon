@@ -38,7 +38,7 @@ class contact_report extends \cenozo\ui\pull\base_report
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'service.id', '=', lib::create( 'business\session' )->get_service()->id );
+    $modifier->where( 'application.id', '=', lib::create( 'business\session' )->get_application()->id );
     $modifier->where( 'uid', 'IN', $this->uid_list );
 
     // create temporary table of last address
@@ -58,7 +58,7 @@ class contact_report extends \cenozo\ui\pull\base_report
       'ADD INDEX dk_participant_id_consent_id ( participant_id, consent_id )' );
 
     $modifier->cross_join( 'participant' );
-    $modifier->join( 'language AS service_language', 'service.language_id', 'service_language.id' );
+    $modifier->join( 'language AS application_language', 'application.language_id', 'application_language.id' );
     $modifier->join( 'cohort', 'participant.cohort_id', 'cohort.id' );
     $modifier->left_join( 'language', 'participant.language_id', 'language.id' );
     $modifier->join( 'temp_first_address', 'participant.id', 'temp_first_address.participant_id' );
@@ -69,7 +69,7 @@ class contact_report extends \cenozo\ui\pull\base_report
   
     $sql =
       'SELECT cohort.name AS cohort, '.
-             'IFNULL( language.code, service_language.code ) AS language, '.
+             'IFNULL( language.code, application_language.code ) AS language, '.
              'uid, '.
              'first_name, '.
              'last_name, '.
@@ -86,7 +86,7 @@ class contact_report extends \cenozo\ui\pull\base_report
                    'IF( accept, "Accept", "Deny" ) '.
                  ') '.
              ') AS consent '.
-      'FROM service '.
+      'FROM application '.
       $modifier->get_sql();
 
     $rows = $participant_class_name::db()->get_all( $sql );

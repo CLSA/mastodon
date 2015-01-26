@@ -1,6 +1,6 @@
 <?php
 /**
- * service_participant_release.class.php
+ * application_participant_release.class.php
  * 
  * @author Dean Inglis <inglisd@mcmaster.ca>
  * @filesource
@@ -14,7 +14,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
  * 
  * @abstract
  */
-class service_participant_release extends \cenozo\ui\pull\base_participant_multi
+class application_participant_release extends \cenozo\ui\pull\base_participant_multi
 {
   /**
    * Constructor
@@ -27,7 +27,7 @@ class service_participant_release extends \cenozo\ui\pull\base_participant_multi
   {
     // the parent class assumes that the subject is always "participant"
     $grand_parent = get_parent_class( get_parent_class( get_class() ) );
-    $grand_parent::__construct( 'service', 'participant_release', $args );
+    $grand_parent::__construct( 'application', 'participant_release', $args );
   }
 
   /**
@@ -85,12 +85,12 @@ class service_participant_release extends \cenozo\ui\pull\base_participant_multi
     $availability_count = 0;
     $note_count = 0;
     
-    $db_service = lib::create( 'database\service', $this->get_argument( 'service_id' ) );
+    $db_application = lib::create( 'database\application', $this->get_argument( 'application_id' ) );
     $start_date = $this->get_argument( 'start_date', '' );
     $end_date = $this->get_argument( 'end_date', '' );
     
     // include participants in the list, but only if one is provided
-    $service_mod = 0 < count( $this->uid_list )
+    $application_mod = 0 < count( $this->uid_list )
                  ? clone $this->modifier
                  : lib::create( 'database\modifier' );
 
@@ -100,22 +100,22 @@ class service_participant_release extends \cenozo\ui\pull\base_participant_multi
       {
         // convert from server datetime since create_timestamp is written in local server time
         $datetime_string = util::from_server_datetime( $start_date );
-        $service_mod->where( 'participant.create_timestamp', '>=', $datetime_string );
+        $application_mod->where( 'participant.create_timestamp', '>=', $datetime_string );
       }
       if( 0 < strlen( $end_date ) )
       {
         // convert from server datetime since create_timestamp is written in local server time
         $datetime_string = util::from_server_datetime( $end_date );
-        $service_mod->where( 'participant.create_timestamp', '<=', $datetime_string );
+        $application_mod->where( 'participant.create_timestamp', '<=', $datetime_string );
       }
     }
     else
     { // do not allow all participants if there is no date span
-      if( 0 == count( $this->uid_list ) ) $service_mod->where( 'uid', 'IN', array('') );
+      if( 0 == count( $this->uid_list ) ) $application_mod->where( 'uid', 'IN', array('') );
     }
 
     // get a list of all unreleased participants
-    foreach( $db_service->release_participant( $service_mod, true ) as $db_participant )
+    foreach( $db_application->release_participant( $application_mod, true ) as $db_participant )
     {
       $address_count += $db_participant->get_address_count();
       $phone_count += $db_participant->get_phone_count();
@@ -123,7 +123,7 @@ class service_participant_release extends \cenozo\ui\pull\base_participant_multi
       $availability_count += $db_participant->get_availability_count();
       $note_count += $db_participant->get_note_count();
 
-      $db_site = $db_participant->get_effective_site( $db_service );
+      $db_site = $db_participant->get_effective_site( $db_application );
       $site_name = is_null( $db_site ) ? 'none' : $db_site->name;
       if( !array_key_exists( $site_name, $participant_count ) ) $participant_count[$site_name] = 0;
       $participant_count[$site_name]++;

@@ -25,7 +25,7 @@ class region_site_add extends \cenozo\ui\widget\region_site_add
   {
     parent::prepare();
     
-    // specify in the heading which service this region_site belongs to
+    // specify in the heading which application this region_site belongs to
     $this->set_heading(
       sprintf( '%s for %s',
                $this->get_heading(),

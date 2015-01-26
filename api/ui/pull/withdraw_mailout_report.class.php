@@ -75,7 +75,7 @@ class withdraw_mailout_report extends \cenozo\ui\pull\base_report
 
       $db_language = $db_participant->get_language();
       if( is_null( $db_language ) )
-        $db_language = lib::create( 'business\session' )->get_service()->get_language();
+        $db_language = lib::create( 'business\session' )->get_application()->get_language();
 
       $content[] = array(
         $db_language->code,

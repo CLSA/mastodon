@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class region_site extends \cenozo\database\region_site
 {
   /**
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
@@ -32,7 +32,7 @@ class region_site extends \cenozo\database\region_site
   }
 
   /** 
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string|array $column A column with the unique key property (or array of columns)
    * @param string|array $value The value of the column to match (or array of values)

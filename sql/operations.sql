@@ -115,13 +115,13 @@ VALUES( "pull", "quota", "report", true, "Download a quota report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "quota", "report", true, "Set up a quota report." );
 
--- service participant_release
+-- application participant_release
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "pull", "service", "participant_release", true, "Returns a summary of participants to be released to another service." );
+VALUES( "pull", "application", "participant_release", true, "Returns a summary of participants to be released to another application." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "push", "service", "participant_release", true, "Releases participants to another service." );
+VALUES( "push", "application", "participant_release", true, "Releases participants to another application." );
 INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "service", "participant_release", true, "A form to release participants to other services." );
+VALUES( "widget", "application", "participant_release", true, "A form to release participants to other applications." );
 
 -- withdraw
 INSERT INTO operation( type, subject, name, restricted, description )

@@ -25,10 +25,10 @@ class jurisdiction_view extends \cenozo\ui\widget\jurisdiction_view
   {
     parent::prepare();
 
-    // specify in the heading which service this jurisdiction belongs to
+    // specify in the heading which application this jurisdiction belongs to
     $this->set_heading(
       sprintf( '%s for %s',
                $this->get_heading(),
-               $this->get_record()->get_service()->title ) );
+               $this->get_record()->get_application()->title ) );
   }
 }

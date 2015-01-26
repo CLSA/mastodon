@@ -41,7 +41,7 @@ class mailout_report extends \cenozo\ui\widget\base_report
     $this->add_restriction( 'collection' );
     $this->add_parameter( 'mailed_to', 'boolean', 'Mailed To' );
     $this->add_restriction( 'cohort' );
-    $this->add_restriction( 'service' );
+    $this->add_restriction( 'application' );
     $this->add_parameter( 'released', 'enum', 'Released' );
     $this->add_restriction( 'source' );
     $this->add_parameter( 'mark_mailout', 'boolean', 'Mark mailouts as complete' );
@@ -50,11 +50,11 @@ class mailout_report extends \cenozo\ui\widget\base_report
       'This report provides a list of participants with respect to whether they have had a '.
       'package mailed out to them or not.  The "mailed to" parameter determines whether to '.
       'include participants who have ever been mailed to or not.  The "cohort" parameter, if set '.
-      'to anything other than "all", restricts the list to a particular cohort.  The "service" '.
+      'to anything other than "all", restricts the list to a particular cohort.  The "application" '.
       'parameter, if set to anything other than "all", restricts the list to participants who '.
-      'belong to a particular service.  The "released" parameter restricts the list to '.
-      'participants who have been released, not released (or either) to the selected service '.
-      '(this parameter is ignored if service is set to "all").  The "source" parameter, if set to '.
+      'belong to a particular application.  The "released" parameter restricts the list to '.
+      'participants who have been released, not released (or either) to the selected application '.
+      '(this parameter is ignored if application is set to "all").  The "source" parameter, if set to '.
       'anything other than "all", restricts the list to a particular source.  Finally, checking '.
       'the "mark mailouts" option will mark all participants included in the report as having '.
       'been mailed out on today\'s date.' );

@@ -52,12 +52,12 @@ class self_menu extends \cenozo\ui\widget\self_menu
                             'subject' => 'import',
                             'name' => 'add' );
 
-    // insert service participant_release into the utlities
-    $db_operation = $operation_class_name::get_operation( 'widget', 'service', 'participant_release' );
+    // insert application participant_release into the utlities
+    $db_operation = $operation_class_name::get_operation( 'widget', 'application', 'participant_release' );
     if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
       $utilities[] = array( 'heading' => 'Participant Release',
                             'type' => 'widget',
-                            'subject' => 'service',
+                            'subject' => 'application',
                             'name' => 'participant_release' );
 
     $this->set_variable( 'utilities', $utilities );

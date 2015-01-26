@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class user_view extends \cenozo\ui\widget\user_view
 {
   /**
-   * Overrides the access list widget's method (include all services)
+   * Overrides the access list widget's method (include all applications)
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the list.
@@ -34,7 +34,7 @@ class user_view extends \cenozo\ui\widget\user_view
   }
 
   /**
-   * Overrides the access list widget's method (include all services)
+   * Overrides the access list widget's method (include all applications)
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the list.

@@ -110,7 +110,7 @@ class form_chart extends \cenozo\ui\widget
       'one' => $one,
       'two' => $two );
 
-    $this->set_variable( 'service_title', $session->get_service()->title );
+    $this->set_variable( 'application_title', $session->get_application()->title );
     $this->set_variable( 'title', 'Data Entry System: Incomplete Form Status' );
     $this->set_variable( 'data', $data );
   }

@@ -1,6 +1,6 @@
 <?php
 /**
- * service.class.php
+ * application.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,12 +10,12 @@ namespace mastodon\database;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
- * service: record
+ * application: record
  */
-class service extends \cenozo\database\service
+class application extends \cenozo\database\application
 {
   /**
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
@@ -32,7 +32,7 @@ class service extends \cenozo\database\service
   }
 
   /** 
-   * Call parent method without restricting records by service.
+   * Call parent method without restricting records by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string|array $column A column with the unique key property (or array of columns)
    * @param string|array $value The value of the column to match (or array of values)
@@ -46,7 +46,7 @@ class service extends \cenozo\database\service
   }
 
   /**
-   * Override parent method so that records are not restricted by service.
+   * Override parent method so that records are not restricted by application.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $record_type The type of record.
    * @param modifier $modifier A modifier to apply to the list or count.
@@ -71,7 +71,7 @@ class service extends \cenozo\database\service
   }
 
   /**
-   * Returns the service's release event-type
+   * Returns the application's release event-type
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return database\event_type
    * @access public
@@ -81,7 +81,7 @@ class service extends \cenozo\database\service
     // check the primary key value
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to get release entry_type from service with no id.' );
+      log::warning( 'Tried to get release entry_type from application with no id.' );
       return;
     }
     
@@ -89,7 +89,7 @@ class service extends \cenozo\database\service
   }
 
   /**
-   * Update this service's release event_type based on the service's name and title
+   * Update this application's release event_type based on the application's name and title
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access public
    */
@@ -98,7 +98,7 @@ class service extends \cenozo\database\service
     // check the primary key value
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to get update release entry_type for service with no id.' );
+      log::warning( 'Tried to get update release entry_type for application with no id.' );
       return;
     }
     
@@ -109,7 +109,7 @@ class service extends \cenozo\database\service
   }
 
   /**
-   * Releases participants to this service according to the provided modifier or,
+   * Releases participants to this application according to the provided modifier or,
    * if the $get_unreleased paramter is set to true, returns a list of participants who have
    * not yet been released.
    * If no modifier is provided then all unreleased participants will be released.
@@ -124,15 +124,15 @@ class service extends \cenozo\database\service
     $database_class_name = lib::get_class_name( 'database\database' );
 
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'service_has_participant.datetime', '=', NULL );
+    $modifier->where( 'application_has_participant.datetime', '=', NULL );
 
     $datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
 
     $select_sql = 'SELECT DISTINCT participant.id ';
 
     $insert_sql = sprintf(
-      'INSERT INTO service_has_participant'.
-      '( service_id, participant_id, create_timestamp, datetime ) '.
+      'INSERT INTO application_has_participant'.
+      '( application_id, participant_id, create_timestamp, datetime ) '.
       'SELECT %s, participant.id, NULL, %s ',
       $database_class_name::format_string( $this->id ),
       $database_class_name::format_string( $datetime ) );
@@ -145,12 +145,12 @@ class service extends \cenozo\database\service
 
     $table_sql = sprintf(
       'FROM participant '.
-      'JOIN service_has_cohort '.
-      'ON service_has_cohort.cohort_id = participant.cohort_id '.
-      'AND service_has_cohort.service_id = %s '.
-      'LEFT JOIN service_has_participant '.
-      'ON service_has_participant.service_id = %s '.
-      'AND service_has_participant.participant_id = participant.id %s',
+      'JOIN application_has_cohort '.
+      'ON application_has_cohort.cohort_id = participant.cohort_id '.
+      'AND application_has_cohort.application_id = %s '.
+      'LEFT JOIN application_has_participant '.
+      'ON application_has_participant.application_id = %s '.
+      'AND application_has_participant.participant_id = participant.id %s',
       $database_class_name::format_string( $this->id ),
       $database_class_name::format_string( $this->id ),
       $modifier->get_sql() );
@@ -173,7 +173,7 @@ class service extends \cenozo\database\service
       // add the release event to each participant
       static::db()->execute( $event_sql );
 
-      // insert them into the service_has_participant table
+      // insert them into the application_has_participant table
       static::db()->execute( $insert_sql );
     }
   }

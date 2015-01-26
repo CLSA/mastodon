@@ -32,7 +32,7 @@ class contact_form extends base_form
     $source_class_name = lib::get_class_name( 'database\source' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $age_group_class_name = lib::get_class_name( 'database\age_group' );
-    $service_class_name = lib::get_class_name( 'database\service' );
+    $application_class_name = lib::get_class_name( 'database\application' );
     $site_class_name = lib::get_class_name( 'database\site' );
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
 

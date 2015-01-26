@@ -96,12 +96,12 @@ class user_list extends \cenozo\ui\widget\site_restricted_list
    */
   public function determine_record_count( $modifier = NULL )
   {
-    // only include users who have access to a role belonging to this service
-    $db_service = lib::create( 'business\session' )->get_service();
+    // only include users who have access to a role belonging to this application
+    $db_application = lib::create( 'business\session' )->get_application();
     if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'access', 'user.id', 'access.user_id' );
-    $modifier->join( 'service_has_role', 'access.role_id', 'service_has_role.role_id' );
-    $modifier->where( 'service_has_role.service_id', '=', $db_service->id );
+    $modifier->join( 'application_has_role', 'access.role_id', 'application_has_role.role_id' );
+    $modifier->where( 'application_has_role.application_id', '=', $db_application->id );
 
     if( !is_null( $this->db_restrict_site ) )
       $modifier->where( 'access.site_id', '=', $this->db_restrict_site->id );
@@ -121,12 +121,12 @@ class user_list extends \cenozo\ui\widget\site_restricted_list
    */
   public function determine_record_list( $modifier = NULL )
   {
-    // only include users who have access to a role belonging to this service
-    $db_service = lib::create( 'business\session' )->get_service();
+    // only include users who have access to a role belonging to this application
+    $db_application = lib::create( 'business\session' )->get_application();
     if( NULL == $modifier ) $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'access', 'user.id', 'access.user_id' );
-    $modifier->join( 'service_has_role', 'access.role_id', 'service_has_role.role_id' );
-    $modifier->where( 'service_has_role.service_id', '=', $db_service->id );
+    $modifier->join( 'application_has_role', 'access.role_id', 'application_has_role.role_id' );
+    $modifier->where( 'application_has_role.application_id', '=', $db_application->id );
 
     if( !is_null( $this->db_restrict_site ) )
       $modifier->where( 'access.site_id', '=', $this->db_restrict_site->id );
