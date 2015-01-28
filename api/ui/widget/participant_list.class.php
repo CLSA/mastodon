@@ -29,7 +29,7 @@ class participant_list extends \cenozo\ui\widget\participant_list
     {
       $operation_class_name = lib::get_class_name( 'database\operation' );
       $db_operation = $operation_class_name::get_operation( 'widget', 'import', 'add' );
-      if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+      if( lib::create( 'business\session' )->is_operation_allowed( $db_operation ) )
         $this->add_action( 'import', 'Import', $db_operation,
           'Import participants from an external CSV file' );
     }

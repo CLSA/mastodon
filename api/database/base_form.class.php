@@ -21,13 +21,13 @@ abstract class base_form extends \cenozo\database\record
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
    * @param boolean $distinct Whether to use the DISTINCT sql keyword
-   * @param boolean $id_only Whether to return a list of primary ids instead of active records
+   * @param enum $format Whether to return an object, column data or only the record id
    * @return array( record ) | int
    * @static
    * @access public
    */
   public static function select(
-    $modifier = NULL, $count = false, $distinct = true, $id_only = false )
+    $modifier = NULL, $count = false, $distinct = true, $format = 0 )
   {
     // first load any scans in the form directory into the database
     $path_constant = sprintf( '%s_PATH', strtoupper( static::get_table_name() ) );
@@ -78,7 +78,7 @@ abstract class base_form extends \cenozo\database\record
     }
 
     // now copmlete the constructor
-    return parent::select( $modifier, $count, $distinct, $id_only );
+    return parent::select( $modifier, $count, $distinct, $format );
   }
 
   /**

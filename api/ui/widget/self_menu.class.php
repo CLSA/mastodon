@@ -46,7 +46,7 @@ class self_menu extends \cenozo\ui\widget\self_menu
 
     // insert participant import into the utilities
     $db_operation = $operation_class_name::get_operation( 'widget', 'import', 'add' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+    if( lib::create( 'business\session' )->is_operation_allowed( $db_operation ) )
       $utilities[] = array( 'heading' => 'Participant Import',
                             'type' => 'widget',
                             'subject' => 'import',
@@ -54,7 +54,7 @@ class self_menu extends \cenozo\ui\widget\self_menu
 
     // insert application participant_release into the utlities
     $db_operation = $operation_class_name::get_operation( 'widget', 'application', 'participant_release' );
-    if( lib::create( 'business\session' )->is_allowed( $db_operation ) )
+    if( lib::create( 'business\session' )->is_operation_allowed( $db_operation ) )
       $utilities[] = array( 'heading' => 'Participant Release',
                             'type' => 'widget',
                             'subject' => 'application',

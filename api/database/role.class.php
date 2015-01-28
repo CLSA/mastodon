@@ -20,15 +20,15 @@ class role extends \cenozo\database\role
    * @param database\modifier $modifier Modifications to the selection.
    * @param boolean $count If true the total number of records instead of a list
    * @param boolean $distinct Whether to use the DISTINCT sql keyword
-   * @param boolean $id_only Whether to return a list of primary ids instead of active records
+   * @param enum $format Whether to return an object, column data or only the record id
    * @param boolean $full Do not use, parameter ignored.
    * @access public
    * @static
    */
   public static function select(
-    $modifier = NULL, $count = false, $distinct = true, $id_only = false, $full = false )
+    $modifier = NULL, $count = false, $distinct = true, $format = 0, $full = false )
   {
-    return parent::select( $modifier, $count, $distinct, $id_only, true );
+    return parent::select( $modifier, $count, $distinct, $format, true );
   }
 
   /** 
