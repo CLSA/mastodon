@@ -134,14 +134,14 @@ class application extends \cenozo\database\application
       'INSERT INTO application_has_participant'.
       '( application_id, participant_id, create_timestamp, datetime ) '.
       'SELECT %s, participant.id, NULL, %s ',
-      $database_class_name::format_string( $this->id ),
-      $database_class_name::format_string( $datetime ) );
+      static::db()->format_string( $this->id ),
+      static::db()->format_string( $datetime ) );
 
     $event_sql = sprintf(
       'INSERT INTO event( participant_id, event_type_id, datetime ) '.
       'SELECT DISTINCT participant.id, %s, %s ',
-      $database_class_name::format_string( $this->release_event_type_id ),
-      $database_class_name::format_string( $datetime ) );
+      static::db()->format_string( $this->release_event_type_id ),
+      static::db()->format_string( $datetime ) );
 
     $table_sql = sprintf(
       'FROM participant '.
@@ -151,14 +151,14 @@ class application extends \cenozo\database\application
       'LEFT JOIN application_has_participant '.
       'ON application_has_participant.application_id = %s '.
       'AND application_has_participant.participant_id = participant.id %s',
-      $database_class_name::format_string( $this->id ),
-      $database_class_name::format_string( $this->id ),
+      static::db()->format_string( $this->id ),
+      static::db()->format_string( $this->id ),
       $modifier->get_sql() );
 
     $select_sql .= $table_sql;
     $insert_sql .= $table_sql
                 .  sprintf( ' ON DUPLICATE KEY UPDATE datetime = %s',
-                            $database_class_name::format_string( $datetime ) );
+                            static::db()->format_string( $datetime ) );
     $event_sql .= $table_sql;
 
     if( $get_unreleased )

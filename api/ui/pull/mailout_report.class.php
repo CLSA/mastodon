@@ -35,7 +35,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
-    $database_class_name = lib::get_class_name( 'database\database' );
+    $session = lib::create( 'business\session' );
+    $db = $session->get_database();
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
@@ -168,8 +169,12 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
       // get default language if participant doesn't have a preference
       $db_language = $db_participant->get_language();
+<<<<<<< HEAD
       if( is_null( $db_language ) )
         $db_language = lib::create( 'business\session' )->get_application()->get_language();
+=======
+      if( is_null( $db_language ) ) $db_language = $session->get_service()->get_language();
+>>>>>>> release
       $row = array(
         $db_language->code,
         $db_participant->uid,
