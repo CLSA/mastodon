@@ -169,12 +169,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
       // get default language if participant doesn't have a preference
       $db_language = $db_participant->get_language();
-<<<<<<< HEAD
-      if( is_null( $db_language ) )
-        $db_language = lib::create( 'business\session' )->get_application()->get_language();
-=======
-      if( is_null( $db_language ) ) $db_language = $session->get_service()->get_language();
->>>>>>> release
+      if( is_null( $db_language ) ) $db_language = $session->get_application()->get_language();
       $row = array(
         $db_language->code,
         $db_participant->uid,
