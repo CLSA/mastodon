@@ -83,7 +83,7 @@ class import extends \cenozo\database\record
       static::db()->execute( sprintf(
         'UPDATE %s SET data = %s %s',
         static::get_table_name(),
-        $database_class_name::format_string( $this->data_value ),
+        static::db()->format_string( $this->data_value ),
         $modifier->get_sql() ) );
     }
   }

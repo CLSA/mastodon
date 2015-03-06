@@ -35,7 +35,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
    */
   protected function build()
   {
-    $database_class_name = lib::get_class_name( 'database\database' );
+    $session = lib::create( 'business\session' );
+    $db = $session->get_database();
     $event_type_class_name = lib::get_class_name( 'database\event_type' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
 
@@ -94,7 +95,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
       'SELECT DISTINCT participant.id FROM participant '.
       'JOIN event ON participant.id = event.participant_id '.
       'AND event.event_type_id = %s ',
-      $database_class_name::format_string( $db_event_type->id ) );
+      $db->format_string( $db_event_type->id ) );
 
     if( $mailed_to )
     {
@@ -119,8 +120,8 @@ class mailout_report extends \cenozo\ui\pull\base_report
         'LEFT JOIN service_has_participant '.
         'ON service_has_participant.participant_id = participant.id '.
         'AND service_has_participant.service_id = %s ',
-        $database_class_name::format_string( $db_service->id ),
-        $database_class_name::format_string( $db_service->id ) );
+        $db->format_string( $db_service->id ),
+        $db->format_string( $db_service->id ) );
 
       if( 0 == strcasecmp( 'yes', $released ) )
         $participant_mod->where( 'service_has_participant.datetime', '!=', NULL );
@@ -166,8 +167,7 @@ class mailout_report extends \cenozo\ui\pull\base_report
 
       // get default language if participant doesn't have a preference
       $db_language = $db_participant->get_language();
-      if( is_null( $db_language ) )
-        $db_language = lib::create( 'business\session' )->get_service()->get_language();
+      if( is_null( $db_language ) ) $db_language = $session->get_service()->get_language();
       $row = array(
         $db_language->code,
         $db_participant->uid,
