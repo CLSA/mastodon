@@ -7,8 +7,6 @@ Designed for large epidemiology studies, Mastodon integrates with Sabretooth and
 Beartooth, software for the telephone-based and personal-based collection of study
 questionnaires and data, respectively.
 
-See doc/install.readme for install instructions.
-
 api/
   This is where the programming interface belongs.
   This includes all packages, classes, functions, settings, etc.
@@ -16,18 +14,23 @@ api/
 aux/
   Any auxiliary files which are needed by the software go here.
 
-tpl/
-  This is where display templates belong.
-  This includes twig templates, javascript, etc.
-
 web/
   This is the public web directory that a web server links to.
 
+web/api/
+  The root of the restful web API
+
+web/app/
+  Application-specific extensions to the Angular-based web application
+
 doc/
-  All documentation for Mastodon is found here including the apigen generated API
+  All documentation for Sabretooth is found here including the apigen generated API
   documentation and design documents.
 
-sql/
+doc/report/
+  Spreadsheet-based report templates are stored here
+
+db/
   This is where all sql needed to install the application belongs.
-  This includes database schemas, default data and script to upgrade from older
+  This includes database schemas, default data and script to upgrade from older 
   versions.

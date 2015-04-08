@@ -2,8 +2,8 @@
 *
 
 # except the standard web files
+api
+app
 img
 index.php
-settings.ini.php
-settings.local.ini.php.sample
 .htaccess.sample

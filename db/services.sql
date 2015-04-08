@@ -1,7 +1,8 @@
 -- -----------------------------------------------------
--- Load all initial data
+-- Services
 -- -----------------------------------------------------
+SET AUTOCOMMIT=0;
 
-SOURCE operations.sql
-SOURCE roles.sql
-SOURCE settings.sql
+-- TODO
+
+COMMIT;

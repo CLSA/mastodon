@@ -11,10 +11,6 @@ global $SETTINGS;
 // whether or not to run the application in development mode
 $SETTINGS['general']['development_mode'] = true;
 
-// defines the username and password used by mastodon when communicating as a machine
-$SETTINGS['general']['machine_user'] = 'mastodon';
-$SETTINGS['general']['machine_password'] = '1qaz2wsx';
-
 // the file path to the application
 $SETTINGS['path']['CENOZO'] = '/home/patrick/files/repositories/cenozo';
 $SETTINGS['path']['APPLICATION'] = '/home/patrick/files/repositories/mastodon';
