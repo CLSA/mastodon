@@ -75,12 +75,10 @@ class import_entry extends \cenozo\database\record
     $cohort_names = array();
     foreach( $cohort_class_name::select() as $db_cohort ) $cohort_names[] = $db_cohort->name;
     if( 0 == preg_match( '/^male|female$/', $this->gender ) ) $this->gender_error = true;
-    if( !util::validate_date( $this->date_of_birth ) ) $this->date_of_birth_error = true;
     if( !is_null( $this->language ) &&
         is_null( $language_class_name::get_unique_record( 'code', $this->language ) ) )
       $this->language_error = true;
     if( !in_array( $this->cohort, $cohort_names ) ) $this->cohort_error = true;
-    if( !util::validate_date( $this->date ) ) $this->date_error = true;
 
     // look for duplicate addresses (same address and cohort)
     if( !$this->apartment_error &&
@@ -115,6 +113,7 @@ class import_entry extends \cenozo\database\record
       }
     }
 
+    // TODO: date_of_birth_error and date_error are no longer needed
     return !$this->apartment_error &&
            !$this->address_error &&
            !$this->province_error &&
@@ -271,158 +270,9 @@ class import_entry extends \cenozo\database\record
       $db_participant_note = lib::create( 'database\person_note' );
       $db_participant_note->person_id = $db_person->id;
       $db_participant_note->user_id = lib::create( 'business\session' )->get_user()->id;
-      $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+      $db_participant_note->datetime = util::get_datetime_object();
       $db_participant_note->note = $this->note;
       $db_participant_note->save();
-    }
-
-    // import data to the availability table
-    $all_days = ( 0 == $this->monday &&
-                  0 == $this->tuesday &&
-                  0 == $this->wednesday &&
-                  0 == $this->thursday &&
-                  0 == $this->friday &&
-                  0 == $this->saturday ) ||
-                ( 1 == $this->monday &&
-                  1 == $this->tuesday &&
-                  1 == $this->wednesday &&
-                  1 == $this->thursday &&
-                  1 == $this->friday &&
-                  1 == $this->saturday );
-    $all_times = ( 0 == $this->time_9_10 &&
-                   0 == $this->time_10_11 &&
-                   0 == $this->time_11_12 &&
-                   0 == $this->time_12_13 &&
-                   0 == $this->time_13_14 &&
-                   0 == $this->time_14_15 &&
-                   0 == $this->time_15_16 &&
-                   0 == $this->time_16_17 &&
-                   0 == $this->time_17_18 &&
-                   0 == $this->time_18_19 &&
-                   0 == $this->time_19_20 &&
-                   0 == $this->time_20_21 ) ||
-                 ( 1 == $this->time_9_10 &&
-                   1 == $this->time_10_11 &&
-                   1 == $this->time_11_12 &&
-                   1 == $this->time_12_13 &&
-                   1 == $this->time_13_14 &&
-                   1 == $this->time_14_15 &&
-                   1 == $this->time_15_16 &&
-                   1 == $this->time_16_17 &&
-                   1 == $this->time_17_18 &&
-                   1 == $this->time_18_19 &&
-                   1 == $this->time_19_20 &&
-                   1 == $this->time_20_21 );
-
-    $time_slots = array();
-    if( !$all_times )
-    {
-      $times = array();
-      if( $this->time_9_10 ) $times[] = 9;
-      if( $this->time_10_11 ) $times[] = 10;
-      if( $this->time_11_12 ) $times[] = 11;
-      if( $this->time_12_13 ) $times[] = 12;
-      if( $this->time_13_14 ) $times[] = 13;
-      if( $this->time_14_15 ) $times[] = 14;
-      if( $this->time_15_16 ) $times[] = 15;
-      if( $this->time_16_17 ) $times[] = 16;
-      if( $this->time_17_18 ) $times[] = 17;
-      if( $this->time_18_19 ) $times[] = 18;
-      if( $this->time_19_20 ) $times[] = 19;
-      if( $this->time_20_21 ) $times[] = 20;
-
-      // find all connected times
-      foreach( $times as $time )
-      {
-        $count = count( $time_slots );
-        if( 0 < $count && $time == $time_slots[$count-1]['end'] + 1 )
-          $time_slots[$count-1]['end'] = $time;
-        else $time_slots[] = array( 'start' => $time, 'end' => $time );
-      }
-    }
-
-    // build the time diff interval (note: date interval doesn't allow negative periods)
-    $time_diff = $db_address->get_time_diff();
-    $time_diff_interval = new \DateInterval(
-      sprintf( 'PT%dM', ( 0 <= $time_diff ? 1 : -1 )*round( 60 * $time_diff ) ) );
-    if( 0 > $time_diff ) $time_diff_interval->invert = true;
-
-    if( $all_days && !$all_times )
-    {
-      foreach( $time_slots as $time_slot )
-      {
-        // create datetime objects and adjust for timezone
-        $start_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['start'] ) );
-        $start_datetime_obj->sub( $time_diff_interval );
-        $end_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['end'] + 1 ) );
-        $end_datetime_obj->sub( $time_diff_interval );
-
-        $db_availability = lib::create( 'database\availability' );
-        $db_availability->participant_id = $db_participant->id;
-        $db_availability->monday = true;
-        $db_availability->tuesday = true;
-        $db_availability->wednesday = true;
-        $db_availability->thursday = true;
-        $db_availability->friday = true;
-        $db_availability->saturday = true;
-        $db_availability->sunday = false;
-        $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-        $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-        $db_availability->save();
-      }
-    }
-    else if( $all_times && !$all_days )
-    {
-      // create datetime objects and adjust for timezone
-      $start_datetime_obj = util::get_datetime_object( '2000-01-02 9:00' );
-      $start_datetime_obj->sub( $time_diff_interval );
-      $end_datetime_obj = util::get_datetime_object( '2000-01-02 21:00' );
-      $end_datetime_obj->sub( $time_diff_interval );
-
-      $db_availability = lib::create( 'database\availability' );
-      $db_availability->participant_id = $db_participant->id;
-      $db_availability->monday = $this->monday;
-      $db_availability->tuesday = $this->tuesday;
-      $db_availability->wednesday = $this->wednesday;
-      $db_availability->thursday = $this->thursday;
-      $db_availability->friday = $this->friday;
-      $db_availability->saturday = $this->saturday;
-      $db_availability->sunday = false;
-      $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-      $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-      $db_availability->save();
-    }
-    else if( !$all_days && !$all_times )
-    {
-      foreach( $time_slots as $time_slot )
-      {
-        // create datetime objects and adjust for timezone
-        $start_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['start'] ) );
-        $start_datetime_obj->sub( $time_diff_interval );
-        $end_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['end'] + 1 ) );
-        $end_datetime_obj->sub( $time_diff_interval );
-
-        $db_availability = lib::create( 'database\availability' );
-        $db_availability->participant_id = $db_participant->id;
-        $db_availability->monday = $this->monday;
-        $db_availability->tuesday = $this->tuesday;
-        $db_availability->wednesday = $this->wednesday;
-        $db_availability->thursday = $this->thursday;
-        $db_availability->friday = $this->friday;
-        $db_availability->saturday = $this->saturday;
-        $db_availability->sunday = false;
-        $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-        $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-        $db_availability->save();
-      }
-    }
-    else if( $all_days && $all_times )
-    {
-      // do nothing, all availability is the same as having no availability entries
     }
 
     // save the new participant record to the form

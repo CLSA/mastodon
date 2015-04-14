@@ -66,7 +66,7 @@ abstract class base_form extends \cenozo\database\record
 
         // create a new form
         $db_form = new static();
-        $db_form->date = util::get_datetime_object()->format( 'Y-m-d' );
+        $db_form->date = util::get_datetime_object();
         $db_form->save();
 
         // write the data to disk

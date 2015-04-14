@@ -126,22 +126,18 @@ class application extends \cenozo\database\application
     if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'application_has_participant.datetime', '=', NULL );
 
-    $datetime = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
-
     $select_sql = 'SELECT DISTINCT participant.id ';
 
     $insert_sql = sprintf(
       'INSERT INTO application_has_participant'.
       '( application_id, participant_id, create_timestamp, datetime ) '.
-      'SELECT %s, participant.id, NULL, %s ',
-      static::db()->format_string( $this->id ),
-      static::db()->format_string( $datetime ) );
+      'SELECT %s, participant.id, NULL, UTC_DATETIME() ',
+      static::db()->format_string( $this->id ) );
 
     $event_sql = sprintf(
       'INSERT INTO event( participant_id, event_type_id, datetime ) '.
-      'SELECT DISTINCT participant.id, %s, %s ',
-      static::db()->format_string( $this->release_event_type_id ),
-      static::db()->format_string( $datetime ) );
+      'SELECT DISTINCT participant.id, %s, UTC_DATETIME() ',
+      static::db()->format_string( $this->release_event_type_id ) );
 
     $table_sql = sprintf(
       'FROM participant '.
@@ -156,9 +152,7 @@ class application extends \cenozo\database\application
       $modifier->get_sql() );
 
     $select_sql .= $table_sql;
-    $insert_sql .= $table_sql
-                .  sprintf( ' ON DUPLICATE KEY UPDATE datetime = %s',
-                            static::db()->format_string( $datetime ) );
+    $insert_sql .= $table_sql.' ON DUPLICATE KEY UPDATE datetime = UTC_DATETIME()';
     $event_sql .= $table_sql;
 
     if( $get_unreleased )

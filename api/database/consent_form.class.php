@@ -40,7 +40,6 @@ class consent_form extends base_form
     $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
 
     // add the consent signed event to the participant
-    $now = util::get_datetime_object()->format( 'Y-m-d H:i:s' );
     $db_event_type =
       $event_type_class_name::get_unique_record( 'name', 'consent signed' );
     if( !is_null( $db_event_type ) )
@@ -50,7 +49,7 @@ class consent_form extends base_form
       $db_event->event_type_id = $db_event_type->id;
       $db_event->datetime = !is_null( $db_consent_form_entry->date )
                           ? $db_consent_form_entry->date
-                          : $now;
+                          : util::get_datetime_object();
       $db_event->save();
     }
 
@@ -58,7 +57,7 @@ class consent_form extends base_form
     $accept = $db_consent_form_entry->option_1;
     $date = !is_null( $db_consent_form_entry->date )
           ? $db_consent_form_entry->date
-          : util::get_datetime_object()->format( 'Y-m-d' );
+          : util::get_datetime_object();
 
     // look for duplicates
     $db_consent = NULL;

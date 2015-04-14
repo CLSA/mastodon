@@ -143,7 +143,7 @@ class contact_form extends base_form
     $db_participant->first_name = $db_contact_form_entry->first_name;
     $db_participant->last_name = $db_contact_form_entry->last_name;
     $db_participant->gender = $db_contact_form_entry->gender;
-    $db_participant->date_of_birth = $dob;
+    $db_participant->date_of_birth = util::get_datetime_obj( $dob );
     if( !is_null( $db_age_group ) ) $db_participant->age_group_id = $db_age_group->id;
     $db_participant->language_id = $db_contact_form_entry->language_id;
     $db_participant->email = $db_contact_form_entry->email;
@@ -155,7 +155,7 @@ class contact_form extends base_form
       $db_participant_note = lib::create( 'database\person_note' );
       $db_participant_note->person_id = $db_person->id;
       $db_participant_note->user_id = $db_contact_form_entry->user_id;
-      $db_participant_note->datetime = util::get_datetime_object()->format( 'Y-m-d' );
+      $db_participant_note->datetime = util::get_datetime_object();
       $db_participant_note->note = $db_contact_form_entry->note;
       $db_participant_note->save();
     }
@@ -169,7 +169,7 @@ class contact_form extends base_form
       $db_event->participant_id = $db_participant->id;
       $db_event->event_type_id = $db_event_type->id;
       $db_event->datetime = is_null( $db_contact_form_entry->participant_date )
-                          ? util::get_datetime_object()->format( 'Y-m-d H:i:s' )
+                          ? util::get_datetime_object()
                           : $db_contact_form_entry->participant_date;
       $db_event->save();
     }
@@ -239,155 +239,6 @@ class contact_form extends base_form
       $db_mobile_phone->save();
       $db_home_phone->rank = 2;
       $db_home_phone->save();
-    }
-
-    // import data to the availability table
-    $all_days = ( 0 == $db_contact_form_entry->monday &&
-                  0 == $db_contact_form_entry->tuesday &&
-                  0 == $db_contact_form_entry->wednesday &&
-                  0 == $db_contact_form_entry->thursday &&
-                  0 == $db_contact_form_entry->friday &&
-                  0 == $db_contact_form_entry->saturday ) ||
-                ( 1 == $db_contact_form_entry->monday &&
-                  1 == $db_contact_form_entry->tuesday &&
-                  1 == $db_contact_form_entry->wednesday &&
-                  1 == $db_contact_form_entry->thursday &&
-                  1 == $db_contact_form_entry->friday &&
-                  1 == $db_contact_form_entry->saturday );
-    $all_times = ( 0 == $db_contact_form_entry->time_9_10 &&
-                   0 == $db_contact_form_entry->time_10_11 &&
-                   0 == $db_contact_form_entry->time_11_12 &&
-                   0 == $db_contact_form_entry->time_12_13 &&
-                   0 == $db_contact_form_entry->time_13_14 &&
-                   0 == $db_contact_form_entry->time_14_15 &&
-                   0 == $db_contact_form_entry->time_15_16 &&
-                   0 == $db_contact_form_entry->time_16_17 &&
-                   0 == $db_contact_form_entry->time_17_18 &&
-                   0 == $db_contact_form_entry->time_18_19 &&
-                   0 == $db_contact_form_entry->time_19_20 &&
-                   0 == $db_contact_form_entry->time_20_21 ) ||
-                 ( 1 == $db_contact_form_entry->time_9_10 &&
-                   1 == $db_contact_form_entry->time_10_11 &&
-                   1 == $db_contact_form_entry->time_11_12 &&
-                   1 == $db_contact_form_entry->time_12_13 &&
-                   1 == $db_contact_form_entry->time_13_14 &&
-                   1 == $db_contact_form_entry->time_14_15 &&
-                   1 == $db_contact_form_entry->time_15_16 &&
-                   1 == $db_contact_form_entry->time_16_17 &&
-                   1 == $db_contact_form_entry->time_17_18 &&
-                   1 == $db_contact_form_entry->time_18_19 &&
-                   1 == $db_contact_form_entry->time_19_20 &&
-                   1 == $db_contact_form_entry->time_20_21 );
-
-    $time_slots = array();
-    if( !$all_times )
-    {
-      $times = array();
-      if( $db_contact_form_entry->time_9_10 ) $times[] = 9;
-      if( $db_contact_form_entry->time_10_11 ) $times[] = 10;
-      if( $db_contact_form_entry->time_11_12 ) $times[] = 11;
-      if( $db_contact_form_entry->time_12_13 ) $times[] = 12;
-      if( $db_contact_form_entry->time_13_14 ) $times[] = 13;
-      if( $db_contact_form_entry->time_14_15 ) $times[] = 14;
-      if( $db_contact_form_entry->time_15_16 ) $times[] = 15;
-      if( $db_contact_form_entry->time_16_17 ) $times[] = 16;
-      if( $db_contact_form_entry->time_17_18 ) $times[] = 17;
-      if( $db_contact_form_entry->time_18_19 ) $times[] = 18;
-      if( $db_contact_form_entry->time_19_20 ) $times[] = 19;
-      if( $db_contact_form_entry->time_20_21 ) $times[] = 20;
-
-      // find all connected times
-      foreach( $times as $time )
-      {
-        $count = count( $time_slots );
-        if( 0 < $count && $time == $time_slots[$count-1]['end'] + 1 )
-          $time_slots[$count-1]['end'] = $time;
-        else $time_slots[] = array( 'start' => $time, 'end' => $time );
-      }
-    }
-
-    // build the time diff interval (note: date interval doesn't allow negative periods)
-    $time_diff = $db_address->get_time_diff();
-    $time_diff_interval = new \DateInterval(
-      sprintf( 'PT%dM', ( 0 <= $time_diff ? 1 : -1 )*round( 60 * $time_diff ) ) );
-    if( 0 > $time_diff ) $time_diff_interval->invert = true;
-
-    if( $all_days && !$all_times )
-    {
-      foreach( $time_slots as $time_slot )
-      {
-        // create datetime objects and adjust for timezone
-        $start_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['start'] ) );
-        $start_datetime_obj->sub( $time_diff_interval );
-        $end_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['end'] + 1 ) );
-        $end_datetime_obj->sub( $time_diff_interval );
-
-        $db_availability = lib::create( 'database\availability' );
-        $db_availability->participant_id = $db_participant->id;
-        $db_availability->monday = true;
-        $db_availability->tuesday = true;
-        $db_availability->wednesday = true;
-        $db_availability->thursday = true;
-        $db_availability->friday = true;
-        $db_availability->saturday = true;
-        $db_availability->sunday = false;
-        $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-        $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-        $db_availability->save();
-      }
-    }
-    else if( $all_times && !$all_days )
-    {
-      // create datetime objects and adjust for timezone
-      $start_datetime_obj = util::get_datetime_object( '2000-01-02 9:00' );
-      $start_datetime_obj->sub( $time_diff_interval );
-      $end_datetime_obj = util::get_datetime_object( '2000-01-02 21:00' );
-      $end_datetime_obj->sub( $time_diff_interval );
-
-      $db_availability = lib::create( 'database\availability' );
-      $db_availability->participant_id = $db_participant->id;
-      $db_availability->monday = $db_contact_form_entry->monday;
-      $db_availability->tuesday = $db_contact_form_entry->tuesday;
-      $db_availability->wednesday = $db_contact_form_entry->wednesday;
-      $db_availability->thursday = $db_contact_form_entry->thursday;
-      $db_availability->friday = $db_contact_form_entry->friday;
-      $db_availability->saturday = $db_contact_form_entry->saturday;
-      $db_availability->sunday = false;
-      $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-      $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-      $db_availability->save();
-    }
-    else if( !$all_days && !$all_times )
-    {
-      foreach( $time_slots as $time_slot )
-      {
-        // create datetime objects and adjust for timezone
-        $start_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['start'] ) );
-        $start_datetime_obj->sub( $time_diff_interval );
-        $end_datetime_obj =
-          util::get_datetime_object( sprintf( '2000-01-02 %d:00', $time_slot['end'] + 1 ) );
-        $end_datetime_obj->sub( $time_diff_interval );
-
-        $db_availability = lib::create( 'database\availability' );
-        $db_availability->participant_id = $db_participant->id;
-        $db_availability->monday = $db_contact_form_entry->monday;
-        $db_availability->tuesday = $db_contact_form_entry->tuesday;
-        $db_availability->wednesday = $db_contact_form_entry->wednesday;
-        $db_availability->thursday = $db_contact_form_entry->thursday;
-        $db_availability->friday = $db_contact_form_entry->friday;
-        $db_availability->saturday = $db_contact_form_entry->saturday;
-        $db_availability->sunday = false;
-        $db_availability->start_time = $start_datetime_obj->format( 'H:i:s' );
-        $db_availability->end_time = $end_datetime_obj->format( 'H:i:s' );
-        $db_availability->save();
-      }
-    }
-    else if( $all_days && $all_times )
-    {
-      // do nothing, all availability is the same as having no availability entries
     }
 
     // save the new participant record to the form
