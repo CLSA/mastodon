@@ -63,7 +63,7 @@ class import_entry extends \cenozo\database\record
       $phone_mod->or_where( 'number', '=', $this->mobile_phone );
     foreach( $phone_class_name::select( $phone_mod ) as $db_phone )
     {
-      $db_participant = $db_phone->get_person()->get_participant();
+      $db_participant = $db_phone->get_participant();
       if( $db_participant && $db_participant->get_cohort()->name == $this->cohort )
       {
         $this->duplicate_participant_error = true;
@@ -104,7 +104,7 @@ class import_entry extends \cenozo\database\record
       $address_mod->where( 'postcode', '=', $postcode );
       foreach( $address_class_name::select( $address_mod ) as $db_address )
       {
-        $db_participant = $db_address->get_person()->get_participant();
+        $db_participant = $db_address->get_participant();
         if( $db_participant && $db_participant->get_cohort()->name == $this->cohort )
         {
           $this->duplicate_address_error = true;
@@ -171,12 +171,8 @@ class import_entry extends \cenozo\database\record
     $age_group_list = $age_group_class_name::select( $age_group_mod );
     $db_age_group = current( $age_group_list );
 
-    // import data to the person and participant tables
-    $db_person = lib::create( 'database\person' );
-    $db_person->save();
-
+    // import data to the participant table
     $db_participant = lib::create( 'database\participant' );
-    $db_participant->person_id = $db_person->id;
     $db_participant->active = true;
     $db_participant->uid = $uid;
     $db_participant->source_id = $this->source_id;
@@ -209,7 +205,7 @@ class import_entry extends \cenozo\database\record
 
     $db_region = $region_class_name::get_unique_record( 'abbreviation', $this->province );
     $db_address = lib::create( 'database\address' );
-    $db_address->person_id = $db_person->id;
+    $db_address->participant_id = $db_participant->id;
     $db_address->active = true;
     $db_address->rank = 1;
     $db_address->address1 = $address;
@@ -232,7 +228,7 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $this->home_phone ) )
     {
       $db_home_phone = lib::create( 'database\phone' );
-      $db_home_phone->person_id = $db_person->id;
+      $db_home_phone->participant_id = $db_participant->id;
       $db_home_phone->address_id = $db_address->id;
       $db_home_phone->active = true;
       $db_home_phone->rank = $rank;
@@ -244,7 +240,7 @@ class import_entry extends \cenozo\database\record
     if( !is_null( $this->mobile_phone ) )
     {
       $db_mobile_phone = lib::create( 'database\phone' );
-      $db_mobile_phone->person_id = $db_person->id;
+      $db_mobile_phone->participant_id = $db_participant->id;
       $db_mobile_phone->active = true;
       $db_mobile_phone->rank = $rank;
       $db_mobile_phone->type = 'mobile';
@@ -264,15 +260,15 @@ class import_entry extends \cenozo\database\record
       $db_home_phone->save();
     }
 
-    // import data to the person_note table
+    // import data to the note table
     if( !is_null( $this->note ) )
     {
-      $db_participant_note = lib::create( 'database\person_note' );
-      $db_participant_note->person_id = $db_person->id;
-      $db_participant_note->user_id = lib::create( 'business\session' )->get_user()->id;
-      $db_participant_note->datetime = util::get_datetime_object();
-      $db_participant_note->note = $this->note;
-      $db_participant_note->save();
+      $db_note = lib::create( 'database\note' );
+      $db_note->participant_id = $db_participant->id;
+      $db_note->user_id = lib::create( 'business\session' )->get_user()->id;
+      $db_note->datetime = util::get_datetime_object();
+      $db_note->note = $this->note;
+      $db_note->save();
     }
 
     // save the new participant record to the form

@@ -58,7 +58,7 @@ class contact_form extends base_form
     $address_mod->where( 'postcode', '=', $postcode );
     foreach( $address_class_name::select( $address_mod ) as $db_address )
     {
-      $db_participant = $db_address->get_person()->get_participant();
+      $db_participant = $db_address->get_participant();
       if( $db_participant && $db_participant->cohort_id == $db_contact_form_entry->cohort_id )
       {
         throw lib::create( 'exception\notice',
@@ -129,12 +129,8 @@ class contact_form extends base_form
                   ? $age_group_class_name::get_unique_record( 'lower', $lower )
                   : NULL;
 
-    // import data to the person and participant tables
-    $db_person = lib::create( 'database\person' );
-    $db_person->save();
-
+    // import data to the participant table
     $db_participant = lib::create( 'database\participant' );
-    $db_participant->person_id = $db_person->id;
     $db_participant->active = true;
     $db_participant->uid = $uid;
     $db_participant->source_id = $db_source->id;
@@ -151,13 +147,13 @@ class contact_form extends base_form
 
     if( !is_null( $db_contact_form_entry->note ) )
     {
-      // import data to the person_note table
-      $db_participant_note = lib::create( 'database\person_note' );
-      $db_participant_note->person_id = $db_person->id;
-      $db_participant_note->user_id = $db_contact_form_entry->user_id;
-      $db_participant_note->datetime = util::get_datetime_object();
-      $db_participant_note->note = $db_contact_form_entry->note;
-      $db_participant_note->save();
+      // import data to the note table
+      $db_note = lib::create( 'database\note' );
+      $db_note->participant_id = $db_participant->id;
+      $db_note->user_id = $db_contact_form_entry->user_id;
+      $db_note->datetime = util::get_datetime_object();
+      $db_note->note = $db_contact_form_entry->note;
+      $db_note->save();
     }
 
     // add the consent to contact signed event to the participant
@@ -188,7 +184,7 @@ class contact_form extends base_form
     
     // import data to the address table
     $db_address = lib::create( 'database\address' );
-    $db_address->person_id = $db_person->id;
+    $db_address->participant_id = $db_participant->id;
     $db_address->active = true;
     $db_address->rank = 1;
     $db_address->address1 = $address[0];
@@ -207,7 +203,7 @@ class contact_form extends base_form
     if( !is_null( $db_contact_form_entry->home_phone ) )
     {
       $db_home_phone = lib::create( 'database\phone' );
-      $db_home_phone->person_id = $db_person->id;
+      $db_home_phone->participant_id = $db_participant->id;
       $db_home_phone->address_id = $db_address->id;
       $db_home_phone->active = true;
       $db_home_phone->rank = $rank;
@@ -220,7 +216,7 @@ class contact_form extends base_form
     if( !is_null( $db_contact_form_entry->mobile_phone ) )
     {
       $db_mobile_phone = lib::create( 'database\phone' );
-      $db_mobile_phone->person_id = $db_person->id;
+      $db_mobile_phone->participant_id = $db_participant->id;
       $db_mobile_phone->active = true;
       $db_mobile_phone->rank = $rank;
       $db_mobile_phone->type = 'mobile';

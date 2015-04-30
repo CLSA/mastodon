@@ -56,7 +56,7 @@ class proxy_form extends base_form
 
     if( $db_proxy_form_entry->proxy )
     {
-      // import data to the person and alternate table
+      // import data to the alternate table
 
       // if this participant already has an alternate with the same first and last name then
       // overwrite instead of creating a new record
@@ -69,15 +69,10 @@ class proxy_form extends base_form
 
       if( false == $db_proxy_alternate )
       { // create a new alternate if no match was found
-        $db_person = lib::create( 'database\person' );
-        $db_person->save();
         $db_proxy_alternate = lib::create( 'database\alternate' );
-        $db_proxy_alternate->person_id = $db_person->id;
       }
       else
       {
-        $db_person = $db_proxy_alternate->get_person();
-
         // replace any address and phone numbers
         foreach( $db_proxy_alternate->get_address_list() as $db_address ) $db_address->delete();
         foreach( $db_proxy_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
@@ -94,13 +89,13 @@ class proxy_form extends base_form
 
       if( !is_null( $db_proxy_form_entry->proxy_note ) )
       {
-        // import data to the person_note table
-        $db_participant_note = lib::create( 'database\person_note' );
-        $db_participant_note->person_id = $db_person->id;
-        $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object();
-        $db_participant_note->note = $db_proxy_form_entry->proxy_note;
-        $db_participant_note->save();
+        // import data to the note table
+        $db_note = lib::create( 'database\note' );
+        $db_note->alternate_id = $db_proxy_alternate->id;
+        $db_note->user_id = $db_proxy_form_entry->user_id;
+        $db_note->datetime = util::get_datetime_object();
+        $db_note->note = $db_proxy_form_entry->proxy_note;
+        $db_note->save();
       }
 
       // import data to the address table
@@ -113,7 +108,7 @@ class proxy_form extends base_form
         $db_proxy_form_entry->proxy_address_other );
 
       $db_proxy_address = lib::create( 'database\address' );
-      $db_proxy_address->person_id = $db_person->id;
+      $db_proxy_address->alternate_id = $db_proxy_alternate->id;
       $db_proxy_address->active = true;
       $db_proxy_address->rank = 1;
       $db_proxy_address->address1 = $address[0];
@@ -132,7 +127,7 @@ class proxy_form extends base_form
 
       // import data to the phone table
       $db_proxy_phone = lib::create( 'database\phone' );
-      $db_proxy_phone->person_id = $db_person->id;
+      $db_proxy_phone->alternate_id = $db_proxy_alternate->id;
       $db_proxy_phone->active = true;
       $db_proxy_phone->rank = 1;
       $db_proxy_phone->type = 'other';
@@ -143,7 +138,7 @@ class proxy_form extends base_form
 
     if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
     {
-      // import data to the person and alternate table
+      // import data to the alternate table
 
       // if this participant already has an alternate with the same first and last name then
       // overwrite instead of creating a new record
@@ -156,15 +151,10 @@ class proxy_form extends base_form
 
       if( false == $db_informant_alternate )
       { // create a new alternate if no match was found
-        $db_person = lib::create( 'database\person' );
-        $db_person->save();
         $db_informant_alternate = lib::create( 'database\alternate' );
-        $db_informant_alternate->person_id = $db_person->id;
       }
       else
       {
-        $db_person = $db_informant_alternate->get_person();
-
         // replace any address and phone numbers
         foreach( $db_informant_alternate->get_address_list() as $db_address ) $db_address->delete();
         foreach( $db_informant_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
@@ -179,13 +169,13 @@ class proxy_form extends base_form
 
       if( !is_null( $db_proxy_form_entry->informant_note ) )
       {
-        // import data to the person_note table
-        $db_participant_note = lib::create( 'database\person_note' );
-        $db_participant_note->person_id = $db_person->id;
-        $db_participant_note->user_id = $db_proxy_form_entry->user_id;
-        $db_participant_note->datetime = util::get_datetime_object();
-        $db_participant_note->note = $db_proxy_form_entry->informant_note;
-        $db_participant_note->save();
+        // import data to the note table
+        $db_note = lib::create( 'database\note' );
+        $db_note->alternate_id = $db_informant_alternate->id;
+        $db_note->user_id = $db_proxy_form_entry->user_id;
+        $db_note->datetime = util::get_datetime_object();
+        $db_note->note = $db_proxy_form_entry->informant_note;
+        $db_note->save();
       }
 
       // import data to the address table
@@ -198,7 +188,7 @@ class proxy_form extends base_form
         $db_proxy_form_entry->informant_address_other );
 
       $db_informant_address = lib::create( 'database\address' );
-      $db_informant_address->person_id = $db_person->id;
+      $db_informant_address->alternate_id = $db_informant_alternate->id;
       $db_informant_address->active = true;
       $db_informant_address->rank = 1;
       $db_informant_address->address1 = $address[0];
@@ -217,7 +207,7 @@ class proxy_form extends base_form
 
       // import data to the phone table
       $db_informant_phone = lib::create( 'database\phone' );
-      $db_informant_phone->person_id = $db_person->id;
+      $db_informant_phone->alternate_id = $db_informant_alternate->id;
       $db_informant_phone->active = true;
       $db_informant_phone->rank = 1;
       $db_informant_phone->type = 'other';
