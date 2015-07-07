@@ -17,10 +17,6 @@ $SETTINGS['general']['version'] = '2.0.0';
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;
 
-// Defines the username and password used by mastodon when communicating as a machine
-$SETTINGS['general']['machine_user'] = NULL;
-$SETTINGS['general']['machine_password'] = NULL;
-
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
