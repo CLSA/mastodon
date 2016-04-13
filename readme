@@ -7,7 +7,7 @@ Designed for large epidemiology studies, Mastodon integrates with Sabretooth and
 Beartooth, software for the telephone-based and personal-based collection of study
 questionnaires and data, respectively.
 
-api/
+src/
   This is where the programming interface belongs.
   This includes all packages, classes, functions, settings, etc.
 

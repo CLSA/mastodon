@@ -1,0 +1,27 @@
+#!/usr/bin/php
+<?php
+/** 
+ * Utility which removes the cached schema file
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+// back up to root directory if we're not already in it
+if( '/aux' == substr( getcwd(), -4 ) ) chdir( '..' );
+
+require_once 'settings.ini.php';
+require_once 'settings.local.ini.php';
+require_once $SETTINGS['path']['CENOZO'].'/src/bootstrap.class.php';
+$bootstrap = new \cenozo\bootstrap();
+$bootstrap->read_settings();
+
+// validate arguments
+if( 1 != $argc )
+{
+  print "Script expects no arguments.\n";
+  exit( 1 );
+}
+
+$filename = sprintf( TEMPORARY_FILES_PATH.'/*.schema.ser' );
+print "Removing all cached schema files\n";
+
+$result = passthru( sprintf( 'rm -v %s', $filename ) );

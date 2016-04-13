@@ -2,14 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
-SOURCE activity.sql
-SOURCE writelog.sql
-SOURCE role_has_operation.sql
-SOURCE operation.sql
-SOURCE service.sql
-SOURCE role_has_service.sql
-SOURCE setting_value.sql
-SOURCE setting.sql
+SOURCE access.sql;
 
 SOURCE table_character_sets.sql
 SOURCE column_character_sets.sql

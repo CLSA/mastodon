@@ -13,33 +13,10 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.0.0';
+$SETTINGS['general']['build'] = '21b94c2';
 
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
-
-// the url to Sabretooth (set to NULL to disable Sabretooth support)
-$SETTINGS['url']['SABRETOOTH'] = NULL;
-
-// the url to Beartooth (set to NULL to disable Mastodon support)
-$SETTINGS['url']['BEARTOOTH'] = NULL;
-
-// the location of new consent forms which need to be processed
-$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
-
-// the location of new contact forms which need to be processed
-$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
-
-// the location of new proxy forms which need to be processed
-$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
-
-// the location to store processed consent forms
-$SETTINGS['path']['CONSENT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/consent';
-
-// the location to store processed contact forms
-$SETTINGS['path']['CONTACT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/contact';
-
-// the location to store processed proxy forms
-$SETTINGS['path']['PROXY_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/proxy';
