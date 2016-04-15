@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS beartooth_participant_last_appointment;
