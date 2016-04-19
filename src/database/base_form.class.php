@@ -21,7 +21,7 @@ abstract class base_form extends \cenozo\database\record
   public static function select( $select = NULL, $modifier = NULL, $return_alternate = '' )
   {
     // first load any scans in the form directory into the database
-    $path = sprintf( '%s/%s', FORM_IN_PATH, static::get_table_name() );
+    $path = sprintf( '%s/%s', FORM_IN_PATH, str_replace( '_form', '', static::get_table_name() ) );
     foreach( scandir( $path ) as $filename )
     {
       $filename = $path.'/'.$filename;
@@ -122,7 +122,7 @@ abstract class base_form extends \cenozo\database\record
 
     $padded_id = str_pad( $this->id, 7, '0', STR_PAD_LEFT );
     $filename = sprintf( '%s/%s/%s/%s.pdf',
-                         sprintf( '%s/%s', FORM_OUT_PATH, static::get_table_name() ),
+                         sprintf( '%s/%s', FORM_OUT_PATH, str_replace( '_form', '', static::get_table_name() ) ),
                          substr( $padded_id, 0, 3 ),
                          substr( $padded_id, 3, 2 ),
                          substr( $padded_id, 5 ) );
