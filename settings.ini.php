@@ -20,3 +20,21 @@ $SETTINGS['general']['development_mode'] = false;
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
+
+// the location of new consent forms which need to be processed
+$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
+
+// the location of new contact forms which need to be processed
+$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
+
+// the location of new proxy forms which need to be processed
+$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
+
+// the location to store processed consent forms
+$SETTINGS['path']['CONSENT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/consent';
+
+// the location to store processed contact forms
+$SETTINGS['path']['CONTACT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/contact';
+
+// the location to store processed proxy forms
+$SETTINGS['path']['PROXY_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/proxy';

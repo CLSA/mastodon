@@ -70,8 +70,8 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name = 'curator' ",
       "AND service.restricted = 1 ",
       "AND service.subject IN ( ",
-        "'address', 'alternate', 'consent', 'event', 'language', 'note', ",
-        "'participant', 'phone', 'region_site', 'source', 'state' ",
+        "'address', 'alternate', 'consent', 'consent_form', 'contact_form', 'event', 'language', 'note', ",
+        "'participant', 'phone', 'proxy_form', 'region_site', 'source', 'state' ",
       ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
@@ -85,26 +85,6 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name IN( 'helpline', 'operator' ) ",
       "AND service.restricted = 1 ",
       "AND service.subject IN ( 'participant', 'token' )" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
-
-    -- supervisor
-    SET @sql = CONCAT(
-      "INSERT INTO role_has_service( role_id, service_id ) ",
-      "SELECT role.id, service.id ",
-      "FROM ", @cenozo, ".role, service ",
-      "WHERE role.name = 'supervisor' ",
-      "AND service.restricted = 1 ",
-      "AND service.id NOT IN ( ",
-        "SELECT id FROM service ",
-        "WHERE subject IN( ",
-          "'address', 'alternate', 'application', 'collection', 'consent', 'event', ",
-          "'jurisdiction', 'language', 'phase', 'phone', 'quota', ",
-          "'recording', 'recording_file', 'region_site', 'script', 'source', 'state' ) ",
-        "OR ( subject = 'setting' AND method = 'GET' ) ",
-        "OR ( subject = 'site' AND method IN ( 'DELETE', 'POST' ) ) ",
-      ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

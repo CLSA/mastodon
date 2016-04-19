@@ -174,6 +174,12 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'voip', 'GET', 0, 0 ),
 ( 'voip', 'GET', 1, 0 ),
 ( 'voip', 'PATCH', 1, 0 ),
-( 'voip', 'POST', 0, 0 );
+( 'voip', 'POST', 0, 0 ),
 
 -- application services
+( 'consent_form', 'GET', 0, 1 ),
+( 'consent_form', 'GET', 1, 1 ),
+( 'contact_form', 'GET', 0, 1 ),
+( 'contact_form', 'GET', 1, 1 ),
+( 'proxy_form', 'GET', 0, 1 ),
+( 'proxy_form', 'GET', 1, 1 );

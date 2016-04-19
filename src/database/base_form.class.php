@@ -17,17 +17,8 @@ abstract class base_form extends \cenozo\database\record
   /**
    * Overrides the parent method in order to read in any PDF files in the
    * form's directory into the database.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the selection.
-   * @param boolean $count If true the total number of records instead of a list
-   * @param boolean $distinct Whether to use the DISTINCT sql keyword
-   * @param enum $format Whether to return an object, column data or only the record id
-   * @return array( record ) | int
-   * @static
-   * @access public
    */
-  public static function select(
-    $modifier = NULL, $count = false, $distinct = true, $format = 0 )
+  public static function select( $select = NULL, $modifier = NULL, $return_alternate = '' )
   {
     // first load any scans in the form directory into the database
     $path_constant = sprintf( '%s_PATH', strtoupper( static::get_table_name() ) );
@@ -78,7 +69,7 @@ abstract class base_form extends \cenozo\database\record
     }
 
     // now copmlete the constructor
-    return parent::select( $modifier, $count, $distinct, $format );
+    return parent::select( $select, $modifier, $return_alternate );
   }
 
   /**
