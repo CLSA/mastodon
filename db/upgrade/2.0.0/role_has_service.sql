@@ -70,8 +70,8 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name = 'curator' ",
       "AND service.restricted = 1 ",
       "AND service.subject IN ( ",
-        "'address', 'alternate', 'consent', 'consent_form', 'contact_form', 'event', 'language', 'note', ",
-        "'participant', 'phone', 'proxy_form', 'region_site', 'source', 'state' ",
+        "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'event', 'language', ",
+        "'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', 'region_site', 'source', 'state' ",
       ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
@@ -82,9 +82,9 @@ CREATE PROCEDURE patch_role_has_service()
       "INSERT INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
-      "WHERE role.name IN( 'helpline', 'operator' ) ",
+      "WHERE role.name IN( 'typist' ) ",
       "AND service.restricted = 1 ",
-      "AND service.subject IN ( 'participant', 'token' )" );
+      "AND service.subject IN ( 'consent_form_entry', 'participant', 'proxy_form_entry' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

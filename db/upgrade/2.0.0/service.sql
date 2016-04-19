@@ -139,9 +139,6 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'self', 'GET', 1, 0 ),
 ( 'self', 'PATCH', 1, 0 ),
 ( 'self', 'POST', 1, 0 ),
-( 'setting', 'GET', 0, 1 ),
-( 'setting', 'GET', 1, 0 ),
-( 'setting', 'PATCH', 1, 1 ),
 ( 'site', 'DELETE', 1, 1 ),
 ( 'site', 'GET', 0, 0 ),
 ( 'site', 'GET', 1, 1 ),
@@ -179,7 +176,9 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 -- application services
 ( 'consent_form', 'GET', 0, 1 ),
 ( 'consent_form', 'GET', 1, 1 ),
-( 'contact_form', 'GET', 0, 1 ),
-( 'contact_form', 'GET', 1, 1 ),
+( 'consent_form_entry', 'GET', 0, 1 ),
+( 'consent_form_entry', 'GET', 1, 1 ),
 ( 'proxy_form', 'GET', 0, 1 ),
-( 'proxy_form', 'GET', 1, 1 );
+( 'proxy_form', 'GET', 1, 1 ),
+( 'proxy_form_entry', 'GET', 0, 1 ),
+( 'proxy_form_entry', 'GET', 1, 1 );

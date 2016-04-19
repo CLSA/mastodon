@@ -15,44 +15,6 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class application extends \cenozo\database\application
 {
   /**
-   * Returns the application's release event-type
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @return database\event_type
-   * @access public
-   */
-  public function get_release_event_type()
-  {
-    // check the primary key value
-    if( is_null( $this->id ) )
-    {
-      log::warning( 'Tried to get release entry_type from application with no id.' );
-      return;
-    }
-    
-    return lib::create( 'database\event_type', $this->release_event_type_id );
-  }
-
-  /**
-   * Update this application's release event_type based on the application's name and title
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @access public
-   */
-  public function update_release_event_type()
-  {
-    // check the primary key value
-    if( is_null( $this->id ) )
-    {
-      log::warning( 'Tried to get update release entry_type for application with no id.' );
-      return;
-    }
-    
-    $db_release_event_type = $this->get_release_event_type();
-    $db_release_event_type->name = sprintf( 'released to %s', $this->name );
-    $db_release_event_type->description = sprintf( 'Released the participant to %s', $this->title );
-    $db_release_event_type->save();
-  }
-
-  /**
    * Releases participants to this application according to the provided modifier or,
    * if the $get_unreleased paramter is set to true, returns a list of participants who have
    * not yet been released.

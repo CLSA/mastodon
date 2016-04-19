@@ -22,6 +22,12 @@ define( function() {
         title: 'Invalid',
         type: 'boolean'
       },
+      entry_count: {
+        title: 'Entries'
+      },
+      submitted_entry_count: {
+        title: 'Submitted Entries'
+      },
       date: {
         title: 'Date',
         type: 'date'

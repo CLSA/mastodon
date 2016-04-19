@@ -22,20 +22,8 @@ $SETTINGS['path']['LOG_FILE'] = $SETTINGS['path']['APPLICATION'].'/log';
 $SETTINGS['db']['username'] = 'put your database username here';
 $SETTINGS['db']['password'] = 'put your database password here';
 
-// the location of new consent forms which need to be processed
-$SETTINGS['path']['CONSENT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/consent';
-
-// the location of new contact forms which need to be processed
-$SETTINGS['path']['CONTACT_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/contact';
-
-// the location of new proxy forms which need to be processed
-$SETTINGS['path']['PROXY_FORM'] = $SETTINGS['path']['APPLICATION'].'/doc/form/proxy';
+// the location of new forms which need to be processed
+$SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form';
 
 // the location to store processed consent forms
-$SETTINGS['path']['CONSENT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/consent';
-
-// the location to store processed contact forms
-$SETTINGS['path']['CONTACT_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/contact';
-
-// the location to store processed proxy forms
-$SETTINGS['path']['PROXY_FORM_DATA'] = $SETTINGS['path']['APPLICATION'].'/doc/data/proxy';
+$SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/data';
