@@ -1,0 +1,79 @@
+<div class="utility-view rounded">
+  <div ng-if="!model.participant">
+    <div class="container-fluid bg-primary rounded-top">
+      <h4>Participant Release</h4>
+    </div>
+    <div class="container-fluid">
+    </div>
+    <div class="form-footer text-right rounded-bottom bg-info">
+    </div> 
+  </div>
+  <div ng-if="model.participant">
+    <div class="container-fluid bg-primary rounded-top">
+      <h4>
+        <i class="glyphicon glyphicon-refresh glyph-hover rounded pull-right btn-primary"
+           ng-if="!isLoading"
+           ng-click="refresh( true )"
+           tooltip="Click to refresh data"
+           tooltip-placement="left"></i>
+        Participant Release
+        <span ng-if="isLoading">(Loading&hellip;)</span>
+      </h4>
+    </div>
+    <div class="container-fluid">
+      <div class="spacer">
+        <p class="text-info" style="margin-top: 1em;">
+          Use the following dialog to set the participant's preferred site for each of the application.
+          You may also release the participant to an application.
+          <span class="text-warning">
+            Warning: once a participant has been released they cannot be unreleased.
+          </span>
+        </p>
+        <hr />
+        <div class="panel panel-info" ng-repeat="application in model.applicationList">
+          <div class="panel-heading">
+            {{ application.title }}
+            {{ application.release_based ? '' : '(not release-based)' }}
+          </div>
+          <div class="container-fluid panel-body">
+            <div class="form-horizontal">
+              <div class="form-body">
+                <div class="row" ng-if="application.release_based">
+                  <label class="col-sm-4 control-label">Released</label>
+                  <div ng-if="application.datetime" class="col-sm-8 form-text">
+                    {{ application.datetime|cnDatetime:'datetime' }}
+                  </div>
+                  <div ng-if="null == application.datetime" class="col-sm-8">
+                    <button type="button"
+                            class="btn btn-warning"
+                            ng-click="release( application )">Release Now</button>
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-4 control-label">Default Site</label>
+                  <div class="col-sm-8 form-text">
+                    {{ application.default_site_id
+                       ? application.siteList.findByProperty( 'id', application.default_site_id ).name
+                       : 'Not assigned to a site' }}
+                  </div>
+                </div>
+                <div class="row" style="padding-top: 7px">
+                  <label class="col-sm-4 control-label">Preferred Site</label>
+                  <div class="col-sm-8">
+                    <select ng-model="application.preferred_site_id"
+                            ng-options="site.id as site.name for site in application.siteList"
+                            required
+                            class="form-control"></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-footer text-right rounded-bottom bg-info">
+      <button type="button" class="btn btn-primary" ng-click="viewParticipant()">View Participant</button>
+    </div> 
+  </div>
+</div>
