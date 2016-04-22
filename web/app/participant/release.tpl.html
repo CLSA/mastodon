@@ -12,12 +12,12 @@
     <div class="container-fluid bg-primary rounded-top">
       <h4>
         <i class="glyphicon glyphicon-refresh glyph-hover rounded pull-right btn-primary"
-           ng-if="!isLoading"
-           ng-click="refresh( true )"
+           ng-if="!model.isLoading"
+           ng-click="model.onLoad()"
            tooltip="Click to refresh data"
            tooltip-placement="left"></i>
         Participant Release
-        <span ng-if="isLoading">(Loading&hellip;)</span>
+        <span ng-if="model.isLoading">(Loading&hellip;)</span>
       </h4>
     </div>
     <div class="container-fluid">
@@ -30,7 +30,8 @@
           </span>
         </p>
         <hr />
-        <div class="panel panel-info" ng-repeat="application in model.applicationList">
+        <div ng-if="model.isLoading" class="loading"></div>
+        <div ng-if="!model.isLoading" class="panel panel-info" ng-repeat="application in model.applicationList">
           <div class="panel-heading">
             {{ application.title }}
             {{ application.release_based ? '' : '(not release-based)' }}
@@ -46,7 +47,7 @@
                   <div ng-if="null == application.datetime" class="col-sm-8">
                     <button type="button"
                             class="btn btn-warning"
-                            ng-click="release( application )">Release Now</button>
+                            ng-click="model.releaseParticipant( application )">Release Now</button>
                   </div>
                 </div>
                 <div class="row">
@@ -62,6 +63,7 @@
                   <div class="col-sm-8">
                     <select ng-model="application.preferred_site_id"
                             ng-options="site.id as site.name for site in application.siteList"
+                            ng-change="model.setPreferredSite( application )"
                             required
                             class="form-control"></select>
                   </div>

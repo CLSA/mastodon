@@ -17,6 +17,8 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
         restrict: 'E', 
         controller: function( $scope ) {
           $scope.model = CnParticipantReleaseFactory.instance();
+
+          $scope.model.onLoad(); // breadcrumbs are handled by the service
         }
       }
     }
@@ -24,40 +26,95 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnParticipantReleaseFactory', [
-    'CnHttpFactory', '$state', '$q',
-    function( CnHttpFactory, $state, $q ) {
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state', '$q',
+    function( CnSession, CnHttpFactory, CnModalMessageFactory, $state, $q ) {
       var object = function() {
         var self = this;
-        this.module = module;
-        this.isLoading = true;
         this.participant = angular.isDefined( $state.params.identifier ) && $state.params.identifier;
-        this.applicationList = [];
-        
         if( this.participant ) {
-          // get the application list with respect to this participant
+          // set up the breadcrumb trail
           CnHttpFactory.instance( {
-            path: 'participant/' + $state.params.identifier + '/application',
-            data: { select: { column: [
-              'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
-            ] } }
+            path: 'participant/' + this.participant,
+            data: { select: { column: [ 'uid' ] } }
           } ).get().then( function( response ) {
-            self.applicationList = response.data;
+            CnSession.setBreadcrumbTrail( [ {
+              title: 'Participant',
+              go: function() { $state.go( 'participant.list' ); }
+            }, {
+              title: response.data.uid,
+              go: function() { $state.go( 'participant.view', { identifier: self.participant } ); }
+            }, {
+              title: 'Release'
+            } ] );
+          } );
 
-            // get the site list for each application
-            var promiseList = [];
-            self.applicationList.forEach( function( application ) {
-              if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
-              CnHttpFactory.instance( {
-                path: 'application/' + application.id + '/site',
-                data: { select: { column: [ 'name' ] } }
-              } ).get().then( function( response ) {
-                application.siteList = response.data;
-                application.siteList.unshift( { id: undefined, name: '(none)' } );
-              } );
-            } );
-            return $q.all( promiseList );
-          } ).finally( function() { self.isLoading = false; } );
+          this.releaseParticipant = function( application ) {
+            // TODO: implement
+          };
+
+          this.setPreferredSite = function( application ) {
+            var site = application.siteList.findByProperty( 'id', application.preferred_site_id );
+
+            // get the new site
+            CnHttpFactory.instance( {
+              path: 'participant/' + this.participant,
+              data: {
+                application_id: application.id,
+                preferred_site_id: angular.isDefined( site.id ) ? site.id : null
+              },
+              onError: function( response ) {
+                CnModalMessageFactory.instance( {
+                  title: 'Unable To Set Preferred Site',
+                  message: 'There was a problem while trying to set the participant\'s preferred site for ' +
+                           application.title + ' to ' + ( angular.isDefined( site.id ) ? site.name : 'no site' ),
+                  error: true
+                } ).show();
+              }
+            } ).patch();
+          };
         }
+
+        this.reset = function() {
+          this.isLoading = false;
+          this.applicationList = [];
+        };
+
+        this.reset();
+
+        this.onLoad = function() {
+          self.reset();
+          self.isLoading = true;
+          var promise = null;
+          if( this.participant ) {
+            // get the application list with respect to this participant
+            promise = CnHttpFactory.instance( {
+              path: 'participant/' + $state.params.identifier + '/application',
+              data: { select: { column: [
+                'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
+              ] } }
+            } ).get().then( function( response ) {
+              self.applicationList = response.data;
+
+              // get the site list for each application
+              var promiseList = [];
+              self.applicationList.forEach( function( application ) {
+                if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
+                CnHttpFactory.instance( {
+                  path: 'application/' + application.id + '/site',
+                  data: { select: { column: [ 'name' ] } }
+                } ).get().then( function( response ) {
+                  application.siteList = response.data;
+                  application.siteList.unshift( { id: undefined, name: '(none)' } );
+                } );
+              } );
+              return $q.all( promiseList );
+            } ).finally( function() { self.isLoading = false; } );
+          } else {
+            promise = $q.all().finally( function() { self.isLoading = false; } );
+          }
+
+          return promise;
+        };
       };
 
       return { instance: function() { return new object( false ); } };
