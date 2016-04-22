@@ -30,34 +30,44 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
     function( CnSession, CnHttpFactory, CnModalMessageFactory, $state, $q ) {
       var object = function() {
         var self = this;
-        this.participant = angular.isDefined( $state.params.identifier ) && $state.params.identifier;
-        if( this.participant ) {
-          // set up the breadcrumb trail
-          CnHttpFactory.instance( {
-            path: 'participant/' + this.participant,
-            data: { select: { column: [ 'uid' ] } }
-          } ).get().then( function( response ) {
-            CnSession.setBreadcrumbTrail( [ {
-              title: 'Participant',
-              go: function() { $state.go( 'participant.list' ); }
-            }, {
-              title: response.data.uid,
-              go: function() { $state.go( 'participant.view', { identifier: self.participant } ); }
-            }, {
-              title: 'Release'
-            } ] );
+        this.participant = null;
+
+        // set up the breadcrumb trail
+        this.promise = CnHttpFactory.instance( {
+          path: 'participant/' + $state.params.identifier,
+          data: { select: { column: [ 'uid' ] } }
+        } ).get().then( function( response ) {
+          self.participant = response.data;
+          self.participant.identifier = $state.params.identifier;
+          CnSession.setBreadcrumbTrail( [ {
+            title: 'Participant',
+            go: function() { $state.go( 'participant.list' ); }
+          }, {
+            title: response.data.uid,
+            go: function() { $state.go( 'participant.view', { identifier: $state.params.identifier } ); }
+          }, {
+            title: 'Release'
+          } ] );
+        } );
+
+        this.releaseParticipant = function( application ) {
+          self.promise.then( function() {
+            CnHttpFactory.instance( {
+              path: 'application/' + application.id + '/participant',
+              data: self.participant.id
+            } ).post().then( function() {
+              application.datetime = moment().format();
+            } );
           } );
+        };
 
-          this.releaseParticipant = function( application ) {
-            // TODO: implement
-          };
-
-          this.setPreferredSite = function( application ) {
+        this.setPreferredSite = function( application ) {
+          self.promise.then( function() {
+            // get the new site
             var site = application.siteList.findByProperty( 'id', application.preferred_site_id );
 
-            // get the new site
             CnHttpFactory.instance( {
-              path: 'participant/' + this.participant,
+              path: 'participant/' + $state.params.identifier,
               data: {
                 application_id: application.id,
                 preferred_site_id: angular.isDefined( site.id ) ? site.id : null
@@ -71,8 +81,8 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
                 } ).show();
               }
             } ).patch();
-          };
-        }
+          } );
+        };
 
         this.reset = function() {
           this.isLoading = false;
@@ -82,12 +92,12 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
         this.reset();
 
         this.onLoad = function() {
-          self.reset();
-          self.isLoading = true;
-          var promise = null;
-          if( this.participant ) {
+          return self.promise.then( function() {
+            self.reset();
+            self.isLoading = true;
+
             // get the application list with respect to this participant
-            promise = CnHttpFactory.instance( {
+            return CnHttpFactory.instance( {
               path: 'participant/' + $state.params.identifier + '/application',
               data: { select: { column: [
                 'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
@@ -99,21 +109,17 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
               var promiseList = [];
               self.applicationList.forEach( function( application ) {
                 if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
-                CnHttpFactory.instance( {
+                promiseList.push( CnHttpFactory.instance( {
                   path: 'application/' + application.id + '/site',
                   data: { select: { column: [ 'name' ] } }
                 } ).get().then( function( response ) {
                   application.siteList = response.data;
                   application.siteList.unshift( { id: undefined, name: '(none)' } );
-                } );
+                } ) );
               } );
               return $q.all( promiseList );
             } ).finally( function() { self.isLoading = false; } );
-          } else {
-            promise = $q.all().finally( function() { self.isLoading = false; } );
-          }
-
-          return promise;
+          } );
         };
       };
 

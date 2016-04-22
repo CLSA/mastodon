@@ -1,0 +1,52 @@
+<div class="utility-view rounded">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>Participant Release To {{ model.application.title }}</h4>
+  </div>
+  <div class="container-fluid">
+    <div class="spacer">
+      <p class="text-info" style="margin-top: 1em;">
+        In order to edit multiple participants at once you must first select which participants to edit.
+        This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
+        included in the operation, then confirm that list to ensure each of the identifiers can be linked
+        to a participant.
+      </p>
+      <p class="text-info">
+        Once you have confirmed the list of participant identifiers you may apply changes to all participants
+        in the dialog box below.  Each tab allows you to make differenty types of changes to all selected
+        participant.
+      </p>
+      <hr />
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>Participant selection</strong>
+          <span class="pull-right">
+            <span ng-if="model.confirmInProgress">working, please wait...</span>
+            <span ng-if="!model.confirmInProgress">
+              {{ model.confirmedCount ?
+                 model.confirmedCount + ' participants confirmed' :
+                 'no confirmed participants' }}
+              <i class="glyphicon" ng-class="model.confirmedCount ? 'glyphicon-ok' : 'glyphicon-remove'"></i>
+            </span>
+          </span>
+        </div>
+        <textarea id="uidList"
+                  name="uidList"
+                  cn-elastic
+                  ng-change="model.uidListChanged()"
+                  ng-model="model.uidList"
+                  ng-disabled="model.confirmInProgress"
+                  class="form-control no-rounding"></textarea>
+        <div class="form-footer text-right rounded-bottom bg-info">
+          <button type="button"
+                  class="btn btn-primary"
+                  ng-disabled="null == model.application ||
+                               null != model.confirmedCount ||
+                               model.confirmInProgress"
+                  ng-click="model.confirm()">Confirm List</button>
+        </div> 
+      </div>
+      <div ng-if="model.confirmedCount">
+      </div>
+    </div>
+  </div>
+</div>

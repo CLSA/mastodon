@@ -15,66 +15,50 @@ use cenozo\lib, cenozo\log, mastodon\util;
 class application extends \cenozo\database\application
 {
   /**
-   * Releases participants to this application according to the provided modifier or,
-   * if the $get_unreleased paramter is set to true, returns a list of participants who have
-   * not yet been released.
-   * If no modifier is provided then all unreleased participants will be released.
+   * Releases participants to the application.
+   * 
+   * If any of the participants have already been release they will be ignored.
    * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\modifier $modifier Modifications to the selection.
-   * @param boolean $get_unreleased Whether to return the unreleased participants instead of
-   *                releasing them.
+   * @param array $participant_list An array of participant ids to release
    * @access public
    */
-  public function release_participant( $modifier = NULL, $get_unreleased = false )
+  public function release_participant_list( $list )
   {
-    $database_class_name = lib::get_class_name( 'database\database' );
+    if( !is_array( $list ) || 0 == count( $list ) )
+      throw lib::create( 'exception\argument', 'list', $list, __METHOD__ );
 
-    if( is_null( $modifier ) ) $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'application_has_participant.datetime', '=', NULL );
+    $participant_sel = lib::create( 'database\select' );
+    $participant_sel->from( 'participant' );
+    $participant_sel->add_constant( $this->id );
+    $participant_sel->add_column( 'id' );
+    $participant_sel->add_constant( NULL );
+    $participant_sel->add_constant( 'UTC_TIMESTAMP()', NULL, NULL, false );
+    $participant_mod = lib::create( 'database\modifier' );
+    $participant_mod->where( 'id', 'IN', $list );
 
-    $select_sql = 'SELECT DISTINCT participant.id ';
+    $sql = sprintf(
+      "INSERT INTO application_has_participant( application_id, participant_id, create_timestamp, datetime )\n".
+      "%s%s\n".
+      'ON DUPLICATE KEY UPDATE datetime = IFNULL( datetime, UTC_TIMESTAMP() )',
+      $participant_sel->get_sql(),
+      $participant_mod->get_sql() );
 
-    $insert_sql = sprintf(
-      'INSERT INTO application_has_participant'.
-      '( application_id, participant_id, create_timestamp, datetime ) '.
-      'SELECT %s, participant.id, NULL, UTC_DATETIME() ',
-      static::db()->format_string( $this->id ) );
+    static::db()->execute( $sql );
+
+    $event_sel = lib::create( 'database\select' );
+    $event_sel->from( 'event' );
+    $event_sel->add_column( 'id' );
+    $event_sel->add_constant( $this->release_event_type_id );
+    $event_sel->add_constant( 'UTC_TIMESTAMP()', NULL, NULL, false );
+    $event_mod = lib::create( 'database\modifier' );
+    $event_mod->where( 'id', 'IN', $list );
 
     $event_sql = sprintf(
-      'INSERT INTO event( participant_id, event_type_id, datetime ) '.
-      'SELECT DISTINCT participant.id, %s, UTC_DATETIME() ',
-      static::db()->format_string( $this->release_event_type_id ) );
+      "INSERT IGNORE INTO event( participant_id, event_type_id, datetime )\n".
+      '%s%s',
+      $event_sel->get_sql(),
+      $event_mod->get_sql() );
 
-    $table_sql = sprintf(
-      'FROM participant '.
-      'JOIN application_has_cohort '.
-      'ON application_has_cohort.cohort_id = participant.cohort_id '.
-      'AND application_has_cohort.application_id = %s '.
-      'LEFT JOIN application_has_participant '.
-      'ON application_has_participant.application_id = %s '.
-      'AND application_has_participant.participant_id = participant.id %s',
-      static::db()->format_string( $this->id ),
-      static::db()->format_string( $this->id ),
-      $modifier->get_sql() );
-
-    $select_sql .= $table_sql;
-    $insert_sql .= $table_sql.' ON DUPLICATE KEY UPDATE datetime = UTC_DATETIME()';
-    $event_sql .= $table_sql;
-
-    if( $get_unreleased )
-    {
-      $id_list = static::db()->get_col( $select_sql );
-      $records = array();
-      foreach( $id_list as $id ) $records[] = lib::create( 'database\participant', $id );
-      return $records;
-    }
-    else
-    {
-      // add the release event to each participant
-      static::db()->execute( $event_sql );
-
-      // insert them into the application_has_participant table
-      static::db()->execute( $insert_sql );
-    }
+    static::db()->execute( $event_sql );
   }
 }
