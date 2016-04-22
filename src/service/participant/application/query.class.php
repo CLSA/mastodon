@@ -27,13 +27,13 @@ class query extends \cenozo\service\query
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'application.id', '=', 'participant_site.application_id', false );
     $join_mod->where( 'participant_site.participant_id', '=', $db_participant->id );
-    $modifier->join_modifier( 'participant_site', $join_mod, 'left' );
+    $modifier->join_modifier( 'participant_site', $join_mod, '', NULL, true );
 
     // add new join to application_has_participant
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'application.id', '=', 'application_has_participant.application_id', false );
     $join_mod->where( 'application_has_participant.participant_id', '=', $db_participant->id );
-    $modifier->join_modifier( 'application_has_participant', $join_mod, 'left' );
+    $modifier->join_modifier( 'application_has_participant', $join_mod, 'left', NULL, true );
 
     // find aliases in the select and translate them in the modifier
     $this->select->apply_aliases_to_modifier( $modifier );
@@ -54,13 +54,13 @@ class query extends \cenozo\service\query
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'application.id', '=', 'participant_site.application_id', false );
     $join_mod->where( 'participant_site.participant_id', '=', $db_participant->id );
-    $modifier->join_modifier( 'participant_site', $join_mod );
+    $modifier->join_modifier( 'participant_site', $join_mod, '', NULL, true );
 
     // add new join to application_has_participant
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'application.id', '=', 'application_has_participant.application_id', false );
     $join_mod->where( 'application_has_participant.participant_id', '=', $db_participant->id );
-    $modifier->join_modifier( 'application_has_participant', $join_mod, 'left' );
+    $modifier->join_modifier( 'application_has_participant', $join_mod, 'left', NULL, true );
 
     // find aliases in the select and translate them in the modifier
     $this->select->apply_aliases_to_modifier( $modifier );
