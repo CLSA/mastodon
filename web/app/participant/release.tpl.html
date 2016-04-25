@@ -21,10 +21,12 @@
       </p>
       <hr />
       <div ng-if="model.isLoading" class="loading"></div>
-      <div ng-if="!model.isLoading" class="panel panel-info" ng-repeat="application in model.applicationList">
+      <div ng-if="!model.isLoading" class="panel panel-default" ng-repeat="application in model.applicationList">
         <div class="panel-heading">
-          {{ application.title }}
-          {{ application.release_based ? '' : '(not release-based)' }}
+          <strong>
+            {{ application.title }}
+            {{ application.release_based ? '' : '(not release-based)' }}
+          </strong>
         </div>
         <div class="container-fluid panel-body">
           <div class="form-horizontal">

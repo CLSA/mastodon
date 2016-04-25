@@ -5,15 +5,17 @@
   <div class="container-fluid">
     <div class="spacer">
       <p class="text-info" style="margin-top: 1em;">
-        In order to edit multiple participants at once you must first select which participants to edit.
+        In order to release participants at once you must first select which participants to release.
         This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
         included in the operation, then confirm that list to ensure each of the identifiers can be linked
         to a participant.
       </p>
       <p class="text-info">
-        Once you have confirmed the list of participant identifiers you may apply changes to all participants
-        in the dialog box below.  Each tab allows you to make differenty types of changes to all selected
-        participant.
+        Once you have confirmed the list of participant identifiers you will be presented with a summary
+        of how many participants will be released to each site, broken down by cohort.
+      </p>
+      <p class="text-warning">
+        Note: only participants with the correct cohort and who have not already been released will be allowed.
       </p>
       <hr />
       <div class="panel panel-default">
@@ -29,11 +31,11 @@
             </span>
           </span>
         </div>
-        <textarea id="uidList"
-                  name="uidList"
+        <textarea id="uidListString"
+                  name="uidListString"
                   cn-elastic
-                  ng-change="model.uidListChanged()"
-                  ng-model="model.uidList"
+                  ng-change="model.uidListStringChanged()"
+                  ng-model="model.uidListString"
                   ng-disabled="model.confirmInProgress"
                   class="form-control no-rounding"></textarea>
         <div class="form-footer text-right rounded-bottom bg-info">
@@ -46,6 +48,28 @@
         </div> 
       </div>
       <div ng-if="model.confirmedCount">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <strong>Confirm selection</strong>
+          </div>
+          <div class="container-fluid panel-body">
+            <div class="form-horizontal">
+              <div ng-repeat="(cohort,siteList) in model.cohortSiteList">
+                <h4 class="text-center">{{ cohort }}</h4>
+                <div class="row" ng-repeat="(site,total) in siteList">
+                  <label class="col-sm-6 control-label">{{ site }}</label>
+                  <div class="col-sm-6 form-text">{{ total }}</div>
+                </div>
+                <hr ng-if="!$last" />
+              </div>
+            </div>
+          </div>
+          <div class="form-footer text-right rounded-bottom bg-info">
+            <button type="button"
+                    class="btn btn-primary"
+                    ng-click="model.release()">Release Participants</button>
+          </div> 
+        </div>
       </div>
     </div>
   </div>

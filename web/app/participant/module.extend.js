@@ -85,10 +85,9 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
         };
 
         this.reset = function() {
-          this.isLoading = false;
-          this.applicationList = [];
+          self.isLoading = false;
+          self.applicationList = [];
         };
-
         this.reset();
 
         this.onLoad = function() {

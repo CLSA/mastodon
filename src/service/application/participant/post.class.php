@@ -37,7 +37,9 @@ class post extends \cenozo\service\write
       throw lib::create( 'exception\argument', 'post_object', $post_object, __METHOD__ );
     }
 
-    $this->get_parent_record()->release_participant_list(
-      is_array( $post_object ) ? $post_object : array( $post_object ) );
+    $modifier = lib::create( 'database\modifier' );
+    if( is_array( $post_object ) ) $modifier->where( 'participant.id', 'IN', $post_object );
+    else $modifier->where( 'participant.id', '=', $post_object );
+    $this->get_parent_record()->release_participants( $modifier );
   }
 }
