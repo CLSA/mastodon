@@ -65,7 +65,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           if( !self.application.release_based ) $state.go( 'error.404' ); 
           else {
             CnSession.setBreadcrumbTrail( [ {
-              title: 'Application',
+              title: 'Applications',
               go: function() { $state.go( 'application.list' ); }
             }, {
               title: response.data.title,

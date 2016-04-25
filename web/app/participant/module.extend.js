@@ -40,7 +40,7 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
           self.participant = response.data;
           self.participant.identifier = $state.params.identifier;
           CnSession.setBreadcrumbTrail( [ {
-            title: 'Participant',
+            title: 'Participants',
             go: function() { $state.go( 'participant.list' ); }
           }, {
             title: response.data.uid,
