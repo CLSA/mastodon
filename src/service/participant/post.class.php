@@ -32,8 +32,8 @@ class post extends \cenozo\service\service
     if( 300 > $this->status->get_code() )
     {
       $session = lib::create( 'business\session' );
-
       $file = $this->get_file_as_array();
+
       if( array_key_exists( 'application_id', $file ) )
       {
         // only tier 3 can set the application
@@ -41,7 +41,7 @@ class post extends \cenozo\service\service
           $this->status->set_code( 403 );
         else
         {
-          // If an appliaction id is provided then make sure it exists
+          // if an appliaction id is provided then make sure it exists
           try { $this->db_application = lib::create( 'database\application', $file['application_id'] ); }
           catch( \cenozo\exception\runtime $e ) { $this->status->set_code( 404 ); }
         }
@@ -49,6 +49,38 @@ class post extends \cenozo\service\service
       else
       {
         $this->db_application = $session->get_application();
+      }
+
+      if( array_key_exists( 'site_id', $file ) )
+      {
+        // only all-site roles set the site
+        if( !$session->get_role()->all_sites )
+          $this->status->set_code( 403 );
+        else
+        {
+          // if an appliaction id is provided then make sure it exists and belongs to the specific application
+          if( !is_null( $file['site_id'] ) )
+          {
+            try { $this->db_site = lib::create( 'database\site', $file['site_id'] ); }
+            catch( \cenozo\exception\runtime $e ) { $this->status->set_code( 404 ); }
+
+            $site_mod = lib::create( 'database\modifier' );
+            $site_mod->where( 'site.id', '=', $this->db_site->id );
+            if( 0 == $this->db_application->get_site_count( $site_mod ) )
+              $this->status->set_code( 400 );
+          }
+        }
+      }
+
+      if( array_key_exists( 'mode', $file ) && 'preferred_site' == $file['mode']  )
+      {
+        // if in preferred site mode then there must be a site_id argument
+        if( !array_key_exists( 'site_id', $file ) ) $this->status->set_code( 400 );
+      }
+      else
+      {
+        // if not in preferred site mode then there cannot be a site_id argument
+        if( array_key_exists( 'site_id', $file ) ) $this->status->set_code( 400 );
       }
     }
   }
@@ -63,9 +95,7 @@ class post extends \cenozo\service\service
     $util_class_name = lib::get_class_name( 'util' );
     $participant_class_name = lib::get_class_name( 'database\participant' );
     $session = lib::create( 'business\session' );
-    $db_site = $session->get_site();
     $db_role = $session->get_role();
-    $db_user = $session->get_user();
 
     // This is a special service since participants cannot be added to the system through the web interface.
     // Instead, this service provides participant-based utility functions.
@@ -100,7 +130,7 @@ class post extends \cenozo\service\service
           $sub_mod = lib::create( 'database\modifier' );
           $sub_mod->where( 'participant.id', '=', 'participant_site.participant_id', false );
           $sub_mod->where( 'participant_site.application_id', '=', 'application.id', false );
-          $sub_mod->where( 'participant_site.site_id', '=', $db_site->id );
+          $sub_mod->where( 'participant_site.site_id', '=', $session->get_site()->id );
           $modifier->join_modifier( 'participant_site', $sub_mod );
         }
 
@@ -130,6 +160,15 @@ class post extends \cenozo\service\service
           $modifier = lib::create( 'database\modifier' );
           $modifier->where( 'participant.uid', 'IN', $uid_list );
           $this->db_application->release_participants( $modifier );
+        }
+      }
+      else if( 'preferred_site' == $mode )
+      { // change the participants' preferred site
+        if( 0 < count( $uid_list ) )
+        {
+          $modifier = lib::create( 'database\modifier' );
+          $modifier->where( 'participant.uid', 'IN', $uid_list );
+          $this->db_application->set_preferred_site( $modifier, $this->db_site );
         }
       }
       else if( !is_null( $mode ) ) // any other release mode
@@ -166,9 +205,6 @@ class post extends \cenozo\service\service
           'site_list' => $site_list
         ) );
       }
-      else if( array_key_exists( 'preferred_site_id', $file ) )
-      { // change the participants' preferred site
-      }
       else // return a list of all valid uids
       {
         $this->set_data( $uid_list );
@@ -189,4 +225,9 @@ class post extends \cenozo\service\service
    * TODO: document
    */
   protected $db_application = NULL;
+
+  /**
+   * TODO: document
+   */
+  protected $db_site = NULL;
 }

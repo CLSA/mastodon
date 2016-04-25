@@ -14,7 +14,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
 
   if( angular.isDefined( module.actions.release ) ) {
     module.addExtraOperation( 'view', {
-      title: 'Release Participants',
+      title: 'Manage Participants',
       operation: function( $state, model ) { $state.go( 'application.release', $state.params ); },
       isIncluded: function( $state, model ) { return model.viewModel.record.release_based; }
     } );
@@ -22,8 +22,8 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnApplicationRelease', [
-    'CnApplicationReleaseFactory',
-    function( CnApplicationReleaseFactory ) {
+    'CnApplicationReleaseFactory', '$timeout',
+    function( CnApplicationReleaseFactory, $timeout ) {
       return {
         // look for the template in the application's path, not the framework
         templateUrl: cenozoApp.baseUrl + '/app/application/release.tpl.html?build=' + cenozoApp.build,
@@ -31,6 +31,12 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
         controller: function( $scope ) {
           $scope.model = CnApplicationReleaseFactory.instance();
           // breadcrumbs are handled by the service
+
+          // trigger the elastic directive when confirming the participant selection
+          $scope.confirm = function() {
+            $scope.model.confirm()
+            $timeout( function() { angular.element( '#uidListString' ).trigger( 'change' ) }, 100 );
+          };
         }
       }
     }
@@ -43,6 +49,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
       var object = function() {
         var self = this;
         this.application = null;
+        this.applicationSiteList = [];
 
         this.reset = function() {
           self.confirmInProgress = false;
@@ -50,10 +57,11 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           self.uidListString = '';
           self.uidList = [];
           self.cohortSiteList = null;
+          self.preferredSiteId = null;
         };
         this.reset();
 
-        // set up the breadcrumb trail
+        // get the application details and set up the breadcrumb trail
         CnHttpFactory.instance( {
           path: 'application/' + $state.params.identifier,
           data: { select: { column: [ 'title', 'release_based' ] } }
@@ -74,6 +82,15 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
               title: 'Release'
             } ] );
           }
+        } );
+
+        // get the application's site list
+        CnHttpFactory.instance( {
+          path: 'application/' + $state.params.identifier + '/site',
+          data: { select: { column: [ 'name' ] } }
+        } ).get().then( function( response ) {
+          self.applicationSiteList = response.data;
+          response.data.unshift( { id: null, name: 'No Preferred Site' } );
         } );
 
         this.uidListStringChanged = function() {
@@ -119,6 +136,26 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           }
         };
 
+        this.setPreferredSite = function( siteId ) {
+          if( !this.confirmInProgress && 0 < this.confirmedCount ) {
+            CnHttpFactory.instance( {
+              path: 'participant',
+              data: {
+                mode: 'preferred_site',
+                application_id: self.application.id,
+                site_id: siteId,
+                uid_list: this.uidList
+              }
+            } ).post().then( function( response ) {
+              CnModalMessageFactory.instance( {
+                title: 'Participants Released',
+                message: 'You have successfully released ' + self.confirmedCount + ' participants to ' +
+                         self.application.title
+              } ).show().then( function() { self.confirm(); } );
+            } );
+          }
+        };
+
         this.release = function() {
           if( !this.confirmInProgress && 0 < this.confirmedCount ) {
             CnHttpFactory.instance( {
@@ -133,7 +170,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
                 title: 'Participants Released',
                 message: 'You have successfully released ' + self.confirmedCount + ' participants to ' +
                          self.application.title
-              } ).show().then( self.reset );
+              } ).show().then( function() { self.reset(); } );
             } );
           }
         };

@@ -1,21 +1,24 @@
 <div class="utility-view rounded">
   <div class="container-fluid bg-primary rounded-top">
-    <h4>Participant Release To {{ model.application.title }}</h4>
+    <h4>Participant Management For {{ model.application.title }}</h4>
   </div>
   <div class="container-fluid">
     <div class="spacer">
       <p class="text-info" style="margin-top: 1em;">
-        In order to release participants at once you must first select which participants to release.
+        This utility allows you to release a batch of participants to, or update their preferred site for
+        {{ model.application.title }}.  In order to do either you must first select which participants to affect.
         This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
         included in the operation, then confirm that list to ensure each of the identifiers can be linked
         to a participant.
       </p>
       <p class="text-info">
         Once you have confirmed the list of participant identifiers you will be presented with a summary
-        of how many participants will be released to each site, broken down by cohort.
+        of how many participants belong to which sites, broken down by cohort.
       </p>
       <p class="text-warning">
         Note: only participants with the correct cohort and who have not already been released will be allowed.
+        If you wish to update the preferred site for participants who have already been released you must use
+        that application's <em>participant multi-edit</em> utility instead.
       </p>
       <hr />
       <div class="panel panel-default">
@@ -44,7 +47,7 @@
                   ng-disabled="null == model.application ||
                                null != model.confirmedCount ||
                                model.confirmInProgress"
-                  ng-click="model.confirm()">Confirm List</button>
+                  ng-click="confirm()">Confirm List</button>
         </div> 
       </div>
       <div ng-if="model.confirmedCount">
@@ -65,9 +68,27 @@
             </div>
           </div>
           <div class="form-footer text-right rounded-bottom bg-info">
+            <div class="dropup pull-left">
+              <button class="btn btn-default dropdown-toggle"
+                      type="button"
+                      id="applicationSiteList"
+                      data-toggle="dropdown">
+                Set Preferred Site <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="applicationSiteList">
+                 <li ng-repeat="site in model.applicationSiteList">
+                   <a href="#"
+                      cn-really-message="Are you sure you wish to set the preferred site of {{ model.confirmedCount }} participants for {{ model.application.title }} to {{ site.name }}?"
+                      cn-really-click="model.setPreferredSite( site.id )"
+                      ng-click="$event.stopPropagation()">{{ site.name }}</a>
+                 </li>
+              </ul>
+            </div>
             <button type="button"
                     class="btn btn-primary"
-                    ng-click="model.release()">Release Participants</button>
+                    cn-really-message="Are you sure you wish to release {{ model.confirmedCount }} participants to {{ model.application.title }}? This cannot be undone."
+                    cn-really-click="model.release()"
+                    ng-click="$event.stopPropagation()">Release Participants</button>
           </div> 
         </div>
       </div>
