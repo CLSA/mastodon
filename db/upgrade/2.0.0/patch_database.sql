@@ -4,6 +4,11 @@ SET AUTOCOMMIT=0;
 
 SOURCE access.sql
 
+SOURCE consent_form_total.sql
+SOURCE update_consent_form_total.sql
+SOURCE proxy_form_total.sql
+SOURCE update_proxy_form_total.sql
+
 SOURCE beartooth_participant_last_appointment.sql
 SOURCE sabretooth_participant_last_appointment.sql
 SOURCE activity.sql
@@ -18,6 +23,10 @@ SOURCE setting_value.sql
 SOURCE setting.sql
 SOURCE system_message.sql
 SOURCE user.sql
+SOURCE consent_form.sql
+SOURCE consent_form_entry.sql
+SOURCE proxy_form.sql
+SOURCE proxy_form_entry.sql
 
 SOURCE table_character_sets.sql
 SOURCE column_character_sets.sql
