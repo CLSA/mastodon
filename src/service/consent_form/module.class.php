@@ -22,9 +22,12 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     // add the total number of entries
-    if( $select->has_column( 'entry_count' ) ) $select->add_constant( 0, 'entry_count' );
+    $modifier->join( 'consent_form_total', 'consent_form.id', 'consent_form_total.consent_form_id' );
 
-    // add the total number of entries
-    if( $select->has_column( 'submitted_entry_count' ) ) $select->add_constant( 0, 'submitted_entry_count' );
+    if( $select->has_column( 'validated' ) )
+      $select->add_column( 'validated_consent_form_entry_id IS NOT NULL', 'validated', false );
+
+    if( $select->has_column( 'adjudicate' ) )
+      $select->add_column( 'NOT complete AND NOT invalid AND submitted_total > 1', 'adjudicate', false );
   }
 }

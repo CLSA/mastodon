@@ -27,7 +27,10 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'application', $module_list ) )
       if( 2 <= $db_role->tier ) $module_list['application']['actions']['release'] = '/{identifier}';
     if( array_key_exists( 'consent_form', $module_list ) )
+    {
       $module_list['consent_form']['children'] = array( 'consent_form_entry' );
+      if( 2 <= $db_role->tier ) $module_list['consent_form']['actions']['adjudicate'] = '/{identifier}';
+    }
     if( array_key_exists( 'participant', $module_list ) )
     {
       array_unshift( $module_list['participant']['children'], 'application' );

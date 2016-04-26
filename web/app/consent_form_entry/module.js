@@ -23,6 +23,10 @@ define( function() {
       deferred: {
         title: 'Deferred',
         type: 'boolean'
+      },
+      validated: {
+        title: 'Validated',
+        type: 'boolean'
       }
     },
     defaultOrder: {

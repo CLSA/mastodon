@@ -69,20 +69,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyFormTree', [
-    'CnProxyFormTreeFactory', 'CnSession',
-    function( CnProxyFormTreeFactory, CnSession ) {
-      return {
-        templateUrl: module.getFileUrl( 'tree.tpl.html' ),
-        restrict: 'E',
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyFormTreeFactory.instance();
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyFormView', [
     'CnProxyFormModelFactory',
     function( CnProxyFormModelFactory ) {
