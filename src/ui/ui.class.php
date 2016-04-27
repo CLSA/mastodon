@@ -24,12 +24,20 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     // add child actions to certain modules
-    if( array_key_exists( 'application', $module_list ) )
-      if( 2 <= $db_role->tier ) $module_list['application']['actions']['release'] = '/{identifier}';
+    if( array_key_exists( 'application', $module_list ) && 2 <= $db_role->tier )
+    {
+      $module_list['application']['actions']['release'] = '/{identifier}';
+    }
     if( array_key_exists( 'consent_form', $module_list ) )
     {
       $module_list['consent_form']['children'] = array( 'consent_form_entry' );
       if( 2 <= $db_role->tier ) $module_list['consent_form']['actions']['adjudicate'] = '/{identifier}';
+    }
+    if( array_key_exists( 'consent_form_entry', $module_list ) &&
+        array_key_exists( 'add', $module_list['consent_form_entry']['actions'] ) )
+    {
+      unset( $module_list['consent_form_entry']['actions']['add'] );
+      $module_list['consent_form_entry']['actions']['start'] = '';
     }
     if( array_key_exists( 'participant', $module_list ) )
     {
@@ -40,6 +48,12 @@ class ui extends \cenozo\ui\ui
     {
       $module_list['proxy_form']['children'] = array( 'proxy_form_entry' );
       if( 2 <= $db_role->tier ) $module_list['proxy_form']['actions']['adjudicate'] = '/{identifier}';
+    }
+    if( array_key_exists( 'proxy_form_entry', $module_list ) &&
+        array_key_exists( 'add', $module_list['proxy_form_entry']['actions'] ) )
+    {
+      unset( $module_list['proxy_form_entry']['actions']['add'] );
+      $module_list['proxy_form_entry']['actions']['start'] = '';
     }
 
     return $module_list;
@@ -56,8 +70,16 @@ class ui extends \cenozo\ui\ui
     // add application-specific states to the base list
     if( array_key_exists( 'consent_form', $module_list ) && $module_list['consent_form']['list_menu'] )
       $list['Consent Forms'] = 'consent_form';
+    if( array_key_exists( 'consent_form_entry', $module_list ) &&
+        $module_list['consent_form_entry']['list_menu'] &&
+        'typist' == $db_role->name )
+      $list['Consent Form Entries'] = 'consent_form_entry';
     if( array_key_exists( 'proxy_form', $module_list ) && $module_list['proxy_form']['list_menu'] )
       $list['Proxy Forms'] = 'proxy_form';
+    if( array_key_exists( 'proxy_form_entry', $module_list ) &&
+        $module_list['proxy_form_entry']['list_menu'] &&
+        'typist' == $db_role->name )
+      $list['Proxy Form Entries'] = 'proxy_form_entry';
 
     return $list;
   }

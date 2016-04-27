@@ -16,6 +16,10 @@ define( function() {
       pluralPossessive: 'consent form entries\''
     },
     columnList: {
+      consent_form_id: {
+        column: 'consent_form_id',
+        title: 'ID'
+      },
       user: {
         column: 'user.name',
         title: 'User'
@@ -27,6 +31,11 @@ define( function() {
       validated: {
         title: 'Validated',
         type: 'boolean'
+      },
+      date: {
+        column: 'consent_form.date',
+        title: 'Date Added',
+        type: 'date'
       }
     },
     defaultOrder: {
@@ -52,7 +61,7 @@ define( function() {
     uid: {
       title: 'UID',
       type: 'string',
-      format: '^[A-Z][0-9]{6}$',
+      regex: '^[A-Z][0-9]{6}$',
       help: 'Must be in "A000000" format (a letter followed by 6 numbers)'
     },
     option_1: {
@@ -72,6 +81,13 @@ define( function() {
       type: 'date'
     }
   } );
+
+  if( angular.isDefined( module.actions.start ) ) {
+    module.addExtraOperation( 'list', {
+      title: 'Start New Entry',
+      operation: function( $state, model ) { model.listModel.startNewEntry(); }
+    } );
+  }
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnConsentFormEntryList', [
@@ -119,9 +135,28 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnConsentFormEntryListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
+    'CnBaseListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
+    function( CnBaseListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
+      var object = function( parentModel ) {
+        CnBaseListFactory.construct( this, parentModel );
+
+        this.startNewEntry = function() {
+          CnHttpFactory.instance( {
+            path: 'consent_form_entry',
+            data: { user_id: CnSession.user.id },
+            onError: function( response ) {
+              if( XXX == response.status ) {
+                CnModalMessageFactory.instance( {
+                  title: 'No Forms Available',
+                  message: 'There are no new consent forms available for transcription at this time.'
+                } ).show();
+              } else { CnModalMessageFactory.httpError( response ); }
+            }
+          } ).post().then( function( response ) {
+            $state.go( 'consent_form_entry.view', { identifier: response } );
+          } );
+        };
+      };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -137,13 +172,21 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnConsentFormEntryModelFactory', [
-    'CnBaseModelFactory', 'CnConsentFormEntryListFactory', 'CnConsentFormEntryViewFactory',
-    function( CnBaseModelFactory, CnConsentFormEntryListFactory, CnConsentFormEntryViewFactory ) {
+    'CnBaseModelFactory', 'CnConsentFormEntryListFactory', 'CnConsentFormEntryViewFactory', 'CnSession',
+    function( CnBaseModelFactory, CnConsentFormEntryListFactory, CnConsentFormEntryViewFactory, CnSession ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnConsentFormEntryListFactory.instance( this );
         this.viewModel = CnConsentFormEntryViewFactory.instance( this, root );
+
+        CnSession.promise.then( function() {
+          if( 'typist' == CnSession.role.name ) {
+            module.columnList.user.type = 'hidden';
+            module.columnList.deferred.type = 'hidden';
+            module.columnList.validated.type = 'hidden';
+          }
+        } );
       };
 
       return {

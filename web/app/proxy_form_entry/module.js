@@ -48,7 +48,7 @@ define( function() {
     uid: {
       title: 'UID',
       type: 'string',
-      format: '^[A-Z][0-9]{6}$',
+      regex: '^[A-Z][0-9]{6}$',
       help: 'Must be in "A000000" format (a letter followed by 6 numbers)'
     }
   } );

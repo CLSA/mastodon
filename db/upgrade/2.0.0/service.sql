@@ -180,9 +180,11 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'consent_form_entry', 'GET', 0, 1 ),
 ( 'consent_form_entry', 'GET', 1, 1 ),
 ( 'consent_form_entry', 'PATCH', 1, 1 ),
+( 'consent_form_entry', 'POST', 0, 1 ),
 ( 'proxy_form', 'GET', 0, 1 ),
 ( 'proxy_form', 'GET', 1, 1 ),
 ( 'proxy_form', 'PATCH', 1, 1 ),
 ( 'proxy_form_entry', 'GET', 0, 1 ),
 ( 'proxy_form_entry', 'GET', 1, 1 ),
-( 'proxy_form_entry', 'PATCH', 1, 1 );
+( 'proxy_form_entry', 'PATCH', 1, 1 ),
+( 'proxy_form_entry', 'POST', 0, 1 );
