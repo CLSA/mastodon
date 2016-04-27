@@ -37,7 +37,10 @@ class ui extends \cenozo\ui\ui
       if( 2 <= $db_role->tier ) $module_list['participant']['actions']['release'] = '/{identifier}';
     }
     if( array_key_exists( 'proxy_form', $module_list ) )
+    {
       $module_list['proxy_form']['children'] = array( 'proxy_form_entry' );
+      if( 2 <= $db_role->tier ) $module_list['proxy_form']['actions']['adjudicate'] = '/{identifier}';
+    }
 
     return $module_list;
   }

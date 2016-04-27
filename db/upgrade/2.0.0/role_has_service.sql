@@ -77,7 +77,7 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
-    -- helpline and operator
+    -- typist
     SET @sql = CONCAT(
       "INSERT INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",

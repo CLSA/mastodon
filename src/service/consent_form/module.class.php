@@ -28,6 +28,7 @@ class module extends \cenozo\service\module
       $select->add_column( 'validated_consent_form_entry_id IS NOT NULL', 'validated', false );
 
     if( $select->has_column( 'adjudicate' ) )
-      $select->add_column( 'NOT complete AND NOT invalid AND submitted_total > 1', 'adjudicate', false );
+      $select->add_column(
+        'NOT complete AND NOT invalid AND submitted_total > 1', 'adjudicate', false, 'boolean' );
   }
 }

@@ -22,6 +22,24 @@ define( function() {
         title: 'Invalid',
         type: 'boolean'
       },
+      validated: {
+        title: 'Validated',
+        type: 'boolean'
+      },
+      adjudicate: {
+        title: 'Adjudication Required',
+        type: 'boolean'
+      },
+      entry_total: {
+        column: 'proxy_form_total.entry_total',
+        title: 'Entries',
+        type: 'number'
+      },
+      submitted_total: {
+        column: 'proxy_form_total.submitted_total',
+        title: 'Submitted Entries',
+        type: 'number'
+      },
       date: {
         title: 'Date',
         type: 'date'
@@ -50,8 +68,37 @@ define( function() {
     date: {
       title: 'Date',
       type: 'date'
+    },
+    adjudicate: {
+      type: 'hidden'
     }
   } );
+
+  if( angular.isDefined( module.actions.adjudicate ) ) {
+    module.addExtraOperation( 'view', {
+      title: 'Adjudicate',
+      operation: function( $state, model ) { $state.go( 'proxy_form.adjudicate', $state.params ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
+    } );
+  }
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnProxyFormAdjudicate', [
+    'CnProxyFormAdjudicateFactory',
+    function( CnProxyFormAdjudicateFactory ) {
+      return {
+        // special general template found in application's general module directory
+        templateUrl: module.getFileUrl( '../mastodon/adjudicate.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          $scope.model = CnProxyFormAdjudicateFactory.instance();
+
+          $scope.model.onLoad(); // breadcrumbs are handled by the service
+        }
+      };
+    }
+  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyFormList', [
@@ -80,6 +127,135 @@ define( function() {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyFormModelFactory.root;
         }
       };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnProxyFormAdjudicateFactory', [
+    'CnBaseFormAdjudicateFactory',
+    function( CnBaseFormAdjudicateFactory ) {
+      var object = function( parentModel ) {
+        this.formColumnList = [ {
+          column: 'uid',
+          title: 'UID'
+        }, {
+          column: 'proxy',
+          title: 'Proxy'
+        }, {
+          column: 'already_identified',
+          title: 'Already Identified'
+        }, {
+          column: 'proxy_first_name',
+          title: 'Proxy First Name'
+        }, {
+          column: 'proxy_last_name',
+          title: 'Proxy Last Name'
+        }, {
+          column: 'proxy_apartment_number',
+          title: 'Proxy Apartment Number'
+        }, {
+          column: 'proxy_street_number',
+          title: 'Proxy Street Number'
+        }, {
+          column: 'proxy_street_name',
+          title: 'Proxy Street Name'
+        }, {
+          column: 'proxy_box',
+          title: 'Proxy Box'
+        }, {
+          column: 'proxy_rural_route',
+          title: 'Proxy Rural Route'
+        }, {
+          column: 'proxy_address_other',
+          title: 'Proxy Address Other'
+        }, {
+          column: 'proxy_city',
+          title: 'Proxy City'
+        }, {
+          column: 'proxy_region',
+          title: 'Proxy Region'
+        }, {
+          column: 'proxy_postcode',
+          title: 'Proxy Postcode'
+        }, {
+          column: 'proxy_address_note',
+          title: 'Proxy Address Note'
+        }, {
+          column: 'proxy_phone',
+          title: 'Proxy Phone'
+        }, {
+          column: 'proxy_phone_note',
+          title: 'Proxy Phone Note'
+        }, {
+          column: 'proxy_note',
+          title: 'Proxy Note'
+        }, {
+          column: 'informant',
+          title: 'Informant'
+        }, {
+          column: 'same_as_proxy',
+          title: 'Same As Proxy'
+        }, {
+          column: 'informant_first_name',
+          title: 'Informant First Name'
+        }, {
+          column: 'informant_last_name',
+          title: 'Informant Last Name'
+        }, {
+          column: 'informant_apartment_number',
+          title: 'Informant Apartment Number'
+        }, {
+          column: 'informant_street_number',
+          title: 'Informant Street Number'
+        }, {
+          column: 'informant_street_name',
+          title: 'Informant Street Name'
+        }, {
+          column: 'informant_box',
+          title: 'Informant Box'
+        }, {
+          column: 'informant_rural_route',
+          title: 'Informant Rural Route'
+        }, {
+          column: 'informant_address_other',
+          title: 'Informant Address Other'
+        }, {
+          column: 'informant_city',
+          title: 'Informant City'
+        }, {
+          column: 'informant_region',
+          title: 'Informant Region'
+        }, {
+          column: 'informant_postcode',
+          title: 'Informant Postcode'
+        }, {
+          column: 'informant_address_note',
+          title: 'Informant Address Note'
+        }, {
+          column: 'informant_phone',
+          title: 'Informant Phone'
+        }, {
+          column: 'informant_phone_note',
+          title: 'Informant Phone Note'
+        }, {
+          column: 'informant_note',
+          title: 'Informant Note'
+        }, {
+          column: 'informant_continue',
+          title: 'Informant Continue'
+        }, {
+          column: 'health_card',
+          title: 'Health Card'
+        }, {
+          column: 'signed',
+          title: 'Signed'
+        }, {
+          column: 'date',
+          title: 'Date'
+        } ];
+        CnBaseFormAdjudicateFactory.construct( this, module );
+      };
+      return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 

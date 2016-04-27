@@ -78,11 +78,7 @@ define( function() {
     module.addExtraOperation( 'view', {
       title: 'Adjudicate',
       operation: function( $state, model ) { $state.go( 'consent_form.adjudicate', $state.params ); },
-      isIncluded: function( $state, model ) {
-        return !model.viewModel.record.complete &&
-               !model.viewModel.record.invalid &&
-               0 != model.viewModel.record.adjudicate;
-      }
+      isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
     } );
   }
 
@@ -91,7 +87,8 @@ define( function() {
     'CnConsentFormAdjudicateFactory',
     function( CnConsentFormAdjudicateFactory ) {
       return {
-        templateUrl: module.getFileUrl( 'adjudicate.tpl.html' ),
+        // special general template found in application's general module directory
+        templateUrl: module.getFileUrl( '../mastodon/adjudicate.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
@@ -135,47 +132,26 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnConsentFormAdjudicateFactory', [
-    'CnSession', 'CnHttpFactory', '$state',
-    function( CnSession, CnHttpFactory, $state ) {
+    'CnBaseFormAdjudicateFactory',
+    function( CnBaseFormAdjudicateFactory ) {
       var object = function( parentModel ) {
-        var self = this;
-        this.consentForm = null;
-
-        this.reset = function() {
-          self.isLoading = false;
-          self.consentFormEntryList = [];
-        };
-        this.reset();
-
-        // get the consent form details and set up the breadcrumb trail
-        CnHttpFactory.instance( {
-          path: 'consent_form/' + $state.params.identifier,
-          data: { select: { column: [ 'complete', 'invalid', 'validated_consent_form_entry_id' ] } }
-        } ).get().then( function( response ) {
-          self.consentForm = response.data;
-          self.consentForm.identifier = $state.params.identifier;
-
-          CnSession.setBreadcrumbTrail( [ {
-            title: 'Consent Forms',
-            go: function() { $state.go( 'consent_form.list' ); }
-          }, {
-            title: self.consentForm.id,
-            go: function() { $state.go( 'consent_form.view', { identifier: $state.params.identifier } ); }
-          }, {
-            title: 'Adjudicate'
-          } ] );
-        } );
-
-        this.onLoad = function() {
-          this.reset();
-          this.isLoading = true;
-          return CnHttpFactory.instance( {
-            path: 'consent_form/' + $state.params.identifier + '/consent_form_entry'
-          } ).get().then( function( response ) {
-            self.consentFormEntryList = response.data;
-            console.log( self.consentFormEntryList );
-          } ).finally( function() { self.isLoading = false; } );
-        };
+        this.formColumnList = [ {
+          column: 'uid',
+          title: 'UID'
+        }, {
+          column: 'option_1',
+          title: 'Option #1'
+        }, {
+          column: 'option_2',
+          title: 'Option #2'
+        }, {
+          column: 'signed',
+          title: 'Signed'
+        }, {
+          column: 'date',
+          title: 'Date'
+        } ];
+        CnBaseFormAdjudicateFactory.construct( this, module );
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }

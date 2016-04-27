@@ -32,6 +32,6 @@ class module extends \cenozo\service\module
 
     // always add the user's name
     $modifier->join( 'user', 'consent_form_entry.user_id', 'user.id' );
-    $select->add_table_column( 'user', 'name', 'username' );
+    $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'user', false );
   }
 }

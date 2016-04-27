@@ -1,0 +1,74 @@
+<div class="utility-view rounded">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>
+      <i class="glyphicon glyphicon-refresh glyph-hover rounded pull-right btn-primary"
+         ng-if="!model.isLoading"
+         ng-click="model.onLoad()"
+         tooltip="Click to refresh data"
+         tooltip-placement="left"></i>
+      Adjudication for {{ model.module.name.singular.ucWords() }} #{{ model.form.id }}
+      <span ng-if="model.isLoading">(Loading&hellip;)</span>
+    </h4>
+  </div>
+  <div class="container-fluid">
+    <div ng-if="model.isLoading" class="loading"></div>
+    <div ng-if="!model.isLoading">
+      <table class="table rounded table-hover">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="text-center" ng-repeat="entry in model.formEntryList">{{ entry.user }}</th>
+          </tr>
+          <tr ng-if="10 < model.formColumnList.length">
+            <td></td>
+            <td ng-repeat="entry in model.formEntryList">
+              <div class="btn-group">
+                <button class="btn btn-default"
+                        type="button"
+                        ng-disabled="!model.form.adjudicate"
+                        ng-click="model.defer( entry.id )">Defer</button>
+                <button class="btn btn-default"
+                        type="button"
+                        ng-disabled="!model.form.adjudicate"
+                        ng-click="model.validate( entry.id )">Validate</button>
+              </div>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="column in model.formColumnList"
+              ng-class="{'warning':0 <= model.conflictColumnList.indexOf( column.column )}">
+            <td class="text-right"><strong>{{ column.title }}</strong></td>
+            <td ng-repeat="entry in model.formEntryList">
+              <strong ng-if="entry.id == model.form.validated_form_id" class="text-success">
+                {{ null == entry[column.column] ? '(empty)' : entry[column.column] }}
+              </strong>
+              <span ng-if="entry.id != model.form.validated_form_id"
+                    ng-class="{'text-muted':entry.deferred ||
+                               ( model.form.validated_form_id && entry.id!=model.form.validated_form_id )}">
+                {{ null == entry[column.column] ? '(empty)' : entry[column.column] }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td ng-repeat="entry in model.formEntryList">
+              <div class="btn-group">
+                <button class="btn btn-default"
+                        type="button"
+                        ng-disabled="!model.form.adjudicate"
+                        ng-click="model.defer( entry.id )">Defer</button>
+                <button class="btn btn-default"
+                        type="button"
+                        ng-disabled="!model.form.adjudicate"
+                        ng-click="model.validate( entry.id )">Validate</button>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
