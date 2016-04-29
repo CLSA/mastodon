@@ -51,7 +51,7 @@ define( function() {
     }
   } );
 
-  module.addInputGroup( null, {
+  module.addInputGroup( '', {
     id: {
       title: 'ID',
       type: 'string',
