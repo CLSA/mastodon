@@ -98,6 +98,10 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
             object.onLoad();
           } );
         };
+
+        object.viewParent = function() {
+          $state.go( '^.view', { identifier: $state.params.identifier } );
+        }
       }
     };
   }
