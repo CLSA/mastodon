@@ -38,7 +38,7 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
             CnHttpFactory.instance( {
               path: formName + '/' + $state.params.identifier,
               data: { select: { column: [
-                'complete',
+                'completed',
                 'invalid',
                 'adjudicate',
                 { column: validatedEntryColumn, alias: 'validated_form_id' }
@@ -88,7 +88,7 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
         };
 
         object.validate = function( entryId ) {
-          var data = { complete: true };
+          var data = { completed: true };
           data[validatedEntryColumn] = entryId;
           CnHttpFactory.instance( {
             path: formName + '/' + object.form.id,

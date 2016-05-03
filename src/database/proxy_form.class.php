@@ -237,7 +237,7 @@ class proxy_form extends base_form
     }
 
     // save the new alternate record to the form
-    $this->complete = true;
+    $this->completed = true;
     if( $db_proxy_form_entry->proxy )
       $this->proxy_alternate_id = $db_proxy_alternate->id;
 

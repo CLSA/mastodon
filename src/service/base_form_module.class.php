@@ -32,6 +32,6 @@ abstract class base_form_module extends \cenozo\service\module
 
     if( $select->has_column( 'adjudicate' ) )
       $select->add_column(
-        'NOT complete AND NOT invalid AND submitted_total > 1', 'adjudicate', false, 'boolean' );
+        'NOT completed AND NOT invalid AND submitted_total > 1', 'adjudicate', false, 'boolean' );
   }
 }

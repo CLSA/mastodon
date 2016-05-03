@@ -14,7 +14,7 @@ define( function() {
       id: {
         title: 'ID'
       },
-      complete: {
+      completed: {
         title: 'Complete',
         type: 'boolean'
       },
@@ -57,7 +57,7 @@ define( function() {
       type: 'string',
       format: 'integer'
     },
-    complete: {
+    completed: {
       title: 'Complete',
       type: 'boolean'
     },

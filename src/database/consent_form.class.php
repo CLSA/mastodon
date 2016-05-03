@@ -107,7 +107,7 @@ class consent_form extends base_form
     $db_hin->save();
 
     // save the new consent record to the form
-    $this->complete = true;
+    $this->completed = true;
     if( !is_null( $db_consent ) ) $this->consent_id = $db_consent->id;
     $this->save();
   }

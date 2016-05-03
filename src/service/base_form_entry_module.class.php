@@ -53,8 +53,8 @@ abstract class base_form_entry_module extends \cenozo\service\module
 
           $modifier = lib::create( 'database\modifier' );
 
-          // where the form isn't complete or invalid
-          $modifier->where( $form_name.'.complete', '=', false );
+          // where the form isn't completed or invalid
+          $modifier->where( $form_name.'.completed', '=', false );
           $modifier->where( $form_name.'.invalid', '=', false );
 
           // where the user doesn't already have an entry
