@@ -219,6 +219,7 @@ class proxy_form extends base_form
     // import data to the participant table
     if( !is_null( $db_proxy_form_entry->informant_continue ) )
     {
+      // TODO: use_informant was replaced with a consent type
       $db_participant->use_informant = $db_proxy_form_entry->informant_continue;
       $db_participant->save();
     }
