@@ -111,13 +111,15 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
               var promiseList = [];
               self.applicationList.forEach( function( application ) {
                 if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
-                promiseList.push( CnHttpFactory.instance( {
-                  path: 'application/' + application.id + '/site',
-                  data: { select: { column: [ 'name' ] } }
-                } ).get().then( function( response ) {
-                  application.siteList = response.data;
-                  application.siteList.unshift( { id: undefined, name: '(none)' } );
-                } ) );
+                promiseList.push(
+                  CnHttpFactory.instance( {
+                    path: 'application/' + application.id + '/site',
+                    data: { select: { column: [ 'name' ] } }
+                  } ).get().then( function( response ) {
+                    application.siteList = response.data;
+                    application.siteList.unshift( { id: undefined, name: '(none)' } );
+                  } )
+                );
               } );
               return $q.all( promiseList );
             } ).finally( function() { self.isLoading = false; } );
