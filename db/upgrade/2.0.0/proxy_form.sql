@@ -42,7 +42,8 @@ CREATE PROCEDURE patch_proxy_form()
     DEALLOCATE PREPARE statement;
     
     SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".consent( participant_id, consent_type_id, accept, written, date, note ) ",
+      "INSERT IGNORE INTO ", @cenozo, ".consent( ",
+        "participant_id, consent_type_id, accept, written, datetime, note ) ",
       "SELECT participant_id, consent_type.id, informant_continue, true, date, ",
         "CONCAT( 'NCC received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
                 "' for informant to continue to answer research questions on their behalf.' ) ",
