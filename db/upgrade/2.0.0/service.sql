@@ -136,6 +136,7 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'report', 'DELETE', 1, 1 ),
 ( 'report', 'GET', 0, 1 ),
 ( 'report', 'GET', 1, 1 ),
+( 'report', 'PATCH', 1, 1 ),
 ( 'report', 'POST', 0, 1 ),
 ( 'report_restriction', 'DELETE', 1, 1 ),
 ( 'report_restriction', 'GET', 0, 1 ),

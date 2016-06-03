@@ -324,8 +324,8 @@ define( function() {
         CnBaseViewFactory.construct( this, parentModel, root );
 
         this.onPatchError = function( response ) {
-          // handle 406 errors (uid doesn't match existing participant)
-          if( 406 == response.status ) {
+          // handle 306 errors (uid doesn't match existing participant)
+          if( 306 == response.status ) {
             CnModalMessageFactory.instance( {
               title: 'Participant Not Found',
               message: 'There was no participant found for the UID "' + self.record.uid + '"',
