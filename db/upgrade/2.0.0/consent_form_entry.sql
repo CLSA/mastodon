@@ -1,3 +1,4 @@
+DROP PROCEDURE IF EXISTS patch_consent_form;
 SELECT "Adding new triggers to consent_form_entry table" AS "";
 
 DELIMITER $$

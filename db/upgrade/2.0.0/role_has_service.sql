@@ -71,9 +71,9 @@ CREATE PROCEDURE patch_role_has_service()
       "AND service.restricted = 1 ",
       "AND ( ",
         "service.subject IN ( ",
-          "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'event', 'jurisdiction', ",
-          "'language', 'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', 'region_site', ",
-          "'report', 'report_type', 'source', 'state' ",
+          "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'event', 'form', ",
+          "'jurisdiction', 'language', 'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', ",
+          "'region_site', 'report', 'report_type', 'source', 'state' ",
         ") ",
         "OR ( subject = 'report_restriction' AND method = 'GET' ) ",
       ")" );

@@ -23,6 +23,32 @@ CREATE PROCEDURE patch_consent_form()
       CHANGE complete completed TINYINT(1) NOT NULL DEFAULT 0;
     END IF;
 
+    SELECT "Adding consent forms to form_type table" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, subject, description ) ",
+      "VALUES( 'Participation Consent', 'consent', 'A form confirming the participant\\'s consent to participant in the study.' )" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SELECT "Adding consent forms to form table" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, record_id ) ",
+      "SELECT consent.participant_id, form_type.id, consent_form.date, consent_form.consent_id ",
+      "FROM ", @cenozo, ".form_type CROSS JOIN consent_form ",
+      "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
+      "LEFT JOIN ", @cenozo, ".form ON consent.participant_id = form.participant_id ",
+                                  "AND form_type.id = form.form_type_id ",
+                                  "AND consent_id = form.record_id ",
+      "WHERE form_type.name = 'Participation Consent' ",
+      "AND consent_form.completed = true ",
+      "AND form.id IS NULL " );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 

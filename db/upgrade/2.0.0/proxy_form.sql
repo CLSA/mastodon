@@ -45,12 +45,39 @@ CREATE PROCEDURE patch_proxy_form()
       "INSERT IGNORE INTO ", @cenozo, ".consent( ",
         "participant_id, consent_type_id, accept, written, datetime, note ) ",
       "SELECT participant_id, consent_type.id, informant_continue, true, date, ",
-        "CONCAT( 'NCC received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
+        "CONCAT( 'Received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
                 "' for informant to continue to answer research questions on their behalf.' ) ",
       "FROM last_proxy_form, ", @cenozo, ".consent_type ",
       "WHERE consent_type.name = 'use informant' ",
       "AND completed = true ",
       "AND invalid = false" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SELECT "Adding proxy forms to form_type table" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, subject, description ) ",
+      "VALUES( 'Alternate', 'alterante', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SELECT "Adding proxy forms to form table" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, record_id ) ",
+      "SELECT participant.id, form_type.id, proxy_form.date, IFNULL( proxy_alternate_id, informant_alternate_id ) ",
+      "FROM ", @cenozo, ".form_type CROSS JOIN proxy_form ",
+      "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
+      "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
+      "LEFT JOIN ", @cenozo, ".form ON participant.id = form.participant_id ",
+                                  "AND form_type.id = form.form_type_id ",
+                                  "AND IFNULL( proxy_alternate_id, informant_alternate_id ) = form.record_id ",
+      "WHERE form_type.name = 'Alternate' ",
+      "AND proxy_form.completed = true ",
+      "AND form.id IS NULL " );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
