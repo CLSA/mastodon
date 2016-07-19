@@ -6,6 +6,10 @@ SOURCE access.sql
 
 SOURCE consent_form_total.sql
 SOURCE update_consent_form_total.sql
+SOURCE contact_form_total.sql
+SOURCE update_contact_form_total.sql
+SOURCE hin_form_total.sql
+SOURCE update_hin_form_total.sql
 SOURCE proxy_form_total.sql
 SOURCE update_proxy_form_total.sql
 
@@ -25,6 +29,10 @@ SOURCE system_message.sql
 SOURCE user.sql
 SOURCE consent_form.sql
 SOURCE consent_form_entry.sql
+SOURCE contact_form.sql
+SOURCE contact_form_entry.sql
+SOURCE hin_form.sql
+SOURCE hin_form_entry.sql
 SOURCE proxy_form.sql
 SOURCE proxy_form_entry.sql
 SOURCE report_type.sql

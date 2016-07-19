@@ -58,8 +58,8 @@ CREATE PROCEDURE patch_proxy_form()
     SELECT "Adding proxy forms to form_type table" AS "";
 
     SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, subject, description ) ",
-      "VALUES( 'Alternate', 'alterante', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, subject, description ) ",
+      "VALUES( 'proxy', 'Alternate', 'alterante', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -75,7 +75,7 @@ CREATE PROCEDURE patch_proxy_form()
       "LEFT JOIN ", @cenozo, ".form ON participant.id = form.participant_id ",
                                   "AND form_type.id = form.form_type_id ",
                                   "AND IFNULL( proxy_alternate_id, informant_alternate_id ) = form.record_id ",
-      "WHERE form_type.name = 'Alternate' ",
+      "WHERE form_type.name = 'proxy' ",
       "AND proxy_form.completed = true ",
       "AND form.id IS NULL " );
     PREPARE statement FROM @sql;

@@ -23,6 +23,3 @@ $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
 // the location of new forms which need to be processed
 $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form';
-
-// the location to store processed consent forms
-$SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/data';

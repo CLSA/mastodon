@@ -71,9 +71,10 @@ CREATE PROCEDURE patch_role_has_service()
       "AND service.restricted = 1 ",
       "AND ( ",
         "service.subject IN ( ",
-          "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'event', 'form', ",
-          "'jurisdiction', 'language', 'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', ",
-          "'region_site', 'report', 'report_type', 'source', 'state' ",
+          "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'contact_form', ",
+          "'contact_form_entry', 'event', 'form', 'hin_form', 'hin_form_entry', 'jurisdiction', 'language', ",
+          "'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', 'region_site', 'report', ",
+          "'report_type', 'source', 'state' ",
         ") ",
         "OR ( subject = 'report_restriction' AND method = 'GET' ) ",
       ")" );
@@ -88,7 +89,8 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name IN( 'typist' ) ",
       "AND service.restricted = 1 ",
-      "AND service.subject IN ( 'consent_form_entry', 'participant', 'proxy_form_entry' )" );
+      "AND service.subject IN ( 'consent_form_entry', 'contact_form_entry', 'hin_form_entry', 'participant', ",
+        "'proxy_form_entry' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

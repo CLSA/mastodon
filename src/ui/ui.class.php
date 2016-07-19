@@ -44,6 +44,28 @@ class ui extends \cenozo\ui\ui
       array_unshift( $module_list['participant']['children'], 'application' );
       if( 2 <= $db_role->tier ) $module_list['participant']['actions']['release'] = '/{identifier}';
     }
+    if( array_key_exists( 'contact_form', $module_list ) )
+    {
+      $module_list['contact_form']['children'] = array( 'contact_form_entry' );
+      if( 2 <= $db_role->tier ) $module_list['contact_form']['actions']['adjudicate'] = '/{identifier}';
+    }
+    if( array_key_exists( 'contact_form_entry', $module_list ) &&
+        array_key_exists( 'add', $module_list['contact_form_entry']['actions'] ) )
+    {
+      unset( $module_list['contact_form_entry']['actions']['add'] );
+      $module_list['contact_form_entry']['actions']['start'] = '';
+    }
+    if( array_key_exists( 'hin_form', $module_list ) )
+    {
+      $module_list['hin_form']['children'] = array( 'hin_form_entry' );
+      if( 2 <= $db_role->tier ) $module_list['hin_form']['actions']['adjudicate'] = '/{identifier}';
+    }
+    if( array_key_exists( 'hin_form_entry', $module_list ) &&
+        array_key_exists( 'add', $module_list['hin_form_entry']['actions'] ) )
+    {
+      unset( $module_list['hin_form_entry']['actions']['add'] );
+      $module_list['hin_form_entry']['actions']['start'] = '';
+    }
     if( array_key_exists( 'proxy_form', $module_list ) )
     {
       $module_list['proxy_form']['children'] = array( 'proxy_form_entry' );
@@ -74,6 +96,21 @@ class ui extends \cenozo\ui\ui
         $module_list['consent_form_entry']['list_menu'] &&
         'typist' == $db_role->name )
       $list['Consent Form Entries'] = 'consent_form_entry';
+
+    if( array_key_exists( 'contact_form', $module_list ) && $module_list['contact_form']['list_menu'] )
+      $list['Contact Forms'] = 'contact_form';
+    if( array_key_exists( 'contact_form_entry', $module_list ) &&
+        $module_list['contact_form_entry']['list_menu'] &&
+        'typist' == $db_role->name )
+      $list['Contact Form Entries'] = 'contact_form_entry';
+    
+    if( array_key_exists( 'hin_form', $module_list ) && $module_list['hin_form']['list_menu'] )
+      $list['HIN Forms'] = 'hin_form';
+    if( array_key_exists( 'hin_form_entry', $module_list ) &&
+        $module_list['hin_form_entry']['list_menu'] &&
+        'typist' == $db_role->name )
+      $list['HIN Form Entries'] = 'hin_form_entry';
+    
     if( array_key_exists( 'proxy_form', $module_list ) && $module_list['proxy_form']['list_menu'] )
       $list['Proxy Forms'] = 'proxy_form';
     if( array_key_exists( 'proxy_form_entry', $module_list ) &&
