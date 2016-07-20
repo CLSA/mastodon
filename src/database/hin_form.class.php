@@ -106,7 +106,19 @@ class hin_form extends base_form
     $db_hin->access = $db_hin_form_entry->option_2;
     $db_hin->save();
 
+    // import the form into the framework's form system
+    $form_type_class_name = lib::get_class_name( 'database\form_type' );
+    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'hin' );
+
+    $db_form = lib::create( 'database\form' );
+    $db_form->participant_id = $db_participant->id;
+    $db_form->form_type_id = $db_form_type->id;
+    $db_form->date = $date;
+    $db_form->record_id = $db_hin->id;
+    $db_form->save();
+
     // save the new hin record to the form
+    $this->form_id = $db_form->id;
     $this->completed = true;
     if( !is_null( $db_hin ) ) $this->hin_id = $db_hin->id;
     $this->save();

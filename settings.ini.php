@@ -22,4 +22,7 @@ $SETTINGS['general']['development_mode'] = false;
 $SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
 
 // the location of new forms which need to be processed
-$SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form';
+$SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
+
+// the location of new forms which have been processed but not transferred to form system yet
+$SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/form_out';

@@ -10,6 +10,29 @@ CREATE PROCEDURE patch_contact_form()
       WHERE constraint_schema = DATABASE()
       AND constraint_name = "fk_access_site_id" );
 
+    SELECT "Adding new form_id column to contact_form table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "contact_form"
+      AND COLUMN_NAME = "form_id" );
+    IF @test = 0 THEN
+      SET @sql = CONCAT(
+        "ALTER TABLE contact_form ",
+        "ADD COLUMN form_id INT UNSIGNED NULL AFTER create_timestamp, ",
+        "ADD INDEX fk_form_id (form_id ASC), ",
+        "ADD CONSTRAINT fk_contact_form_form_id ",
+          "FOREIGN KEY (form_id) ",
+          "REFERENCES ", @cenozo, ".form (id) ",
+          "ON DELETE SET NULL ",
+          "ON UPDATE CASCADE" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
+
     SELECT "Renaming complete column to completed in contact_form table" AS "";
 
     SET @test = (
@@ -44,6 +67,20 @@ CREATE PROCEDURE patch_contact_form()
       "WHERE form_type.name = 'contact' ",
       "AND contact_form.completed = true ",
       "AND form.id IS NULL " );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SELECT "Linking forms back to contact_form table" AS "";
+
+    SET @sql = CONCAT(
+      "UPDATE contact_form CROSS JOIN ", @cenozo, ".form_type ",
+      "JOIN ", @cenozo, ".form ON contact_form.participant_id = form.participant_id ",
+                              "AND form_type.id = form.form_type_id ",
+                              "AND contact_form.participant_id = form.record_id ",
+      "SET contact_form.form_id = form.id "
+      "WHERE contact_form.form_id IS NULL ",
+      "AND form_type.name = 'contact'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

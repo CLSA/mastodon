@@ -54,6 +54,7 @@ class proxy_form extends base_form
       $db_event->save();
     }
 
+    $db_proxy_alternate = NULL;
     if( $db_proxy_form_entry->proxy )
     {
       // import data to the alternate table
@@ -136,6 +137,7 @@ class proxy_form extends base_form
       $db_proxy_phone->save();
     }
 
+    $db_informant_alternate = NULL;
     if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
     {
       // import data to the alternate table
@@ -237,15 +239,30 @@ class proxy_form extends base_form
       $db_hin->save();
     }
 
-    // save the new alternate record to the form
-    $this->completed = true;
-    if( $db_proxy_form_entry->proxy )
-      $this->proxy_alternate_id = $db_proxy_alternate->id;
+    // import the form into the framework's form system
+    $form_type_class_name = lib::get_class_name( 'database\form_type' );
+    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'proxy' );
 
-    if( $db_proxy_form_entry->proxy && $db_proxy_form_entry->same_as_proxy )
+    $db_form = lib::create( 'database\form' );
+    $db_form->participant_id = $db_participant->id;
+    $db_form->form_type_id = $db_form_type->id;
+    $db_form->date = $date;
+    if( !is_null( $db_proxy_alternate ) ) $db_form->record_id = $db_proxy_alternate->id;
+    else if( !is_null( $db_informant_alternate ) ) $db_form->record_id = $db_informant_alternate->id;
+    $db_form->save();
+
+    // save the new proxy record to the form
+    $this->form_id = $db_form->id;
+    $this->completed = true;
+    if( !is_null( $db_proxy_alternate ) )
+    {
+      $this->proxy_alternate_id = $db_proxy_alternate->id;
       $this->informant_alternate_id = $db_proxy_alternate->id;
-    else if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
+    }
+    if( !is_null( $db_informant_alternate ) )
+    {
       $this->informant_alternate_id = $db_informant_alternate->id;
+    }
 
     $this->save();
   }

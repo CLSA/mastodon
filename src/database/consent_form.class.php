@@ -106,7 +106,19 @@ class consent_form extends base_form
     $db_hin->access = $db_consent_form_entry->option_2;
     $db_hin->save();
 
+    // import the form into the framework's form system
+    $form_type_class_name = lib::get_class_name( 'database\form_type' );
+    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'consent' );
+
+    $db_form = lib::create( 'database\form' );
+    $db_form->participant_id = $db_participant->id;
+    $db_form->form_type_id = $db_form_type->id;
+    $db_form->date = $date;
+    if( !is_null( $db_consent ) ) $db_form->record_id = $db_consent->id;
+    $db_form->save();
+
     // save the new consent record to the form
+    $this->form_id = $db_form->id;
     $this->completed = true;
     if( !is_null( $db_consent ) ) $this->consent_id = $db_consent->id;
     $this->save();

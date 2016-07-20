@@ -10,6 +10,29 @@ CREATE PROCEDURE patch_consent_form()
       WHERE constraint_schema = DATABASE()
       AND constraint_name = "fk_access_site_id" );
 
+    SELECT "Adding new form_id column to consent_form table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "consent_form"
+      AND COLUMN_NAME = "form_id" );
+    IF @test = 0 THEN
+      SET @sql = CONCAT(
+        "ALTER TABLE consent_form ",
+        "ADD COLUMN form_id INT UNSIGNED NULL AFTER create_timestamp, ",
+        "ADD INDEX fk_form_id (form_id ASC), ",
+        "ADD CONSTRAINT fk_consent_form_form_id ",
+          "FOREIGN KEY (form_id) ",
+          "REFERENCES ", @cenozo, ".form (id) ",
+          "ON DELETE SET NULL ",
+          "ON UPDATE CASCADE" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
+
     SELECT "Renaming complete column to completed in consent_form table" AS "";
 
     SET @test = (
@@ -45,6 +68,21 @@ CREATE PROCEDURE patch_consent_form()
       "WHERE form_type.name = 'consent' ",
       "AND consent_form.completed = true ",
       "AND form.id IS NULL " );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SELECT "Linking forms back to consent_form table" AS "";
+
+    SET @sql = CONCAT(
+      "UPDATE consent_form CROSS JOIN ", @cenozo, ".form_type ",
+      "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
+      "JOIN ", @cenozo, ".form ON consent.participant_id = form.participant_id ",
+                              "AND form_type.id = form.form_type_id ",
+                              "AND consent_id = form.record_id ",
+      "SET consent_form.form_id = form.id "
+      "WHERE consent_form.form_id IS NULL ",
+      "AND form_type.name = 'consent'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

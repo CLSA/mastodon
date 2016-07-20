@@ -107,6 +107,10 @@ abstract class base_form extends \cenozo\database\record
   /**
    * Gets the file associated with this form
    * 
+   * Before forms are imported (before entry and adjudication) they will be located in the application's
+   * local form storage (FORM_OUT_PATH), after being imported they are moved to the framework's form
+   * storage (FORM_PATH).  This method will return the correct path based on whether the record's form_id
+   * column is set.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return string
    * @access public
@@ -120,12 +124,20 @@ abstract class base_form extends \cenozo\database\record
       return NULL;
     }
 
-    $padded_id = str_pad( $this->id, 7, '0', STR_PAD_LEFT );
-    $filename = sprintf( '%s/%s/%s/%s.pdf',
-                         sprintf( '%s/%s', FORM_PATH, str_replace( '_form', '', static::get_table_name() ) ),
-                         substr( $padded_id, 0, 3 ),
-                         substr( $padded_id, 3, 2 ),
-                         substr( $padded_id, 5 ) );
+    if( !is_null( $this->form_id ) )
+    {
+      $filename = $this->get_form()->get_filename();
+    }
+    else
+    {
+      $padded_id = str_pad( $this->id, 7, '0', STR_PAD_LEFT );
+      $filename = sprintf( '%s/%s/%s/%s/%s.pdf',
+                           FORM_OUT_PATH,
+                           str_replace( '_form', '', static::get_table_name() ),
+                           substr( $padded_id, 0, 3 ),
+                           substr( $padded_id, 3, 2 ),
+                           substr( $padded_id, 5 ) );
+    }
 
     return $filename;
   }
