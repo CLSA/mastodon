@@ -19,7 +19,7 @@ $SETTINGS['general']['build'] = 'f7d1210';
 $SETTINGS['general']['development_mode'] = false;
 
 // the location of mastodon internal path
-$SETTINGS['path']['APPLICATION'] = '/usr/local/lib/mastodon';
+$SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
 // the location of new forms which need to be processed
 $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
