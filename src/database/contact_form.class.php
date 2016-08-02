@@ -117,6 +117,8 @@ class contact_form extends base_form
     $db_form->record_id = $db_participant->id;
     $db_form->save();
 
+    // TODO: need to move form's file from mastodon to cenozo
+
     // save the new contact record to the form
     $this->form_id = $db_form->id;
     $this->completed = true;

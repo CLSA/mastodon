@@ -49,43 +49,97 @@ CREATE PROCEDURE patch_consent_form()
     SELECT "Adding consent forms to form_type table" AS "";
 
     SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, subject, description ) ",
-      "VALUES( 'consent', 'Participation Consent', 'consent', 'A form confirming the participant\\'s consent to participant in the study.' )" );
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
+      "VALUES( 'consent', 'Participation Consent', 'A form confirming the participant\\'s consent to participant in the study.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
     SELECT "Adding consent forms to form table" AS "";
 
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, record_id ) ",
-      "SELECT consent.participant_id, form_type.id, consent_form.date, consent_form.consent_id ",
-      "FROM ", @cenozo, ".form_type CROSS JOIN consent_form ",
-      "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
-      "LEFT JOIN ", @cenozo, ".form ON consent.participant_id = form.participant_id ",
-                                  "AND form_type.id = form.form_type_id ",
-                                  "AND consent_id = form.record_id ",
-      "WHERE form_type.name = 'consent' ",
-      "AND consent_form.completed = true ",
-      "AND form.id IS NULL " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+    SET @test = (
+      SELECT COUNT(*)
+      FROM consent_form
+      WHERE form_id IS NULL
+      AND completed = 1
+      AND consent_id IS NOT NULL );
+    IF @test > 0 THEN
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form ADD COLUMN consent_form_id INT UNSIGNED NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SELECT "Linking forms back to consent_form table" AS "";
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, consent_form_id ) ",
+        "SELECT consent.participant_id, form_type.id, consent_form.date, consent_form.id ",
+        "FROM ", @cenozo, ".form_type, consent_form ",
+        "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
+        "WHERE form_type.name = 'consent' ",
+        "AND consent_form.form_id IS NULL ",
+        "AND consent_form.completed = true" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SET @sql = CONCAT(
-      "UPDATE consent_form CROSS JOIN ", @cenozo, ".form_type ",
-      "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
-      "JOIN ", @cenozo, ".form ON consent.participant_id = form.participant_id ",
-                              "AND form_type.id = form.form_type_id ",
-                              "AND consent_id = form.record_id ",
-      "SET consent_form.form_id = form.id "
-      "WHERE consent_form.form_id IS NULL ",
-      "AND form_type.name = 'consent'" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+      SELECT "Linking forms back to consent_form table" AS "";
+
+      SET @sql = CONCAT(
+        "UPDATE consent_form ",
+        "JOIN ", @cenozo, ".form ON consent_form.id = form.consent_form_id ",
+        "SET consent_form.form_id = form.id "
+        "WHERE consent_form.form_id IS NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to consent to participate records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'consent', consent_form.consent_id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN consent_form ON form.id = consent_form.form_id ",
+        "WHERE form.consent_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to consent for hin access records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'consent', consent.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
+        "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
+        "WHERE consent_type.name = 'HIN access' ",
+        "AND form.consent_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to event records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'event', event.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN consent_form ON form.id = consent_form.form_id ",
+        "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
+        "JOIN ", @cenozo, ".event ON consent.participant_id = event.participant_id ",
+                                 "AND DATE( consent.datetime ) = DATE( event.datetime ) ",
+        "JOIN ", @cenozo, ".event_type ON event.event_type_id = event_type.id ",
+        "WHERE event_type.name = 'consent signed' ",
+        "AND form.consent_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form DROP COLUMN consent_form_id" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
 
   END //
 DELIMITER ;

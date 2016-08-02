@@ -49,41 +49,54 @@ CREATE PROCEDURE patch_contact_form()
     SELECT "Adding contact forms to form_type table" AS "";
 
     SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, subject, description ) ",
-      "VALUES( 'contact', 'Participation Consent', 'contact', 'A form confirming the participant\\'s contact to participant in the study.' )" );
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
+      "VALUES( 'contact', 'Contact Details', 'A recruitment form containing the participant\\'s name and contact details.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
     SELECT "Adding contact forms to form table" AS "";
 
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, record_id ) ",
-      "SELECT contact_form.participant_id, form_type.id, contact_form.date, contact_form.participant_id ",
-      "FROM ", @cenozo, ".form_type CROSS JOIN contact_form ",
-      "LEFT JOIN ", @cenozo, ".form ON contact_form.participant_id = form.participant_id ",
-                                  "AND form_type.id = form.form_type_id ",
-                                  "AND contact_form.participant_id = form.record_id ",
-      "WHERE form_type.name = 'contact' ",
-      "AND contact_form.completed = true ",
-      "AND form.id IS NULL " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+    SET @test = (
+      SELECT COUNT(*)
+      FROM contact_form
+      WHERE form_id IS NULL
+      AND completed = 1
+      AND participant_id IS NOT NULL );
+    IF @test > 0 THEN
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form ADD COLUMN contact_form_id INT UNSIGNED NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SELECT "Linking forms back to contact_form table" AS "";
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, contact_form_id ) ",
+        "SELECT contact_form.participant_id, form_type.id, contact_form.date, contact_form.id ",
+        "FROM ", @cenozo, ".form_type, contact_form ",
+        "WHERE form_type.name = 'contact' ",
+        "AND contact_form.form_id IS NULL ",
+        "AND contact_form.participant_id IS NOT NULL ",
+        "AND contact_form.completed = true" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SET @sql = CONCAT(
-      "UPDATE contact_form CROSS JOIN ", @cenozo, ".form_type ",
-      "JOIN ", @cenozo, ".form ON contact_form.participant_id = form.participant_id ",
-                              "AND form_type.id = form.form_type_id ",
-                              "AND contact_form.participant_id = form.record_id ",
-      "SET contact_form.form_id = form.id "
-      "WHERE contact_form.form_id IS NULL ",
-      "AND form_type.name = 'contact'" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+      SELECT "Linking forms back to contact_form table" AS "";
+
+      SET @sql = CONCAT(
+        "UPDATE contact_form ",
+        "JOIN ", @cenozo, ".form ON contact_form.id = form.contact_form_id ",
+        "SET contact_form.form_id = form.id "
+        "WHERE contact_form.form_id IS NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form DROP COLUMN contact_form_id" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
 
   END //
 DELIMITER ;

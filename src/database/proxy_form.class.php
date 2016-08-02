@@ -251,6 +251,8 @@ class proxy_form extends base_form
     else if( !is_null( $db_informant_alternate ) ) $db_form->record_id = $db_informant_alternate->id;
     $db_form->save();
 
+    // TODO: need to move form's file from mastodon to cenozo
+
     // save the new proxy record to the form
     $this->form_id = $db_form->id;
     $this->completed = true;

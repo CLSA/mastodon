@@ -81,46 +81,112 @@ CREATE PROCEDURE patch_proxy_form()
     SELECT "Adding proxy forms to form_type table" AS "";
 
     SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, subject, description ) ",
-      "VALUES( 'proxy', 'Alternate', 'alterante', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
+      "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
+      "VALUES( 'proxy', 'Alternate', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
     SELECT "Adding proxy forms to form table" AS "";
 
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, record_id ) ",
-      "SELECT participant.id, form_type.id, proxy_form.date, IFNULL( proxy_alternate_id, informant_alternate_id ) ",
-      "FROM ", @cenozo, ".form_type CROSS JOIN proxy_form ",
-      "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
-      "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
-      "LEFT JOIN ", @cenozo, ".form ON participant.id = form.participant_id ",
-                                  "AND form_type.id = form.form_type_id ",
-                                  "AND IFNULL( proxy_alternate_id, informant_alternate_id ) = form.record_id ",
-      "WHERE form_type.name = 'proxy' ",
-      "AND proxy_form.completed = true ",
-      "AND IFNULL( proxy_alternate_id, informant_alternate_id ) IS NOT NULL ",
-      "AND form.id IS NULL " );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+    SET @test = (
+      SELECT COUNT(*)
+      FROM proxy_form
+      WHERE form_id IS NULL
+      AND completed = 1 );
+    IF @test > 0 THEN
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form ADD COLUMN proxy_form_id INT UNSIGNED NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SELECT "Linking forms back to consent_form table" AS "";
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, proxy_form_id ) ",
+        "SELECT participant.id, form_type.id, proxy_form.date, proxy_form.id ",
+        "FROM ", @cenozo, ".form_type, proxy_form ",
+        "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
+        "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
+        "WHERE form_type.name = 'proxy' ",
+        "AND proxy_form.form_id IS NULL ",
+        "AND proxy_form.completed = true" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
-    SET @sql = CONCAT(
-      "UPDATE proxy_form CROSS JOIN ", @cenozo, ".form_type ",
-      "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
-      "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
-      "JOIN ", @cenozo, ".form ON participant.id = form.participant_id ",
-                              "AND form_type.id = form.form_type_id ",
-                              "AND IFNULL( proxy_alternate_id, informant_alternate_id ) = form.record_id ",
-      "SET proxy_form.form_id = form.id "
-      "WHERE proxy_form.form_id IS NULL ",
-      "AND form_type.name = 'proxy'" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+      SELECT "Linking forms back to proxy_form table" AS "";
+
+      SET @sql = CONCAT(
+        "UPDATE proxy_form ",
+        "JOIN ", @cenozo, ".form ON proxy_form.id = form.proxy_form_id ",
+        "SET proxy_form.form_id = form.id "
+        "WHERE proxy_form.form_id IS NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to event records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'event', event.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN proxy_form ON form.id = proxy_form.form_id ",
+        "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
+        "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
+        "JOIN ", @cenozo, ".event ON participant.id = event.participant_id ",
+                                 "AND proxy_form_entry.date = DATE( event.datetime ) ",
+        "JOIN ", @cenozo, ".event_type ON event.event_type_id = event_type.id ",
+        "WHERE event_type.name = 'consent for proxy signed' ",
+        "AND form.proxy_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to proxy alternate records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'alternate', alternate.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN proxy_form ON form.id = proxy_form.form_id ",
+        "JOIN ", @cenozo, ".alternate ON proxy_form.proxy_alternate_id = alternate.id "
+        "WHERE form.proxy_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to proxy alternate records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'alternate', alternate.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN proxy_form ON form.id = proxy_form.form_id ",
+        "JOIN ", @cenozo, ".alternate ON proxy_form.informant_alternate_id = alternate.id ",
+        "WHERE form.proxy_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SELECT "Adding form associations to consent for future hin access records" AS "";
+
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+        "SELECT form.id, 'consent', consent.id ",
+        "FROM ", @cenozo, ".form ",
+        "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
+        "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
+        "WHERE consent_type.name = 'HIN future access' ",
+        "AND form.proxy_form_id IS NOT NULL" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form DROP COLUMN proxy_form_id" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
 
   END //
 DELIMITER ;

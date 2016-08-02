@@ -117,6 +117,8 @@ class consent_form extends base_form
     if( !is_null( $db_consent ) ) $db_form->record_id = $db_consent->id;
     $db_form->save();
 
+    // TODO: need to move form's file from mastodon to cenozo
+
     // save the new consent record to the form
     $this->form_id = $db_form->id;
     $this->completed = true;
