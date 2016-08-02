@@ -14,10 +14,9 @@ DROP PROCEDURE IF EXISTS patch_setting;
 
     SET @test = (
       SELECT COUNT(*)
-      FROM information_schema.COLUMNS
+      FROM information_schema.TABLES
       WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = "old_setting_value"
-      AND COLUMN_NAME = "category" );
+      AND TABLE_NAME = "old_setting_value" );
     IF @test = 1 THEN
 
       DROP TABLE setting;
@@ -40,6 +39,9 @@ DROP PROCEDURE IF EXISTS patch_setting;
       PREPARE statement FROM @sql;
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
+
+      -- no settings in mastodon v1, so just drop the old_setting_value table
+      DROP TABLE old_setting_value;
 
     END IF;
 
