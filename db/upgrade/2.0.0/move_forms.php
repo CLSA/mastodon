@@ -29,6 +29,7 @@ class patch
   {
     // include the initialization settings
     global $SETTINGS;
+    require_once '../../../settings.ini.php';
     require_once '../../../settings.local.ini.php';
     $this->add_settings( $SETTINGS, true );
     unset( $SETTINGS );
@@ -199,7 +200,7 @@ class patch
         if( 0 != $done % 10000 ) out( sprintf( 'Finished moving %d files', $done ) );
       }
 
-      out( 'Done.  PLEASE NOTE: you must now remove the FORM_OUT line from your settings.local.ini.php file.' );
+      out( 'Done' );
     }
     else out( 'Done' );
   }
