@@ -31,46 +31,9 @@ class patch
     global $SETTINGS;
     require_once '../../../settings.ini.php';
     require_once '../../../settings.local.ini.php';
-    $this->add_settings( $SETTINGS, true );
-    unset( $SETTINGS );
-
-    // include the framework's initialization settings
-    require_once( sprintf( '%s/settings.local.ini.php', $this->settings['path']['CENOZO'] ) );
-    $this->add_settings( $settings );
-    require_once( sprintf( '%s/settings.ini.php', $this->settings['path']['CENOZO'] ) );
-    $this->add_settings( $settings );
-  }
-
-  /**
-   * Adds a list of key/value pairs to the settings
-   * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param array $settings
-   * @param boolean $replace Whether to replace the existing settings array
-   * @access public
-   */
-  public function add_settings( $settings, $replace = false )
-  {
-    if( $replace )
-    {
-      $this->settings = $settings;
-    }
-    else
-    {
-      foreach( $settings as $category => $setting )
-      {
-        if( !array_key_exists( $category, $this->settings ) )
-        {
-          $this->settings[$category] = $setting;
-        }
-        else
-        {
-          foreach( $setting as $key => $value )
-            if( !array_key_exists( $key, $this->settings[$category] ) )
-              $this->settings[$category][$key] = $value;
-        }
-      }
-    }
+    require_once $SETTINGS['path']['CENOZO'].'/src/initial.class.php';
+    $initial = new \cenozo\initial();
+    $this->settings = $initial->get_settings();
   }
 
   public function connect_database()
