@@ -53,11 +53,7 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
-      "AND service.restricted = 1 ",
-      "AND service.id NOT IN ( ",
-        "SELECT id FROM service ",
-        "WHERE subject = 'token' ",
-      ")" );
+      "AND service.restricted = 1" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -74,7 +70,7 @@ CREATE PROCEDURE patch_role_has_service()
           "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'contact_form', ",
           "'contact_form_entry', 'event', 'form', 'hin_form', 'hin_form_entry', 'jurisdiction', 'language', ",
           "'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', 'region_site', 'report', ",
-          "'report_type', 'source', 'state' ",
+          "'report_type', 'source', 'state', 'token' ",
         ") ",
         "OR ( subject = 'report_restriction' AND method = 'GET' ) ",
       ")" );
