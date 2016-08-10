@@ -55,11 +55,12 @@ define( function() {
     id: {
       title: 'ID',
       type: 'string',
-      format: 'integer'
+      constant: true
     },
     completed: {
       title: 'Complete',
-      type: 'boolean'
+      type: 'boolean',
+      constant: true
     },
     invalid: {
       title: 'Invalid',
@@ -72,6 +73,11 @@ define( function() {
     adjudicate: {
       type: 'hidden'
     }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
   if( angular.isDefined( module.actions.adjudicate ) ) {
@@ -270,9 +276,28 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyFormViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
+    'CnBaseViewFactory', 'CnHttpFactory',
+    function( CnBaseViewFactory, CnHttpFactory ) {
+      var object = function( parentModel, root ) {
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        // download the form's file
+        this.downloadFile = function() {
+          return CnHttpFactory.instance( {
+            path: 'consent_form/' + this.record.getIdentifier(),
+            data: { 'download': true },
+            format: 'pdf'
+          } ).get().then( function( response ) {
+            saveAs(
+              new Blob(
+                [response.data],
+                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
+              ),
+              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
+            );
+          } );
+        };
+      };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
