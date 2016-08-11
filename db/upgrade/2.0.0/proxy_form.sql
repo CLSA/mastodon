@@ -49,34 +49,44 @@ CREATE PROCEDURE patch_proxy_form()
     SELECT "Creating use informant consent entries" AS "";
 
     SET @sql = CONCAT(
-      "CREATE TEMPORARY TABLE last_proxy_form ",
-      "SELECT participant.id participant_id, completed, invalid, informant_continue, proxy_form_entry.date ",
-      "FROM proxy_form ",
-      "JOIN proxy_form_entry ON proxy_form.validated_proxy_form_entry_id = proxy_form_entry.id ",
-      "JOIN ", @cenozo, ".participant on proxy_form_entry.uid = participant.uid ",
-      "WHERE proxy_form_entry.date = ( ",
-        "SELECT MAX( pfe2.date ) ",
-        "FROM proxy_form pf2 ",
-        "JOIN proxy_form_entry pfe2 ON pf2.validated_proxy_form_entry_id = pfe2.id ",
-        "WHERE pfe2.uid = proxy_form_entry.uid ",
-      ")" );
+      "SELECT COUNT(*) INTO @test FROM ", @cenozo, ".consent ",
+      "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id ",
+      "WHERE consent_type.name = 'use informant'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
-    
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO ", @cenozo, ".consent( ",
-        "participant_id, consent_type_id, accept, written, datetime, note ) ",
-      "SELECT participant_id, consent_type.id, informant_continue, true, date, ",
-        "CONCAT( 'Received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
-                "' for informant to continue to answer research questions on their behalf.' ) ",
-      "FROM last_proxy_form, ", @cenozo, ".consent_type ",
-      "WHERE consent_type.name = 'use informant' ",
-      "AND completed = true ",
-      "AND invalid = false" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
+
+    IF @test = 0 THEN
+      SET @sql = CONCAT(
+        "CREATE TEMPORARY TABLE last_proxy_form ",
+        "SELECT participant.id participant_id, completed, invalid, informant_continue, proxy_form_entry.date ",
+        "FROM proxy_form ",
+        "JOIN proxy_form_entry ON proxy_form.validated_proxy_form_entry_id = proxy_form_entry.id ",
+        "JOIN ", @cenozo, ".participant on proxy_form_entry.uid = participant.uid ",
+        "WHERE proxy_form_entry.date = ( ",
+          "SELECT MAX( pfe2.date ) ",
+          "FROM proxy_form pf2 ",
+          "JOIN proxy_form_entry pfe2 ON pf2.validated_proxy_form_entry_id = pfe2.id ",
+          "WHERE pfe2.uid = proxy_form_entry.uid ",
+        ")" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+      
+      SET @sql = CONCAT(
+        "INSERT IGNORE INTO ", @cenozo, ".consent( ",
+          "participant_id, consent_type_id, accept, written, datetime, note ) ",
+        "SELECT participant_id, consent_type.id, informant_continue, true, date, ",
+          "CONCAT( 'Received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
+                  "' for informant to continue to answer research questions on their behalf.' ) ",
+        "FROM last_proxy_form, ", @cenozo, ".consent_type ",
+        "WHERE consent_type.name = 'use informant' ",
+        "AND completed = true ",
+        "AND invalid = false" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
 
     SELECT "Adding proxy forms to form_type table" AS "";
 

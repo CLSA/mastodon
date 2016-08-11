@@ -85,8 +85,15 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name IN( 'typist' ) ",
       "AND service.restricted = 1 ",
-      "AND service.subject IN ( 'consent_form_entry', 'contact_form_entry', 'hin_form_entry', 'participant', ",
-        "'proxy_form_entry' )" );
+      "AND ( ",
+        "service.subject IN ( ",
+          "'consent_form_entry', 'contact_form_entry', 'hin_form_entry', 'participant', 'proxy_form_entry' ) ",
+        "OR ( ",
+          "service.subject IN( 'consent_form', 'contact_form', 'hin_form', 'proxy_form' ) ",
+          "AND method = 'GET' ",
+          "AND resource = 1 ",
+        ") ",
+      ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

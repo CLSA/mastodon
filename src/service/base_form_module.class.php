@@ -17,6 +17,27 @@ abstract class base_form_module extends \cenozo\service\module
   /**
    * Extend parent method
    */
+  public function validate()
+  {
+    // do not allow completed forms to be invalidated
+    if( 'PATCH' == $this->get_method() )
+    {
+      $record = $this->get_resource();
+      if( $record->completed )
+      {
+        $file = $this->get_file_as_array();
+        if( array_key_exists( 'invalid', $file ) && true == $file['invalid'] )
+        {
+          $this->set_data( 'Once a form has been completed it cannot be invalidated.' );
+          $this->get_status()->set_code( 306 );
+        }
+      }
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function prepare_read( $select, $modifier )
   {
     parent::prepare_read( $select, $modifier );
@@ -36,7 +57,16 @@ abstract class base_form_module extends \cenozo\service\module
 
     if( $select->has_column( 'status' ) )
     {
-      // TODO: define form status as one of complete/invalid/adjudicated/etc
+      $select->add_column(
+        'IF( completed, "completed", '.
+          'IF( invalid, "invalid", '.
+            'IF( submitted_total > 1, "adjudication", '.
+              'IF( entry_total > 0, "started", "new" ) '.
+            ') '.
+          ') '.
+        ')',
+        'status',
+        false );
     }
   }
 }

@@ -17,7 +17,7 @@ define( function() {
     },
     columnList: {
       consent_form_id: {
-        column: 'consent_form_id',
+        column: 'consent_form.id',
         title: 'ID'
       },
       user: {
@@ -80,6 +80,11 @@ define( function() {
       title: 'Date',
       type: 'date'
     }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
   if( angular.isDefined( module.actions.start ) ) {
@@ -206,6 +211,23 @@ define( function() {
                 $state.go( 'consent_form_entry.list' );
               } );
             }
+          } );
+        };
+
+        // download the form's file
+        this.downloadFile = function() {
+          return CnHttpFactory.instance( {
+            path: 'consent_form/' + this.record.getIdentifier(),
+            data: { 'download': true },
+            format: 'pdf'
+          } ).get().then( function( response ) {
+            saveAs(
+              new Blob(
+                [response.data],
+                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
+              ),
+              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
+            );
           } );
         };
       };

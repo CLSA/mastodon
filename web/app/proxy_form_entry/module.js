@@ -45,6 +45,7 @@ define( function() {
   } );
 
   module.addInputGroup( '', {
+    proxy_form_id: { type: 'hidden' },
     user_id: {
       title: 'User',
       type: 'lookup-typeahead',
@@ -227,6 +228,11 @@ define( function() {
     }
   }, true );
 
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
+  } );
+
   if( angular.isDefined( module.actions.start ) ) { 
     module.addExtraOperation( 'list', {
       title: 'Start New Entry',
@@ -350,6 +356,23 @@ define( function() {
                 $state.go( 'proxy_form_entry.list' );
               } );
             }
+          } );
+        };
+
+        // download the form's file
+        this.downloadFile = function() {
+          return CnHttpFactory.instance( {
+            path: 'proxy_form/' + this.record.proxy_form_id,
+            data: { 'download': true },
+            format: 'pdf'
+          } ).get().then( function( response ) {
+            saveAs(
+              new Blob(
+                [response.data],
+                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
+              ),
+              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
+            );
           } );
         };
       };

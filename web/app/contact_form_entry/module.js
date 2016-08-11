@@ -248,6 +248,11 @@ define( function() {
     }
   } );
 
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
+  } );
+
   if( angular.isDefined( module.actions.start ) ) {
     module.addExtraOperation( 'list', {
       title: 'Start New Entry',
@@ -372,6 +377,23 @@ define( function() {
                 $state.go( 'contact_form_entry.list' );
               } );
             }
+          } );
+        };
+
+        // download the form's file
+        this.downloadFile = function() {
+          return CnHttpFactory.instance( {
+            path: 'contact_form/' + this.record.getIdentifier(),
+            data: { 'download': true },
+            format: 'pdf'
+          } ).get().then( function( response ) {
+            saveAs(
+              new Blob(
+                [response.data],
+                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
+              ),
+              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
+            );
           } );
         };
       };

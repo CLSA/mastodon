@@ -14,21 +14,10 @@ define( function() {
       id: {
         title: 'ID'
       },
-      completed: {
-        title: 'Complete',
-        type: 'boolean'
-      },
-      invalid: {
-        title: 'Invalid',
-        type: 'boolean'
-      },
-      validated: {
-        title: 'Validated',
-        type: 'boolean'
-      },
-      adjudicate: {
-        title: 'Adjudication Required',
-        type: 'boolean'
+      status: {
+        title: 'Status',
+        type: 'string',
+        help: 'One of "completed", "invalid", "adjudication", "started" or "new".'
       },
       entry_total: {
         column: 'proxy_form_total.entry_total',
@@ -56,6 +45,16 @@ define( function() {
       title: 'ID',
       type: 'string',
       constant: true
+    },
+    status: {
+      title: 'Status',
+      type: 'string',
+      constant: true,
+      help: 'Set to "completed" when done, ' +
+            '"invalid" when marked invalid, ' +
+            '"adjudication" when two entries have been submitted but do not match, ' +
+            '"started" when there are less than two entries submitted and ' +
+            '"new" when no entries have been submitted.'
     },
     completed: {
       title: 'Complete',
