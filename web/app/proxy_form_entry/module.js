@@ -327,6 +327,7 @@ define( function() {
     'CnBaseViewFactory', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state',
     function( CnBaseViewFactory, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state ) {
       var object = function( parentModel, root ) {
+        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         this.onPatchError = function( response ) {
