@@ -69,9 +69,10 @@ CREATE PROCEDURE patch_role_has_service()
         "service.subject IN ( ",
           "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'contact_form', ",
           "'contact_form_entry', 'event', 'form', 'hin_form', 'hin_form_entry', 'jurisdiction', 'language', ",
-          "'note', 'participant', 'phone', 'proxy_form', 'proxy_form_entry', 'region_site', 'report', ",
+          "'note', 'participant', 'phone', 'proxy_form_entry', 'region_site', 'report', ",
           "'report_type', 'source', 'state', 'token' ",
         ") ",
+        "OR ( subject = 'proxy_form' AND method != 'POST' ) ",
         "OR ( subject = 'report_restriction' AND method = 'GET' ) ",
       ")" );
     PREPARE statement FROM @sql;
