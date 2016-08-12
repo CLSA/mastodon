@@ -71,9 +71,11 @@ CREATE PROCEDURE patch_consent_form()
 
       SET @sql = CONCAT(
         "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, consent_form_id ) ",
-        "SELECT consent.participant_id, form_type.id, consent_form.date, consent_form.id ",
+        "SELECT consent.participant_id, form_type.id, ",
+          "IFNULL( consent_form_entry.date, consent_form.date ), consent_form.id ",
         "FROM ", @cenozo, ".form_type, consent_form ",
         "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
+        "LEFT JOIN consent_form_entry ON consent_form.validated_consent_form_entry_id = consent_form_entry.id "
         "WHERE form_type.name = 'consent' ",
         "AND consent_form.form_id IS NULL ",
         "AND consent_form.completed = true" );
@@ -113,23 +115,6 @@ CREATE PROCEDURE patch_consent_form()
         "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
         "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
         "WHERE consent_type.name = 'HIN access' ",
-        "AND form.consent_form_id IS NOT NULL" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
-
-      SELECT "Adding form associations to event records" AS "";
-
-      SET @sql = CONCAT(
-        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
-        "SELECT form.id, 'event', event.id ",
-        "FROM ", @cenozo, ".form ",
-        "JOIN consent_form ON form.id = consent_form.form_id ",
-        "JOIN ", @cenozo, ".consent ON consent_form.consent_id = consent.id ",
-        "JOIN ", @cenozo, ".event ON consent.participant_id = event.participant_id ",
-                                 "AND DATE( consent.datetime ) = DATE( event.datetime ) ",
-        "JOIN ", @cenozo, ".event_type ON event.event_type_id = event_type.id ",
-        "WHERE event_type.name = 'consent signed' ",
         "AND form.consent_form_id IS NOT NULL" );
       PREPARE statement FROM @sql;
       EXECUTE statement;

@@ -71,8 +71,10 @@ CREATE PROCEDURE patch_hin_form()
 
       SET @sql = CONCAT(
         "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, hin_form_id ) ",
-        "SELECT hin_form.participant_id, form_type.id, hin_form.date, hin_form.id ",
+        "SELECT hin_form.participant_id, form_type.id, ",
+          "IFNULL( hin_form_entry.date, hin_form.date ), hin_form.id ",
         "FROM ", @cenozo, ".form_type, hin_form ",
+        "LEFT JOIN hin_form_entry ON hin_form.validated_hin_form_entry_id = hin_form_entry.id "
         "WHERE form_type.name = 'hin' ",
         "AND hin_form.form_id IS NULL ",
         "AND hin_form.participant_id IS NOT NULL ",

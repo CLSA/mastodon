@@ -112,7 +112,8 @@ CREATE PROCEDURE patch_proxy_form()
 
       SET @sql = CONCAT(
         "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, proxy_form_id ) ",
-        "SELECT participant.id, form_type.id, proxy_form.date, proxy_form.id ",
+        "SELECT participant.id, form_type.id, ",
+          "IFNULL( proxy_form_entry.date, proxy_form.date ), proxy_form.id ",
         "FROM ", @cenozo, ".form_type, proxy_form ",
         "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
         "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
@@ -130,24 +131,6 @@ CREATE PROCEDURE patch_proxy_form()
         "JOIN ", @cenozo, ".form ON proxy_form.id = form.proxy_form_id ",
         "SET proxy_form.form_id = form.id "
         "WHERE proxy_form.form_id IS NULL" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
-
-      SELECT "Adding form associations to event records" AS "";
-
-      SET @sql = CONCAT(
-        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
-        "SELECT form.id, 'event', event.id ",
-        "FROM ", @cenozo, ".form ",
-        "JOIN proxy_form ON form.id = proxy_form.form_id ",
-        "JOIN proxy_form_entry ON validated_proxy_form_entry_id = proxy_form_entry.id ",
-        "JOIN ", @cenozo, ".participant ON proxy_form_entry.uid = participant.uid ",
-        "JOIN ", @cenozo, ".event ON participant.id = event.participant_id ",
-                                 "AND proxy_form_entry.date = DATE( event.datetime ) ",
-        "JOIN ", @cenozo, ".event_type ON event.event_type_id = event_type.id ",
-        "WHERE event_type.name = 'consent for proxy signed' ",
-        "AND form.proxy_form_id IS NOT NULL" );
       PREPARE statement FROM @sql;
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
