@@ -26,7 +26,7 @@
                 <button class="btn btn-default"
                         type="button"
                         ng-disabled="!model.form.adjudicate"
-                        ng-click="model.defer( entry.id )">Defer</button>
+                        ng-click="model.defer( entry.id )">Return to Typist</button>
                 <button class="btn btn-default"
                         type="button"
                         ng-disabled="!model.form.adjudicate"
@@ -44,7 +44,7 @@
                 {{ null == entry[column.column] ? '(empty)' : entry[column.column] }}
               </strong>
               <span ng-if="entry.id != model.form.validated_form_id"
-                    ng-class="{'text-muted':entry.deferred ||
+                    ng-class="{'text-muted':!entry.submitted ||
                                ( model.form.validated_form_id && entry.id!=model.form.validated_form_id )}">
                 {{ null == entry[column.column] ? '(empty)' : entry[column.column] }}
               </span>
@@ -59,7 +59,7 @@
                 <button class="btn btn-default"
                         type="button"
                         ng-disabled="!model.form.adjudicate"
-                        ng-click="model.defer( entry.id )">Defer</button>
+                        ng-click="model.defer( entry.id )">Return to Typist</button>
                 <button class="btn btn-default"
                         type="button"
                         ng-disabled="!model.form.adjudicate"

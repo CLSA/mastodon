@@ -36,8 +36,8 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'consent_form_entry', $module_list ) &&
         array_key_exists( 'add', $module_list['consent_form_entry']['actions'] ) )
     {
+      // posting new form-entries is handled specially by the interface
       unset( $module_list['consent_form_entry']['actions']['add'] );
-      $module_list['consent_form_entry']['actions']['start'] = '';
     }
     if( array_key_exists( 'participant', $module_list ) )
     {
@@ -52,8 +52,8 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'contact_form_entry', $module_list ) &&
         array_key_exists( 'add', $module_list['contact_form_entry']['actions'] ) )
     {
+      // posting new form-entries is handled specially by the interface
       unset( $module_list['contact_form_entry']['actions']['add'] );
-      $module_list['contact_form_entry']['actions']['start'] = '';
     }
     if( array_key_exists( 'hin_form', $module_list ) )
     {
@@ -63,8 +63,12 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'hin_form_entry', $module_list ) &&
         array_key_exists( 'add', $module_list['hin_form_entry']['actions'] ) )
     {
+      // posting new form-entries is handled specially by the interface
       unset( $module_list['hin_form_entry']['actions']['add'] );
-      $module_list['hin_form_entry']['actions']['start'] = '';
+    }
+    if( array_key_exists( 'user', $module_list ) )
+    {
+      array_unshift( $module_list['user']['children'], array( 'proxy_form_entry' ) );
     }
     if( array_key_exists( 'proxy_form', $module_list ) )
     {
@@ -74,8 +78,8 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'proxy_form_entry', $module_list ) &&
         array_key_exists( 'add', $module_list['proxy_form_entry']['actions'] ) )
     {
+      // posting new form-entries is handled specially by the interface
       unset( $module_list['proxy_form_entry']['actions']['add'] );
-      $module_list['proxy_form_entry']['actions']['start'] = '';
     }
 
     return $module_list;

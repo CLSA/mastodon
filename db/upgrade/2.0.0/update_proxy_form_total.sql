@@ -16,7 +16,7 @@ BEGIN
       submitted_total = (
         SELECT COUNT(*) FROM proxy_form_entry
         WHERE proxy_form_id = proc_proxy_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
 END

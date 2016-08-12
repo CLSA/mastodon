@@ -1,71 +1,10 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'proxy_form_entry', true ); } catch( err ) { console.warn( err ); return; }
-  angular.extend( module, {
-    identifier: {
-      parent: {
-        subject: 'proxy_form',
-        column: 'proxy_form.id'
-      }
-    },
-    name: {
-      singular: 'proxy form entry',
-      plural: 'proxy form entries',
-      possessive: 'proxy form entry\'s',
-      pluralPossessive: 'proxy form entries\''
-    },
-    columnList: {
-      proxy_form_id: {
-        column: 'proxy_form_id',
-        title: 'ID'
-      },
-      user: {
-        column: 'user.name',
-        title: 'User'
-      },
-      deferred: {
-        title: 'Deferred',
-        type: 'boolean'
-      },
-      validated: {
-        title: 'Validated',
-        type: 'boolean'
-      },
-      date: {
-        column: 'proxy_form.date',
-        title: 'Date Added',
-        type: 'date'
-      }
-    },
-    defaultOrder: {
-      column: 'user.name',
-      reverse: false
-    }
-  } );
+  try { var module = cenozoApp.module( 'proxy_form_entry', true ); }
+  catch( err ) { console.warn( err ); return; }
 
-  module.addInputGroup( '', {
-    proxy_form_id: { type: 'hidden' },
-    user_id: {
-      title: 'User',
-      type: 'lookup-typeahead',
-      typeahead: {
-        table: 'user',
-        select: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
-        where: [ 'first_name', 'last_name', 'name' ]
-      }
-    },
-    deferred: {
-      title: 'Deferred',
-      type: 'boolean'
-    },
-    uid: {
-      title: 'UID',
-      type: 'string',
-      regex: '^[A-Z][0-9]{6}$',
-      help: 'Must be in "A000000" format (a letter followed by 6 numbers)'
-    }
-  } );
+  cenozoApp.initFormModule( module, 'proxy' );
 
   module.addInputGroup( 'Proxy Decision Maker', {
     proxy: {
@@ -228,27 +167,6 @@ define( function() {
     }
   }, true );
 
-  module.addExtraOperation( 'view', {
-    title: 'Download',
-    operation: function( $state, model ) { model.viewModel.downloadFile(); }
-  } );
-
-  if( angular.isDefined( module.actions.start ) ) { 
-    module.addExtraOperation( 'list', {
-      title: 'Start New Entry',
-      operation: function( $state, model ) { model.listModel.startNewEntry(); },
-      isIncluded: function( $state, model ) { return model.isTypist; }
-    } );
-  }
-
-  if( angular.isDefined( module.actions.start ) ) { 
-    module.addExtraOperation( 'view', {
-      title: 'Submit Entry',
-      operation: function( $state, model ) { model.viewModel.submitEntry(); },
-      isIncluded: function( $state, model ) { return model.isTypist; }
-    } );
-  }
-
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyFormEntryList', [
     'CnProxyFormEntryModelFactory',
@@ -295,28 +213,10 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyFormEntryListFactory', [
-    'CnBaseListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
-    function( CnBaseListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
+    'CnBaseFormEntryListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
+    function( CnBaseFormEntryListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
       var object = function( parentModel ) {
-        CnBaseListFactory.construct( this, parentModel );
-
-        this.startNewEntry = function() {
-          CnHttpFactory.instance( {
-            path: 'proxy_form_entry',
-            data: { user_id: CnSession.user.id },
-            onError: function( response ) {
-              if( 404 == response.status ) {
-                console.info( 'The "404 (Not Found)" error found above is normal and can be ignored.' );
-                CnModalMessageFactory.instance( {
-                  title: 'No Forms Available',
-                  message: 'There are no new proxy forms available for transcription at this time.'
-                } ).show();
-              } else { CnModalMessageFactory.httpError( response ); }
-            }
-          } ).post().then( function( response ) {
-            $state.go( 'proxy_form_entry.view', { identifier: response.data } );
-          } );
-        };
+        CnBaseFormEntryListFactory.construct( this, parentModel );
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
@@ -324,58 +224,10 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyFormEntryViewFactory', [
-    'CnBaseViewFactory', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state',
-    function( CnBaseViewFactory, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state ) {
+    'CnBaseFormEntryViewFactory', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state',
+    function( CnBaseFormEntryViewFactory, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state ) {
       var object = function( parentModel, root ) {
-        var self = this;
-        CnBaseViewFactory.construct( this, parentModel, root );
-
-        this.onPatchError = function( response ) {
-          // handle 306 errors (uid doesn't match existing participant)
-          if( 306 == response.status ) {
-            CnModalMessageFactory.instance( {
-              title: 'Participant Not Found',
-              message: 'There was no participant found for the UID "' + self.record.uid + '"',
-              error: true
-            } ).show().then( function() {
-              self.record.uid = self.backupRecord.uid;
-            } );
-          } else self.$$onPatchError( response );
-        };
-
-        this.submitEntry = function() {
-          CnModalConfirmFactory.instance( {
-            title: 'Submit Entry',
-            message: 'Are you sure you wish to submit this form?  This should only be done after you have ' +
-                     'entered all information on the form.'
-          } ).show().then( function( response ) {
-            if( response ) {
-              CnHttpFactory.instance( {
-                path: 'proxy_form_entry/' + self.record.id,
-                data: { deferred: false }
-              } ).patch().then( function( response ) {
-                $state.go( 'proxy_form_entry.list' );
-              } );
-            }
-          } );
-        };
-
-        // download the form's file
-        this.downloadFile = function() {
-          return CnHttpFactory.instance( {
-            path: 'proxy_form/' + this.record.proxy_form_id,
-            data: { 'download': true },
-            format: 'pdf'
-          } ).get().then( function( response ) {
-            saveAs(
-              new Blob(
-                [response.data],
-                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
-              ),
-              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
-            );
-          } );
-        };
+        CnBaseFormEntryViewFactory.construct( this, parentModel, root );
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -383,32 +235,15 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyFormEntryModelFactory', [
-    'CnBaseModelFactory', 'CnProxyFormEntryListFactory', 'CnProxyFormEntryViewFactory',
+    'CnBaseFormEntryModelFactory', 'CnProxyFormEntryListFactory', 'CnProxyFormEntryViewFactory',
     'CnSession', 'CnHttpFactory', '$q',
-    function( CnBaseModelFactory, CnProxyFormEntryListFactory, CnProxyFormEntryViewFactory,
+    function( CnBaseFormEntryModelFactory, CnProxyFormEntryListFactory, CnProxyFormEntryViewFactory,
               CnSession, CnHttpFactory, $q ) {
       var object = function( root ) {
         var self = this;
-        CnBaseModelFactory.construct( this, module );
+        CnBaseFormEntryModelFactory.construct( this, module );
         this.listModel = CnProxyFormEntryListFactory.instance( this );
         this.viewModel = CnProxyFormEntryViewFactory.instance( this, root );
-        this.isTypist = true;
-
-        CnSession.promise.then( function() {
-          self.isTypist = 'typist' == CnSession.role.name;
-
-          if( self.isTypist ) {
-            module.identifier = {};
-            module.columnList.user.type = 'hidden';
-            module.columnList.deferred.type = 'hidden';
-            module.columnList.validated.type = 'hidden';
-            var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
-            if( mainInputGroup ) {
-              mainInputGroup.inputList.user_id.type = 'hidden';
-              mainInputGroup.inputList.deferred.type = 'hidden';
-            }
-          }
-        } );
 
         // extend getMetadata
         this.getMetadata = function() {

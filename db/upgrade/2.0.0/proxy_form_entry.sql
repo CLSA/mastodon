@@ -1,3 +1,33 @@
+DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
+  DELIMITER //
+  CREATE PROCEDURE patch_proxy_form_entry()
+  BEGIN
+
+    SELECT "Replacing deferred column with submitted in proxy_form_entry table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "proxy_form_entry"
+      AND COLUMN_NAME = "deferred" );
+    IF @test = 1 THEN
+      ALTER TABLE proxy_form_entry
+      ADD COLUMN submitted TINYINT(1) NOT NULL DEFAULT 0
+      AFTER deferred;
+
+      UPDATE proxy_form_entry SET submitted = !deferred;
+
+      ALTER TABLE proxy_form_entry DROP COLUMN deferred;
+    END IF;
+
+  END //
+DELIMITER ;
+
+-- now call the procedure and remove the procedure
+CALL patch_proxy_form_entry();
+DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
+
 SELECT "Adding new triggers to proxy_form_entry table" AS "";
 
 DELIMITER $$

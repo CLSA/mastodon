@@ -99,7 +99,7 @@ abstract class base_form_entry_module extends \cenozo\service\module
     if( 'typist' == $db_role->name )
     {
       $modifier->where( $form_entry_name.'.user_id', '=', $db_user->id );
-      $modifier->where( 'deferred', '=', true );
+      $modifier->where( 'submitted', '=', false );
     }
 
     if( $select->has_column( 'validated' ) )
@@ -129,7 +129,7 @@ abstract class base_form_entry_module extends \cenozo\service\module
       $form_column_name = $form_name.'_id';
 
       $record->$form_column_name = $this->new_form_id;
-      $record->deferred = true;
+      $record->submitted = false;
     }
   }
 

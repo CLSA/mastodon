@@ -16,7 +16,7 @@ BEGIN
       submitted_total = (
         SELECT COUNT(*) FROM contact_form_entry
         WHERE contact_form_id = proc_contact_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
 END
