@@ -21,7 +21,8 @@ abstract class base_form extends \cenozo\database\record
   public static function select( $select = NULL, $modifier = NULL, $return_alternate = '' )
   {
     // first load any scans in the form directory into the database
-    $path = sprintf( '%s/%s', FORM_IN_PATH, str_replace( '_form', '', static::get_table_name() ) );
+    $table_name = static::get_table_name();
+    $path = sprintf( '%s/%s', FORM_IN_PATH, str_replace( '_form', '', $table_name ) );
     foreach( scandir( $path ) as $filename )
     {
       $filename = $path.'/'.$filename;
@@ -31,26 +32,20 @@ abstract class base_form extends \cenozo\database\record
         $resource = fopen( $filename, 'rb' );
         if( false === $resource )
         {
-          log::err( sprintf( 'Unable to open %s file: "%s"',
-                             str_replace( '_', ' ', static::get_table_name() ),
-                             $filename ) );
+          log::err( sprintf( 'Unable to open %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
         $scan = fread( $resource, filesize( $filename ) );
         if( false === $scan )
         {
-          log::err( sprintf( 'Unable to read %s file: "%s"',
-                             str_replace( '_', ' ', static::get_table_name() ),
-                             $filename ) );
+          log::err( sprintf( 'Unable to read %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
         if( false === fclose( $resource ) )
         {
-          log::err( sprintf( 'Unable to close %s file: "%s"',
-                             str_replace( '_', ' ', static::get_table_name() ),
-                             $filename ) );
+          log::err( sprintf( 'Unable to close %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
@@ -69,39 +64,6 @@ abstract class base_form extends \cenozo\database\record
 
     // now copmlete the constructor
     return parent::select( $select, $modifier, $return_alternate );
-  }
-
-  /**
-   * Get the number of forms which have a certain number of entries associated with it
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param integer $entries The number of entries to test for
-   * @param string $comparison An integer-based comparison operator (eg: <, >, >=, =, etc)
-   * @access public
-   */
-  static public function count_for_entries( $entries, $comparison = '=', $modifier = NULL )
-  {
-    // requires custom sql
-    return static::db()->get_one( sprintf(
-      'SELECT COUNT(*) '.
-      'FROM ( '.
-      '  SELECT %s.id, IF( %s_entry.id IS NULL, 0, COUNT(*) ) count '.
-      '  FROM %s '.
-      '  LEFT JOIN %s_entry ON %s.id = %s_entry.%s_id '.
-      '  %s '.
-      '  GROUP BY %s.id '.
-      '  HAVING count %s %d '.
-      ') temp',
-      static::get_table_name(),
-      static::get_table_name(),
-      static::get_table_name(),
-      static::get_table_name(),
-      static::get_table_name(),
-      static::get_table_name(),
-      static::get_table_name(),
-      is_null( $modifier ) ? '' : $modifier->get_sql(),
-      static::get_table_name(),
-      $comparison,
-      $entries ) );
   }
 
   /**
@@ -143,18 +105,72 @@ abstract class base_form extends \cenozo\database\record
   }
 
   /**
+   * Imports the form into the system.
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @param database\form_entry $db_form_entry The entry to be used as the valid data.
+   * @access public
+   */
+  public function import( $db_form_entry )
+  {
+    $form_type_class_name = lib::get_class_name( 'database\form_type' );
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
+    $table_name = static::get_table_name();
+    $type = str_replace( '_form', '', $table_name );
+    if( 'contact_form' == $table_name )
+      throw lib::create( 'exception\runtime', 'Importing contact forms is not implemented.', __METHOD__ );
+    if( is_null( $db_form_entry ) || !$db_form_entry->id )
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Tried to import invalid %s.', str_replace( '_', ' ', $table_name ) ),
+        __METHOD__ );
+    if( 0 < count( $db_form_entry->get_errors() ) )
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Tried to import %s that has errors.', str_replace( '_', ' ', $table_name ) ),
+        __METHOD__ );
+
+    $db_participant = $participant_class_name::get_unique_record( 'uid', $db_form_entry->uid );
+
+    // create the form
+    $db_form_type = $form_type_class_name::get_unique_record( 'name', $type );
+    $db_form = lib::create( 'database\form' );
+    $db_form->participant_id = $db_participant->id;
+    $db_form->form_type_id = $db_form_type->id;
+    $db_form->date = !is_null( $db_form_entry->date )
+                   ? $db_form_entry->date
+                   : util::get_datetime_object();
+    $db_form->save();
+
+    // save the new form to the hin form and set the validated form entry
+    $column_name = sprintf( 'validated_%s_id', $table_name );
+    $this->$column_name = $db_form_entry->id;
+    $this->form_id = $db_form->id;
+    $this->completed = true;
+    $this->save();
+
+    // move the file from the application to the framework
+    $filename = $this->get_filename();
+    if( !$db_form->copy_file( $filename ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Unable to copy %s form file (%s).', $type, $filename ),
+        __METHOD__ );
+    }
+    else unlink( $filename );
+  }
+
+  /**
    * Writes the file associciated with this form to the disk
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string The contents of the form (as a binary string)
    * @abstract
-   * @access public
+   * @access protected
    */
-  public function write_form( $contents )
+  protected function write_form( $contents )
   {
     $filename = $this->get_filename();
     $table_name = static::get_table_name();
-    $type = substr( $table_name, 0, strrpos( $table_name, '_' ) );
+    $type = substr( $table_name, 0, strrpos( $table_name, '_form' ) );
 
     // create directory if necessary
     $directory = substr( $filename, 0, strrpos( $filename, '/' ) );
@@ -176,13 +192,4 @@ abstract class base_form extends \cenozo\database\record
 
     fclose( $resource );
   }
-
-  /**
-   * Imports the form into the system.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
-   * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
-   * @abstract
-   * @access public
-   */
-  abstract public function import( $db_base_form_entry );
 }

@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * hin_form_entry: record
  */
-class hin_form_entry extends \cenozo\database\record {}
+class hin_form_entry extends base_form_entry {}

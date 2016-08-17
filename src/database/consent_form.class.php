@@ -22,93 +22,11 @@ class consent_form extends base_form
    */
   public function import( $db_consent_form_entry )
   {
-    if( is_null( $db_consent_form_entry ) || !$db_consent_form_entry->id )
-    {
-      throw lib::create( 'exception\runtime',
-        'Tried to import invalid consent form entry.', __METHOD__ );
-    }
+    parent::import( $db_consent_form_entry );
 
-    $event_type_class_name = lib::get_class_name( 'database\event_type' );
-    $database_class_name = lib::get_class_name( 'database\database' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
-    $hin_class_name = lib::get_class_name( 'database\hin' );
-
-    $db_participant =
-      $participant_class_name::get_unique_record( 'uid', $db_consent_form_entry->uid );
-
-    // link to the form
-    $this->validated_consent_form_entry_id = $db_consent_form_entry->id;
-
-    // import the data to the consent table
-    $accept = $db_consent_form_entry->option_1;
-    $date = !is_null( $db_consent_form_entry->date )
-          ? $db_consent_form_entry->date
-          : util::get_datetime_object();
-
-    // look for duplicates
-    $db_consent = NULL;
-    $consent_mod = lib::create( 'database\modifier' );
-    $consent_mod->where( 'accept', '=', $accept );
-    $consent_mod->where( 'written', '=', true );
-    $consent_mod->where( 'date', '=', $date );
-    $consent_list = $db_participant->get_consent_list( $consent_mod );
-    if( 0 < count( $consent_list ) )
-    { // found a duplicate, link the form to it
-      $db_consent = current( $consent_list );
-    }
-    else
-    { // no duplicate, create a new consent record
-      $db_consent = lib::create( 'database\consent' );
-      $db_consent->participant_id = $db_participant->id;
-      $db_consent->accept = $accept;
-      $db_consent->written = true;
-      $db_consent->date = $date;
-      $db_consent->note = 'Imported by data entry system.';
-      $db_consent->save();
-
-      // now find that new consent so we can link to its ID
-      $consent_mod = lib::create( 'database\modifier' );
-      $consent_mod->where( 'accept', '=', $accept );
-      $consent_mod->where( 'written', '=', true );
-      $consent_mod->where( 'date', '=', $date );
-      $consent_list = $db_participant->get_consent_list( $consent_mod );
-      if( 0 < count( $consent_list ) )
-      {
-        $db_consent = current( $consent_list );
-      }
-      else
-      {
-        log::warning( 'Consent entry not found after importing consent form.' );
-      }
-    }
-
-    // import the data to the hin table
-    $db_hin = $hin_class_name::get_unique_record( 'participant_id', $db_participant->id );
-    if( is_null( $db_hin ) )
-    {
-      $db_hin = lib::create( 'database\hin' );
-      $db_hin->participant_id = $db_participant->id;
-    }
-    $db_hin->access = $db_consent_form_entry->option_2;
-    $db_hin->save();
-
-    // import the form into the framework's form system
-    $form_type_class_name = lib::get_class_name( 'database\form_type' );
-    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'consent' );
-
-    $db_form = lib::create( 'database\form' );
-    $db_form->participant_id = $db_participant->id;
-    $db_form->form_type_id = $db_form_type->id;
-    $db_form->date = $date;
-    if( !is_null( $db_consent ) ) $db_form->record_id = $db_consent->id;
-    $db_form->save();
-
-    // TODO: need to move form's file from mastodon to cenozo
-
-    // save the new consent record to the form
-    $this->form_id = $db_form->id;
-    $this->completed = true;
-    if( !is_null( $db_consent ) ) $this->consent_id = $db_consent->id;
-    $this->save();
+    // add the participation and HIN consent
+    $db_form = $this->get_form();
+    $db_form->add_consent( 'participation', array( 'accept' => $db_hin_form_entry->option_1 ) );
+    $db_form->add_consent( 'HIN access', array( 'accept' => $db_hin_form_entry->option_2 ) );
   }
 }

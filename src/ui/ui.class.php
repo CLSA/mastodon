@@ -90,8 +90,8 @@ class ui extends \cenozo\ui\ui
    */
   protected function get_list_items( $module_list )
   {
-    $list = parent::get_list_items( $module_list );
     $db_role = lib::create( 'business\session' )->get_role();
+    $list = 'typist' == $db_role->name ? array() : parent::get_list_items( $module_list );
 
     // add application-specific states to the base list
     if( array_key_exists( 'consent_form', $module_list ) && $module_list['consent_form']['list_menu'] )
@@ -123,5 +123,13 @@ class ui extends \cenozo\ui\ui
       $list['Proxy Form Entries'] = 'proxy_form_entry';
 
     return $list;
+  }
+
+  /**
+   * Extends the parent method
+   */
+  protected function get_utility_items()
+  {
+    return 'typist' == lib::create( 'business\session' )->get_role()->name ? array() : parent::get_utility_items();
   }
 }

@@ -59,59 +59,73 @@ CREATE PROCEDURE patch_hin_form()
 
     SET @test = (
       SELECT COUNT(*)
-      FROM hin_form
-      WHERE form_id IS NULL
-      AND completed = 1
-      AND participant_id IS NOT NULL );
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "hin_form"
+      AND COLUMN_NAME = "participant_id" );
     IF @test > 0 THEN
-      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form ADD COLUMN hin_form_id INT UNSIGNED NULL" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
+      SET @test = (
+        SELECT COUNT(*)
+        FROM hin_form
+        WHERE form_id IS NULL
+        AND completed = 1
+        AND participant_id IS NOT NULL );
+      IF @test > 0 THEN
+        SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form ADD COLUMN hin_form_id INT UNSIGNED NULL" );
+        PREPARE statement FROM @sql;
+        EXECUTE statement;
+        DEALLOCATE PREPARE statement;
 
-      SET @sql = CONCAT(
-        "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, hin_form_id ) ",
-        "SELECT hin_form.participant_id, form_type.id, ",
-          "IFNULL( hin_form_entry.date, hin_form.date ), hin_form.id ",
-        "FROM ", @cenozo, ".form_type, hin_form ",
-        "LEFT JOIN hin_form_entry ON hin_form.validated_hin_form_entry_id = hin_form_entry.id "
-        "WHERE form_type.name = 'hin' ",
-        "AND hin_form.form_id IS NULL ",
-        "AND hin_form.participant_id IS NOT NULL ",
-        "AND hin_form.completed = true" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
+        SET @sql = CONCAT(
+          "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, hin_form_id ) ",
+          "SELECT hin_form.participant_id, form_type.id, ",
+            "IFNULL( hin_form_entry.date, hin_form.date ), hin_form.id ",
+          "FROM ", @cenozo, ".form_type, hin_form ",
+          "LEFT JOIN hin_form_entry ON hin_form.validated_hin_form_entry_id = hin_form_entry.id "
+          "WHERE form_type.name = 'hin' ",
+          "AND hin_form.form_id IS NULL ",
+          "AND hin_form.participant_id IS NOT NULL ",
+          "AND hin_form.completed = true" );
+        PREPARE statement FROM @sql;
+        EXECUTE statement;
+        DEALLOCATE PREPARE statement;
 
-      SELECT "Linking forms back to hin_form table" AS "";
+        SELECT "Linking forms back to hin_form table" AS "";
 
-      SET @sql = CONCAT(
-        "UPDATE hin_form ",
-        "JOIN ", @cenozo, ".form ON hin_form.id = form.hin_form_id ",
-        "SET hin_form.form_id = form.id "
-        "WHERE hin_form.form_id IS NULL" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
+        SET @sql = CONCAT(
+          "UPDATE hin_form ",
+          "JOIN ", @cenozo, ".form ON hin_form.id = form.hin_form_id ",
+          "SET hin_form.form_id = form.id "
+          "WHERE hin_form.form_id IS NULL" );
+        PREPARE statement FROM @sql;
+        EXECUTE statement;
+        DEALLOCATE PREPARE statement;
 
-      SELECT "Adding form associations to consent for extended hin access records" AS "";
+        SELECT "Adding form associations to consent for extended hin access records" AS "";
 
-      SET @sql = CONCAT(
-        "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
-        "SELECT form.id, 'consent', consent.id ",
-        "FROM ", @cenozo, ".form ",
-        "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
-        "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
-        "WHERE consent_type.name = 'HIN extended access' ",
-        "AND form.hin_form_id IS NOT NULL" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
+        SET @sql = CONCAT(
+          "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
+          "SELECT form.id, 'consent', consent.id ",
+          "FROM ", @cenozo, ".form ",
+          "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
+          "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
+          "WHERE consent_type.name = 'HIN extended access' ",
+          "AND form.hin_form_id IS NOT NULL" );
+        PREPARE statement FROM @sql;
+        EXECUTE statement;
+        DEALLOCATE PREPARE statement;
 
-      SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form DROP COLUMN hin_form_id" );
-      PREPARE statement FROM @sql;
-      EXECUTE statement;
-      DEALLOCATE PREPARE statement;
+        SET @sql = CONCAT( "ALTER TABLE ", @cenozo, ".form DROP COLUMN hin_form_id" );
+        PREPARE statement FROM @sql;
+        EXECUTE statement;
+        DEALLOCATE PREPARE statement;
+      END IF;
+
+      SELECT "Removing participant_id column from hin_form table" AS "";
+      ALTER TABLE hin_form
+      DROP FOREIGN KEY fk_hin_form_participant_id,
+      DROP KEY fk_participant_id,
+      DROP COLUMN participant_id;
     END IF;
     
   END //

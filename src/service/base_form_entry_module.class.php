@@ -19,6 +19,8 @@ abstract class base_form_entry_module extends \cenozo\service\module
    */
   public function validate()
   {
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
     parent::validate();
 
     if( 300 > $this->get_status()->get_code() )
@@ -31,9 +33,21 @@ abstract class base_form_entry_module extends \cenozo\service\module
         $file = $this->get_file_as_array();
         if( array_key_exists( 'uid', $file ) )
         {
-          $participant_class_name = lib::get_class_name( 'database\participant' );
           if( is_null( $participant_class_name::get_unique_record( 'uid', $file['uid'] ) ) )
-            $this->get_status()->set_code( 406 );
+          {
+            $this->get_status()->set_code( 306 );
+            $this->set_data( sprintf( 'There is no participant with the UID "%s".', $file['uid'] ) );
+          }
+        }
+        else if( array_key_exists( 'submitted', $file ) && true == $file['submitted'] )
+        {
+          // test the entry for errors
+          $errors = $this->get_resource()->get_errors();
+          if( 0 < count( $errors ) )
+          {
+            $this->get_status()->set_code( 400 );
+            $this->set_data( $errors );
+          }
         }
       }
       else if( 'POST' == $method )

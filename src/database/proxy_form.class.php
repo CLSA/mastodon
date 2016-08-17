@@ -22,236 +22,56 @@ class proxy_form extends base_form
    */
   public function import( $db_proxy_form_entry )
   {
-    if( is_null( $db_proxy_form_entry ) || !$db_proxy_form_entry->id )
-    {
-      throw lib::create( 'exception\runtime',
-        'Tried to import invalid proxy form entry.', __METHOD__ );
-    }
+    parent::import( $db_consent_form_entry );
 
-    $event_type_class_name = lib::get_class_name( 'database\event_type' );
-    $database_class_name = lib::get_class_name( 'database\database' );
-    $participant_class_name = lib::get_class_name( 'database\participant' );
-    $alternate_class_name = lib::get_class_name( 'database\alternate' );
-    $hin_class_name = lib::get_class_name( 'database\hin' );
+    // add the physical tests and future HIN consent
+    $db_form = $this->get_form();
+    $db_form->add_consent(
+      'continue physical tests', array( 'accept' => $db_proxy_form_entry->informant_continue ) );
+    $db_form->add_consent( 'HIN future access', array( 'accept' => $db_proxy_form_entry->health_card ) );
 
-    $db_participant =
-      $participant_class_name::get_unique_record( 'uid', $db_proxy_form_entry->uid );
-
-    // link to the form
-    $this->validated_proxy_form_entry_id = $db_proxy_form_entry->id;
-
-    $db_proxy_alternate = NULL;
     if( $db_proxy_form_entry->proxy )
     {
-      // import data to the alternate table
-
-      // if this participant already has an alternate with the same first and last name then
-      // overwrite instead of creating a new record
-      $alternate_mod = lib::create( 'database\modifier' );
-      $alternate_mod->where( 'participant_id', '=', $db_participant->id );
-      $alternate_mod->where( 'first_name', '=', $db_proxy_form_entry->proxy_first_name );
-      $alternate_mod->where( 'last_name', '=', $db_proxy_form_entry->proxy_last_name );
-      $alternate_list = $alternate_class_name::select( $alternate_mod );
-      $db_proxy_alternate = current( $alternate_list );
-
-      if( false == $db_proxy_alternate )
-      { // create a new alternate if no match was found
-        $db_proxy_alternate = lib::create( 'database\alternate' );
-      }
-      else
-      {
-        // replace any address and phone numbers
-        foreach( $db_proxy_alternate->get_address_list() as $db_address ) $db_address->delete();
-        foreach( $db_proxy_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
-      }
-
-      $db_proxy_alternate->participant_id = $db_participant->id;
-      $db_proxy_alternate->informant =
-        $db_proxy_form_entry->same_as_proxy && $db_proxy_form_entry->informant;
-      $db_proxy_alternate->proxy = true;
-      $db_proxy_alternate->first_name = $db_proxy_form_entry->proxy_first_name;
-      $db_proxy_alternate->last_name = $db_proxy_form_entry->proxy_last_name;
-      $db_proxy_alternate->association = 'Unknown';
-      $db_proxy_alternate->save();
-
-      if( !is_null( $db_proxy_form_entry->proxy_note ) )
-      {
-        // import data to the note table
-        $db_note = lib::create( 'database\note' );
-        $db_note->alternate_id = $db_proxy_alternate->id;
-        $db_note->user_id = $db_proxy_form_entry->user_id;
-        $db_note->datetime = util::get_datetime_object();
-        $db_note->note = $db_proxy_form_entry->proxy_note;
-        $db_note->save();
-      }
-
-      // import data to the address table
-      $address = util::parse_address(
-        $db_proxy_form_entry->proxy_apartment_number,
-        $db_proxy_form_entry->proxy_street_number,
-        $db_proxy_form_entry->proxy_street_name,
-        $db_proxy_form_entry->proxy_box,
-        $db_proxy_form_entry->proxy_rural_route,
-        $db_proxy_form_entry->proxy_address_other );
-
-      $db_proxy_address = lib::create( 'database\address' );
-      $db_proxy_address->alternate_id = $db_proxy_alternate->id;
-      $db_proxy_address->active = true;
-      $db_proxy_address->rank = 1;
-      $db_proxy_address->address1 = $address[0];
-      $db_proxy_address->address2 = $address[1];
-      $db_proxy_address->city = $db_proxy_form_entry->proxy_city;
-      $db_proxy_address->region_id = $db_proxy_form_entry->proxy_region_id;
-      $postcode = 6 == strlen( $db_proxy_form_entry->proxy_postcode )
-                ? sprintf( '%s %s',
-                           substr( $db_proxy_form_entry->proxy_postcode, 0, 3 ),
-                           substr( $db_proxy_form_entry->proxy_postcode, 3, 3 ) )
-                : $db_proxy_form_entry->proxy_postcode;
-      $db_proxy_address->postcode = $postcode;
-      $db_proxy_address->source_postcode();
-      $db_proxy_address->note = $db_proxy_form_entry->proxy_address_note;
-      $db_proxy_address->save();
-
-      // import data to the phone table
-      $db_proxy_phone = lib::create( 'database\phone' );
-      $db_proxy_phone->alternate_id = $db_proxy_alternate->id;
-      $db_proxy_phone->active = true;
-      $db_proxy_phone->rank = 1;
-      $db_proxy_phone->type = 'other';
-      $db_proxy_phone->number = $db_proxy_form_entry->proxy_phone;
-      $db_proxy_phone->note = $db_proxy_form_entry->proxy_phone_note;
-      $db_proxy_phone->save();
+      $db_form->add_proxy_alternate( array(
+        'first_name' => $db_proxy_form_entry->proxy_first_name,
+        'last_name' => $db_proxy_form_entry->proxy_last_name,
+        'apartment_number' => $db_proxy_form_entry->proxy_apartment_number,
+        'street_number' => $db_proxy_form_entry->proxy_street_number,
+        'street_name' => $db_proxy_form_entry->proxy_street_name,
+        'box' => $db_proxy_form_entry->proxy_box,
+        'rural_route' => $db_proxy_form_entry->proxy_rural_route,
+        'address_other' => $db_proxy_form_entry->proxy_address_other,
+        'city' => $db_proxy_form_entry->proxy_city,
+        'region_id' => $db_proxy_form_entry->proxy_region_id,
+        'postcode' => $db_proxy_form_entry->proxy_postcode,
+        'address_note' => $db_proxy_form_entry->proxy_address_note,
+        'phone' => $db_proxy_form_entry->proxy_phone,
+        'phone_note' => $db_proxy_form_entry->proxy_phone_note,
+        'note' => $db_proxy_form_entry->proxy_note,
+        'informant' => $db_proxy_form_entry->informant,
+        'same_as_proxy' => $db_proxy_form_entry->same_as_proxy
+      ) );
     }
 
-    $db_informant_alternate = NULL;
-    if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
+    if( $db_proxy_form_entry->informant )
     {
-      // import data to the alternate table
-
-      // if this participant already has an alternate with the same first and last name then
-      // overwrite instead of creating a new record
-      $alternate_mod = lib::create( 'database\modifier' );
-      $alternate_mod->where( 'participant_id', '=', $db_participant->id );
-      $alternate_mod->where( 'first_name', '=', $db_proxy_form_entry->informant_first_name );
-      $alternate_mod->where( 'last_name', '=', $db_proxy_form_entry->informant_last_name );
-      $alternate_list = $alternate_class_name::select( $alternate_mod );
-      $db_informant_alternate = current( $alternate_list );
-
-      if( false == $db_informant_alternate )
-      { // create a new alternate if no match was found
-        $db_informant_alternate = lib::create( 'database\alternate' );
-      }
-      else
-      {
-        // replace any address and phone numbers
-        foreach( $db_informant_alternate->get_address_list() as $db_address ) $db_address->delete();
-        foreach( $db_informant_alternate->get_phone_list() as $db_phone ) $db_phone->delete();
-      }
-
-      $db_informant_alternate->participant_id = $db_participant->id;
-      $db_informant_alternate->informant = true;
-      $db_informant_alternate->first_name = $db_proxy_form_entry->informant_first_name;
-      $db_informant_alternate->last_name = $db_proxy_form_entry->informant_last_name;
-      $db_informant_alternate->association = 'Unknown';
-      $db_informant_alternate->save();
-
-      if( !is_null( $db_proxy_form_entry->informant_note ) )
-      {
-        // import data to the note table
-        $db_note = lib::create( 'database\note' );
-        $db_note->alternate_id = $db_informant_alternate->id;
-        $db_note->user_id = $db_proxy_form_entry->user_id;
-        $db_note->datetime = util::get_datetime_object();
-        $db_note->note = $db_proxy_form_entry->informant_note;
-        $db_note->save();
-      }
-
-      // import data to the address table
-      $address = util::parse_address(
-        $db_proxy_form_entry->informant_apartment_number,
-        $db_proxy_form_entry->informant_street_number,
-        $db_proxy_form_entry->informant_street_name,
-        $db_proxy_form_entry->informant_box,
-        $db_proxy_form_entry->informant_rural_route,
-        $db_proxy_form_entry->informant_address_other );
-
-      $db_informant_address = lib::create( 'database\address' );
-      $db_informant_address->alternate_id = $db_informant_alternate->id;
-      $db_informant_address->active = true;
-      $db_informant_address->rank = 1;
-      $db_informant_address->address1 = $address[0];
-      $db_informant_address->address2 = $address[1];
-      $db_informant_address->city = $db_proxy_form_entry->informant_city;
-      $db_informant_address->region_id = $db_proxy_form_entry->informant_region_id;
-      $postcode = 6 == strlen( $db_proxy_form_entry->informant_postcode )
-                ? sprintf( '%s %s',
-                           substr( $db_proxy_form_entry->informant_postcode, 0, 3 ),
-                           substr( $db_proxy_form_entry->informant_postcode, 3, 3 ) )
-                : $db_proxy_form_entry->informant_postcode;
-      $db_informant_address->postcode = $postcode;
-      $db_informant_address->source_postcode();
-      $db_informant_address->note = $db_proxy_form_entry->informant_address_note;
-      $db_informant_address->save();
-
-      // import data to the phone table
-      $db_informant_phone = lib::create( 'database\phone' );
-      $db_informant_phone->alternate_id = $db_informant_alternate->id;
-      $db_informant_phone->active = true;
-      $db_informant_phone->rank = 1;
-      $db_informant_phone->type = 'other';
-      $db_informant_phone->number = $db_proxy_form_entry->informant_phone;
-      $db_informant_phone->note = $db_proxy_form_entry->informant_phone_note;
-      $db_informant_phone->save();
+      $db_form->add_informant_alternate( array(
+        'first_name' => $db_proxy_form_entry->informant_first_name,
+        'last_name' => $db_proxy_form_entry->informant_last_name,
+        'apartment_number' => $db_proxy_form_entry->informant_apartment_number,
+        'street_number' => $db_proxy_form_entry->informant_street_number,
+        'street_name' => $db_proxy_form_entry->informant_street_name,
+        'box' => $db_proxy_form_entry->informant_box,
+        'rural_route' => $db_proxy_form_entry->informant_rural_route,
+        'address_other' => $db_proxy_form_entry->informant_address_other,
+        'city' => $db_proxy_form_entry->informant_city,
+        'region_id' => $db_proxy_form_entry->informant_region_id,
+        'postcode' => $db_proxy_form_entry->informant_postcode,
+        'address_note' => $db_proxy_form_entry->informant_address_note,
+        'phone' => $db_proxy_form_entry->informant_phone,
+        'phone_note' => $db_proxy_form_entry->informant_phone_note,
+        'note' => $db_proxy_form_entry->informant_note
+      ) );
     }
-    
-    // import data to the participant table
-    if( !is_null( $db_proxy_form_entry->informant_continue ) )
-    {
-      // TODO: use_informant was replaced with a consent type
-      $db_participant->use_informant = $db_proxy_form_entry->informant_continue;
-      $db_participant->save();
-    }
-
-    // import data to the hin table
-    if( !is_null( $db_proxy_form_entry->health_card ) )
-    {
-      $db_hin = $hin_class_name::get_unique_record( 'participant_id', $db_participant->id );
-      if( is_null( $db_hin ) )
-      {
-        $db_hin = lib::create( 'database\hin' );
-        $db_hin->participant_id = $db_participant->id;
-      }
-      $db_hin->future_access = $db_proxy_form_entry->health_card;
-      $db_hin->save();
-    }
-
-    // import the form into the framework's form system
-    $form_type_class_name = lib::get_class_name( 'database\form_type' );
-    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'proxy' );
-
-    $db_form = lib::create( 'database\form' );
-    $db_form->participant_id = $db_participant->id;
-    $db_form->form_type_id = $db_form_type->id;
-    $db_form->date = $date;
-    if( !is_null( $db_proxy_alternate ) ) $db_form->record_id = $db_proxy_alternate->id;
-    else if( !is_null( $db_informant_alternate ) ) $db_form->record_id = $db_informant_alternate->id;
-    $db_form->save();
-
-    // TODO: need to move form's file from mastodon to cenozo
-
-    // save the new proxy record to the form
-    $this->form_id = $db_form->id;
-    $this->completed = true;
-    if( !is_null( $db_proxy_alternate ) )
-    {
-      $this->proxy_alternate_id = $db_proxy_alternate->id;
-      $this->informant_alternate_id = $db_proxy_alternate->id;
-    }
-    if( !is_null( $db_informant_alternate ) )
-    {
-      $this->informant_alternate_id = $db_informant_alternate->id;
-    }
-
-    $this->save();
   }
 }
