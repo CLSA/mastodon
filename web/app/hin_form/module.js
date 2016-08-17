@@ -3,7 +3,7 @@ define( function() {
 
   try { var module = cenozoApp.module( 'hin_form', true ); } catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'contact' );
+  cenozoApp.initFormModule( module, 'hin' );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnHinFormAdjudicate', [

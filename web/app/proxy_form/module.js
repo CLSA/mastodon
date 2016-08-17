@@ -3,7 +3,7 @@ define( function() {
 
   try { var module = cenozoApp.module( 'proxy_form', true ); } catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'contact' );
+  cenozoApp.initFormModule( module, 'proxy' );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyFormAdjudicate', [

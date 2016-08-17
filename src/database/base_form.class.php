@@ -128,6 +128,7 @@ abstract class base_form extends \cenozo\database\record
         sprintf( 'Tried to import %s that has errors.', str_replace( '_', ' ', $table_name ) ),
         __METHOD__ );
 
+    $filename = $this->get_filename();
     $db_participant = $participant_class_name::get_unique_record( 'uid', $db_form_entry->uid );
 
     // create the form
@@ -135,27 +136,31 @@ abstract class base_form extends \cenozo\database\record
     $db_form = lib::create( 'database\form' );
     $db_form->participant_id = $db_participant->id;
     $db_form->form_type_id = $db_form_type->id;
-    $db_form->date = !is_null( $db_form_entry->date )
-                   ? $db_form_entry->date
-                   : util::get_datetime_object();
+    $db_form->date = !is_null( $db_form_entry->date ) ? $db_form_entry->date : util::get_datetime_object();
     $db_form->save();
 
     // save the new form to the hin form and set the validated form entry
-    $column_name = sprintf( 'validated_%s_id', $table_name );
+    $column_name = sprintf( 'validated_%s_entry_id', $table_name );
     $this->$column_name = $db_form_entry->id;
     $this->form_id = $db_form->id;
     $this->completed = true;
     $this->save();
 
     // move the file from the application to the framework
-    $filename = $this->get_filename();
-    if( !$db_form->copy_file( $filename ) )
+    if( !file_exists( $filename ) )
     {
-      throw lib::create( 'exception\runtime',
-        sprintf( 'Unable to copy %s form file (%s).', $type, $filename ),
-        __METHOD__ );
+      log::warning( sprintf( 'Data entry %s form file (%s) is missing.', $type, $filename ) );
     }
-    else unlink( $filename );
+    else
+    {
+      if( !$db_form->copy_file( $filename ) )
+      {
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Unable to copy %s form file (%s).', $type, $filename ),
+          __METHOD__ );
+      }
+      else unlink( $filename );
+    }
   }
 
   /**

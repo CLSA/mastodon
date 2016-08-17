@@ -218,7 +218,7 @@ cenozo.factory( 'CnBaseFormViewFactory', [
         // download the form's file
         object.downloadFile = function() {
           return CnHttpFactory.instance( {
-            path: module.subject.snake + '/' + object.record.getIdentifier(),
+            path: parentModel.module.subject.snake + '/' + object.record.getIdentifier(),
             data: { 'download': true },
             format: 'pdf'
           } ).get().then( function( response ) {
@@ -295,8 +295,13 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
                 if( 0 < index ) {
                   for( var column in entry ) {
                     // check if this column is in the form column list and doesn't match the first entry
-                    if( object.formColumnList.findByProperty( 'column', column ) &&
-                        compareEntry[column] !== entry[column] ) list.push( column );
+                    var entry1 = compareEntry[column];
+                    if( angular.isString( entry1 ) ) entry1 = entry1.toUpperCase();
+                    var entry2 = entry[column];
+                    if( angular.isString( entry2 ) ) entry2 = entry2.toUpperCase();
+
+                    if( object.formColumnList.findByProperty( 'column', column ) && entry1 !== entry2 )
+                      list.push( column );
                   }
                 }
                 return list;
@@ -305,21 +310,15 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
           ] ).finally( function() { object.isLoading = false; } );
         };
 
-        object.defer = function( entryId ) {
-          CnHttpFactory.instance( {
-            path: formEntryName + '/' + entryId,
-            data: { submitted: false }
-          } ).patch().then( object.onLoad );
-        };
+        object.view = function( entryId ) { $state.go( formEntryName + '.view', { identifier: entryId } ); };
 
         object.validate = function( entryId ) {
           var data = { completed: true };
-          data[validatedEntryColumn] = entryId;
           CnHttpFactory.instance( {
             path: formName + '/' + object.form.id,
-            data: data
+            data: { adjudicate: entryId }
           } ).patch().then( function() {
-            object.form[validatedEntryColumn] = entryId;
+            //object.form[validatedEntryColumn] = entryId;
             object.onLoad();
           } );
         };

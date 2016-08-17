@@ -22,7 +22,7 @@ class proxy_form extends base_form
    */
   public function import( $db_proxy_form_entry )
   {
-    parent::import( $db_consent_form_entry );
+    parent::import( $db_proxy_form_entry );
 
     // add the physical tests and future HIN consent
     $db_form = $this->get_form();
@@ -53,7 +53,7 @@ class proxy_form extends base_form
       ) );
     }
 
-    if( $db_proxy_form_entry->informant )
+    if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
     {
       $db_form->add_informant_alternate( array(
         'first_name' => $db_proxy_form_entry->informant_first_name,

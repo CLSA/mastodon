@@ -148,6 +148,64 @@ abstract class base_form_entry_module extends \cenozo\service\module
   }
 
   /**
+   * Extends parent method
+   */
+  public function post_write( $record )
+  {
+    if( 'PATCH' == $this->get_method() )
+    {
+      $file = $this->get_file_as_array();
+      if( array_key_exists( 'submitted', $file ) && $record->submitted )
+      {
+        // submit the parent form if the sibling form has been submitted and matches this one
+        $form_entry_name = $this->get_subject();
+        $form_name = str_replace( '_entry', '', $form_entry_name );
+        $form_method = sprintf( 'get_%s', $form_name );
+        $form_entry_method = sprintf( 'get_%s_list', $form_entry_name );
+        $db_parent_form = $record->$form_method();
+
+        $form_entry_sel = lib::create( 'database\select' );
+        $form_entry_sel->add_all_table_columns();
+        $form_entry_list = $db_parent_form->$form_entry_method( $form_entry_sel );
+
+        if( 1 < count( $form_entry_list ) )
+        {
+          $match = true;
+          $base_form_entry = array_pop( $form_entry_list );
+          foreach( $base_form_entry as $column => $value )
+          {
+            if( !in_array( $column, array( 'id', 'update_timestamp', 'create_timestamp', 'user_id' ) ) )
+            {
+              foreach( $form_entry_list as $compare_form_entry )
+              {
+                $compare_value = $compare_form_entry[$column];
+                if( is_null( $value ) )
+                {
+                  if( !is_null( $compare_value ) ) $match = false;
+                }
+                else if( is_string( $value ) )
+                {
+                  if( strtoupper( $value ) !== strtoupper( $compare_value ) ) $match = false;
+                }
+                else
+                {
+                  if( $value !== $compare_value ) $match = false;
+                }
+
+                if( !$match ) break;
+              }
+            }
+
+            if( !$match ) break;
+          }
+
+          if( $match ) $db_parent_form->import( $record );
+        }
+      }
+    }
+  }
+
+  /**
    * When posting a new entry the validate method searches for a form that requires one.
    * 
    * If no form is found then this variable will remain null and the status code will be set to 404.
