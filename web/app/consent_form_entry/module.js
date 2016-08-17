@@ -4,7 +4,7 @@ define( function() {
   try { var module = cenozoApp.module( 'consent_form_entry', true ); }
   catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'consent' );
+  cenozoApp.initFormEntryModule( module, 'consent' );
 
   module.addInputGroup( 'Details', {
     option_1: {
@@ -73,9 +73,7 @@ define( function() {
   cenozo.providers.factory( 'CnConsentFormEntryListFactory', [
     'CnBaseFormEntryListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
     function( CnBaseFormEntryListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
-      var object = function( parentModel ) {
-        CnBaseFormEntryListFactory.construct( this, parentModel );
-      };
+      var object = function( parentModel ) { CnBaseFormEntryListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );

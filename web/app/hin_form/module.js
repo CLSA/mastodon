@@ -2,90 +2,8 @@ define( function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'hin_form', true ); } catch( err ) { console.warn( err ); return; }
-  angular.extend( module, {
-    identifier: {},
-    name: {
-      singular: 'hin form',
-      plural: 'hin forms',
-      possessive: 'hin form\'s',
-      pluralPossessive: 'hin forms\''
-    },
-    columnList: {
-      id: {
-        title: 'ID'
-      },
-      status: {
-        title: 'Status',
-        type: 'string',
-        help: 'One of "completed", "invalid", "adjudication", "started" or "new".'
-      },
-      entry_total: {
-        column: 'hin_form_total.entry_total',
-        title: 'Entries',
-        type: 'number'
-      },
-      submitted_total: {
-        column: 'hin_form_total.submitted_total',
-        title: 'Submitted Entries',
-        type: 'number'
-      },
-      date: {
-        title: 'Date',
-        type: 'date'
-      }
-    },
-    defaultOrder: {
-      column: 'date',
-      reverse: true
-    }
-  } );
 
-  module.addInputGroup( '', {
-    id: {
-      title: 'ID',
-      type: 'string',
-      constant: true
-    },
-    status: {
-      title: 'Status',
-      type: 'string',
-      constant: true,
-      help: 'Set to "completed" when done, ' +
-            '"invalid" when marked invalid, ' +
-            '"adjudication" when two entries have been submitted but do not match, ' +
-            '"started" when there are less than two entries submitted and ' +
-            '"new" when no entries have been submitted.'
-    },
-    completed: {
-      title: 'Complete',
-      type: 'boolean',
-      constant: true
-    },
-    invalid: {
-      title: 'Invalid',
-      type: 'boolean'
-    },
-    date: {
-      title: 'Date',
-      type: 'date'
-    },
-    adjudicate: {
-      type: 'hidden'
-    }
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Download',
-    operation: function( $state, model ) { model.viewModel.downloadFile(); }
-  } );
-
-  if( angular.isDefined( module.actions.adjudicate ) ) {
-    module.addExtraOperation( 'view', {
-      title: 'Adjudicate',
-      operation: function( $state, model ) { $state.go( 'hin_form.adjudicate', $state.params ); },
-      isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
-    } );
-  }
+  cenozoApp.initFormModule( module, 'contact' );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnHinFormAdjudicate', [
@@ -173,28 +91,9 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnHinFormViewFactory', [
-    'CnBaseViewFactory', 'CnHttpFactory',
-    function( CnBaseViewFactory, CnHttpFactory ) {
-      var object = function( parentModel, root ) {
-        CnBaseViewFactory.construct( this, parentModel, root );
-
-        // download the form's file
-        this.downloadFile = function() {
-          return CnHttpFactory.instance( {
-            path: 'consent_form/' + this.record.getIdentifier(),
-            data: { 'download': true },
-            format: 'pdf'
-          } ).get().then( function( response ) {
-            saveAs(
-              new Blob(
-                [response.data],
-                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
-              ),
-              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
-            );
-          } );
-        };
-      };
+    'CnBaseFormViewFactory',
+    function( CnBaseFormViewFactory ) {
+      var object = function( parentModel, root ) { CnBaseFormViewFactory.construct( this, parentModel, root ); };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );

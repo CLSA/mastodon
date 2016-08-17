@@ -4,7 +4,7 @@ define( function() {
   try { var module = cenozoApp.module( 'hin_form_entry', true ); }
   catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'hin' );
+  cenozoApp.initFormEntryModule( module, 'hin' );
 
   module.addInputGroup( 'Details', {
     accept: {
@@ -69,9 +69,7 @@ define( function() {
   cenozo.providers.factory( 'CnHinFormEntryListFactory', [
     'CnBaseFormEntryListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
     function( CnBaseFormEntryListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
-      var object = function( parentModel ) {
-        CnBaseFormEntryListFactory.construct( this, parentModel );
-      };
+      var object = function( parentModel ) { CnBaseFormEntryListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );

@@ -13,6 +13,94 @@ cenozo.controller( 'HeaderCtrl', [
 
 /* ######################################################################################################## */
 cenozoApp.initFormModule = function( module, type ) {
+  angular.extend( module, {
+    identifier: {},
+    name: {
+      singular: type + ' form',
+      plural: type + ' forms',
+      possessive: type + ' form\'s',
+      pluralPossessive: type + ' forms\''
+    },
+    columnList: {
+      id: {
+        title: 'ID'
+      },
+      status: {
+        title: 'Status',
+        type: 'string',
+        help: 'One of "completed", "invalid", "adjudication", "started" or "new".'
+      },
+      entry_total: {
+        column: type + '_form_total.entry_total',
+        title: 'Entries',
+        type: 'number'
+      },
+      submitted_total: {
+        column: type + '_form_total.submitted_total',
+        title: 'Submitted Entries',
+        type: 'number'
+      },
+      date: {
+        title: 'Date',
+        type: 'date'
+      }
+    },
+    defaultOrder: {
+      column: 'date',
+      reverse: true
+    }
+  } );
+
+  module.addInputGroup( '', {
+    id: {
+      title: 'ID',
+      type: 'string',
+      constant: true
+    },
+    status: {
+      title: 'Status',
+      type: 'string',
+      constant: true,
+      help: 'Set to "completed" when done, ' +
+            '"invalid" when marked invalid, ' +
+            '"adjudication" when two entries have been submitted but do not match, ' +
+            '"started" when there are less than two entries submitted and ' +
+            '"new" when no entries have been submitted.'
+    },
+    completed: {
+      title: 'Complete',
+      type: 'boolean',
+      constant: true
+    },
+    invalid: {
+      title: 'Invalid',
+      type: 'boolean'
+    },
+    date: {
+      title: 'Date',
+      type: 'date'
+    },
+    adjudicate: {
+      type: 'hidden'
+    }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
+  } );
+
+  if( angular.isDefined( module.actions.adjudicate ) ) {
+    module.addExtraOperation( 'view', {
+      title: 'Adjudicate',
+      operation: function( $state, model ) { $state.go( type + '_form.adjudicate', $state.params ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
+    } );
+  }
+};
+
+/* ######################################################################################################## */
+cenozoApp.initFormEntryModule = function( module, type ) {
   var columnList = {};
   columnList[type + '_form_id'] = {
     column: type + '_form.id',
@@ -37,6 +125,7 @@ cenozoApp.initFormModule = function( module, type ) {
       type: 'date'
     }
   } );
+
   angular.extend( module, {
     identifier: {
       parent: {
@@ -117,6 +206,35 @@ cenozoApp.initFormModule = function( module, type ) {
     isIncluded: function( $state, model ) { return !model.isTypist && false === model.viewModel.record.submitted; }
   } );
 }
+
+/* ######################################################################################################## */
+cenozo.factory( 'CnBaseFormViewFactory', [
+  'CnBaseViewFactory', 'CnHttpFactory',
+  function( CnBaseViewFactory, CnHttpFactory ) {
+    return {
+      construct: function( object, parentModel, root ) {
+        CnBaseViewFactory.construct( object, parentModel, root );
+
+        // download the form's file
+        object.downloadFile = function() {
+          return CnHttpFactory.instance( {
+            path: module.subject.snake + '/' + object.record.getIdentifier(),
+            data: { 'download': true },
+            format: 'pdf'
+          } ).get().then( function( response ) {
+            saveAs(
+              new Blob(
+                [response.data],
+                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
+              ),
+              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
+            );
+          } );
+        };
+      }
+    };
+  }
+] );
 
 /* ######################################################################################################## */
 cenozo.factory( 'CnBaseFormAdjudicateFactory', [
@@ -261,7 +379,7 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
           if( 306 == response.status ) {
             CnModalMessageFactory.instance( {
               title: 'Participant Not Found',
-              message: 'There was no participant found for the UID "' + object.record.uid + '"',
+              message: response.data,
               error: true
             } ).show().then( function() {
               object.record.uid = object.backupRecord.uid;
@@ -279,7 +397,22 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
         object.submitEntry = function() {
           return CnHttpFactory.instance( {
             path: formEntryName +'/' + object.record.id,
-            data: { submitted: true }
+            data: { submitted: true },
+            onError: function( response ) {
+              if( 400 == response.status && angular.isObject( response.data ) ) {
+                cenozo.forEachFormElement( 'form', function( element ) { element.$error = {}; } );
+                for( var name in response.data ) {
+                  var element = cenozo.getFormElement( name );
+                  if( element ) {
+                    if( 'Cannot be blank.' == response.data[name] ) element.$error.required = true;
+                    else element.$error.custom = response.data[name];
+                  }
+                }
+                cenozo.forEachFormElement( 'form', function( element ) {
+                  cenozo.updateFormElement( element, true );
+                } );
+              } else CnModalMessageFactory.httpError( response );
+            }
           } ).patch();
         };
 

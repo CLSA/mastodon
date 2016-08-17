@@ -4,7 +4,7 @@ define( function() {
   try { var module = cenozoApp.module( 'proxy_form_entry', true ); }
   catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'proxy' );
+  cenozoApp.initFormEntryModule( module, 'proxy' );
 
   module.addInputGroup( 'Proxy Decision Maker', {
     proxy: {
@@ -37,11 +37,13 @@ define( function() {
     },
     proxy_box: {
       title: "Box",
-      type: 'string'
+      type: 'string',
+      format: 'integer'
     },
     proxy_rural_route: {
       title: "Rural Route",
-      type: 'string'
+      type: 'string',
+      format: 'integer'
     },
     proxy_address_other: {
       title: "Address Other",
@@ -57,7 +59,9 @@ define( function() {
     },
     proxy_postcode: {
       title: "Postcode",
-      type: 'string'
+      type: 'string',
+      regex: '^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$',
+      help: 'Must be in "A1A1A1" format, zip codes in "01234" format.'
     },
     proxy_address_note: {
       title: "Address Note",
@@ -65,7 +69,9 @@ define( function() {
     },
     proxy_phone: {
       title: "Phone",
-      type: 'string'
+      type: 'string',
+      regex: '^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$',
+      help: 'Must be in NNN-NNN-NNNN format.'
     },
     proxy_phone_note: {
       title: "Phone Note",
@@ -108,11 +114,13 @@ define( function() {
     },
     informant_box: {
       title: "Box",
-      type: 'string'
+      type: 'string',
+      format: 'integer'
     },
     informant_rural_route: {
       title: "Rural Route",
-      type: 'string'
+      type: 'string',
+      format: 'integer'
     },
     informant_address_other: {
       title: "Address Other",
@@ -128,7 +136,9 @@ define( function() {
     },
     informant_postcode: {
       title: "Postcode",
-      type: 'string'
+      type: 'string',
+      regex: '^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$',
+      help: 'Must be in "A1A1A1" format, zip codes in "01234" format.'
     },
     informant_address_note: {
       title: "Address Note",
@@ -136,7 +146,9 @@ define( function() {
     },
     informant_phone: {
       title: "Phone",
-      type: 'string'
+      type: 'string',
+      regex: '^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$',
+      help: 'Must be in XXX-XXX-XXXX format.'
     },
     informant_phone_note: {
       title: "Phone Note",
@@ -215,9 +227,7 @@ define( function() {
   cenozo.providers.factory( 'CnProxyFormEntryListFactory', [
     'CnBaseFormEntryListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
     function( CnBaseFormEntryListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
-      var object = function( parentModel ) {
-        CnBaseFormEntryListFactory.construct( this, parentModel );
-      };
+      var object = function( parentModel ) { CnBaseFormEntryListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
