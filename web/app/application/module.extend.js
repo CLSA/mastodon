@@ -27,7 +27,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
       return {
         // look for the template in the application's path, not the framework
         templateUrl: cenozoApp.baseUrl + '/app/application/release.tpl.html?build=' + cenozoApp.build,
-        restrict: 'E', 
+        restrict: 'E',
         controller: function( $scope ) {
           $scope.model = CnApplicationReleaseFactory.instance();
           // breadcrumbs are handled by the service
@@ -68,9 +68,9 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
         } ).get().then( function( response ) {
           self.application = response.data;
           self.application.identifier = $state.params.identifier;
-          
+
           // immediately send a 404 if this application is not release-based
-          if( !self.application.release_based ) $state.go( 'error.404' ); 
+          if( !self.application.release_based ) $state.go( 'error.404' );
           else {
             CnSession.setBreadcrumbTrail( [ {
               title: 'Applications',
@@ -179,5 +179,5 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
       return { instance: function() { return new object( false ); } };
     }
   ] );
-      
+
 } );

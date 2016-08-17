@@ -17,7 +17,7 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
       return {
         // look for the template in the application's path, not the framework
         templateUrl: cenozoApp.baseUrl + '/app/participant/release.tpl.html?build=' + cenozoApp.build,
-        restrict: 'E', 
+        restrict: 'E',
         controller: function( $scope ) {
           $scope.model = CnParticipantReleaseFactory.instance();
 
@@ -130,5 +130,5 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
       return { instance: function() { return new object( false ); } };
     }
   ] );
-      
+
 } );

@@ -48,7 +48,7 @@
                                null != model.confirmedCount ||
                                model.confirmInProgress"
                   ng-click="confirm()">Confirm List</button>
-        </div> 
+        </div>
       </div>
       <div ng-if="model.confirmedCount">
         <div class="panel panel-default">
@@ -89,7 +89,7 @@
                     cn-really-message="Are you sure you wish to release {{ model.confirmedCount }} participants to {{ model.application.title }}? This cannot be undone."
                     cn-really-click="model.release()"
                     ng-click="$event.stopPropagation()">Release Participants</button>
-          </div> 
+          </div>
         </div>
       </div>
     </div>
