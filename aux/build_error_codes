@@ -5,30 +5,7 @@
  * It uses this information to rebuild the src/exception/error_codes.inc.php file.
  */
 
-function print_exception_block( $lists, $type )
-{
-  if( !array_key_exists( $type, $lists ) ) return;
-  $list = $lists[$type];
-
-  // now print out the lines
-  $counter = 1;
-  ksort( $list );
-  foreach( $list as $class_name => $method_list )
-  {
-    ksort( $method_list );
-    $method_list = array_unique( $method_list );
-    foreach( $method_list as $method_name )
-    {
-      printf( "define( '%s__%s__%s__ERRNO',\n".
-              "        %s_MASTODON_BASE_ERRNO + %d );\n",
-              strtoupper( $type ),
-              strtoupper( $class_name ),
-              strtoupper( $method_name ),
-              strtoupper( $type ),
-              $counter++ );
-    }
-  }
-}
+$filename = 'src/exception/error_codes.inc.php';
 
 // if we are in the aux/ directory then back out
 if( preg_match( '#/aux$#', getcwd() ) ) chdir( '..' );
@@ -47,6 +24,37 @@ if( 0 != $return_status ) die( 'There was an error when fetching method list.' )
 $error_codes = array();
 $current_class_name = NULL;
 $current_method_name = NULL;
+
+function exception_block( $lists, $type )
+{
+  $output = '';
+  if( array_key_exists( $type, $lists ) )
+  {
+    $list = $lists[$type];
+
+    // now print out the lines
+    $counter = 1;
+    ksort( $list );
+    foreach( $list as $class_name => $method_list )
+    {
+      ksort( $method_list );
+      $method_list = array_unique( $method_list );
+      foreach( $method_list as $method_name )
+      {
+        $output .= sprintf(
+          "define( '%s__%s__%s__ERRNO',\n".
+          "        %s_MASTODON_BASE_ERRNO + %d );\n",
+          strtoupper( $type ),
+          strtoupper( $class_name ),
+          strtoupper( $method_name ),
+          strtoupper( $type ),
+          $counter++ );
+      }
+    }
+  }
+
+  return $output;
+}
 
 foreach( $grep_line_list as $grep_line )
 {
@@ -110,8 +118,8 @@ foreach( $grep_line_list as $grep_line )
   }
 }
 
-// now print out the file
-print <<<OUTPUT
+// now write the file
+$output = <<<OUTPUT
 <?php
 /**
  * error_codes.inc.php
@@ -138,9 +146,9 @@ define( 'SYSTEM_MASTODON_BASE_ERRNO',     740000 );
 OUTPUT;
 
 // now print all argument exceptions
-print_exception_block( $error_codes, 'argument' );
+$output .= exception_block( $error_codes, 'argument' );
 
-print <<<OUTPUT
+$output .= <<<OUTPUT
 
 /**
  * "database" error codes
@@ -161,9 +169,9 @@ print <<<OUTPUT
 OUTPUT;
 
 // now print all notice exceptions
-print_exception_block( $error_codes, 'notice' );
+$output .= exception_block( $error_codes, 'notice' );
 
-print <<<OUTPUT
+$output .= <<<OUTPUT
 
 /**
  * "permission" error codes
@@ -172,9 +180,9 @@ print <<<OUTPUT
 OUTPUT;
 
 // now print all permission exceptions
-print_exception_block( $error_codes, 'permission' );
+$output .= exception_block( $error_codes, 'permission' );
 
-print <<<OUTPUT
+$output .= <<<OUTPUT
 
 /**
  * "runtime" error codes
@@ -183,9 +191,9 @@ print <<<OUTPUT
 OUTPUT;
 
 // now print all runtime exceptions
-print_exception_block( $error_codes, 'runtime' );
+$output .= exception_block( $error_codes, 'runtime' );
 
-print <<<OUTPUT
+$output .= <<<OUTPUT
 
 /**
  * "system" error codes
@@ -208,3 +216,4 @@ print <<<OUTPUT
 
 OUTPUT;
 
+file_put_contents( $filename, $output );
