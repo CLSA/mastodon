@@ -371,7 +371,7 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
       construct: function( object, parentModel, root ) {
         CnBaseViewFactory.construct( object, parentModel, root );
         var formEntryName = parentModel.module.subject.snake;
-        var formName = formEntryName.substring( 0, formEntryName.length - 5 );
+        var formName = formEntryName.replace( '_entry', '' );
 
         object.onPatchError = function( response ) {
           // handle 306 errors (uid doesn't match existing participant)
@@ -429,7 +429,7 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
         // download the form's file
         object.downloadFile = function() {
           return CnHttpFactory.instance( {
-            path: formName + '/' + object.record.getIdentifier(),
+            path: formName + '/' + object.record[formName + '_id'],
             data: { 'download': true },
             format: 'pdf'
           } ).get().then( function( response ) {
