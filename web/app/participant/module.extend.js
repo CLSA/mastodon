@@ -4,10 +4,12 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
 
   var module = cenozoApp.module( 'participant' );
   delete module.columnList.site;
-  var siteInputGroup = module.inputGroupList.findByProperty( 'title', 'Site & Contact Details' );
-  if( siteInputGroup ) {
-    delete siteInputGroup.inputList.default_site;
-    delete siteInputGroup.inputList.preferred_site_id;
+  var index = module.inputGroupList.findIndexByProperty( 'title', 'Site & Contact Details' );
+  if( null != index ) {
+    var inputGroup = module.inputGroupList[index];
+    inputGroup.title = 'Contact Details';
+    delete inputGroup.inputList.default_site;
+    delete inputGroup.inputList.preferred_site_id;
   }
 
   /* ######################################################################################################## */
