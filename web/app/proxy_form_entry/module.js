@@ -38,12 +38,14 @@ define( function() {
     proxy_box: {
       title: "Box",
       type: 'string',
-      format: 'integer'
+      format: 'integer',
+      help: 'Include numbers only.'
     },
     proxy_rural_route: {
       title: "Rural Route",
       type: 'string',
-      format: 'integer'
+      format: 'integer',
+      help: 'Include numbers only.'
     },
     proxy_address_other: {
       title: "Address Other",
@@ -61,7 +63,7 @@ define( function() {
       title: "Postcode",
       type: 'string',
       regex: '^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$',
-      help: 'Must be in "A1A1A1" format, zip codes in "01234" format.'
+      help: 'Must be in "A1A 1A1" format, zip codes in "01234" format.'
     },
     proxy_address_note: {
       title: "Address Note",
@@ -138,7 +140,7 @@ define( function() {
       title: "Postcode",
       type: 'string',
       regex: '^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$',
-      help: 'Must be in "A1A1A1" format, zip codes in "01234" format.'
+      help: 'Must be in "A1A 1A1" format, zip codes in "01234" format.'
     },
     informant_address_note: {
       title: "Address Note",
