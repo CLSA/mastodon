@@ -10,6 +10,17 @@
       <span ng-if="model.isLoading">(Loading&hellip;)</span>
     </h4>
   </div>
+  <div class="form-footer text-right bg-info">
+    <div class="btn-group pull-left">
+      <button type="button"
+              class="btn btn-default"
+              ng-disabled="undefined === model.downloadFile"
+              ng-click="model.downloadFile()">Download</button>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            ng-click="model.viewParent()">View {{ model.module.name.singular.ucWords() }}</button>
+  </div>
   <div class="container-fluid">
     <div ng-if="model.isLoading" class="loading"></div>
     <div ng-if="!model.isLoading">
@@ -70,6 +81,11 @@
     </div>
   </div>
   <div class="form-footer text-right rounded-bottom bg-info">
+    <div class="btn-group pull-left">
+      <button type="button"
+              class="btn btn-default"
+              ng-click="model.downloadFile()">Download</button>
+    </div>
     <button type="button"
             class="btn btn-primary"
             ng-click="model.viewParent()">View {{ model.module.name.singular.ucWords() }}</button>

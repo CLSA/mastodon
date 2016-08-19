@@ -26,9 +26,18 @@ class proxy_form extends base_form
 
     // add the physical tests and future HIN consent
     $db_form = $this->get_form();
-    $db_form->add_consent(
-      'continue physical tests', array( 'accept' => $db_proxy_form_entry->informant_continue ) );
-    $db_form->add_consent( 'HIN future access', array( 'accept' => $db_proxy_form_entry->health_card ) );
+    if( !is_null( $db_proxy_form_entry->use_informant ) )
+      $db_form->add_consent(
+        'use informant', array( 'accept' => $db_proxy_form_entry->use_informant ) );
+    if( !is_null( $db_proxy_form_entry->continue_physical_tests ) )
+      $db_form->add_consent(
+        'continue physical tests', array( 'accept' => $db_proxy_form_entry->continue_physical_tests ) );
+    if( !is_null( $db_proxy_form_entry->continue_draw_blood ) )
+      $db_form->add_consent(
+        'continue draw blood', array( 'accept' => $db_proxy_form_entry->continue_draw_blood ) );
+    if( !is_null( $db_proxy_form_entry->hin_future_access ) )
+      $db_form->add_consent(
+        'HIN future access', array( 'accept' => $db_proxy_form_entry->hin_future_access ) );
 
     if( $db_proxy_form_entry->proxy )
     {

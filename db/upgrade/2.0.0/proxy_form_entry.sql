@@ -21,6 +21,60 @@ DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
       ALTER TABLE proxy_form_entry DROP COLUMN deferred;
     END IF;
 
+    SELECT "Renaming informant_continue column to use_informant in proxy_form_entry table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "proxy_form_entry"
+      AND COLUMN_NAME = "informant_continue" );
+    IF @test = 1 THEN
+      ALTER TABLE proxy_form_entry
+      CHANGE COLUMN informant_continue use_informant TINYINT(1) NULL DEFAULT NULL;
+    END IF;
+
+    SELECT "Adding continue_physical_tests column to proxy_form_entry table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "proxy_form_entry"
+      AND COLUMN_NAME = "continue_physical_tests" );
+    IF @test = 0 THEN
+      ALTER TABLE proxy_form_entry
+      ADD COLUMN continue_physical_tests TINYINT(1) NULL DEFAULT NULL
+      AFTER use_informant;
+    END IF;
+
+    SELECT "Adding continue_draw_blood column to proxy_form_entry table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "proxy_form_entry"
+      AND COLUMN_NAME = "continue_draw_blood" );
+    IF @test = 0 THEN
+      ALTER TABLE proxy_form_entry
+      ADD COLUMN continue_draw_blood TINYINT(1) NULL DEFAULT NULL
+      AFTER continue_physical_tests;
+    END IF;
+
+    SELECT "Renaming health_card column to hin_future_access in proxy_form_entry table" AS "";
+
+    SET @test = (
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "proxy_form_entry"
+      AND COLUMN_NAME = "health_card" );
+    IF @test = 1 THEN
+      ALTER TABLE proxy_form_entry
+      CHANGE COLUMN health_card hin_future_access TINYINT(1) NULL DEFAULT NULL;
+    END IF;
+
   END //
 DELIMITER ;
 

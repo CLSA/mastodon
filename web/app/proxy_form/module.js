@@ -164,11 +164,17 @@ define( function() {
           column: 'informant_note',
           title: 'Informant Note'
         }, {
-          column: 'informant_continue',
-          title: 'Informant Continue'
+          column: 'use_informant',
+          title: 'Use Information Provider'
         }, {
-          column: 'health_card',
-          title: 'Health Card'
+          column: 'continue_physical_tests',
+          title: 'Continue Physical Tests'
+        }, {
+          column: 'continue_draw_blood',
+          title: 'Continue Draw Blood'
+        }, {
+          column: 'hin_future_access',
+          title: 'Continue Health Card'
         }, {
           column: 'signed',
           title: 'Signed'

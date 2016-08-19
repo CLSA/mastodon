@@ -121,11 +121,15 @@ abstract class base_form extends \cenozo\database\record
       throw lib::create( 'exception\runtime', 'Importing contact forms is not implemented.', __METHOD__ );
     if( is_null( $db_form_entry ) || !$db_form_entry->id )
       throw lib::create( 'exception\runtime',
-        sprintf( 'Tried to import invalid %s.', str_replace( '_', ' ', $table_name ) ),
+        sprintf( 'Tried to import invalid %s form.', $type ),
+        __METHOD__ );
+    if( !$db_form_entry->submitted )
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Tried to import %s form entry that hasn\'t been submitted.', $type ),
         __METHOD__ );
     if( 0 < count( $db_form_entry->get_errors() ) )
       throw lib::create( 'exception\runtime',
-        sprintf( 'Tried to import %s that has errors.', str_replace( '_', ' ', $table_name ) ),
+        sprintf( 'Tried to import %s form entry that has errors.', $type ),
         __METHOD__ );
 
     $filename = $this->get_filename();
@@ -169,9 +173,9 @@ abstract class base_form extends \cenozo\database\record
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string The contents of the form (as a binary string)
    * @abstract
-   * @access protected
+   * @access public
    */
-  protected function write_form( $contents )
+  public function write_form( $contents )
   {
     $filename = $this->get_filename();
     $table_name = static::get_table_name();

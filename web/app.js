@@ -87,6 +87,7 @@ cenozoApp.initFormModule = function( module, type ) {
 
   module.addExtraOperation( 'view', {
     title: 'Download',
+    isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
     operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
@@ -160,6 +161,8 @@ cenozoApp.initFormEntryModule = function( module, type ) {
     }
   };
 
+  inputGroup[type + '_form_id'] = { type: 'hidden' };
+
   if( 'contact' != type ) {
     inputGroup.uid = {
       title: 'UID',
@@ -173,6 +176,7 @@ cenozoApp.initFormEntryModule = function( module, type ) {
 
   module.addExtraOperation( 'view', {
     title: 'Download',
+    isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
     operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
@@ -215,22 +219,15 @@ cenozo.factory( 'CnBaseFormViewFactory', [
       construct: function( object, parentModel, root ) {
         CnBaseViewFactory.construct( object, parentModel, root );
 
-        // download the form's file
-        object.downloadFile = function() {
-          return CnHttpFactory.instance( {
-            path: parentModel.module.subject.snake + '/' + object.record.getIdentifier(),
-            data: { 'download': true },
-            format: 'pdf'
-          } ).get().then( function( response ) {
-            saveAs(
-              new Blob(
-                [response.data],
-                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
-              ),
-              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
-            );
-          } );
-        };
+        object.afterView( function() {
+          if( angular.isUndefined( object.downloadFile ) ) {
+            object.downloadFile = function() {
+              return CnHttpFactory.instance( {
+                path: parentModel.module.subject.snake + '/' + object.record.getIdentifier()
+              } ).file();
+            };
+          }
+        } );
       }
     };
   }
@@ -271,6 +268,12 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
             } ).get().then( function( response ) {
               object.form = response.data;
               object.form.identifier = $state.params.identifier;
+
+              if( angular.isUndefined( object.downloadFile ) ) {
+                object.downloadFile = function() {
+                  return CnHttpFactory.instance( { path: formName + '/' + object.form.id } ).file();
+                };
+              };
 
               CnSession.setBreadcrumbTrail( [ {
                 title: module.name.plural.ucWords(),
@@ -373,6 +376,14 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
         var formEntryName = parentModel.module.subject.snake;
         var formName = formEntryName.replace( '_entry', '' );
 
+        object.afterView( function() {
+          if( angular.isUndefined( object.downloadFile ) ) {
+            object.downloadFile = function() {
+              return CnHttpFactory.instance( { path: formName + '/' + object.record[formName + '_id'] } ).file();
+            };
+          }
+        } );
+
         object.onPatchError = function( response ) {
           // handle 306 errors (uid doesn't match existing participant)
           if( 306 == response.status ) {
@@ -423,23 +434,6 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
           } ).show().then( function( response ) {
             if( response )
               object.submitEntry().then( function( response ) { $state.go( formEntryName + '.list' ); } );
-          } );
-        };
-
-        // download the form's file
-        object.downloadFile = function() {
-          return CnHttpFactory.instance( {
-            path: formName + '/' + object.record[formName + '_id'],
-            data: { 'download': true },
-            format: 'pdf'
-          } ).get().then( function( response ) {
-            saveAs(
-              new Blob(
-                [response.data],
-                { type: response.headers( 'Content-Type' ).replace( /"(.*)"/, '$1' ) }
-              ),
-              response.headers( 'Content-Disposition' ).match( /filename=(.*);/ )[1]
-            );
           } );
         };
       }

@@ -163,12 +163,20 @@ define( function() {
   }, true );
 
   module.addInputGroup( 'Additional Details', {
-    informant_continue: {
-      title: "Continue",
+    use_informant: {
+      title: "Use Information Provider",
       type: 'boolean'
     },
-    health_card: {
-      title: "Health Card",
+    continue_physical_tests: {
+      title: "Continue Physical Tests",
+      type: 'boolean'
+    },
+    continue_draw_blood: {
+      title: "Continue Blood and Urine",
+      type: 'boolean'
+    },
+    hin_future_access: {
+      title: "Continue Health Card",
       type: 'boolean'
     },
     signed: {
@@ -178,6 +186,10 @@ define( function() {
     date: {
       title: 'Date',
       type: 'date'
+    },
+    from_onyx: {
+      column: 'proxy_form.from_onyx',
+      type: 'hidden'
     }
   }, true );
 
@@ -212,14 +224,25 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyFormEntryView', [
-    'CnProxyFormEntryModelFactory',
-    function( CnProxyFormEntryModelFactory ) {
+    'CnProxyFormEntryModelFactory', '$timeout',
+    function( CnProxyFormEntryModelFactory, $timeout ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyFormEntryModelFactory.root;
+
+          $timeout( function() {
+            $scope.model.getMetadata().then( function() {
+              var cnRecordView = cenozo.findChildDirectiveScope( $scope, 'cnRecordView' );
+              var inputArray = cnRecordView.dataArray.findByProperty( 'title', 'Additional Details' ).inputArray;
+              inputArray.findByProperty( 'key', 'continue_physical_tests' ).type =
+                $scope.model.viewModel.record.from_onyx ? 'enum' : 'hidden';
+              inputArray.findByProperty( 'key', 'continue_draw_blood' ).type =
+                $scope.model.viewModel.record.from_onyx ? 'enum' : 'hidden';
+            } );
+          }, 200 );
         }
       };
     }
