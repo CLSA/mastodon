@@ -14,7 +14,8 @@ CREATE PROCEDURE patch_application_has_role()
 
     SET @sql = CONCAT(
       "DELETE FROM ", @cenozo, ".application_has_role WHERE role_id IN ( ",
-        "SELECT id FROM ", @cenozo, ".role WHERE name IN ( 'cedar' ) ",
+        "SELECT id FROM ", @cenozo, ".role ",
+        "WHERE name IN ( 'coordinator', 'cedar', 'interviewer', 'operator', 'supervisor' ) ",
       ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
