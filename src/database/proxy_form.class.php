@@ -44,6 +44,7 @@ class proxy_form extends base_form
       $db_form->add_proxy_alternate( array(
         'first_name' => $db_proxy_form_entry->proxy_first_name,
         'last_name' => $db_proxy_form_entry->proxy_last_name,
+        'global_note' => $db_proxy_form_entry->proxy_note,
         'apartment_number' => $db_proxy_form_entry->proxy_apartment_number,
         'street_number' => $db_proxy_form_entry->proxy_street_number,
         'street_name' => $db_proxy_form_entry->proxy_street_name,
@@ -56,7 +57,6 @@ class proxy_form extends base_form
         'address_note' => $db_proxy_form_entry->proxy_address_note,
         'phone' => $db_proxy_form_entry->proxy_phone,
         'phone_note' => $db_proxy_form_entry->proxy_phone_note,
-        'note' => $db_proxy_form_entry->proxy_note,
         'informant' => $db_proxy_form_entry->informant,
         'same_as_proxy' => $db_proxy_form_entry->same_as_proxy
       ) );
@@ -67,6 +67,7 @@ class proxy_form extends base_form
       $db_form->add_informant_alternate( array(
         'first_name' => $db_proxy_form_entry->informant_first_name,
         'last_name' => $db_proxy_form_entry->informant_last_name,
+        'global_note' => $db_proxy_form_entry->informant_note,
         'apartment_number' => $db_proxy_form_entry->informant_apartment_number,
         'street_number' => $db_proxy_form_entry->informant_street_number,
         'street_name' => $db_proxy_form_entry->informant_street_name,
@@ -78,8 +79,7 @@ class proxy_form extends base_form
         'postcode' => $db_proxy_form_entry->informant_postcode,
         'address_note' => $db_proxy_form_entry->informant_address_note,
         'phone' => $db_proxy_form_entry->informant_phone,
-        'phone_note' => $db_proxy_form_entry->informant_phone_note,
-        'note' => $db_proxy_form_entry->informant_note
+        'phone_note' => $db_proxy_form_entry->informant_phone_note
       ) );
     }
   }
