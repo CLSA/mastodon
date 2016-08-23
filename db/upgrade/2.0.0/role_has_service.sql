@@ -67,14 +67,26 @@ CREATE PROCEDURE patch_role_has_service()
       "AND service.restricted = 1 ",
       "AND ( ",
         "service.subject IN ( ",
-          "'address', 'alternate', 'consent', 'consent_form', 'consent_form_entry', 'contact_form', ",
-          "'contact_form_entry', 'event', 'form', 'hin_form', 'hin_form_entry', 'jurisdiction', 'language', ",
-          "'note', 'participant', 'phone', 'proxy_form_entry', 'region_site', 'report', ",
+          "'address', 'alternate', 'application', 'consent', 'consent_form', 'consent_form_entry', ",
+          "'contact_form', 'contact_form_entry', 'event', 'form', 'hin_form', 'hin_form_entry', 'jurisdiction', ",
+          "'language', 'note', 'participant', 'phone', 'proxy_form_entry', 'region_site', 'report', ",
           "'report_type', 'source', 'state', 'token' ",
         ") ",
         "OR ( subject = 'proxy_form' AND method != 'POST' ) ",
         "OR ( subject = 'report_restriction' AND method = 'GET' ) ",
       ")" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    -- helpline
+    SET @sql = CONCAT(
+      "INSERT INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name IN( 'helpline' ) ",
+      "AND service.restricted = 1 ",
+      "AND service.subject IN ( 'application', 'participant', 'token' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

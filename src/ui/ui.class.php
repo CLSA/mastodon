@@ -93,6 +93,9 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
     $list = 'typist' == $db_role->name ? array() : parent::get_list_items( $module_list );
 
+    // remove the application list from non admins
+    if( 3 > $db_role->tier ) unset( $list['Applications'] );
+
     // add application-specific states to the base list
     if( array_key_exists( 'consent_form', $module_list ) && $module_list['consent_form']['list_menu'] )
       $list['Consent Forms'] = 'consent_form';
