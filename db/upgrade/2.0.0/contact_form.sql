@@ -79,7 +79,7 @@ CREATE PROCEDURE patch_contact_form()
         SET @sql = CONCAT(
           "INSERT IGNORE INTO ", @cenozo, ".form( participant_id, form_type_id, date, contact_form_id ) ",
           "SELECT contact_form.participant_id, form_type.id, ",
-            "IFNULL( contact_form_entry.date, contact_form.date ), contact_form.id ",
+            "IFNULL( contact_form_entry.stamped_date, contact_form.date ), contact_form.id ",
           "FROM ", @cenozo, ".form_type, contact_form ",
           "LEFT JOIN contact_form_entry ON contact_form.validated_contact_form_entry_id = contact_form_entry.id "
           "WHERE form_type.name = 'contact' ",
