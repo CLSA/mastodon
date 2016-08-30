@@ -15,7 +15,11 @@ use cenozo\lib, cenozo\log, mastodon\util;
 abstract class base_form_entry extends \cenozo\database\record
 {
   /**
-   * TODO: document
+   * Returns the errors found by processing this entry
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return associative array
+   * @access public
    */
   public function get_errors()
   {

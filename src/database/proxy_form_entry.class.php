@@ -33,7 +33,11 @@ class proxy_form_entry extends base_form_entry
   }
 
   /**
-   * TODO: document
+   * Returns the errors found by processing this entry
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return associative array
+   * @access public
    */
   public function get_errors()
   {

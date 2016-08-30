@@ -214,7 +214,7 @@ class post extends \cenozo\service\service
   }
 
   /**
-   * TODO: document
+   * Overrides the parent method (this service not meant for creating resources)
    */
   protected function create_resource( $index )
   {
@@ -222,12 +222,16 @@ class post extends \cenozo\service\service
   }
 
   /**
-   * TODO: document
+   * A cache of the application used by this service
+   * @var database\application $db_application
+   * @access protected
    */
   protected $db_application = NULL;
 
   /**
-   * TODO: document
+   * A cache of the site used by this service
+   * @var database\site $db_site
+   * @access protected
    */
   protected $db_site = NULL;
 }
