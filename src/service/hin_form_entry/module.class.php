@@ -21,11 +21,15 @@ class module extends \mastodon\service\base_form_entry_module
   {
     parent::prepare_read( $select, $modifier );
 
-    // include the user's first/last/name as supplemental data
     $modifier->left_join( 'user', 'hin_form_entry.user_id', 'user.id' );
-    $select->add_column(
-      'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
-      'formatted_user_id',
-      false );
+
+    if( !is_null( $this->get_resource() ) )
+    {
+      // include the user's first/last/name as supplemental data
+      $select->add_column(
+        'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        'formatted_user_id',
+        false );
+    }
   }
 }
