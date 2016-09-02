@@ -50,7 +50,7 @@ CREATE PROCEDURE patch_consent_form()
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
-      "VALUES( 'consent', 'Participation Consent', 'A form confirming the participant\\'s consent to participant in the study.' )" );
+      "VALUES( 'consent', 'Participation Consent', 'A form confirming the participant\\'s consent to participate in the study.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
