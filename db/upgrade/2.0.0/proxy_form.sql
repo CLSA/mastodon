@@ -92,7 +92,7 @@ CREATE PROCEDURE patch_proxy_form()
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
-      "VALUES( 'proxy', 'Alternate', 'A form providing the name and contact information for a participant\\'s alternate contacts.' )" );
+      "VALUES( 'proxy', 'Proxy Details', 'A form providing the name and contact information for a participant\\'s proxy information provider and decision makers.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
