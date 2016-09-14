@@ -17,115 +17,100 @@ class ui extends \cenozo\ui\ui
   /**
    * Extends the parent method
    */
-  protected function get_module_list( $modifier = NULL )
+  protected function build_module_list()
   {
-    $module_list = parent::get_module_list( $modifier );
+    parent::build_module_list();
 
     $db_role = lib::create( 'business\session' )->get_role();
 
     // add child actions to certain modules
-    if( array_key_exists( 'application', $module_list ) && 2 <= $db_role->tier )
+
+    $module = $this->get_module( 'application' );
+    if( !is_null( $module ) && 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
+
+    $module = $this->get_module( 'consent_form' );
+    if( !is_null( $module ) )
     {
-      $module_list['application']['actions']['release'] = '/{identifier}';
-    }
-    if( array_key_exists( 'consent_form', $module_list ) )
-    {
-      $module_list['consent_form']['children'] = array( 'consent_form_entry' );
-      if( 2 <= $db_role->tier ) $module_list['consent_form']['actions']['adjudicate'] = '/{identifier}';
-    }
-    if( array_key_exists( 'consent_form_entry', $module_list ) &&
-        array_key_exists( 'add', $module_list['consent_form_entry']['actions'] ) )
-    {
-      // posting new form-entries is handled specially by the interface
-      unset( $module_list['consent_form_entry']['actions']['add'] );
-    }
-    if( array_key_exists( 'participant', $module_list ) )
-    {
-      array_unshift( $module_list['participant']['children'], 'application' );
-      if( 2 <= $db_role->tier ) $module_list['participant']['actions']['release'] = '/{identifier}';
-    }
-    if( array_key_exists( 'contact_form', $module_list ) )
-    {
-      $module_list['contact_form']['children'] = array( 'contact_form_entry' );
-      if( 2 <= $db_role->tier ) $module_list['contact_form']['actions']['adjudicate'] = '/{identifier}';
-    }
-    if( array_key_exists( 'contact_form_entry', $module_list ) &&
-        array_key_exists( 'add', $module_list['contact_form_entry']['actions'] ) )
-    {
-      // posting new form-entries is handled specially by the interface
-      unset( $module_list['contact_form_entry']['actions']['add'] );
-    }
-    if( array_key_exists( 'hin_form', $module_list ) )
-    {
-      $module_list['hin_form']['children'] = array( 'hin_form_entry' );
-      if( 2 <= $db_role->tier ) $module_list['hin_form']['actions']['adjudicate'] = '/{identifier}';
-    }
-    if( array_key_exists( 'hin_form_entry', $module_list ) &&
-        array_key_exists( 'add', $module_list['hin_form_entry']['actions'] ) )
-    {
-      // posting new form-entries is handled specially by the interface
-      unset( $module_list['hin_form_entry']['actions']['add'] );
-    }
-    if( array_key_exists( 'user', $module_list ) )
-    {
-      array_unshift( $module_list['user']['children'], array( 'proxy_form_entry' ) );
-    }
-    if( array_key_exists( 'proxy_form', $module_list ) )
-    {
-      $module_list['proxy_form']['children'] = array( 'proxy_form_entry' );
-      if( 2 <= $db_role->tier ) $module_list['proxy_form']['actions']['adjudicate'] = '/{identifier}';
-    }
-    if( array_key_exists( 'proxy_form_entry', $module_list ) &&
-        array_key_exists( 'add', $module_list['proxy_form_entry']['actions'] ) )
-    {
-      // posting new form-entries is handled specially by the interface
-      unset( $module_list['proxy_form_entry']['actions']['add'] );
+      $module->add_child( 'consent_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
     }
 
-    return $module_list;
+    // posting new form-entries is handled specially by the interface
+    $module = $this->get_module( 'consent_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    $module = $this->get_module( 'participant' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'application' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
+    }
+
+    $module = $this->get_module( 'contact_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'contact_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+
+    // posting new form-entries is handled specially by the interface
+    $module = $this->get_module( 'contact_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    $module = $this->get_module( 'hin_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'hin_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+
+    $module = $this->get_module( 'hin_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    $module = $this->get_module( 'user' );
+    if( !is_null( $module ) ) $module->add_child( 'proxy_form_entry' );
+
+    $module = $this->get_module( 'proxy_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'proxy_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+
+    // posting new form-entries is handled specially by the interface
+    $module = $this->get_module( 'proxy_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
   }
 
   /**
    * Extends the parent method
    */
-  protected function get_list_items( $module_list )
+  protected function build_listitem_list()
   {
     $db_role = lib::create( 'business\session' )->get_role();
-    $list = 'typist' == $db_role->name ? array() : parent::get_list_items( $module_list );
+
+    // don't generate the parent list items for typists
+    if( 'typist' != $db_role->name ) parent::build_listitem_list();
 
     // remove the application list from non admins
-    if( 3 > $db_role->tier ) unset( $list['Applications'] );
+    if( 3 > $db_role->tier ) $this->remove_listitem( 'Applications' );
 
     // add application-specific states to the base list
-    if( array_key_exists( 'consent_form', $module_list ) && $module_list['consent_form']['list_menu'] )
-      $list['Consent Forms'] = 'consent_form';
-    if( array_key_exists( 'consent_form_entry', $module_list ) &&
-        $module_list['consent_form_entry']['list_menu'] &&
-        'typist' == $db_role->name )
-      $list['Consent Form Entries'] = 'consent_form_entry';
+    $this->add_listitem( 'Consent Forms', 'consent_form' );
+    if( 'typist' == $db_role->name )
+      $this->add_listitem( 'Consent Form Entries', 'consent_form_entry' );
 
-    if( array_key_exists( 'contact_form', $module_list ) && $module_list['contact_form']['list_menu'] )
-      $list['Contact Forms'] = 'contact_form';
-    if( array_key_exists( 'contact_form_entry', $module_list ) &&
-        $module_list['contact_form_entry']['list_menu'] &&
-        'typist' == $db_role->name )
-      $list['Contact Form Entries'] = 'contact_form_entry';
-    
-    if( array_key_exists( 'hin_form', $module_list ) && $module_list['hin_form']['list_menu'] )
-      $list['HIN Forms'] = 'hin_form';
-    if( array_key_exists( 'hin_form_entry', $module_list ) &&
-        $module_list['hin_form_entry']['list_menu'] &&
-        'typist' == $db_role->name )
-      $list['HIN Form Entries'] = 'hin_form_entry';
-    
-    if( array_key_exists( 'proxy_form', $module_list ) && $module_list['proxy_form']['list_menu'] )
-      $list['Proxy Forms'] = 'proxy_form';
-    if( array_key_exists( 'proxy_form_entry', $module_list ) &&
-        $module_list['proxy_form_entry']['list_menu'] &&
-        'typist' == $db_role->name )
-      $list['Proxy Form Entries'] = 'proxy_form_entry';
+    $this->add_listitem( 'Contact Forms', 'contact_form' );
+    if( 'typist' == $db_role->name )
+      $this->add_listitem( 'Contact Form Entries', 'contact_form_entry' );
 
-    return $list;
+    $this->add_listitem( 'HIN Forms', 'hin_form' );
+    if( 'typist' == $db_role->name )
+      $this->add_listitem( 'HIN Form Entries', 'hin_form_entry' );
+
+    $this->add_listitem( 'Proxy Forms', 'proxy_form' );
+    if( 'typist' == $db_role->name )
+      $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
   }
 
   /**
