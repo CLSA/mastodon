@@ -42,7 +42,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'participant' );
     if( !is_null( $module ) )
     {
-      $module->add_child( 'application' );
+      $module->add_child( 'application', 0 );
       if( 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
     }
 
@@ -68,7 +68,7 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) ) $module->remove_action( 'add' );
 
     $module = $this->get_module( 'user' );
-    if( !is_null( $module ) ) $module->add_child( 'proxy_form_entry' );
+    if( !is_null( $module ) ) $module->add_child( 'proxy_form_entry', 0 );
 
     $module = $this->get_module( 'proxy_form' );
     if( !is_null( $module ) )
