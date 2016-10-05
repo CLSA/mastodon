@@ -6,7 +6,7 @@
          ng-click="model.onLoad()"
          tooltip="Click to refresh data"
          tooltip-placement="left"></i>
-      Adjudication for {{ model.module.name.singular.ucWords() }} #{{ model.form.id }}
+      Adjudication for {{ model.module.name.singular|cnUCWords }} #{{ model.form.id }}
       <span ng-if="model.isLoading">(Loading&hellip;)</span>
     </h4>
   </div>
@@ -19,7 +19,7 @@
     </div>
     <button type="button"
             class="btn btn-primary"
-            ng-click="model.viewParent()">View {{ model.module.name.singular.ucWords() }}</button>
+            ng-click="model.viewParent()">View {{ model.module.name.singular|cnUCWords }}</button>
   </div>
   <div class="container-fluid">
     <div ng-if="model.isLoading" class="loading"></div>
@@ -88,6 +88,6 @@
     </div>
     <button type="button"
             class="btn btn-primary"
-            ng-click="model.viewParent()">View {{ model.module.name.singular.ucWords() }}</button>
+            ng-click="model.viewParent()">View {{ model.module.name.singular|cnUCWords }}</button>
   </div>
 </div>
