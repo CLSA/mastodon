@@ -215,6 +215,9 @@ define( function() {
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnProxyFormListFactory.instance( this );
         this.viewModel = CnProxyFormViewFactory.instance( this, root );
+        
+        // proxy forms can be submitted (for beartooth integration) but this can't be done through the web UI
+        this.getAddEnabled = function() { return false; };
       };
 
       return {
