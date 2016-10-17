@@ -342,7 +342,7 @@ cenozo.factory( 'CnBaseFormEntryListFactory', [
       construct: function( object, parentModel ) {
         CnBaseListFactory.construct( object, parentModel );
         var formEntryName = parentModel.module.subject.snake;
-        var formType = formEntryName.substring( 0, formEntryName.length - 10 );
+        var formType = formEntryName.substring( 0, formEntryName.length - 11 );
 
         object.startNewEntry = function() {
           CnHttpFactory.instance( {
