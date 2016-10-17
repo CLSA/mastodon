@@ -340,6 +340,23 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
 ] );
 
 /* ######################################################################################################## */
+cenozo.factory( 'CnBaseFormModelFactory', [
+  'CnBaseModelFactory',
+  function( CnBaseModelFactory ) {
+    return {
+      construct: function( object, module ) {
+        CnBaseModelFactory.construct( object, module );
+
+        // make sure not to allow editing of completed forms
+        object.getEditEnabled = function() {
+          return object.$$getEditEnabled() && !object.viewModel.record.completed;
+        };
+      }
+    };
+  }
+] );
+
+/* ######################################################################################################## */
 cenozo.factory( 'CnBaseFormEntryListFactory', [
   'CnBaseListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
   function( CnBaseListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
@@ -474,6 +491,11 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
       construct: function( object, module ) {
         CnBaseModelFactory.construct( object, module );
         object.isTypist = true;
+
+        // make sure not to allow editing of completed forms
+        object.getEditEnabled = function() {
+          return object.$$getEditEnabled() && !object.viewModel.record.completed;
+        };
 
         CnSession.promise.then( function() {
           object.isTypist = 'typist' == CnSession.role.name;

@@ -19,18 +19,13 @@ abstract class base_form_module extends \cenozo\service\module
    */
   public function validate()
   {
-    // do not allow completed forms to be invalidated
+    // do not allow completed forms to be edited
     if( 'PATCH' == $this->get_method() )
     {
-      $record = $this->get_resource();
-      if( $record->completed )
+      if( $this->get_resource()->completed )
       {
-        $file = $this->get_file_as_array();
-        if( array_key_exists( 'invalid', $file ) && true == $file['invalid'] )
-        {
-          $this->set_data( 'Once a form has been completed it cannot be invalidated.' );
-          $this->get_status()->set_code( 306 );
-        }
+        $this->set_data( 'Once a form has been completed it cannot be changed.' );
+        $this->get_status()->set_code( 306 );
       }
     }
   }

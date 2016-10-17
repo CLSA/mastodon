@@ -23,30 +23,43 @@ abstract class base_form_entry_module extends \cenozo\service\module
 
     parent::validate();
 
+    $form_entry_name = $this->get_subject();
+    $form_name = str_replace( '_entry', '', $form_entry_name );
+
     if( 300 > $this->get_status()->get_code() )
     {
       $method = $this->get_method();
 
       if( 'PATCH' == $method )
       {
-        // when setting the UID, make sure there is a matching participant
-        $file = $this->get_file_as_array();
-        if( array_key_exists( 'uid', $file ) )
+        // do not allow completed forms to be edited
+        $get_form_method = sprintf( 'get_%s', $form_name );
+        if( $this->get_resource()->$get_form_method()->completed )
         {
-          if( is_null( $participant_class_name::get_unique_record( 'uid', $file['uid'] ) ) )
-          {
-            $this->get_status()->set_code( 306 );
-            $this->set_data( sprintf( 'There is no participant with the UID "%s".', $file['uid'] ) );
-          }
+          $this->set_data( 'Once a form has been completed it cannot be changed.' );
+          $this->get_status()->set_code( 306 );
         }
-        else if( array_key_exists( 'submitted', $file ) && true == $file['submitted'] )
+        else
         {
-          // test the entry for errors
-          $errors = $this->get_resource()->get_errors();
-          if( 0 < count( $errors ) )
+          // when setting the UID, make sure there is a matching participant
+          $file = $this->get_file_as_array();
+          if( array_key_exists( 'uid', $file ) )
           {
-            $this->get_status()->set_code( 400 );
-            $this->set_data( $errors );
+            if( is_null( $participant_class_name::get_unique_record( 'uid', $file['uid'] ) ) )
+            {
+              $this->get_status()->set_code( 306 );
+              $this->set_data( sprintf( 'There is no participant with the UID "%s".', $file['uid'] ) );
+            }
+          }
+          else if( array_key_exists( 'submitted', $file ) && true == $file['submitted'] )
+          {
+            // test the entry for errors
+            $errors = $this->get_resource()->get_errors();
+            if( 0 < count( $errors ) )
+            {
+              $this->get_status()->set_code( 400 );
+              $this->set_data( $errors );
+            }
           }
         }
       }
@@ -57,8 +70,6 @@ abstract class base_form_entry_module extends \cenozo\service\module
         else
         {
           // try and get a form which requires another entry
-          $form_entry_name = $this->get_subject();
-          $form_name = str_replace( '_entry', '', $form_entry_name );
           $class_name = lib::get_class_name( sprintf( 'database\%s', $form_name ) );
 
           $select = lib::create( 'database\select' );

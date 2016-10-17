@@ -208,11 +208,11 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyFormModelFactory', [
-    'CnBaseModelFactory', 'CnProxyFormListFactory', 'CnProxyFormViewFactory',
-    function( CnBaseModelFactory, CnProxyFormListFactory, CnProxyFormViewFactory ) {
+    'CnBaseFormModelFactory', 'CnProxyFormListFactory', 'CnProxyFormViewFactory',
+    function( CnBaseFormModelFactory, CnProxyFormListFactory, CnProxyFormViewFactory ) {
       var object = function( root ) {
         var self = this;
-        CnBaseModelFactory.construct( this, module );
+        CnBaseFormModelFactory.construct( this, module );
         this.listModel = CnProxyFormListFactory.instance( this );
         this.viewModel = CnProxyFormViewFactory.instance( this, root );
         

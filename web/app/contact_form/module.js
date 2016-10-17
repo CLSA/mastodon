@@ -100,11 +100,11 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnContactFormModelFactory', [
-    'CnBaseModelFactory', 'CnContactFormListFactory', 'CnContactFormViewFactory',
-    function( CnBaseModelFactory, CnContactFormListFactory, CnContactFormViewFactory ) {
+    'CnBaseFormModelFactory', 'CnContactFormListFactory', 'CnContactFormViewFactory',
+    function( CnBaseFormModelFactory, CnContactFormListFactory, CnContactFormViewFactory ) {
       var object = function( root ) {
         var self = this;
-        CnBaseModelFactory.construct( this, module );
+        CnBaseFormModelFactory.construct( this, module );
         this.listModel = CnContactFormListFactory.instance( this );
         this.viewModel = CnContactFormViewFactory.instance( this, root );
       };
