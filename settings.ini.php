@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.0.0';
-$SETTINGS['general']['build'] = 'eb9a489';
+$SETTINGS['general']['build'] = 'e88326e';
 
 // always leave as false when running as production server
 $SETTINGS['general']['development_mode'] = false;

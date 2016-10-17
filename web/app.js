@@ -429,6 +429,12 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
             data: { submitted: true },
             onError: function( response ) {
               if( 400 == response.status && angular.isObject( response.data ) ) {
+                CnModalMessageFactory.instance( {
+                  title: 'Error Found in Form',
+                  message: 'There were errors found in the form which have been highlighted in red. ' +
+                           'You must correct these errors before the form can be submitted.'
+                } ).show();
+
                 cenozo.forEachFormElement( 'form', function( element ) { element.$error = {}; } );
                 for( var name in response.data ) {
                   var element = cenozo.getFormElement( name );
