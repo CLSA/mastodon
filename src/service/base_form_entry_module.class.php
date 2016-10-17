@@ -109,6 +109,15 @@ abstract class base_form_entry_module extends \cenozo\service\module
     $form_entry_name = $this->get_subject();
     $form_name = str_replace( '_entry', '', $form_entry_name );
 
+    if( $select->has_column( 'participant_full_name' ) )
+    {
+      $modifier->left_join( 'participant', $form_entry_name.'.uid', 'participant.uid' );
+      $select->add_column(
+        'CONCAT( participant.first_name, " ", participant.last_name )',
+        'participant_full_name',
+        false );
+    }
+
     // special restricts for typists
     if( 'typist' == $db_role->name )
     {

@@ -170,6 +170,11 @@ cenozoApp.initFormEntryModule = function( module, type ) {
       regex: '^[A-Z][0-9]{6}$',
       help: 'Must be in "A000000" format (a letter followed by 6 numbers)'
     };
+    inputGroup.participant_full_name = {
+      title: 'Participant',
+      type: 'string',
+      constant: true
+    };
   }
 
   module.addInputGroup( '', inputGroup );
@@ -383,6 +388,20 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
             };
           }
         } );
+
+        object.onPatch = function( data ) {
+          return object.$$onPatch( data ).then( function() {
+            if( angular.isDefined( data.uid ) ) {
+              // update the participant's name
+              CnHttpFactory.instance( {
+                path: object.parentModel.getServiceResourcePath(),
+                data: { select: { column: [ 'participant_full_name' ] } }
+              } ).get().then( function( response ) {
+                object.record.participant_full_name = response.data.participant_full_name;
+              } );
+            }
+          } );
+        };
 
         object.onPatchError = function( response ) {
           // handle 306 errors (uid doesn't match existing participant)
