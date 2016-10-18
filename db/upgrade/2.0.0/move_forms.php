@@ -5,6 +5,14 @@
  * This script should be run once after running patch_database.sql
  * It moves and renames all forms from Mastodon1 to Cenozo2
  * 
+ * INSTRUCTIONS:
+ * Start by making sure that mastodon's ['path']['FORM_OUT'] directory is pointing to the
+ * directory which contains the existing form folders (consent, contact, hin and proxy).
+ * Then make sure cenozo's ['path']['FORM'] directory is pointing to a clean directory
+ * which is writable by www-data and contains the same list of folders (consent, contact
+ * hin and proxy).
+ * Finally, run the database patch on Mastodon FIRST, then you can run this script.
+ * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
