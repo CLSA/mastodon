@@ -134,6 +134,7 @@ abstract class base_form_entry_module extends \cenozo\service\module
     {
       $modifier->where( $form_entry_name.'.user_id', '=', $db_user->id );
       $modifier->where( 'submitted', '=', false );
+      $modifier->where( 'invalid', '=', false );
     }
 
     if( $select->has_column( 'validated' ) )
