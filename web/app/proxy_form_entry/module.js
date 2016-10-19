@@ -232,17 +232,6 @@ define( function() {
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyFormEntryModelFactory.root;
-
-          $timeout( function() {
-            $scope.model.getMetadata().then( function() {
-              var cnRecordView = cenozo.findChildDirectiveScope( $scope, 'cnRecordView' );
-              var inputArray = cnRecordView.dataArray.findByProperty( 'title', 'Additional Details' ).inputArray;
-              inputArray.findByProperty( 'key', 'continue_physical_tests' ).type =
-                $scope.model.viewModel.record.from_onyx ? 'enum' : 'hidden';
-              inputArray.findByProperty( 'key', 'continue_draw_blood' ).type =
-                $scope.model.viewModel.record.from_onyx ? 'enum' : 'hidden';
-            } );
-          }, 200 );
         }
       };
     }
