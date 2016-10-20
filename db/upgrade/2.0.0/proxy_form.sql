@@ -76,7 +76,7 @@ CREATE PROCEDURE patch_proxy_form()
       SET @sql = CONCAT(
         "INSERT IGNORE INTO ", @cenozo, ".consent( ",
           "participant_id, consent_type_id, accept, written, datetime, note ) ",
-        "SELECT participant_id, consent_type.id, informant_continue, true, date, ",
+        "SELECT participant_id, consent_type.id, informant_continue, true, date + INTERVAL 12 HOUR, ",
           "CONCAT( 'Received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
                   "' for informant to continue to answer research questions on their behalf.' ) ",
         "FROM last_proxy_form, ", @cenozo, ".consent_type ",
