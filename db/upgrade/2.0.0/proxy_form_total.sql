@@ -1,7 +1,3 @@
-
-
-
-
 DROP PROCEDURE IF EXISTS patch_proxy_form_total;
 DELIMITER //
 CREATE PROCEDURE patch_proxy_form_total()

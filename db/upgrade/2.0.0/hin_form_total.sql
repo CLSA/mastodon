@@ -1,48 +1,44 @@
-
-
-
-
-DROP PROCEDURE IF EXISTS patch_consent_form_total;
+DROP PROCEDURE IF EXISTS patch_hin_form_total;
 DELIMITER //
-CREATE PROCEDURE patch_consent_form_total()
+CREATE PROCEDURE patch_hin_form_total()
   BEGIN
 
-    SELECT "Adding new consent_form_total caching table" AS "";
+    SELECT "Adding new hin_form_total caching table" AS "";
 
     SET @test = (
       SELECT COUNT(*)
       FROM information_schema.TABLES
       WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = "consent_form_total" );
+      AND TABLE_NAME = "hin_form_total" );
     IF @test = 0 THEN
 
-      CREATE TABLE IF NOT EXISTS consent_form_total (
-        consent_form_id INT UNSIGNED NOT NULL,
+      CREATE TABLE IF NOT EXISTS hin_form_total (
+        hin_form_id INT UNSIGNED NOT NULL,
         update_timestamp TIMESTAMP NOT NULL,
         create_timestamp TIMESTAMP NOT NULL,
         entry_total INT NOT NULL,
         submitted_total INT NOT NULL,
-        PRIMARY KEY (consent_form_id),
-        CONSTRAINT fk_consent_form_total_consent_form_id
-          FOREIGN KEY (consent_form_id)
-          REFERENCES consent_form (id)
+        PRIMARY KEY (hin_form_id),
+        CONSTRAINT fk_hin_form_total_hin_form_id
+          FOREIGN KEY (hin_form_id)
+          REFERENCES hin_form (id)
           ON DELETE CASCADE
           ON UPDATE CASCADE)
       ENGINE = InnoDB;
 
-      SELECT "Populating consent_form_total table" AS "";
+      SELECT "Populating hin_form_total table" AS "";
 
-      REPLACE INTO consent_form_total( consent_form_id, entry_total, submitted_total )
-      SELECT consent_form.id, IF( consent_form_entry.id IS NULL, 0, COUNT(*) ), 0
-      FROM consent_form
-      LEFT JOIN consent_form_entry ON consent_form.id = consent_form_entry.consent_form_id
-      GROUP BY consent_form.id;
+      REPLACE INTO hin_form_total( hin_form_id, entry_total, submitted_total )
+      SELECT hin_form.id, IF( hin_form_entry.id IS NULL, 0, COUNT(*) ), 0
+      FROM hin_form
+      LEFT JOIN hin_form_entry ON hin_form.id = hin_form_entry.hin_form_id
+      GROUP BY hin_form.id;
 
-      UPDATE consent_form_total
+      UPDATE hin_form_total
       SET submitted_total = (
         SELECT COUNT(*)
-        FROM consent_form_entry
-        WHERE consent_form_entry.consent_form_id = consent_form_total.consent_form_id
+        FROM hin_form_entry
+        WHERE hin_form_entry.hin_form_id = hin_form_total.hin_form_id
         AND deferred = false
       );
 
@@ -51,5 +47,5 @@ CREATE PROCEDURE patch_consent_form_total()
   END //
 DELIMITER ;
 
-CALL patch_consent_form_total();
-DROP PROCEDURE IF EXISTS patch_consent_form_total;
+CALL patch_hin_form_total();
+DROP PROCEDURE IF EXISTS patch_hin_form_total;

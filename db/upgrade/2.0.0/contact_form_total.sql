@@ -1,7 +1,3 @@
-
-
-
-
 DROP PROCEDURE IF EXISTS patch_contact_form_total;
 DELIMITER //
 CREATE PROCEDURE patch_contact_form_total()
