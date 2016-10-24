@@ -51,6 +51,19 @@ cenozoApp.initFormModule = function( module, type ) {
     }
   } );
 
+  if( 'contact' != type ) {
+    cenozo.insertPropertyAfter( module.columnList, 'id', 'cohort', {
+      title: 'Cohort',
+      type: 'string',
+      help: 'A list of all cohorts entered by typists for this form (separated by a comma).'
+    } );
+    cenozo.insertPropertyAfter( module.columnList, 'cohort', 'uid', {
+      title: 'UID',
+      type: 'string',
+      help: 'A list of all UIDs entered by typists for this form (separated by a comma).'
+    } );
+  }
+
   module.addInputGroup( '', {
     id: {
       title: 'ID',
