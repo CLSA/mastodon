@@ -120,6 +120,8 @@ abstract class base_form_entry_module extends \cenozo\service\module
     $form_entry_name = $this->get_subject();
     $form_name = str_replace( '_entry', '', $form_entry_name );
 
+    $modifier->join( $form_name, sprintf( '%s.%s_id', $form_entry_name, $form_name ), $form_name.'.id' );
+
     if( $select->has_column( 'participant_full_name' ) )
     {
       $modifier->left_join( 'participant', $form_entry_name.'.uid', 'participant.uid' );
@@ -133,13 +135,12 @@ abstract class base_form_entry_module extends \cenozo\service\module
     if( 'typist' == $db_role->name )
     {
       $modifier->where( $form_entry_name.'.user_id', '=', $db_user->id );
-      $modifier->where( 'submitted', '=', false );
-      $modifier->where( 'invalid', '=', false );
+      $modifier->where( $form_entry_name.'.submitted', '=', false );
+      $modifier->where( $form_name.'.invalid', '=', false );
     }
 
     if( $select->has_column( 'validated' ) )
     {
-      $modifier->join( $form_name, sprintf( '%s.%s_id', $form_entry_name, $form_name ), $form_name.'.id' );
       $select->add_column(
         sprintf( 'IF( %s.validated_%s_id = %s.id, true, false )', $form_name, $form_entry_name, $form_entry_name ),
         'validated',
