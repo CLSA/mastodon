@@ -54,7 +54,7 @@ abstract class base_form_module extends \cenozo\service\module
     {
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( $form_name );
-      $join_sel->add_column( 'id' );
+      $join_sel->add_column( 'id', $form_name.'_id' );
       $join_sel->add_column(
         'GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR "," )',
         'uid',
@@ -75,7 +75,7 @@ abstract class base_form_module extends \cenozo\service\module
       $modifier->join(
         sprintf( '( %s %s )', $join_sel->get_sql(), $join_mod->get_sql() ),
         $form_name.'.id',
-        'join_participant.id',
+        'join_participant.'.$form_name.'_id',
         '',
         'join_participant'
       );
