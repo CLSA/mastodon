@@ -1,0 +1,70 @@
+#!/usr/bin/php
+<?php
+/**
+ * Utility script which should be ran once a day, ideally when the application is under light use.
+ * Author: Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+/**
+ * Make sure to fill in the following
+ */
+
+define( 'URL', 'https://localhost/<PATH-TO-MASTODON>/api/' );
+
+/**
+ * Do not edit any of the following lines
+ */
+
+chdir( dirname( __FILE__ ).'/../' );
+require_once 'settings.ini.php';
+require_once 'settings.local.ini.php';
+require_once $SETTINGS['path']['CENOZO'].'/src/initial.class.php';
+$initial = new \cenozo\initial();
+$settings = $initial->get_settings();
+define( 'USER', $settings['utility']['username'] );
+define( 'AUTH', sprintf( 'Authorization: Basic %s', base64_encode(
+  sprintf( '%s:%s', $settings['utility']['username'], $settings['utility']['password'] ) ) ) );
+
+// function for writing to the log
+function write_log( $message )
+{
+  file_put_contents(
+    LOG_FILE_PATH,
+    sprintf( "%s  [cron] <%s> %s\n\n", date( 'Y-m-d (D) H:i:s' ), USER, $message ),
+    FILE_APPEND
+  );
+}
+
+/**
+ * Send a command to run all scheduled reports
+ */
+write_log( 'Updating all scheduled reports' );
+
+$curl = curl_init();
+curl_setopt( $curl, CURLOPT_URL, URL.'report_schedule?update=1' );
+curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+curl_setopt( $curl, CURLOPT_HTTPHEADER, array( AUTH ) );
+
+curl_exec( $curl );
+if( curl_errno( $curl ) )
+{
+  write_log( sprintf(
+    "Returned error code %s when trying to update scheduled reports\nMessage: %s",
+    curl_errno( $curl ),
+    curl_error( $curl )
+  ) );
+}
+else
+{
+  $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+  if( 200 != $code )
+  {
+    write_log( sprintf( 'Failed to update scheduled reports (response code: %s)', $code ) );
+  }
+  else
+  {
+    write_log( 'Scheduled reports have been successfully updated' );
+  }
+}
+curl_close( $curl );
