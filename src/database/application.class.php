@@ -47,10 +47,12 @@ class application extends \cenozo\database\application
     $sub_mod->where( 'participant.id', '=', 'app_has_participant.participant_id', false );
     $sub_mod->where( 'app_has_participant.application_id', '=', 'application.id', false );
     $participant_mod->join_modifier( 'application_has_participant', $sub_mod, 'left', 'app_has_participant' );
-    $participant_mod->where( 'app_has_participant.datetime', '=', NULL );
 
     // used below
     $event_mod = clone $participant_mod;
+
+    // make sure the participant hasn't already been exported
+    $participant_mod->where( 'app_has_participant.datetime', '=', NULL );
 
     $sql = sprintf(
       "INSERT INTO application_has_participant( application_id, participant_id, create_timestamp, datetime )\n".
