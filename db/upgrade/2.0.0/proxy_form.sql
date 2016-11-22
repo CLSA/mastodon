@@ -46,12 +46,12 @@ CREATE PROCEDURE patch_proxy_form()
       CHANGE complete completed TINYINT(1) NOT NULL DEFAULT 0;
     END IF;
 
-    SELECT "Creating use informant consent entries" AS "";
+    SELECT "Creating continue questionnaires consent entries" AS "";
 
     SET @sql = CONCAT(
       "SELECT COUNT(*) INTO @test FROM ", @cenozo, ".consent ",
       "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id ",
-      "WHERE consent_type.name = 'use informant'" );
+      "WHERE consent_type.name = 'continue questionnaires'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -80,7 +80,7 @@ CREATE PROCEDURE patch_proxy_form()
           "CONCAT( 'Received proxy form indicating ', IF( informant_continue, 'yes', 'no' ), ",
                   "' for informant to continue to answer research questions on their behalf.' ) ",
         "FROM last_proxy_form, ", @cenozo, ".consent_type ",
-        "WHERE consent_type.name = 'use informant' ",
+        "WHERE consent_type.name = 'continue questionnaires' ",
         "AND completed = true ",
         "AND invalid = false" );
       PREPARE statement FROM @sql;

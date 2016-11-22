@@ -28,7 +28,7 @@ class proxy_form extends base_form
     $db_form = $this->get_form();
     if( !is_null( $db_proxy_form_entry->use_informant ) )
       $db_form->add_consent(
-        'use informant', array( 'accept' => $db_proxy_form_entry->use_informant ) );
+        'continue questionnaires', array( 'accept' => $db_proxy_form_entry->use_informant ) );
     if( !is_null( $db_proxy_form_entry->continue_physical_tests ) )
       $db_form->add_consent(
         'continue physical tests', array( 'accept' => $db_proxy_form_entry->continue_physical_tests ) );
