@@ -21,7 +21,7 @@ DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
       ALTER TABLE proxy_form_entry DROP COLUMN deferred;
     END IF;
 
-    SELECT "Renaming informant_continue column to use_informant in proxy_form_entry table" AS "";
+    SELECT "Renaming informant_continue column to continue_questionnaires in proxy_form_entry table" AS "";
 
     SET @test = (
       SELECT COUNT(*)
@@ -31,7 +31,7 @@ DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
       AND COLUMN_NAME = "informant_continue" );
     IF @test = 1 THEN
       ALTER TABLE proxy_form_entry
-      CHANGE COLUMN informant_continue use_informant TINYINT(1) NULL DEFAULT NULL;
+      CHANGE COLUMN informant_continue continue_questionnaires TINYINT(1) NULL DEFAULT NULL;
     END IF;
 
     SELECT "Adding continue_physical_tests column to proxy_form_entry table" AS "";
@@ -45,7 +45,7 @@ DROP PROCEDURE IF EXISTS patch_proxy_form_entry;
     IF @test = 0 THEN
       ALTER TABLE proxy_form_entry
       ADD COLUMN continue_physical_tests TINYINT(1) NULL DEFAULT NULL
-      AFTER use_informant;
+      AFTER continue_questionnaires;
     END IF;
 
     SELECT "Adding continue_draw_blood column to proxy_form_entry table" AS "";

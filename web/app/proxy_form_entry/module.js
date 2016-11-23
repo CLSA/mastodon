@@ -163,8 +163,8 @@ define( function() {
   }, true );
 
   module.addInputGroup( 'Additional Details', {
-    use_informant: {
-      title: "Use Information Provider",
+    continue_questionnaires: {
+      title: "Continue Questionnaires",
       type: 'boolean'
     },
     continue_physical_tests: {

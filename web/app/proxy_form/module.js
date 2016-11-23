@@ -164,8 +164,8 @@ define( function() {
           column: 'informant_note',
           title: 'Informant Note'
         }, {
-          column: 'use_informant',
-          title: 'Use Information Provider'
+          column: 'continue_questionnaires',
+          title: 'Continue Questionnaires'
         }, {
           column: 'continue_physical_tests',
           title: 'Continue Physical Tests'
