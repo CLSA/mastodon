@@ -38,8 +38,6 @@ SOURCE report_type.sql
 SOURCE application_type_has_report_type.sql
 SOURCE role_has_report_type.sql
 SOURCE application_has_script.sql
-SOURCE recording.sql
-SOURCE recording_file.sql
 
 SOURCE table_character_sets.sql
 SOURCE column_character_sets.sql
