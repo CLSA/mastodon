@@ -39,7 +39,7 @@ CREATE PROCEDURE patch_proxy_form_total()
         SELECT COUNT(*)
         FROM proxy_form_entry
         WHERE proxy_form_entry.proxy_form_id = proxy_form_total.proxy_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
     END IF;

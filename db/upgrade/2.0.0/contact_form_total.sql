@@ -39,7 +39,7 @@ CREATE PROCEDURE patch_contact_form_total()
         SELECT COUNT(*)
         FROM contact_form_entry
         WHERE contact_form_entry.contact_form_id = contact_form_total.contact_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
     END IF;

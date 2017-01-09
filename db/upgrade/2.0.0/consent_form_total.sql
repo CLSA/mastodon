@@ -39,7 +39,7 @@ CREATE PROCEDURE patch_consent_form_total()
         SELECT COUNT(*)
         FROM consent_form_entry
         WHERE consent_form_entry.consent_form_id = consent_form_total.consent_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
     END IF;

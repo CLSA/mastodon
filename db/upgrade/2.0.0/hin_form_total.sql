@@ -39,7 +39,7 @@ CREATE PROCEDURE patch_hin_form_total()
         SELECT COUNT(*)
         FROM hin_form_entry
         WHERE hin_form_entry.hin_form_id = hin_form_total.hin_form_id
-        AND deferred = false
+        AND submitted = true
       );
 
     END IF;
