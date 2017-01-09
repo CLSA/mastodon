@@ -12,7 +12,7 @@ global $SETTINGS;
 // tagged version
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
-$SETTINGS['general']['version'] = '2.0.0';
+$SETTINGS['general']['version'] = '2.1.0';
 $SETTINGS['general']['build'] = '93b2ab5';
 
 // always leave as false when running as production server

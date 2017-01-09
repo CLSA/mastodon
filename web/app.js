@@ -16,10 +16,10 @@ cenozoApp.initFormModule = function( module, type ) {
   angular.extend( module, {
     identifier: {},
     name: {
-      singular: type + ' form',
-      plural: type + ' forms',
-      possessive: type + ' form\'s',
-      pluralPossessive: type + ' forms\''
+      singular: type.replace( '_', ' ' ) + ' form',
+      plural: type.replace( '_', ' ' ) + ' forms',
+      possessive: type.replace( '_', ' ' ) + ' form\'s',
+      pluralPossessive: type.replace( '_', ' ' ) + ' forms\''
     },
     columnList: {
       id: {
@@ -148,10 +148,10 @@ cenozoApp.initFormEntryModule = function( module, type ) {
       }
     },
     name: {
-      singular: type + ' form entry',
-      plural: type + ' form entries',
-      possessive: type + ' form entry\'s',
-      pluralPossessive: type + ' form entries\''
+      singular: type.replace( '_', ' ' ) + ' form entry',
+      plural: type.replace( '_', ' ' ) + ' form entries',
+      possessive: type.replace( '_', ' ' ) + ' form entry\'s',
+      pluralPossessive: type.replace( '_', ' ' ) + ' form entries\''
     },
     columnList: columnList,
     defaultOrder: {

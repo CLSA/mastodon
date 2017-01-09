@@ -68,7 +68,24 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) ) $module->remove_action( 'add' );
 
     $module = $this->get_module( 'user' );
-    if( !is_null( $module ) ) $module->add_child( 'proxy_form_entry', 0 );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'consent_form_entry', 0 );
+      $module->add_child( 'contact_form_entry', 0 );
+      $module->add_child( 'general_proxy_form_entry', 0 );
+      $module->add_child( 'proxy_form_entry', 0 );
+    }
+
+    $module = $this->get_module( 'general_proxy_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'general_proxy_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+
+    // posting new form-entries is handled specially by the interface
+    $module = $this->get_module( 'general_proxy_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
 
     $module = $this->get_module( 'proxy_form' );
     if( !is_null( $module ) )
@@ -97,20 +114,19 @@ class ui extends \cenozo\ui\ui
 
     // add application-specific states to the base list
     $this->add_listitem( 'Consent Forms', 'consent_form' );
-    if( 'typist' == $db_role->name )
-      $this->add_listitem( 'Consent Form Entries', 'consent_form_entry' );
-
     $this->add_listitem( 'Contact Forms', 'contact_form' );
-    if( 'typist' == $db_role->name )
-      $this->add_listitem( 'Contact Form Entries', 'contact_form_entry' );
-
     $this->add_listitem( 'HIN Forms', 'hin_form' );
-    if( 'typist' == $db_role->name )
-      $this->add_listitem( 'HIN Form Entries', 'hin_form_entry' );
-
+    $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
+
     if( 'typist' == $db_role->name )
+    {
+      $this->add_listitem( 'Consent Form Entries', 'consent_form_entry' );
+      $this->add_listitem( 'Contact Form Entries', 'contact_form_entry' );
+      $this->add_listitem( 'HIN Form Entries', 'hin_form_entry' );
+      $this->add_listitem( 'General Proxy Form Entries', 'general_proxy_form_entry' );
       $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
+    }
   }
 
   /**
