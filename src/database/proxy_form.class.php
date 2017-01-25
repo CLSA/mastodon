@@ -27,17 +27,37 @@ class proxy_form extends base_form
     // add the physical tests and future HIN consent
     $db_form = $this->get_form();
     if( !is_null( $db_proxy_form_entry->continue_questionnaires ) )
+    {
       $db_form->add_consent(
-        'continue questionnaires', array( 'accept' => $db_proxy_form_entry->continue_questionnaires ) );
+        'continue questionnaires',
+        array( 'accept' => $db_proxy_form_entry->continue_questionnaires ),
+        $this->from_onyx ? 'Provided by Onyx.' : NULL
+      );
+    }
     if( !is_null( $db_proxy_form_entry->continue_physical_tests ) )
+    {
       $db_form->add_consent(
-        'continue physical tests', array( 'accept' => $db_proxy_form_entry->continue_physical_tests ) );
+        'continue physical tests',
+        array( 'accept' => $db_proxy_form_entry->continue_physical_tests ),
+        $this->from_onyx ? 'Provided by Onyx.' : NULL
+      );
+    }
     if( !is_null( $db_proxy_form_entry->continue_draw_blood ) )
+    {
       $db_form->add_consent(
-        'continue draw blood', array( 'accept' => $db_proxy_form_entry->continue_draw_blood ) );
+        'continue draw blood',
+        array( 'accept' => $db_proxy_form_entry->continue_draw_blood ),
+        $this->from_onyx ? 'Provided by Onyx.' : NULL
+      );
+    }
     if( !is_null( $db_proxy_form_entry->hin_future_access ) )
+    {
       $db_form->add_consent(
-        'HIN future access', array( 'accept' => $db_proxy_form_entry->hin_future_access ) );
+        'HIN future access',
+        array( 'accept' => $db_proxy_form_entry->hin_future_access ),
+        $this->from_onyx ? 'Provided by Onyx.' : NULL
+      );
+    }
 
     if( $db_proxy_form_entry->proxy )
     {
