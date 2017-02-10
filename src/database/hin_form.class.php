@@ -24,7 +24,7 @@ class hin_form extends base_form
   {
     parent::import( $db_hin_form_entry );
 
-    // add the extended hin access consent
-    $this->get_form()->add_consent( 'HIN extended access', array( 'accept' => $db_hin_form_entry->accept ) );
+    // add the HIN access consent
+    $this->get_form()->add_consent( 'HIN access', array( 'accept' => $db_hin_form_entry->accept ) );
   }
 }

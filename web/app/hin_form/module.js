@@ -62,11 +62,8 @@ define( function() {
           column: 'uid',
           title: 'UID'
         }, {
-          column: 'option_1',
-          title: 'Option #1'
-        }, {
-          column: 'option_2',
-          title: 'Option #2'
+          column: 'accept',
+          title: 'Accept'
         }, {
           column: 'signed',
           title: 'Signed'

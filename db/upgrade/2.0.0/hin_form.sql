@@ -50,7 +50,7 @@ CREATE PROCEDURE patch_hin_form()
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".form_type( name, title, description ) ",
-      "VALUES( 'hin', 'Extended HIN Access', 'A form confirming the participant\\'s consent to provide extended access to their HIN information.' )" );
+      "VALUES( 'hin', 'HIN Access', 'A form confirming the participant\\'s consent to provide access to their HIN information.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -101,7 +101,7 @@ CREATE PROCEDURE patch_hin_form()
         EXECUTE statement;
         DEALLOCATE PREPARE statement;
 
-        SELECT "Adding form associations to consent for extended hin access records" AS "";
+        SELECT "Adding form associations to consent for hin access records" AS "";
 
         SET @sql = CONCAT(
           "INSERT IGNORE INTO ", @cenozo, ".form_association( form_id, subject, record_id ) ",
@@ -109,7 +109,7 @@ CREATE PROCEDURE patch_hin_form()
           "FROM ", @cenozo, ".form ",
           "JOIN ", @cenozo, ".consent ON form.participant_id = consent.participant_id "
           "JOIN ", @cenozo, ".consent_type ON consent.consent_type_id = consent_type.id "
-          "WHERE consent_type.name = 'HIN extended access' ",
+          "WHERE consent_type.name = 'HIN access' ",
           "AND form.hin_form_id IS NOT NULL" );
         PREPARE statement FROM @sql;
         EXECUTE statement;

@@ -1,21 +1,21 @@
-SELECT "Creating new update_consent_form_total procedure" AS "";
+SELECT "Creating new update_hin_form_total procedure" AS "";
 
-DROP procedure IF EXISTS update_consent_form_total;
+DROP procedure IF EXISTS update_hin_form_total;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_consent_form_total(IN proc_consent_form_id INT(10) UNSIGNED)
+CREATE PROCEDURE update_hin_form_total(IN proc_hin_form_id INT(10) UNSIGNED)
 BEGIN
 
-  REPLACE INTO consent_form_total
-  SET consent_form_id = proc_consent_form_id,
+  REPLACE INTO hin_form_total
+  SET hin_form_id = proc_hin_form_id,
       entry_total = (
-        SELECT COUNT(*) FROM consent_form_entry
-        WHERE consent_form_id = proc_consent_form_id
+        SELECT COUNT(*) FROM hin_form_entry
+        WHERE hin_form_id = proc_hin_form_id
       ),
       submitted_total = (
-        SELECT COUNT(*) FROM consent_form_entry
-        WHERE consent_form_id = proc_consent_form_id
+        SELECT COUNT(*) FROM hin_form_entry
+        WHERE hin_form_id = proc_hin_form_id
         AND submitted = true
       );
 
