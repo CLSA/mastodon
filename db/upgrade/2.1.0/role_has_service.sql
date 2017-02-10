@@ -7,7 +7,7 @@ CREATE PROCEDURE patch_role_has_service()
 
     -- administrator
     SET @sql = CONCAT(
-      "INSERT INTO role_has_service( role_id, service_id ) ",
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
@@ -19,7 +19,7 @@ CREATE PROCEDURE patch_role_has_service()
 
     -- curator
     SET @sql = CONCAT(
-      "INSERT INTO role_has_service( role_id, service_id ) ",
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'curator' ",
@@ -34,7 +34,7 @@ CREATE PROCEDURE patch_role_has_service()
 
     -- typist
     SET @sql = CONCAT(
-      "INSERT INTO role_has_service( role_id, service_id ) ",
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name IN( 'typist' ) ",
