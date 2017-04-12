@@ -4,7 +4,7 @@
       <i class="glyphicon glyphicon-refresh glyph-hover rounded pull-right btn-primary"
          ng-if="!model.isLoading"
          ng-click="model.onLoad()"
-         tooltip="Click to refresh data"
+         uib-tooltip="Click to refresh data"
          tooltip-placement="left"></i>
       Adjudication for {{ model.module.name.singular|cnUCWords }} #{{ model.form.id }}
       <span ng-if="model.isLoading">(Loading&hellip;)</span>
