@@ -48,6 +48,7 @@ DROP PROCEDURE IF EXISTS patch_general_proxy_form_entry;
           "proxy_phone_note TEXT NULL DEFAULT NULL, ",
           "proxy_note TEXT NULL DEFAULT NULL, ",
           "already_identified TINYINT(1) NULL DEFAULT NULL, ",
+          "same_as_proxy TINYINT(1) NULL DEFAULT NULL, ",
           "informant_first_name VARCHAR(255) NULL DEFAULT NULL, ",
           "informant_last_name VARCHAR(255) NULL DEFAULT NULL, ",
           "informant_apartment_number VARCHAR(15) NULL DEFAULT NULL, ",

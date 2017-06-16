@@ -125,6 +125,9 @@ define( function() {
           column: 'already_identified',
           title: 'Already Identified'
         }, {
+          column: 'same_as_proxy',
+          title: 'Same As Proxy'
+        }, {
           column: 'informant_first_name',
           title: 'Informant First Name'
         }, {

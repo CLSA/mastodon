@@ -36,9 +36,18 @@ class general_proxy_form extends base_form
       $db_form->add_consent(
         'HIN future access', array( 'accept' => $db_general_proxy_form_entry->hin_future_access ) );
 
-    $informant_same =
+    $informant_exists =
+      !is_null( $db_general_proxy_form_entry->informant_first_name ) &&
+      !is_null( $db_general_proxy_form_entry->informant_last_name );
+
+    $informant_same = (
+      !$informant_exists &&
+      $db_general_proxy_form_entry->same_as_proxy
+    ) || (
+      $informant_exists &&
       $db_general_proxy_form_entry->proxy_first_name == $db_general_proxy_form_entry->informant_first_name &&
-      $db_general_proxy_form_entry->proxy_last_name == $db_general_proxy_form_entry->informant_last_name;
+      $db_general_proxy_form_entry->proxy_last_name == $db_general_proxy_form_entry->informant_last_name
+    );
 
     if( !is_null( $db_general_proxy_form_entry->proxy_first_name ) &&
         !is_null( $db_general_proxy_form_entry->proxy_last_name ) )
@@ -59,14 +68,12 @@ class general_proxy_form extends base_form
         'address_note' => $db_general_proxy_form_entry->proxy_address_note,
         'phone' => $db_general_proxy_form_entry->proxy_phone,
         'phone_note' => $db_general_proxy_form_entry->proxy_phone_note,
-        'informant' => $same_informant,
-        'same_as_proxy' => $same_informant
+        'informant' => $informant_same,
+        'same_as_proxy' => $informant_same
       ) );
     }
 
-    if( !$same_informant &&
-        !is_null( $db_general_proxy_form_entry->informant_first_name ) &&
-        !is_null( $db_general_proxy_form_entry->informant_last_name ) )
+    if( $informant_exists && !$informant_same )
     {
       $db_form->add_informant_alternate( array(
         'first_name' => $db_general_proxy_form_entry->informant_first_name,

@@ -105,6 +105,10 @@ define( function() {
     already_identified: {
       title: "Already Identified",
       type: 'boolean'
+    },
+    same_as_proxy: {
+      title: "Same As Proxy",
+      type: 'boolean'
     }
   }, true );
 
