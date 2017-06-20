@@ -1,6 +1,7 @@
 SELECT "Adding new services" AS "";
 
 INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
+( 'failed_login', 'GET', 0, 1 ),
 ( 'general_proxy_form', 'GET', 0, 1 ),
 ( 'general_proxy_form', 'GET', 1, 1 ),
 ( 'general_proxy_form', 'PATCH', 1, 1 ),

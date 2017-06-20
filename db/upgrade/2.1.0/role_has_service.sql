@@ -3,50 +3,22 @@ DELIMITER //
 CREATE PROCEDURE patch_role_has_service()
   BEGIN
 
+    -- determine the @cenozo database name
+    SET @cenozo = (
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_access_site_id" );
+
     SELECT "Adding new services to roles" AS "";
 
-    -- administrator
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
-      "AND service.restricted = 1 ",
-      "AND service.subject IN( 'general_proxy_form', 'general_proxy_form_entry' )" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
-
-    -- curator
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
-      "SELECT role.id, service.id ",
-      "FROM ", @cenozo, ".role, service ",
-      "WHERE role.name = 'curator' ",
-      "AND service.restricted = 1 ",
-      "AND ( ",
-        "service.subject = 'general_proxy_form_entry' ",
-        "OR ( subject = 'general_proxy_form' AND method != 'POST' ) ",
-      ")" );
-    PREPARE statement FROM @sql;
-    EXECUTE statement;
-    DEALLOCATE PREPARE statement;
-
-    -- typist
-    SET @sql = CONCAT(
-      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
-      "SELECT role.id, service.id ",
-      "FROM ", @cenozo, ".role, service ",
-      "WHERE role.name IN( 'typist' ) ",
-      "AND service.restricted = 1 ",
-      "AND ( ",
-        "service.subject = 'general_proxy_form_entry' ",
-        "OR ( ",
-          "service.subject = 'general_proxy_form' ",
-          "AND method = 'GET' ",
-          "AND resource = 1 ",
-        ") ",
-      ")" );
+      "AND service.subject = 'failed_login' ",
+      "AND service.restricted = 1" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
