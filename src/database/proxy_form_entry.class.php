@@ -89,7 +89,17 @@ class proxy_form_entry extends base_form_entry
       { // check that the postal code is valid
         $db_postcode = $postcode_class_name::get_match( $this->proxy_postcode );
         if( is_null( $db_postcode ) || $db_postcode->region_id != $this->proxy_region_id )
+        {
           $errors['proxy_postcode'] = 'The postal code does not exist in the selected province.';
+        }
+        else
+        {
+          $db_address = lib::create( 'database\address' );
+          $db_address->region_id = $this->proxy_region_id;
+          $db_address->postcode = $this->proxy_postcode;
+          if( !$db_address->is_valid() )
+            $errors['proxy_postcode'] = 'The postal code is invalid.';
+        }
       }
 
       if( is_null( $this->proxy_phone ) )
@@ -143,7 +153,17 @@ class proxy_form_entry extends base_form_entry
       { // check that the postal code is valid
         $db_postcode = $postcode_class_name::get_match( $this->informant_postcode );
         if( is_null( $db_postcode ) || $db_postcode->region_id != $this->informant_region_id )
+        {
           $errors['informant_postcode'] = 'The postal code does not exist in the selected province.';
+        }
+        else
+        {
+          $db_address = lib::create( 'database\address' );
+          $db_address->region_id = $this->informant_region_id;
+          $db_address->postcode = $this->informant_postcode;
+          if( !$db_address->is_valid() )
+            $errors['informant_postcode'] = 'The postal code is invalid.';
+        }
       }
 
       if( is_null( $this->informant_phone ) )
