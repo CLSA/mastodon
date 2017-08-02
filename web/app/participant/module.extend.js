@@ -55,6 +55,10 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
           } ] );
         } );
 
+        this.viewParticipant = function() {
+          $state.go( 'participant.view', { identifier: $state.params.identifier } );
+        };
+
         this.releaseParticipant = function( application ) {
           self.promise.then( function() {
             CnHttpFactory.instance( {
