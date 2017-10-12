@@ -17,7 +17,7 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
-      "AND service.subject IN( 'failed_login', 'opal_form_template', 'opal_form_template_file' ) ",
+      "AND service.subject IN( 'failed_login', 'opal_form_template' ) ",
       "AND service.restricted = 1" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
