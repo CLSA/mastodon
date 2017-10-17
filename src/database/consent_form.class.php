@@ -26,7 +26,7 @@ class consent_form extends base_form
 
     // add the participation and HIN consent
     $db_form = $this->get_form();
-    $db_form->add_consent( 'participation', array( 'accept' => $db_hin_form_entry->option_1 ) );
-    $db_form->add_consent( 'HIN access', array( 'accept' => $db_hin_form_entry->option_2 ) );
+    $db_form->add_consent( 'participation', array( 'accept' => $db_consent_form_entry->option_1 ) );
+    $db_form->add_consent( 'HIN access', array( 'accept' => $db_consent_form_entry->option_2 ) );
   }
 }
