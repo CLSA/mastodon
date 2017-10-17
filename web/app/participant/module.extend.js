@@ -12,6 +12,44 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
     delete inputGroup.inputList.preferred_site_id;
   }
 
+  module.addExtraOperation( 'view', {
+    title: 'Download Opal Forms',
+    isIncluded: function( $state, model ) {
+      return angular.isDefined( model.viewModel.downloadOpalForms );
+    },
+    operation: function( $state, model ) {
+      return model.viewModel.downloadOpalForms();
+    }
+  } );
+
+  // extend the view factory
+  cenozo.providers.decorator( 'CnParticipantViewFactory', [
+    '$delegate', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory',
+    function( $delegate, CnSession, CnHttpFactory, CnModalMessageFactory ) { 
+      var instance = $delegate.instance;
+      $delegate.instance = function( parentModel, root ) { 
+        var object = instance( parentModel, root );
+        if( 3 <= CnSession.role.tier ) {
+          object.downloadOpalForms = function() {
+            var modal = CnModalMessageFactory.instance( {
+              title: 'Please Wait',
+              message: 'Please wait while the participant\'s data is retrieved from Opal.',
+              block: true
+            } );
+            modal.show();
+
+            return CnHttpFactory.instance( {
+              path: 'participant/' + object.record.getIdentifier() + '?opal_forms=1',
+              format: 'zip'
+            } ).file().finally( function() { modal.close(); } );
+          };
+        }
+        return object;
+      };  
+      return $delegate;
+    }   
+  ] );
+
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnParticipantRelease', [
     'CnParticipantReleaseFactory',
