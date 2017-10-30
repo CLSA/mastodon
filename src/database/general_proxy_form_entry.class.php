@@ -122,7 +122,8 @@ class general_proxy_form_entry extends base_form_entry
         $errors['proxy_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
-    if( !is_null( $this->informant_apartment_number ) ||
+    if( !$this->same_as_proxy ||
+        !is_null( $this->informant_apartment_number ) ||
         !is_null( $this->informant_street_number ) ||
         !is_null( $this->informant_street_name ) ||
         !is_null( $this->informant_box ) ||
