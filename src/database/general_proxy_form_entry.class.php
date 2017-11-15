@@ -209,7 +209,7 @@ class general_proxy_form_entry extends base_form_entry
     }
 
     // make sure a proxy is provided if continue-questionnaires is true
-    if( $this->continue_questionnaires && !$proxy &&  )
+    if( $this->continue_questionnaires && !$proxy )
     {
       $errors['continue_questionnaires'] = 'Cannot be set to "Yes" when Decision Maker is blank.';
     }
