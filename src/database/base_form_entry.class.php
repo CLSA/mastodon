@@ -3,7 +3,6 @@
  * base_form_entry.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\database;
@@ -17,7 +16,6 @@ abstract class base_form_entry extends \cenozo\database\record
   /**
    * Returns the errors found by processing this entry
    * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return associative array
    * @access public
    */

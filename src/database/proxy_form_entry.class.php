@@ -3,7 +3,6 @@
  * proxy_form_entry.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\database;
@@ -17,7 +16,6 @@ class proxy_form_entry extends base_form_entry
   /**
    * Override parent method to make sure 6-character postal codes get a space
    * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string $column_name The name of the column
    * @param mixed $value The value to set the contents of a column to
    * @throws exception\argument
@@ -35,7 +33,6 @@ class proxy_form_entry extends base_form_entry
   /**
    * Returns the errors found by processing this entry
    * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return associative array
    * @access public
    */

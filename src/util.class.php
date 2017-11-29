@@ -1,8 +1,7 @@
 <?php
 /**
  * util.class.php
- * 
- * @filesource
+ * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
 namespace mastodon;
@@ -17,7 +16,6 @@ class util extends \cenozo\util
   /**
    * Given address details this method returns an array with two elements which map to
    * the address table's address1 and address2 lines.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string apartment_number The apartment number only.
    * @param string street_number The street number only.
    * @param string street_name The street name.

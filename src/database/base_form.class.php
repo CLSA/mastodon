@@ -3,7 +3,6 @@
  * base_form.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\database;
@@ -73,7 +72,6 @@ abstract class base_form extends \cenozo\database\record
    * local form storage (FORM_OUT_PATH), after being imported they are moved to the framework's form
    * storage (FORM_PATH).  This method will return the correct path based on whether the record's form_id
    * column is set.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @return string
    * @access public
    */
@@ -106,7 +104,6 @@ abstract class base_form extends \cenozo\database\record
 
   /**
    * Imports the form into the system.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_form_entry The entry to be used as the valid data.
    * @access public
    */
@@ -170,7 +167,6 @@ abstract class base_form extends \cenozo\database\record
   /**
    * Writes the file associciated with this form to the disk
    * 
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param string The contents of the form (as a binary string)
    * @abstract
    * @access public

@@ -3,7 +3,6 @@
  * module.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\service\proxy_form_entry;

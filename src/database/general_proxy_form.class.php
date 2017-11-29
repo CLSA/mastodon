@@ -3,7 +3,6 @@
  * general_proxy_form.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\database;
@@ -16,7 +15,6 @@ class general_proxy_form extends base_form
 {
   /**
    * Implements the parent's abstract import method.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param database\form_entry $db_base_form_entry The entry to be used as the valid data.
    * @access public
    */

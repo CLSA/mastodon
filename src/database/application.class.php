@@ -3,7 +3,6 @@
  * application.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @filesource
  */
 
 namespace mastodon\database;
@@ -18,7 +17,6 @@ class application extends \cenozo\database\application
    * Releases participants to the application.
    * 
    * If any of the participants have already been release they will be ignored.
-   * @author Patrick Emond <emondpd@mcmaster.ca>
    * @param array $modifier A modifier identifying which participants to release
    * @access public
    */
