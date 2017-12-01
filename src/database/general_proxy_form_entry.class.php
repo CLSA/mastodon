@@ -45,8 +45,6 @@ class general_proxy_form_entry extends base_form_entry
 
     $errors = parent::get_errors();
 
-    if( is_null( $this->same_as_proxy ) ) $errors['same_as_proxy'] = 'Cannot be blank.';
-
     $proxy = false;
     if( !is_null( $this->proxy_first_name ) ||
         !is_null( $this->proxy_last_name ) ||
@@ -208,24 +206,35 @@ class general_proxy_form_entry extends base_form_entry
         $errors['informant_phone'] = 'Invalid phone number, please use XXX-XXX-XXXX format.';
     }
 
-    // make sure a proxy is provided if continue-questionnaires is true
-    if( $this->continue_questionnaires && !$proxy )
+    // make sure a proxy or informant are provided if continue-questionnaires is true
+    if( $this->continue_questionnaires && !$proxy && !$informant )
     {
-      $errors['continue_questionnaires'] = 'Cannot be set to "Yes" when Decision Maker is blank.';
+      $errors['continue_questionnaires'] =
+        'Cannot be set to "Yes" when both Decision Maker and Information Provider are blank.';
     }
 
     // make sure the same-as-proxy checkbox is compatible with the DM and IP data
-    if( $proxy && $this->same_as_proxy && $informant )
+    if( is_null( $this->same_as_proxy ) )
     {
-      $errors['same_as_proxy'] = 'Cannot be set to "Yes" when Information Provider is not blank.';
+      if( $proxy || $informant )
+      {
+        $errors['same_as_proxy'] = 'Cannot be blank when Decision Maker or Information Provider are provided.';
+      }
     }
-    else if( $proxy && !$this->same_as_proxy && !$informant )
+    else
     {
-      $errors['same_as_proxy'] = 'Cannot be set to "No" when Information Provider is blank.';
-    }
-    else if( !$proxy && $this->same_as_proxy && $informant )
-    {
-      $errors['same_as_proxy'] = 'Cannot be set to "Yes" when Decision Maker is blank.';
+      if( $proxy && $this->same_as_proxy && $informant )
+      {
+        $errors['same_as_proxy'] = 'Cannot be set to "Yes" when Information Provider is not blank.';
+      }
+      else if( $proxy && !$this->same_as_proxy && !$informant )
+      {
+        $errors['same_as_proxy'] = 'Cannot be set to "No" when Information Provider is blank.';
+      }
+      else if( !$proxy && $this->same_as_proxy && $informant )
+      {
+        $errors['same_as_proxy'] = 'Cannot be set to "Yes" when Decision Maker is blank.';
+      }
     }
 
     return $errors;
