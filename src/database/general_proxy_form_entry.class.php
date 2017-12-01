@@ -214,14 +214,7 @@ class general_proxy_form_entry extends base_form_entry
     }
 
     // make sure the same-as-proxy checkbox is compatible with the DM and IP data
-    if( is_null( $this->same_as_proxy ) )
-    {
-      if( $proxy || $informant )
-      {
-        $errors['same_as_proxy'] = 'Cannot be blank when Decision Maker or Information Provider are provided.';
-      }
-    }
-    else
+    if( !is_null( $this->same_as_proxy ) )
     {
       if( $proxy && $this->same_as_proxy && $informant )
       {
