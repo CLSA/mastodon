@@ -15,9 +15,6 @@ $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name']
 $SETTINGS['general']['version'] = '2.2';
 $SETTINGS['general']['build'] = '723351a';
 
-// always leave as false when running as production server
-$SETTINGS['general']['development_mode'] = false;
-
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
