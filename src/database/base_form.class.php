@@ -31,20 +31,20 @@ abstract class base_form extends \cenozo\database\record
         $resource = fopen( $filename, 'rb' );
         if( false === $resource )
         {
-          log::err( sprintf( 'Unable to open %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
+          log::error( sprintf( 'Unable to open %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
         $scan = fread( $resource, filesize( $filename ) );
         if( false === $scan )
         {
-          log::err( sprintf( 'Unable to read %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
+          log::error( sprintf( 'Unable to read %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
         if( false === fclose( $resource ) )
         {
-          log::err( sprintf( 'Unable to close %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
+          log::error( sprintf( 'Unable to close %s file: "%s"', str_replace( '_', ' ', $table_name ), $filename ) );
           continue;
         }
 
