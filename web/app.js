@@ -385,7 +385,6 @@ cenozo.factory( 'CnBaseFormEntryListFactory', [
             data: { user_id: CnSession.user.id },
             onError: function( response ) {
               if( 404 == response.status ) {
-                console.info( 'The "404 (Not Found)" error found above is normal and can be ignored.' );
                 CnModalMessageFactory.instance( {
                   title: 'No Forms Available',
                   message: 'There are no new ' + formType + ' forms available for transcription at this time.'
