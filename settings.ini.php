@@ -23,3 +23,6 @@ $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
 
 // the location of new forms which have been processed but not transferred to form system yet
 $SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/form_out';
+
+// add modules used by the application
+$SETTINGS['module']['script'] = true;
