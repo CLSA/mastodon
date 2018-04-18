@@ -9,13 +9,6 @@
 namespace mastodon\database;
 use cenozo\lib, cenozo\log, cenozo\util;
 
-require_once MIKEHAERTL_PATH.'/php-shellcommand/src/Command.php';
-require_once MIKEHAERTL_PATH.'/php-tmpfile/src/File.php';
-require_once MIKEHAERTL_PATH.'/php-pdftk/src/Command.php';
-require_once MIKEHAERTL_PATH.'/php-pdftk/src/Pdf.php';
-require_once MIKEHAERTL_PATH.'/php-pdftk/src/FdfFile.php';
-require_once MIKEHAERTL_PATH.'/php-pdftk/src/XfdfFile.php';
-
 /**
  * opal_form_template: record
  */
@@ -66,8 +59,10 @@ class opal_form_template extends \cenozo\database\record
         else
         {
           // create the pdf file and write to it
-          $pdf = new \mikehaertl\pdftk\Pdf( $pdf_template );
-          if( !$pdf->fillForm( $form_data )->needAppearances()->saveAs( $filename ) )
+          $pdf_writer = lib::create( 'business\pdf_writer' );
+          $pdf_writer->set_template( $pdf_template );
+          $pdf_writer->fill_form( $form_data );
+          if( !$pdf_writer->save( $filename ) )
           {
             throw lib::create( 'exception\runtime',
               sprintf(
