@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.2';
-$SETTINGS['general']['build'] = '9c7a4ac';
+$SETTINGS['general']['build'] = '4331e5e';
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -25,4 +25,5 @@ $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
 $SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/form_out';
 
 // add modules used by the application
+$SETTINGS['module']['pdf'] = true;
 $SETTINGS['module']['script'] = true;

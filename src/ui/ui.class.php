@@ -116,6 +116,7 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'Contact Forms', 'contact_form' );
     $this->add_listitem( 'HIN Forms', 'hin_form' );
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
+    if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
 
     if( 'typist' == $db_role->name )
