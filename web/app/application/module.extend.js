@@ -35,7 +35,7 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           // trigger the elastic directive when confirming the participant selection
           $scope.confirm = function() {
             $scope.model.confirm()
-            $timeout( function() { angular.element( '#uidListString' ).trigger( 'keyup' ) }, 100 );
+            $timeout( function() { angular.element( '#uidListString' ).trigger( 'elastic' ) }, 100 );
           };
         }
       }
