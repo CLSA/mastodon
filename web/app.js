@@ -93,9 +93,8 @@ cenozoApp.initFormModule = function( module, type ) {
       title: 'Date',
       type: 'date'
     },
-    adjudicate: {
-      type: 'hidden'
-    }
+    adjudicate: { type: 'hidden' },
+    form_id: { type: 'hidden' }
   } );
 
   module.addExtraOperation( 'view', {
@@ -111,6 +110,12 @@ cenozoApp.initFormModule = function( module, type ) {
       isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
     } );
   }
+
+  module.addExtraOperation( 'view', {
+    title: 'View Imported Form',
+    operation: function( $state, model ) { return $state.go( 'form.view', { identifier: model.viewModel.record.form_id } ); },
+    isIncluded: function( $state, model ) { return model.viewModel.record.form_id; }
+  } );
 };
 
 /* ######################################################################################################## */

@@ -1,0 +1,53 @@
+// extend the framework's module
+define( [ cenozoApp.module( 'form' ).getFileUrl( 'module.js' ) ], function() {
+  'use strict';
+
+  var module = cenozoApp.module( 'form' );
+
+  module.addInput( '', 'form_type_name', {
+    column: 'form_type.name',
+    type: 'hidden'
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'View in Data Entry',
+    isDisabled: function( $state, model ) {
+      return angular.isUndefined( model.viewModel.viewDataEntryForm );
+    },
+    operation: function( $state, model ) {
+      return model.viewModel.viewDataEntryForm();
+    }
+  } );
+
+  // extend the view factory
+  cenozo.providers.decorator( 'CnFormViewFactory', [
+    '$delegate', 'CnHttpFactory', '$state',
+    function( $delegate, CnHttpFactory, $state ) {
+      var instance = $delegate.instance;
+      $delegate.instance = function( parentModel, root ) {
+        var object = instance( parentModel, root );
+
+        // see if the form has a record in the data-entry module
+        object.afterView( function() {
+          var form_subject = object.record.form_type_name + '_form';
+
+          CnHttpFactory.instance( {
+            path: 'form/' + object.record.getIdentifier() + '/' + form_subject,
+            data: { select: { column: 'id' } }
+          } ).query().then( function( response ) {
+            if( 0 < response.data.length ) {
+              object.viewDataEntryForm = function() {
+                $state.go( form_subject + '.view', { identifier: response.data[0].id } );
+              }
+            }
+          } );
+        } );
+
+        return object;
+      };
+
+      return $delegate;
+    }
+  ] );
+
+} );
