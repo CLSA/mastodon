@@ -7,12 +7,16 @@ define( function() {
   cenozoApp.initFormEntryModule( module, 'consent' );
 
   module.addInputGroup( 'Details', {
-    option_1: {
-      title: 'Option #1',
+    participation: {
+      title: 'Consent to Participate',
       type: 'boolean'
     },
-    option_2: {
-      title: 'Option #2',
+    blood_urine: {
+      title: 'Consent to Blood/Urine',
+      type: 'boolean'
+    },
+    hin_access: {
+      title: 'Consent to HIN Access',
       type: 'boolean'
     },
     signed: {

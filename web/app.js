@@ -442,7 +442,7 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
           if( 306 == response.status ) {
             CnModalMessageFactory.instance( {
               title: 'Participant Not Found',
-              message: response.data,
+              message: JSON.parse( response.data ),
               error: true
             } ).show().then( function() {
               object.record.uid = object.backupRecord.uid;

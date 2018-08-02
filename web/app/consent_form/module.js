@@ -62,11 +62,14 @@ define( function() {
           column: 'uid',
           title: 'UID'
         }, {
-          column: 'option_1',
-          title: 'Option #1'
+          column: 'participation',
+          title: 'Consent to Participate'
         }, {
-          column: 'option_2',
-          title: 'Option #2'
+          column: 'blood_urine',
+          title: 'Consent to Blood/Urine'
+        }, {
+          column: 'hin_access',
+          title: 'Consent to HIN Access'
         }, {
           column: 'signed',
           title: 'Signed'
