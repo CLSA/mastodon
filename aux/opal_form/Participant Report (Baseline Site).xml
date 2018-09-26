@@ -1,0 +1,776 @@
+<org.obiba.magma.views.View>
+  <name>Participant Report (Baseline Site)</name>
+  <from class="org.obiba.magma.views.JoinTable">
+    <list>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.BloodPressure</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.Hearing</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.HipsWaist</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.Participants</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.Spirometry</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.StandingHeight</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.VisionAcuity</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs.Weight</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>mastodon.Baseline Auxilliary</reference>
+      </table>
+    </list>
+  </from>
+  <select class="org.obiba.magma.views.support.NoneClause"/>
+  <where class="org.obiba.magma.views.support.AllClause"/>
+  <variables class="org.obiba.magma.js.views.VariablesClause">
+    <variables class="linked-hash-set">
+      <variable name="BMI" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$(&apos;BMI&apos;)
+var res=null
+if(v.isNull().not().and(v.gt(0)).value()) {
+  res=v.value().toFixed(2)
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMI</attribute>
+        </attributes>
+      </variable>
+      <variable name="AGE" valueType="integer" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;AGE&apos;)</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/clsa-dcs/table/Participants/variable/AGE</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_500" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_500&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_500</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_500" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_500</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_500&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="SEX" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/SEX</attribute>
+          <attribute name="script" valueType="text">var res=$(&apos;Admin.Participant.gender&apos;)
+if(res.isNull().not().and($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).not()).value()) {
+  res=res.compareNoCase(newValue(&apos;male&apos;)).eq(0).value()?&apos;HOMME&apos;:&apos;FÉMININ&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="DATE" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/DATE</attribute>
+          <attribute name="script" valueType="text">$(&apos;Admin.Participant.appointmentDate&apos;).format(&apos;yyyy-MM-dd&apos;)</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEIGHT" valueType="text" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">StandingHeight</attribute>
+          <attribute name="source" valueType="text">
+        $(&apos;StandingHeight:Measure.RES_HEIGHT_MEASURE&apos;).avg();
+        </attribute>
+          <attribute name="captureMethod" valueType="text">COMPUTED</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEIGHT</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_HEIGHT&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  res=v.value().toFixed(1)+&apos; cm&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="WEIGHT" valueType="text" entityType="Participant" unit="kg" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/WEIGHT</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_WEIGHT&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  res=v.value().toFixed(1)+&apos; kg&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="WAIST_CIRC" valueType="text" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/WAIST_CIRC</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_WAIST_SIZE&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  res=v.value()+&apos; cm&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HIP_CIRC" valueType="text" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HIP_CIRC</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_HIPS_SIZE&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  res=v.value()+&apos; cm&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="WAIST_TO_HIP_RATIO" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/WAIST_TO_HIP_RATIO</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;CALC_WAIST_TO_HIP_RATIO&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  res=v.value().toFixed(2)
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMI_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var bmi=$(&apos;BMI&apos;)
+var res=null
+if(bmi.isNull().not().and(bmi.gt(0)).value()) {  
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=bmi.lt(18.5).value()?&apos;LOW&apos;:(bmi.ge(25).value()?&apos;HIGH&apos;:&apos;NORMAL&apos;)
+  } else {
+    res=bmi.lt(18.5).value()?&apos;FAIBLE&apos;:(bmi.ge(25).value()?&apos;ÉLEVÉ&apos;:&apos;NORMAL&apos;)
+  }  
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMI_INTERP</attribute>
+        </attributes>
+      </variable>
+      <variable name="WAIST_TO_HIP_RATIO_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/WAIST_TO_HIP_RATIO_INTERP</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;CALC_WAIST_TO_HIP_RATIO&apos;)
+var s=$(&apos;Admin.Participant.gender&apos;)
+var res=null
+if(v.isNull().not().and(s.isNull().not()).value()) {
+  var en=$(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()
+  if(s.compareNoCase(newValue(&apos;male&apos;)).eq(0).value()) {
+    res=v.le(1.0).value()?&apos;NORMAL&apos;:(en?&apos;HIGH&apos;:&apos;ÉLEVÉ&apos;)
+  } else {
+    res=v.le(0.8).value()?&apos;NORMAL&apos;:(en?&apos;HIGH&apos;:&apos;ÉLEVÉ&apos;)
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FEV1&apos;)
+var r=$(&apos;mastodon.Baseline Auxilliary:FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=v.valueAt(r.value()).value().toFixed(2)
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FVC" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FVC</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FVC&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  var m=newValue(0.0,&apos;decimal&apos;)
+  for(var i=0; i&lt;v.size(); i++) {
+    if(v.valueAt(i).gt(m).value()) {
+      m=v.valueAt(i)      
+    }
+  }
+  res=m.value().toFixed(2)
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_FVC" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1_FVC</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FEV1_FVC&apos;)
+var r=$(&apos;mastodon.Baseline Auxilliary:FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=v.valueAt(r.value()).value().toFixed(2)
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FVC_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$this(&apos;FVC&apos;)
+var ll=$(&apos;mastodon.Baseline Auxilliary:FVC_LLNORMAL&apos;)
+var res=null
+if(v.isNull().not().and(ll.isNull().not()).value()) {
+  var en=$(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()
+  res=v.ge(ll).value()?&apos;NORMAL&apos;:(en?&apos;LOW&apos;:&apos;FAIBLE&apos;)
+}
+res  </attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FVC_INTERP</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$this(&apos;FEV1&apos;)
+var ll=$(&apos;mastodon.Baseline Auxilliary:FEV1_LLNORMAL&apos;)
+var res=null
+if(v.isNull().not().and(ll.isNull().not()).value()) {  
+  var en=$(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()
+  res=v.ge(ll).value()?&apos;NORMAL&apos;:(en?&apos;LOW&apos;:&apos;FAIBLE&apos;)
+}
+res  </attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1_INTERP</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_FVC_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var res=null
+var v=$this(&apos;FEV1_FVC&apos;)
+if(v.isNull().not().value()){
+  var en=$(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()
+  res=v.ge(0.7).value()?&apos;NORMAL&apos;:(en?&apos;LOW&apos;:&apos;FAIBLE&apos;)
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1_FVC_INTERP</attribute>
+        </attributes>
+      </variable>
+      <variable name="VISUAL_ACUITY" valueType="integer" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/clsa-dcs/table/VisionAcuity/variable/ETDRS_SCORE_BOTH_NB_VA</attribute>
+          <attribute name="script" valueType="text">$(&apos;ETDRS_SCORE_BOTH_NB_VA&apos;)</attribute>
+        </attributes>
+        <categories>
+          <category name="200">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">200</attribute>
+              <attribute name="label" valueType="text" locale="fr">200</attribute>
+            </attributes>
+          </category>
+          <category name="160">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">160</attribute>
+              <attribute name="label" valueType="text" locale="fr">160</attribute>
+            </attributes>
+          </category>
+          <category name="125">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">125</attribute>
+              <attribute name="label" valueType="text" locale="fr">125</attribute>
+            </attributes>
+          </category>
+          <category name="100">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">100</attribute>
+              <attribute name="label" valueType="text" locale="fr">100</attribute>
+            </attributes>
+          </category>
+          <category name="80">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">80</attribute>
+              <attribute name="label" valueType="text" locale="fr">80</attribute>
+            </attributes>
+          </category>
+          <category name="63">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">63</attribute>
+              <attribute name="label" valueType="text" locale="fr">63</attribute>
+            </attributes>
+          </category>
+          <category name="50">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">50</attribute>
+              <attribute name="label" valueType="text" locale="fr">50</attribute>
+            </attributes>
+          </category>
+          <category name="40">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">40</attribute>
+              <attribute name="label" valueType="text" locale="fr">40</attribute>
+            </attributes>
+          </category>
+          <category name="32">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">32</attribute>
+              <attribute name="label" valueType="text" locale="fr">32</attribute>
+            </attributes>
+          </category>
+          <category name="25">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">25</attribute>
+              <attribute name="label" valueType="text" locale="fr">25</attribute>
+            </attributes>
+          </category>
+          <category name="20.0">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">20</attribute>
+              <attribute name="label" valueType="text" locale="fr">20</attribute>
+            </attributes>
+          </category>
+          <category name="16.0">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">16</attribute>
+              <attribute name="label" valueType="text" locale="fr">16</attribute>
+            </attributes>
+          </category>
+          <category name="12.5">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">12.5</attribute>
+              <attribute name="label" valueType="text" locale="fr">12.5</attribute>
+            </attributes>
+          </category>
+          <category name="10.0">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">10</attribute>
+              <attribute name="label" valueType="text" locale="fr">10</attribute>
+            </attributes>
+          </category>
+          <category name="0.0">
+            <attributes>
+              <attribute name="label" valueType="text" locale="en">0</attribute>
+              <attribute name="label" valueType="text" locale="fr">0</attribute>
+            </attributes>
+          </category>
+        </categories>
+      </variable>
+      <variable name="WAIST_TO_HIP_RATIO_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$(&apos;CALC_WAIST_TO_HIP_RATIO&apos;)
+var s=$(&apos;Admin.Participant.gender&apos;)
+var res=null
+if(v.isNull().not().and(s.isNull().not()).value()) {
+  if(s.compareNoCase(newValue(&apos;male&apos;)).eq(0).value()) {
+    res=&apos;\u2264&apos;+&apos; 1.0&apos;
+  } else {
+    res=&apos;\u2264&apos;+&apos; 0.8&apos;
+  }
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/WAIST_TO_HIP_RATIO_NORMAL</attribute>
+        </attributes>
+      </variable>
+      <variable name="FVC_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FVC_LLNORMAL&apos;)
+var r=$(&apos;mastodon.Baseline Auxilliary:FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=&apos;\u2265&apos; + &quot; &quot; + v.valueAt(r.value()).value().toFixed(2)
+  }
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FVC_NORMAL</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FEV1_LLNORMAL&apos;)
+var r=$(&apos;mastodon.Baseline Auxilliary:FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=&apos;\u2265&apos; + &quot; &quot; + v.valueAt(r.value()).value().toFixed(2)
+  }
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1_NORMAL</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_SYSTOLIC" valueType="integer" entityType="Participant" unit="mmHg" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/clsa-dcs/table/BloodPressure/variable/RES_AVG_SYSTOLIC</attribute>
+          <attribute name="script" valueType="text">$(&apos;RES_AVG_SYSTOLIC&apos;)</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_DIASTOLIC" valueType="integer" entityType="Participant" unit="mmHg" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/clsa-dcs/table/BloodPressure/variable/RES_AVG_DIASTOLIC</attribute>
+          <attribute name="script" valueType="text">$(&apos;RES_AVG_DIASTOLIC&apos;)</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_SYSTOLIC_INTERP" valueType="text" entityType="Participant" unit="mmHg" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BP_SYSTOLIC_INTERP</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_AVG_SYSTOLIC&apos;)
+var res=null
+if(v.isNull().not().value()){
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.lt(130).value()?&apos;NORMAL&apos;:(v.ge(140).value()?&apos;HIGH&apos;:&apos;BORDERLINE&apos;)
+  } else {
+    res=v.lt(130).value()?&apos;NORMAL&apos;:(v.ge(140).value()?&apos;ÉLEVÉ&apos;:&apos;LIMITE&apos;)
+  }  
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_DIASTOLIC_INTERP" valueType="text" entityType="Participant" unit="mmHg" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BP_DIASTOLIC_INTERP</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_AVG_DIASTOLIC&apos;)
+var res=null
+if(v.isNull().not().value()){  
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.lt(85).value()?&apos;NORMAL&apos;:(v.ge(90).value()?&apos;HIGH&apos;:&apos;BORDERLINE&apos;)
+  } else {
+    res=v.lt(85).value()?&apos;NORMAL&apos;:(v.ge(90).value()?&apos;ÉLEVÉ&apos;:&apos;LIMITE&apos;)
+  }  
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMD" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;mastodon.Baseline Auxilliary:HIP_TSCORE&apos;)
+/*
+var a=$this(&apos;AGE&apos;)
+var s=$this(&apos;SEX&apos;)
+var res=null
+if(a.isNull().not().and(s.isNull().not()).value()) {
+  res=a.ge(50).value()?
+    $(&apos;mastodon.Baseline Auxilliary:TSCORE&apos;):
+    $(&apos;mastodon.Baseline Auxilliary:ZSCORE&apos;)  
+}
+res
+*/</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMD</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMD_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var s=$(&apos;Admin.Participant.gender&apos;)
+var a=$this(&apos;AGE&apos;)
+var res=null
+if(a.isNull().not().and(s.isNull().not()).value()) {
+  res=s.compareNoCase(newValue(&apos;female&apos;)).eq(0).and(a.ge(50)).value()?
+      (&apos;&gt; -1.0 SDs&apos;):
+      (&apos;&gt; -2.5 SDs&apos;)
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMD_NORMAL</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMD_INTERP" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="script" valueType="text">var a=$this(&apos;AGE&apos;)
+var s=$(&apos;Admin.Participant.gender&apos;)
+var t=$this(&apos;BMD&apos;)
+var res=null
+if(a.isNull().not().and(s.isNull().not()).and(t.isNull().not()).value()) {
+  var en=$(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()
+  res=s.compareNoCase(newValue(&apos;female&apos;)).eq(0).and(a.ge(50)).value()?
+    (t.gt(-1.0).value()?&apos;NORMAL&apos;:(en?&apos;LOW&apos;:&apos;FAIBLE&apos;)):
+    (t.gt(-2.5).value()?&apos;NORMAL&apos;:(en?&apos;LOW&apos;:&apos;FAIBLE&apos;))
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMD_INTERP</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMI_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BMI_NORMAL</attribute>
+          <attribute name="script" valueType="text">&apos;18.5-24.9&apos;</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_SYSTOLIC_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BP_SYSTOLIC_NORMAL</attribute>
+          <attribute name="script" valueType="text">&apos;&lt; 130&apos;</attribute>
+        </attributes>
+      </variable>
+      <variable name="BP_DIASTOLIC_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/BP_DIASTOLIC_NORMAL</attribute>
+          <attribute name="script" valueType="text">&apos;&lt; 85&apos;</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_FVC_NORMAL" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/FEV1_FVC_NORMAL</attribute>
+          <attribute name="script" valueType="text">&apos;\u2265&apos;+&apos; 0.7&apos;</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_1000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_1K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_1000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_1K&apos;)
+var res=null
+if(v.isNull().not().value()) {  
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }  
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_2000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_2K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_2000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_2K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_3000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_3K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_3000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_3K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_4000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_4K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_4000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_4K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_6000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_6K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_6000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_6K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_RIGHT_8000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">R_8K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_RIGHT_8000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_RIGHT_8K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_1000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">L_1K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_1000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_1K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_2000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">L_2K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_2000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_2K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_3000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">L_3K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_3000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_3K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_4000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">L_4K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_4000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_4K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_6000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="stage" valueType="text">Hearing</attribute>
+          <attribute name="condition" valueType="text">Data[BOOLEAN:false]</attribute>
+          <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+          <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+          <attribute name="vendorName" valueType="text">L_6K</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_6000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_6K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEARING_LEFT_8000" valueType="text" entityType="Participant" unit="dB" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/HEARING_LEFT_8000</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;RES_LEFT_8K&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  if($(&apos;mastodon.Baseline Auxilliary:ENG&apos;).value()) {
+    res=v.le(40).value()?&apos;PASS&apos;:&apos;FAIL&apos;
+  } else {
+    res=v.le(40).value()?&apos;SUCCÈS&apos;:&apos;ÉCHEC&apos;
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="LANGUAGE" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Participant%20Report%20(Baseline%20Site)/variable/LANGUAGE</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs.ContraIndications:QuestionnaireRun.locale&apos;).type(&apos;text&apos;).whenNull(&apos;en&apos;)</attribute>
+        </attributes>
+      </variable>
+    </variables>
+  </variables>
+  <created valueType="datetime">2018-01-02T14:47:22.649-05</created>
+  <updated valueType="datetime">2018-01-02T14:47:22.649-05</updated>
+</org.obiba.magma.views.View>

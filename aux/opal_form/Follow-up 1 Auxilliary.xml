@@ -1,0 +1,96 @@
+<org.obiba.magma.views.View>
+  <name>Follow-up 1 Auxilliary</name>
+  <from class="org.obiba.magma.views.JoinTable">
+    <list>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-images-f1.DualHipBoneDensity</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.Spirometry</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.ContraIndications</reference>
+      </table>
+      <table inner="false" class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.Participants</reference>
+      </table>
+    </list>
+  </from>
+  <select class="org.obiba.magma.views.support.NoneClause"/>
+  <where class="org.obiba.magma.views.support.AllClause"/>
+  <variables class="org.obiba.magma.js.views.VariablesClause">
+    <variables class="linked-hash-set">
+      <variable name="FVC_RANK" valueType="integer" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/FVC_RANK</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FVC&apos;)
+var res=null
+if(v.isNull().not().value()) {
+  var m=newValue(0.0,&apos;decimal&apos;)
+  for(var i=0; i&lt;v.size(); i++) {
+    if(v.valueAt(i).gt(m).value()) {
+      m=v.valueAt(i)
+      res=newValue(i,&apos;integer&apos;)
+    }
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FEV1_LLNORMAL" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/FEV1_LLNORMAL</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FEV1_LLNORMAL&apos;)
+var r=$this(&apos;FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=v.valueAt(r.value())
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="FVC_LLNORMAL" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/FVC_LLNORMAL</attribute>
+          <attribute name="script" valueType="text">var v=$(&apos;Measure.RES_FVC_LLNORMAL&apos;)
+var r=$this(&apos;FVC_RANK&apos;)
+var res=null
+if(v.isNull().not().and(r.isNull().not()).value()) {
+  if(r.le(v.size()).value()) {
+    res=v.valueAt(r.value())
+  }
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="ENG" valueType="boolean" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/ENG</attribute>
+          <attribute name="script" valueType="text">$(&apos;QuestionnaireRun.locale&apos;).type(&apos;text&apos;).eq(newValue(&apos;en&apos;)).whenNull(true)</attribute>
+        </attributes>
+      </variable>
+      <variable name="HIP_NECK_TSCORE" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/HIP_TOTAL_TSCORE</attribute>
+          <attribute name="script" valueType="text">var res=null
+if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;LEFT&apos;)
+  .and($group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_T&apos;)
+  .asSequence().last().isNull().not()).value()) {
+  res = $group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_T&apos;)
+    .asSequence().last()
+} else if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;RIGHT&apos;)
+  .and($group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_T&apos;)
+  .asSequence().last().isNull().not()).value()) {
+  res = $group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_T&apos;)
+  .asSequence().last()
+}
+res</attribute>
+        </attributes>
+      </variable>
+    </variables>
+  </variables>
+  <created valueType="datetime">2018-01-02T14:47:21.803-05</created>
+  <updated valueType="datetime">2018-01-02T14:47:21.803-05</updated>
+</org.obiba.magma.views.View>
