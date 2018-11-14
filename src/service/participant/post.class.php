@@ -23,51 +23,53 @@ class post extends \cenozo\service\participant\post
     if( 300 > $this->status->get_code() )
     {
       $session = lib::create( 'business\session' );
-      $file = $this->get_file_as_array();
-
-      if( array_key_exists( 'application_id', $file ) )
+      $file = $this->get_file_as_object();
+      if( is_object( $file ) ) // participant import sends an array
       {
-        // only tier 3 can set the application
-        if( 3 > $session->get_role()->tier )
-          $this->status->set_code( 403 );
-        else
+        if( property_exists( $file, 'application_id' ) )
         {
-          // if an appliaction id is provided then make sure it exists
-          try { $this->db_application = lib::create( 'database\application', $file['application_id'] ); }
-          catch( \cenozo\exception\runtime $e ) { $this->status->set_code( 404 ); }
-        }
-      }
-
-      if( array_key_exists( 'site_id', $file ) )
-      {
-        // only all-site roles set the site
-        if( !$session->get_role()->all_sites )
-          $this->status->set_code( 403 );
-        else
-        {
-          // if an appliaction id is provided then make sure it exists and belongs to the specific application
-          if( !is_null( $file['site_id'] ) )
+          // only tier 3 can set the application
+          if( 3 > $session->get_role()->tier )
+            $this->status->set_code( 403 );
+          else
           {
-            try { $this->db_site = lib::create( 'database\site', $file['site_id'] ); }
+            // if an appliaction id is provided then make sure it exists
+            try { $this->db_application = lib::create( 'database\application', $file->application_id ); }
             catch( \cenozo\exception\runtime $e ) { $this->status->set_code( 404 ); }
-
-            $site_mod = lib::create( 'database\modifier' );
-            $site_mod->where( 'site.id', '=', $this->db_site->id );
-            if( is_null( $this->db_application ) || 0 == $this->db_application->get_site_count( $site_mod ) )
-              $this->status->set_code( 400 );
           }
         }
-      }
 
-      if( array_key_exists( 'mode', $file ) && 'preferred_site' == $file['mode']  )
-      {
-        // if in preferred site mode then there must be a site_id argument
-        if( !array_key_exists( 'site_id', $file ) ) $this->status->set_code( 400 );
-      }
-      else
-      {
-        // if not in preferred site mode then there cannot be a site_id argument
-        if( array_key_exists( 'site_id', $file ) ) $this->status->set_code( 400 );
+        if( property_exists( $file, 'site_id' ) )
+        {
+          // only all-site roles set the site
+          if( !$session->get_role()->all_sites )
+            $this->status->set_code( 403 );
+          else
+          {
+            // if an appliaction id is provided then make sure it exists and belongs to the specific application
+            if( !is_null( $file->site_id ) )
+            {
+              try { $this->db_site = lib::create( 'database\site', $file->site_id ); }
+              catch( \cenozo\exception\runtime $e ) { $this->status->set_code( 404 ); }
+
+              $site_mod = lib::create( 'database\modifier' );
+              $site_mod->where( 'site.id', '=', $this->db_site->id );
+              if( is_null( $this->db_application ) || 0 == $this->db_application->get_site_count( $site_mod ) )
+                $this->status->set_code( 400 );
+            }
+          }
+        }
+
+        if( property_exists( $file, 'mode' ) && 'preferred_site' == $file->mode  )
+        {
+          // if in preferred site mode then there must be a site_id argument
+          if( !property_exists( $file, 'site_id' ) ) $this->status->set_code( 400 );
+        }
+        else
+        {
+          // if not in preferred site mode then there cannot be a site_id argument
+          if( property_exists( $file, 'site_id' ) ) $this->status->set_code( 400 );
+        }
       }
     }
   }
@@ -77,24 +79,26 @@ class post extends \cenozo\service\participant\post
    */
   protected function execute()
   {
-    $file = $this->get_file_as_array();
-    $mode = array_key_exists( 'mode', $file ) ? $file['mode'] : NULL;
-    if( is_null( $mode ) ) parent::execute();
+    $file = $this->get_file_as_object();
+    if( is_array( $file ) || !property_exists( $file, 'mode' ) || is_null( $file->mode ) )
+    {
+      parent::execute();
+    }
     else
     {
       $participant_class_name = lib::get_class_name( 'database\participant' );
 
       // This is a special service since participants cannot be added to the system through the web interface.
       // Instead, this service provides participant-based utility functions.
-      if( array_key_exists( 'uid_list', $file ) )
+      if( property_exists( $file, 'uid_list' ) )
       {
         $uid_list = $participant_class_name::get_valid_uid_list(
-          $file['uid_list'],
+          $file->uid_list,
           $this->db_application,
-          'unreleased_only' == $mode || 'release' == $mode
+          'unreleased_only' == $file->mode || 'release' == $file->mode
         );
 
-        if( 'release' == $mode )
+        if( 'release' == $file->mode )
         { // release the participants
           if( 0 < count( $uid_list ) )
           {
@@ -103,7 +107,7 @@ class post extends \cenozo\service\participant\post
             $this->db_application->release_participants( $modifier );
           }
         }
-        else if( 'preferred_site' == $mode )
+        else if( 'preferred_site' == $file->mode )
         { // change the participants' preferred site
           if( 0 < count( $uid_list ) )
           {
@@ -148,7 +152,7 @@ class post extends \cenozo\service\participant\post
         }
       }
       else $this->status->set_code( 400 ); // must provide a uid_list
-    }
+    } 
   }
 
   /**
