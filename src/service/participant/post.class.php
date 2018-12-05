@@ -30,7 +30,9 @@ class post extends \cenozo\service\participant\post
         {
           // only tier 3 can set the application
           if( 3 > $session->get_role()->tier )
+          {
             $this->status->set_code( 403 );
+          }
           else
           {
             // if an appliaction id is provided then make sure it exists
@@ -43,7 +45,9 @@ class post extends \cenozo\service\participant\post
         {
           // only all-site roles set the site
           if( !$session->get_role()->all_sites )
+          {
             $this->status->set_code( 403 );
+          }
           else
           {
             // if an appliaction id is provided then make sure it exists and belongs to the specific application
