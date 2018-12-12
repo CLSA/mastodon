@@ -140,7 +140,7 @@ abstract class base_form extends \cenozo\database\record
     $db_form->date = !is_null( $db_form_entry->date ) ? $db_form_entry->date : util::get_datetime_object();
     $db_form->save();
 
-    // save the new form to the hin form and set the validated form entry
+    // save the new form to the record and set the validated form entry
     $column_name = sprintf( 'validated_%s_entry_id', $table_name );
     $this->$column_name = $db_form_entry->id;
     $this->form_id = $db_form->id;

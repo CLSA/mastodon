@@ -66,6 +66,16 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'hin_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
 
+    $module = $this->get_module( 'extended_hin_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'extended_hin_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+
+    $module = $this->get_module( 'extended_hin_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
     $module = $this->get_module( 'user' );
     if( !is_null( $module ) )
     {
@@ -115,6 +125,7 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'Consent Forms', 'consent_form' );
     $this->add_listitem( 'Contact Forms', 'contact_form' );
     $this->add_listitem( 'HIN Forms', 'hin_form' );
+    $this->add_listitem( 'Extended HIN Forms', 'extended_hin_form' );
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
     if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
@@ -124,6 +135,7 @@ class ui extends \cenozo\ui\ui
       $this->add_listitem( 'Consent Form Entries', 'consent_form_entry' );
       $this->add_listitem( 'Contact Form Entries', 'contact_form_entry' );
       $this->add_listitem( 'HIN Form Entries', 'hin_form_entry' );
+      $this->add_listitem( 'Extended HIN Form Entries', 'extended_hin_form_entry' );
       $this->add_listitem( 'General Proxy Form Entries', 'general_proxy_form_entry' );
       $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
     }

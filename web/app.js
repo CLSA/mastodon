@@ -18,8 +18,7 @@ cenozoApp.initFormModule = function( module, type ) {
     name: {
       singular: type.replace( '_', ' ' ) + ' form',
       plural: type.replace( '_', ' ' ) + ' forms',
-      possessive: type.replace( '_', ' ' ) + ' form\'s',
-      pluralPossessive: type.replace( '_', ' ' ) + ' forms\''
+      possessive: type.replace( '_', ' ' ) + ' form\'s'
     },
     columnList: {
       id: {
@@ -155,8 +154,7 @@ cenozoApp.initFormEntryModule = function( module, type ) {
     name: {
       singular: type.replace( '_', ' ' ) + ' form entry',
       plural: type.replace( '_', ' ' ) + ' form entries',
-      possessive: type.replace( '_', ' ' ) + ' form entry\'s',
-      pluralPossessive: type.replace( '_', ' ' ) + ' form entries\''
+      possessive: type.replace( '_', ' ' ) + ' form entry\'s'
     },
     columnList: columnList,
     defaultOrder: {
@@ -382,7 +380,7 @@ cenozo.factory( 'CnBaseFormEntryListFactory', [
       construct: function( object, parentModel ) {
         CnBaseListFactory.construct( object, parentModel );
         var formEntryName = parentModel.module.subject.snake;
-        var formType = formEntryName.substring( 0, formEntryName.length - 11 );
+        var formType = formEntryName.substring( 0, formEntryName.length - 11 ).camelToSnake().replace( /_/g, ' ' );
 
         object.startNewEntry = function() {
           CnHttpFactory.instance( {

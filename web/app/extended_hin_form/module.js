@@ -1,21 +1,21 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'hin_form', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'extended_hin_form', true ); } catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'hin' );
+  cenozoApp.initFormModule( module, 'extended_hin' );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnHinFormAdjudicate', [
-    'CnHinFormAdjudicateFactory',
-    function( CnHinFormAdjudicateFactory ) {
+  cenozo.providers.directive( 'cnExtendedHinFormAdjudicate', [
+    'CnExtendedHinFormAdjudicateFactory',
+    function( CnExtendedHinFormAdjudicateFactory ) {
       return {
         // special general template found in application's general module directory
         templateUrl: module.getFileUrl( '../mastodon/adjudicate.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          $scope.model = CnHinFormAdjudicateFactory.instance();
+          $scope.model = CnExtendedHinFormAdjudicateFactory.instance();
 
           $scope.model.onLoad(); // breadcrumbs are handled by the service
         }
@@ -24,37 +24,37 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnHinFormList', [
-    'CnHinFormModelFactory',
-    function( CnHinFormModelFactory ) {
+  cenozo.providers.directive( 'cnExtendedHinFormList', [
+    'CnExtendedHinFormModelFactory',
+    function( CnExtendedHinFormModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnHinFormModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnExtendedHinFormModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnHinFormView', [
-    'CnHinFormModelFactory',
-    function( CnHinFormModelFactory ) {
+  cenozo.providers.directive( 'cnExtendedHinFormView', [
+    'CnExtendedHinFormModelFactory',
+    function( CnExtendedHinFormModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnHinFormModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnExtendedHinFormModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnHinFormAdjudicateFactory', [
+  cenozo.providers.factory( 'CnExtendedHinFormAdjudicateFactory', [
     'CnBaseFormAdjudicateFactory',
     function( CnBaseFormAdjudicateFactory ) {
       var object = function( parentModel ) {
@@ -84,7 +84,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnHinFormListFactory', [
+  cenozo.providers.factory( 'CnExtendedHinFormListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -93,7 +93,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnHinFormViewFactory', [
+  cenozo.providers.factory( 'CnExtendedHinFormViewFactory', [
     'CnBaseFormViewFactory',
     function( CnBaseFormViewFactory ) {
       var object = function( parentModel, root ) { CnBaseFormViewFactory.construct( this, parentModel, root ); };
@@ -102,14 +102,14 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnHinFormModelFactory', [
-    'CnBaseFormModelFactory', 'CnHinFormListFactory', 'CnHinFormViewFactory',
-    function( CnBaseFormModelFactory, CnHinFormListFactory, CnHinFormViewFactory ) {
+  cenozo.providers.factory( 'CnExtendedHinFormModelFactory', [
+    'CnBaseFormModelFactory', 'CnExtendedHinFormListFactory', 'CnExtendedHinFormViewFactory',
+    function( CnBaseFormModelFactory, CnExtendedHinFormListFactory, CnExtendedHinFormViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseFormModelFactory.construct( this, module );
-        this.listModel = CnHinFormListFactory.instance( this );
-        this.viewModel = CnHinFormViewFactory.instance( this, root );
+        this.listModel = CnExtendedHinFormListFactory.instance( this );
+        this.viewModel = CnExtendedHinFormViewFactory.instance( this, root );
       };
 
       return {
