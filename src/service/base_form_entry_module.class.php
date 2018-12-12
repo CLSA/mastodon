@@ -220,7 +220,23 @@ abstract class base_form_entry_module extends \cenozo\service\module
             if( !$match ) break;
           }
 
-          if( $match ) $db_parent_form->import( $record );
+          if( $match ) 
+          {
+            // importing may cause a duplicate record in the form table
+            try
+            {
+              $db_parent_form->import( $record );
+            }
+            catch( \cenozo\exception\database $e )
+            {
+              if( $e->is_duplicate_entry() )
+              {
+                $this->set_data( $e->get_duplicate_columns( 'form' ) );
+                $this->get_status()->set_code( 409 );
+              }
+              else throw $e;
+            }
+          }
         }
       }
     }

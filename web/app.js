@@ -478,6 +478,17 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
                 cenozo.forEachFormElement( 'form', function( element ) {
                   cenozo.updateFormElement( element, true );
                 } );
+              } else if( 409 == response.status ) {
+                // highlight the duplicate rows
+                response.data.forEach( function( item ) {
+                  // convert participant_id to uid
+                  if( 'participant_id' == item ) item = 'uid';
+                  var element = cenozo.getFormElement( item );
+                  if( element ) {
+                    element.$error.conflict = true;
+                    cenozo.updateFormElement( element, true );
+                  }
+                } );
               } else CnModalMessageFactory.httpError( response );
             }
           } ).patch();
