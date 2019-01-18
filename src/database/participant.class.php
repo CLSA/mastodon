@@ -18,20 +18,24 @@ class participant extends \cenozo\database\participant
    */
   public static function get_valid_uid_list( $uid_list, $db_application = NULL, $unreleased = false )
   {
+    $setting_manager = lib::create( 'business\setting_manager' );
+    $uid_regex = $setting_manager->get_setting( 'general', 'uid_regex' );
+
     $output_uid_list = array();
-    
-    if( !is_array( $uid_list ) ) 
-    {   
+
+    if( !is_array( $uid_list ) )
+    {
       // sanitize the entries
       $uid_list = explode( ' ', // delimite string by spaces and create array from result
                   preg_replace( '/[^a-zA-Z0-9 ]/', '', // remove anything that isn't a letter, number of space
                   preg_replace( '/[\s,;|\/]/', ' ', // replace whitespace and separation chars with a space
                   strtoupper( $uid_list ) ) ) ); // convert to uppercase
-    }   
+    }
 
     // match UIDs (eg: A123456)
-    $uid_list = array_filter( $uid_list, function( $string ) { 
-      return 1 == preg_match( '/^[A-Z][0-9]{6}$/', $string );
+    $uid_list = array_filter( $uid_list, function( $string ) {
+      global $uid_regex;
+      return 1 == preg_match( sprintf( '/%s/', $uid_regex ), $string );
     } );
 
     if( 0 < count( $uid_list ) )
@@ -51,7 +55,7 @@ class participant extends \cenozo\database\participant
       $modifier = lib::create( 'database\modifier' );
       $modifier->where( 'uid', 'IN', $uid_list );
       $modifier->order( 'uid' );
-      
+
       if( !is_null( $db_application ) )
       {
         // restrict to participant cohorts in the given application
