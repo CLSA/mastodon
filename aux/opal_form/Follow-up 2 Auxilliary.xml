@@ -40,29 +40,19 @@ res</attribute>
       <variable name="FEV1_LLNORMAL" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
         <attributes>
           <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/FEV1_LLNORMAL</attribute>
-          <attribute name="script" valueType="text">var v=$(&apos;RES_FEV1_LLNORMAL2&apos;)
-var r=$this(&apos;FVC_RANK&apos;)
-var res=null
-if(v.isNull().not().and(r.isNull().not()).value()) {
-  if(r.le(v.size()).value()) {
-    res=v.valueAt(r.value())
-  }
-}
-res</attribute>
+          <attribute name="script" valueType="text">// note that in F2, the lower limit of normal variables are
+// no longer repeatable
+//
+$(&apos;RES_FEV1_LLNORMAL2&apos;)</attribute>
         </attributes>
       </variable>
       <variable name="FVC_LLNORMAL" valueType="decimal" entityType="Participant" unit="L" mimeType="" referencedEntityType="" index="0">
         <attributes>
           <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/mastodon/table/Follow-up%201%20Auxilliary/variable/FVC_LLNORMAL</attribute>
-          <attribute name="script" valueType="text">var v=$(&apos;RES_FVC_LLNORMAL2&apos;)
-var r=$this(&apos;FVC_RANK&apos;)
-var res=null
-if(v.isNull().not().and(r.isNull().not()).value()) {
-  if(r.le(v.size()).value()) {
-    res=v.valueAt(r.value())
-  }
-}
-res</attribute>
+          <attribute name="script" valueType="text">// note that in F2, the lower limit of normal variables are
+// no longer repeatable
+//
+$(&apos;RES_FVC_LLNORMAL2&apos;)</attribute>
         </attributes>
       </variable>
       <variable name="ENG" valueType="boolean" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
@@ -97,5 +87,5 @@ res</attribute>
     </variables>
   </variables>
   <created valueType="datetime">2018-07-19T13:59:35.425-04</created>
-  <updated valueType="datetime">2018-09-24T10:35:08.085-04</updated>
+  <updated valueType="datetime">2019-02-05T13:55:39.361-05</updated>
 </org.obiba.magma.views.View>
