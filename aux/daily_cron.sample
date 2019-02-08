@@ -70,10 +70,10 @@ else
 curl_close( $curl );
 
 /**
- * Process all pending withdraw data
+ * Process all pending script data
  */
 $curl = curl_init();
-curl_setopt( $curl, CURLOPT_URL, URL.'application/name=mastodon?process_pending_withdraw=1' );
+curl_setopt( $curl, CURLOPT_URL, URL.'application/name=mastodon?process_pending_scripts=1' );
 curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, 'PATCH' );
 curl_setopt( $curl, CURLOPT_POSTFIELDS, '{}' );
 curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
@@ -84,7 +84,7 @@ $result = curl_exec( $curl );
 if( curl_errno( $curl ) )
 {
   write_log( sprintf(
-    "Returned error code %s when trying to process pending withdraw data\nMessage: %s",
+    "Returned error code %s when trying to process pending script data\nMessage: %s",
     curl_errno( $curl ),
     curl_error( $curl )
   ) );
@@ -94,12 +94,12 @@ else
   $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
   if( 200 != $code )
   {
-    write_log( sprintf( 'Failed to process pending withdraw data (response code: %s)', $code ) );
+    write_log( sprintf( 'Failed to process pending script data (response code: %s)', $code ) );
   }
   else
   {
     if( 0 < $result ) write_log( sprintf(
-      'Pending withdraw data for %d participant%s has been updated',
+      'Pending script data for %d participant%s has been updated',
       $result,
       1 != $result ? 's' : ''
     ) );
@@ -120,7 +120,7 @@ $result = curl_exec( $curl );
 if( curl_errno( $curl ) )
 {
   write_log( sprintf(
-    "Returned error code %s when trying to process pending withdraw data\nMessage: %s",
+    "Returned error code %s when trying to update participant first-address data\nMessage: %s",
     curl_errno( $curl ),
     curl_error( $curl )
   ) );
@@ -130,7 +130,7 @@ else
   $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
   if( 200 != $code )
   {
-    write_log( sprintf( 'Failed to process pending withdraw data (response code: %s)', $code ) );
+    write_log( sprintf( 'Failed to update participant first-address data (response code: %s)', $code ) );
   }
   else
   {
@@ -149,7 +149,7 @@ $result = curl_exec( $curl );
 if( curl_errno( $curl ) )
 {
   write_log( sprintf(
-    "Returned error code %s when trying to process pending withdraw data\nMessage: %s",
+    "Returned error code %s when trying to update participant first-address data\nMessage: %s",
     curl_errno( $curl ),
     curl_error( $curl )
   ) );
@@ -159,7 +159,7 @@ else
   $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
   if( 200 != $code )
   {
-    write_log( sprintf( 'Failed to process pending withdraw data (response code: %s)', $code ) );
+    write_log( sprintf( 'Failed to update participant first-address data (response code: %s)', $code ) );
   }
   else
   {
