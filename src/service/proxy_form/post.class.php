@@ -16,6 +16,36 @@ class post extends \cenozo\service\post
   /**
    * Extends parent method
    */
+  protected function validate()
+  {
+    parent::validate();
+
+    $participant_class_name = lib::create( 'database\participant' );
+    $form_class_name = lib::create( 'database\form' );
+
+    // make sure the form's data doesn't already exist
+    $unique_columns = array( 'participant_id', 'form_type_id', 'date' );
+    $post_object = $this->get_file_as_object();
+
+    $db_form_type = $form_type_class_name::get_unique_record( 'name', 'proxy' );
+    $db_participant = $participant_class_name::get_unique_record( 'uid', $db_form_entry->uid );
+    $date = !is_null( $post_object->date ) ? $post_object->date : util::get_datetime_object()->format( 'Y-m-d' );
+
+    $db_form = $form_class_name::get_unique_record(
+      $unique_columns,
+      array( $db_participant->id, $db_form_type->id, $date )
+    );
+
+    if( !is_null( $db_form ) )
+    {
+      $this->set_data( $unique_columns );
+      $this->status->set_code( 409 );
+    }
+  }
+
+  /**
+   * Extends parent method
+   */
   protected function execute()
   {
     parent::execute();
