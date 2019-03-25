@@ -22,6 +22,7 @@ class post extends \cenozo\service\post
 
     $participant_class_name = lib::create( 'database\participant' );
     $form_class_name = lib::create( 'database\form' );
+    $form_type_class_name = lib::create( 'database\form_type' );
 
     // make sure the form's data doesn't already exist
     $unique_columns = array( 'participant_id', 'form_type_id', 'date' );
