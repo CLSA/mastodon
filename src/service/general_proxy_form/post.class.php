@@ -29,7 +29,7 @@ class post extends \cenozo\service\post
     $post_object = $this->get_file_as_object();
 
     $db_form_type = $form_type_class_name::get_unique_record( 'name', 'general_proxy' );
-    $db_participant = $participant_class_name::get_unique_record( 'uid', $db_form_entry->uid );
+    $db_participant = $participant_class_name::get_unique_record( 'uid', $post_object->uid );
     $date = !is_null( $post_object->date ) ? $post_object->date : util::get_datetime_object()->format( 'Y-m-d' );
 
     $db_form = $form_class_name::get_unique_record(
