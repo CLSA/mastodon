@@ -52,11 +52,13 @@ cenozoApp.initFormModule = function( module, type ) {
 
   if( 'contact' != type ) {
     cenozo.insertPropertyAfter( module.columnList, 'id', 'cohort', {
+      column: type + '_form_total.cohort',
       title: 'Cohort',
       type: 'string',
       help: 'A list of all cohorts entered by typists for this form (separated by a comma).'
     } );
     cenozo.insertPropertyAfter( module.columnList, 'cohort', 'uid', {
+      column: type + '_form_total.uid',
       title: 'UID',
       type: 'string',
       help: 'A list of all UIDs entered by typists for this form (separated by a comma).'

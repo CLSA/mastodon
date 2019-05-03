@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS extended_hin_form_total (
   create_timestamp TIMESTAMP NOT NULL,
   entry_total INT NOT NULL,
   submitted_total INT NOT NULL,
+  uid VARCHAR(45) NULL DEFAULT NULL,
+  cohort VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (extended_hin_form_id),
   CONSTRAINT fk_extended_hin_form_total_extended_hin_form_id
     FOREIGN KEY (extended_hin_form_id)
