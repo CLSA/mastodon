@@ -52,8 +52,8 @@ abstract class base_form_module extends \cenozo\service\module
     if( $select->has_column( 'cohort' ) || $select->has_column( 'uid' ) )
     {
       $join_sel = lib::create( 'database\select' );
-      $join_sel->from( $form_name );
-      $join_sel->add_column( 'id', $form_name.'_id' );
+      $join_sel->from( $form_entry_name );
+      $join_sel->add_column( $form_name.'_id' );
       $join_sel->add_column(
         'GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR "," )',
         'uid',
@@ -66,16 +66,15 @@ abstract class base_form_module extends \cenozo\service\module
       );
 
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->left_join( $form_entry_name, $form_name.'.id', $form_entry_name.'.'.$form_name.'_id' );
       $join_mod->left_join( 'participant', $form_entry_name.'.uid', 'participant.uid' );
       $join_mod->left_join( 'cohort', 'participant.cohort_id', 'cohort.id' );
-      $join_mod->group( $form_name.'.id' );
+      $join_mod->group( $form_name.'_id' );
 
       $modifier->join(
         sprintf( '( %s %s )', $join_sel->get_sql(), $join_mod->get_sql() ),
         $form_name.'.id',
         'join_participant.'.$form_name.'_id',
-        '',
+        'left',
         'join_participant'
       );
 
