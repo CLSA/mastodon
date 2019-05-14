@@ -29,7 +29,7 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
       var instance = $delegate.instance;
       $delegate.instance = function( parentModel, root ) { 
         var object = instance( parentModel, root );
-        if( 3 <= CnSession.role.tier ) {
+        if( 'administrator' == CnSession.role.name || 'curator' == CnSession.role.name ) {
           object.downloadOpalForms = function() {
             var modal = CnModalMessageFactory.instance( {
               title: 'Please Wait',
