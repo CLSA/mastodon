@@ -18,6 +18,16 @@ DROP PROCEDURE IF EXISTS patch_application_type_has_report_type;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".application_type_has_report_type( application_type_id, report_type_id ) ",
+      "SELECT application_type.id, report_type.id ",
+      "FROM ", @cenozo, ".application_type, ", @cenozo, ".report_type ",
+      "WHERE application_type.name = 'mastodon' ",
+      "AND report_type.name = 'decedent_responder'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 

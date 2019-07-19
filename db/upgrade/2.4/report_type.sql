@@ -16,6 +16,14 @@ DROP PROCEDURE IF EXISTS patch_report_type;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".report_type ( name, title, subject, description ) VALUES ",
+      "( 'decedent_responder', 'Decedent Responder', 'alternate', ",
+        "'This report provides contact details for a list of participants and their decedent responders.' )" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 
