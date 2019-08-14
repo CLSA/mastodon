@@ -26,7 +26,7 @@ class decedent_responder extends \cenozo\business\report\base_report
     $select->add_column( 'cohort.name', 'Cohort', false );
     $select->add_column( 'language.name', 'Language', false );
     $select->add_column( 'uid', 'UID' );
-    $select->add_column( 'honorific', 'Alternate Honorific' );
+    $select->add_column( 'honorific', 'Participant Honorific' );
     $select->add_column( 'first_name', 'Participant First Name' );
     $select->add_column( 'last_name', 'Participant Last Name' );
     $select->add_column( 'alternate.first_name', 'Alternate First Name', false );
