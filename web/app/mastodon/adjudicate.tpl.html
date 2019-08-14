@@ -47,7 +47,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="column in model.formColumnList"
-              ng-class="{'warning':0 <= model.conflictColumnList.indexOf( column.column )}">
+              ng-class="{'warning': model.conflictColumnList.includes( column.column )}">
             <td class="text-right"><strong>{{ column.title }}</strong></td>
             <td ng-repeat="entry in model.formEntryList">
               <strong ng-if="entry.id == model.form.validated_form_id" class="text-success">
