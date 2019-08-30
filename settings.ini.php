@@ -12,7 +12,7 @@ global $SETTINGS;
 // tagged version
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
-$SETTINGS['general']['version'] = '2.4';
+$SETTINGS['general']['version'] = '2.5';
 $SETTINGS['general']['build'] = 'f2e3968';
 
 // the location of mastodon internal path
