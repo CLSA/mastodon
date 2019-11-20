@@ -217,7 +217,7 @@ class general_proxy_form_entry extends base_form_entry
       {
         $errors['same_as_proxy'] = 'Cannot be set to "Yes" when Information Provider is not blank.';
       }
-      else if( $proxy && !$this->same_as_proxy && !$informant )
+      else if( $proxy && !$this->same_as_proxy && !$informant && $this->continue_questionnaires )
       {
         $errors['same_as_proxy'] = 'Cannot be set to "No" when Information Provider is blank.';
       }
