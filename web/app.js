@@ -69,12 +69,12 @@ cenozoApp.initFormModule = function( module, type ) {
     id: {
       title: 'ID',
       type: 'string',
-      constant: true
+      isConstant: true
     },
     status: {
       title: 'Status',
       type: 'string',
-      constant: true,
+      isConstant: true,
       help: 'Set to "completed" when done, ' +
             '"invalid" when marked invalid, ' +
             '"adjudication" when two entries have been submitted but do not match, ' +
@@ -84,7 +84,7 @@ cenozoApp.initFormModule = function( module, type ) {
     completed: {
       title: 'Complete',
       type: 'boolean',
-      constant: true
+      isConstant: true
     },
     invalid: {
       title: 'Invalid',
@@ -191,7 +191,7 @@ cenozoApp.initFormEntryModule = function( module, type ) {
     inputGroup.participant_full_name = {
       title: 'Participant',
       type: 'string',
-      constant: true
+      isConstant: true
     };
   }
 
