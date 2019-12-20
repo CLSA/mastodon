@@ -34,9 +34,7 @@ SOURCE hin_form.sql
 SOURCE hin_form_entry.sql
 SOURCE proxy_form.sql
 SOURCE proxy_form_entry.sql
-SOURCE report_type.sql
 SOURCE application_type_has_report_type.sql
-SOURCE role_has_report_type.sql
 SOURCE application_has_script.sql
 
 SOURCE table_character_sets.sql
