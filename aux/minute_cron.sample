@@ -70,3 +70,39 @@ else
   }
 }
 curl_close( $curl );
+
+/**
+ * Send all queue mail
+ */
+$curl = curl_init();
+curl_setopt( $curl, CURLOPT_URL, URL.'mail?send_queued=1' );
+curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+curl_setopt( $curl, CURLOPT_HTTPHEADER, array( AUTH, 'No-Activity:true' ) );
+
+$result = curl_exec( $curl );
+if( curl_errno( $curl ) )
+{
+  write_log( sprintf(
+    "Returned error code %s when trying to send queued mail\nMessage: %s",
+    curl_errno( $curl ),
+    curl_error( $curl )
+  ) );
+}
+else
+{
+  $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+  if( 200 != $code )
+  {
+    write_log( sprintf( 'Failed to send queued mail (response code: %s)', $code ) );
+  }
+  else
+  {
+    if( 0 < $result ) write_log( sprintf(
+      'Sent %d queued mail message%s',
+      $result,
+      1 != $result ? 's' : ''
+    ) );
+  }
+}
+curl_close( $curl );
