@@ -31,12 +31,6 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
         controller: function( $scope ) {
           $scope.model = CnApplicationReleaseFactory.instance();
           // breadcrumbs are handled by the service
-
-          // trigger the elastic directive when confirming the participant selection
-          $scope.confirm = function() {
-            $scope.model.confirm()
-            $timeout( function() { angular.element( '#uidListString' ).trigger( 'elastic' ) }, 100 );
-          };
         }
       }
     }
@@ -44,18 +38,17 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnApplicationReleaseFactory', [
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state', '$q',
-    function( CnSession, CnHttpFactory, CnModalMessageFactory, $state, $q ) {
+    'CnSession', 'CnHttpFactory', 'CnParticipantSelectionFactory', 'CnModalMessageFactory', '$state', '$q',
+    function( CnSession, CnHttpFactory, CnParticipantSelectionFactory, CnModalMessageFactory, $state, $q ) {
       var object = function() {
         var self = this;
         this.application = null;
+        this.preferredSiteId = null;
         this.applicationSiteList = [];
+        this.participantSelection = CnParticipantSelectionFactory.instance();
 
         this.reset = function() {
-          self.confirmInProgress = false;
-          self.confirmedCount = null;
-          self.uidListString = '';
-          self.uidList = [];
+          self.participantSelection.reset();
           self.cohortSiteList = null;
           self.preferredSiteId = null;
         };
@@ -68,6 +61,18 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
         } ).get().then( function( response ) {
           self.application = response.data;
           self.application.identifier = $state.params.identifier;
+
+          // Make modifications to the standard participant selection service
+          // This is required because Mastodon extends the service by adding a site-list as well as identifier-list
+          angular.extend( self.participantSelection, {
+            data: { mode: 'unreleased_only', application_id: self.application.id },
+            responseFn: function( model, response ) {
+              model.confirmedCount = response.data.identifier_list.length;
+              model.identifierListString = response.data.identifier_list.join( ' ' );
+              model.confirmInProgress = false;
+              self.cohortSiteList = response.data.site_list;
+            }
+          } );
 
           // immediately send a 404 if this application is not release-based
           if( !self.application.release_based ) $state.go( 'error.404' );
@@ -93,83 +98,21 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           response.data.unshift( { id: null, name: 'No Preferred Site' } );
         } );
 
-        this.uidListStringChanged = function() {
-          this.confirmedCount = null;
-        };
-
-        this.confirm = function() {
-          this.confirmInProgress = true;
-          this.confirmedCount = null;
-          var uidRegex = new RegExp( CnSession.application.uidRegex );
-
-          // clean up the uid list
-          this.uidList =
-            this.uidListString.toUpperCase() // convert to uppercase
-                        .replace( /[\s,;|\/]/g, ' ' ) // replace whitespace and separation chars with a space
-                        .replace( /[^a-zA-Z0-9 ]/g, '' ) // remove anything that isn't a letter, number of space
-                        .split( ' ' ) // delimite string by spaces and create array from result
-                        .filter( function( uid ) { // match UIDs (eg: A123456)
-                          return null != uid.match( uidRegex );
-                        } )
-                        .filter( function( uid, index, array ) { // make array unique
-                          return index <= array.indexOf( uid );
-                        } )
-                        .sort(); // sort the array
-
-          // now confirm UID list with server
-          if( 0 == this.uidList.length ) {
-            this.uidListString = '';
-            this.confirmInProgress = false;
-          } else {
-            CnHttpFactory.instance( {
-              path: 'participant',
-              data: {
-                mode: 'unreleased_only',
-                application_id: this.application.id,
-                uid_list: this.uidList
-              }
-            } ).post().then( function( response ) {
-              self.confirmedCount = response.data.uid_list.length;
-              self.uidListString = response.data.uid_list.join( ' ' );
-              self.cohortSiteList = response.data.site_list;
-              self.confirmInProgress = false;
-            } );
-          }
-        };
-
-        this.setPreferredSite = function( siteId ) {
-          if( !this.confirmInProgress && 0 < this.confirmedCount ) {
-            CnHttpFactory.instance( {
-              path: 'participant',
-              data: {
-                mode: 'preferred_site',
-                application_id: self.application.id,
-                site_id: siteId,
-                uid_list: this.uidList
-              }
-            } ).post().then( function( response ) {
-              CnModalMessageFactory.instance( {
-                title: 'Participants Released',
-                message: 'You have successfully released ' + self.confirmedCount + ' participants to ' +
-                         self.application.title
-              } ).show().then( function() { self.confirm(); } );
-            } );
-          }
-        };
-
         this.release = function() {
-          if( !this.confirmInProgress && 0 < this.confirmedCount ) {
+          if( !this.participantSelection.confirmInProgress && 0 < this.participantSelection.confirmedCount ) {
             CnHttpFactory.instance( {
               path: 'participant',
               data: {
                 mode: 'release',
                 application_id: self.application.id,
-                uid_list: this.uidList
+                site_id: this.preferredSiteId,
+                identifier_id: self.participantSelection.identifierId,
+                identifier_list: this.participantSelection.getIdentifierList()
               }
             } ).post().then( function( response ) {
               CnModalMessageFactory.instance( {
                 title: 'Participants Released',
-                message: 'You have successfully released ' + self.confirmedCount + ' participants to ' +
+                message: 'You have successfully released ' + self.participantSelection.confirmedCount + ' participants to ' +
                          self.application.title
               } ).show().then( function() { self.reset(); } );
             } );

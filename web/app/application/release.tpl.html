@@ -21,36 +21,8 @@
         that application's <em>participant multi-edit</em> utility instead.
       </p>
       <hr />
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <strong>Participant selection</strong>
-          <span class="pull-right">
-            <span ng-if="model.confirmInProgress">working, please wait...</span>
-            <span ng-if="!model.confirmInProgress">
-              {{ model.confirmedCount ?
-                 model.confirmedCount + ' participants confirmed' :
-                 'no confirmed participants' }}
-              <i class="glyphicon" ng-class="model.confirmedCount ? 'glyphicon-ok' : 'glyphicon-remove'"></i>
-            </span>
-          </span>
-        </div>
-        <textarea id="uidListString"
-                  name="uidListString"
-                  cn-elastic
-                  ng-change="model.uidListStringChanged()"
-                  ng-model="model.uidListString"
-                  ng-disabled="model.confirmInProgress"
-                  class="form-control no-rounding"></textarea>
-        <div class="form-footer text-right rounded-bottom bg-info">
-          <button type="button"
-                  class="btn btn-primary"
-                  ng-disabled="null == model.application ||
-                               null != model.confirmedCount ||
-                               model.confirmInProgress"
-                  ng-click="confirm()">Confirm List</button>
-        </div>
-      </div>
-      <div ng-if="model.confirmedCount">
+      <cn-participant-selection model="model.participantSelection"></cn-participant-selection>
+      <div ng-if="model.participantSelection.confirmedCount">
         <div class="panel panel-default">
           <div class="panel-heading">
             <strong>Confirm selection</strong>
@@ -67,26 +39,18 @@
               </div>
             </div>
           </div>
-          <div class="form-footer text-right rounded-bottom bg-info">
-            <div class="dropup pull-left">
-              <button class="btn btn-default dropdown-toggle"
-                      type="button"
-                      id="applicationSiteList"
-                      data-toggle="dropdown">
-                Set Preferred Site <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="applicationSiteList">
-                 <li ng-repeat="site in model.applicationSiteList">
-                   <a href="#"
-                      cn-really-message="Are you sure you wish to set the preferred site of {{ model.confirmedCount }} participants for {{ model.application.title }} to {{ site.name }}?"
-                      cn-really-click="model.setPreferredSite( site.id )"
-                      ng-click="$event.stopPropagation()">{{ site.name }}</a>
-                 </li>
-              </ul>
+          <div class="form-footer text-right rounded-bottom bg-info no-line-height">
+            <div class="form-inline pull-left">
+              <label for="preferredSite" ng-class="pull-left">Preferred Site:</label>
+              <select id="preferredSite"
+                      ng-model="model.preferredSiteId"
+                      ng-options="item.id as item.name for item in model.applicationSiteList"
+                      class="form-control">
+              </select>
             </div>
             <button type="button"
                     class="btn btn-primary"
-                    cn-really-message="Are you sure you wish to release {{ model.confirmedCount }} participants to {{ model.application.title }}? This cannot be undone."
+                    cn-really-message="Are you sure you wish to release {{ model.participantSelection.confirmedCount }} participants to {{ model.application.title }}? This cannot be undone."
                     cn-really-click="model.release()"
                     ng-click="$event.stopPropagation()">Release Participants</button>
           </div>

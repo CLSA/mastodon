@@ -64,14 +64,9 @@ class post extends \cenozo\service\participant\post
           }
         }
 
-        if( property_exists( $file, 'mode' ) && 'preferred_site' == $file->mode  )
+        if( !property_exists( $file, 'mode' ) || 'release' != $file->mode  )
         {
-          // if in preferred site mode then there must be a site_id argument
-          if( !property_exists( $file, 'site_id' ) ) $this->status->set_code( 400 );
-        }
-        else
-        {
-          // if not in preferred site mode then there cannot be a site_id argument
+          // if not in release mode then there cannot be a site_id argument
           if( property_exists( $file, 'site_id' ) ) $this->status->set_code( 400 );
         }
       }
@@ -94,37 +89,42 @@ class post extends \cenozo\service\participant\post
 
       // This is a special service since participants cannot be added to the system through the web interface.
       // Instead, this service provides participant-based utility functions.
-      if( property_exists( $file, 'uid_list' ) )
+      if( property_exists( $file, 'identifier_list' ) )
       {
-        $uid_list = $participant_class_name::get_valid_uid_list(
-          $file->uid_list,
+        $identifier_id = property_exists( $file, 'identifier_id' ) ? $file->identifier_id : NULL;
+        $db_identifier = is_null( $identifier_id ) ? NULL : lib::create( 'database\identifier', $identifier_id );
+        $identifier_list = $participant_class_name::get_valid_identifier_list(
+          $db_identifier,
+          $file->identifier_list,
           $this->db_application,
           'unreleased_only' == $file->mode || 'release' == $file->mode
         );
 
         if( 'release' == $file->mode )
         { // release the participants
-          if( 0 < count( $uid_list ) )
+          if( 0 < count( $identifier_list ) )
           {
             $modifier = lib::create( 'database\modifier' );
-            $modifier->where( 'participant.uid', 'IN', $uid_list );
+            if( is_null( $db_identifier ) )
+            {
+              $modifier->where( 'participant.uid', 'IN', $identifier_list );
+            }
+            else
+            {
+              $modifier->join( 'participant_identifier', 'participant.id', 'participant_identifier.participant_id' );
+              $modifier->where( 'participant_identifier.identifier_id', '=', $identifier_id );
+              $modifier->where( 'participant_identifier.value', 'IN', $identifier_list );
+            }
+
+            if( !is_null( $this->db_site ) ) $this->db_application->set_preferred_site( $modifier, $this->db_site );
             $this->db_application->release_participants( $modifier );
           }
         }
-        else if( 'preferred_site' == $file->mode )
-        { // change the participants' preferred site
-          if( 0 < count( $uid_list ) )
-          {
-            $modifier = lib::create( 'database\modifier' );
-            $modifier->where( 'participant.uid', 'IN', $uid_list );
-            $this->db_application->set_preferred_site( $modifier, $this->db_site );
-          }
-        }
         else // any other mode
-        { // return a list of all valid uids and count by cohort and site
+        { // return a list of all valid identifiers and count by cohort and site
           $site_list = array();
 
-          if( 0 < count( $uid_list ) )
+          if( 0 < count( $identifier_list ) )
           {
             $site_sel = lib::create( 'database\select' );
             $site_sel->from( 'participant' );
@@ -138,7 +138,18 @@ class post extends \cenozo\service\participant\post
             $join_mod->where( 'participant_site.application_id', '=', $this->db_application->id );
             $site_mod->join_modifier( 'participant_site', $join_mod );
             $site_mod->join( 'site', 'participant_site.site_id', 'site.id' );
-            $site_mod->where( 'participant.uid', 'IN', $uid_list );
+            
+            if( is_null( $db_identifier ) )
+            {
+              $site_mod->where( 'participant.uid', 'IN', $identifier_list );
+            }
+            else
+            {
+              $site_mod->join( 'participant_identifier', 'participant.id', 'participant_identifier.participant_id' );
+              $site_mod->where( 'participant_identifier.identifier_id', '=', $identifier_id );
+              $site_mod->where( 'participant_identifier.value', 'IN', $identifier_list );
+            }
+            
             $site_mod->group( 'cohort.id' );
             $site_mod->group( 'site.id' );
 
@@ -150,12 +161,12 @@ class post extends \cenozo\service\participant\post
           }
 
           $this->set_data( array(
-            'uid_list' => $uid_list,
+            'identifier_list' => $identifier_list,
             'site_list' => $site_list
           ) );
         }
       }
-      else $this->status->set_code( 400 ); // must provide a uid_list
+      else $this->status->set_code( 400 ); // must provide an identifier_list
     } 
   }
 

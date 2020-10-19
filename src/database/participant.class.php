@@ -16,45 +16,62 @@ class participant extends \cenozo\database\participant
   /**
    * Replace parent method
    */
-  public static function get_valid_uid_list( $uid_list, $db_application = NULL, $unreleased = false )
+  public static function get_valid_identifier_list( $db_identifier, $identifier_list, $db_application = NULL, $unreleased = false )
   {
     $setting_manager = lib::create( 'business\setting_manager' );
-    $uid_regex = $setting_manager->get_setting( 'general', 'uid_regex' );
+    $regex = is_null( $db_identifier ) ? $setting_manager->get_setting( 'general', 'uid_regex' ) : $db_identifier->regex;
 
-    $output_uid_list = array();
+    $output_identifier_list = array();
 
-    if( !is_array( $uid_list ) )
+    if( !is_array( $identifier_list ) )
     {
       // sanitize the entries
-      $uid_list = explode( ' ', // delimite string by spaces and create array from result
-                  preg_replace( '/[^a-zA-Z0-9 ]/', '', // remove anything that isn't a letter, number of space
-                  preg_replace( '/[\s,;|\/]/', ' ', // replace whitespace and separation chars with a space
-                  strtoupper( $uid_list ) ) ) ); // convert to uppercase
+      $identifier_list =
+        explode( ' ', // delimite string by spaces and create array from result
+        preg_replace( '/[^a-zA-Z0-9_ ]/', '', // remove anything that isn't a letter, number, underscore or space
+        preg_replace( '/[\s,;|\/]/', ' ', // replace whitespace and separation chars with a space
+        strtoupper( $identifier_list ) ) ) ); // convert to uppercase
     }
 
-    // match UIDs (eg: A123456)
-    $uid_list = array_filter( $uid_list, function( $string ) {
-      global $uid_regex;
-      return 1 == preg_match( sprintf( '/%s/', $uid_regex ), $string );
-    } );
+    // match identifiers based on regex
+    if( !is_null( $regex ) )
+    {
+      $identifier_list = array_filter( $identifier_list, function( $string ) {
+        global $regex;
+        return 1 == preg_match( sprintf( '/%s/', $regex ), $string );
+      } );
+    }
 
-    if( 0 < count( $uid_list ) )
+    if( 0 < count( $identifier_list ) )
     {
       $session = lib::create( 'business\session' );
       $db_site = $session->get_site();
       $db_role = $session->get_role();
 
       // make list unique and sort it
-      $uid_list = array_unique( $uid_list );
-      sort( $uid_list );
+      $identifier_list = array_unique( $identifier_list );
+      sort( $identifier_list );
+
+      $select = lib::create( 'database\select' );
+      $modifier = lib::create( 'database\modifier' );
 
       // go through the list and remove invalid UIDs
-      $select = lib::create( 'database\select' );
-      $select->add_column( 'uid' );
-      $select->from( 'participant' );
-      $modifier = lib::create( 'database\modifier' );
-      $modifier->where( 'uid', 'IN', $uid_list );
-      $modifier->order( 'uid' );
+      if( is_null( $db_identifier ) )
+      {
+        $select->add_column( 'uid', 'identifier' );
+        $select->from( 'participant' );
+        $modifier->where( 'uid', 'IN', $identifier_list );
+        $modifier->order( 'uid' );
+      }
+      else
+      {
+        $select->add_table_column( 'participant_identifier', 'value', 'identifier' );
+        $select->from( 'participant' );
+        $modifier->join( 'participant_identifier', 'participant.id', 'participant_identifier.participant_id' );
+        $modifier->where( 'participant_identifier.identifier_id', '=', $db_identifier->id );
+        $modifier->where( 'participant_identifier.value', 'IN', $identifier_list );
+        $modifier->order( 'participant_identifier.value' );
+      }
 
       if( !is_null( $db_application ) )
       {
@@ -74,9 +91,9 @@ class participant extends \cenozo\database\participant
         }
       }
 
-      foreach( static::select( $select, $modifier ) as $row ) $output_uid_list[] = $row['uid'];
+      foreach( static::select( $select, $modifier ) as $row ) $output_identifier_list[] = $row['identifier'];
     }
 
-    return $output_uid_list;
+    return $output_identifier_list;
   }
 }
