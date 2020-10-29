@@ -93,7 +93,7 @@ class post extends \cenozo\service\participant\post
       {
         $identifier_id = property_exists( $file, 'identifier_id' ) ? $file->identifier_id : NULL;
         $db_identifier = is_null( $identifier_id ) ? NULL : lib::create( 'database\identifier', $identifier_id );
-        $identifier_list = $participant_class_name::get_valid_identifier_list(
+        $identifier_list = $participant_class_name::get_valid_identifier_list_by_application(
           $db_identifier,
           $file->identifier_list,
           $this->db_application,

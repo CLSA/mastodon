@@ -16,7 +16,8 @@ class participant extends \cenozo\database\participant
   /**
    * Replace parent method
    */
-  public static function get_valid_identifier_list( $db_identifier, $identifier_list, $db_application = NULL, $unreleased = false )
+  public static function get_valid_identifier_list_by_application(
+    $db_identifier, $identifier_list, $db_application = NULL, $unreleased = false )
   {
     $setting_manager = lib::create( 'business\setting_manager' );
     $regex = is_null( $db_identifier ) ? $setting_manager->get_setting( 'general', 'uid_regex' ) : $db_identifier->regex;
