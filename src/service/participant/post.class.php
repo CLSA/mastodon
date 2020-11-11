@@ -118,6 +118,24 @@ class post extends \cenozo\service\participant\post
 
             if( !is_null( $this->db_site ) ) $this->db_application->set_preferred_site( $modifier, $this->db_site );
             $this->db_application->release_participants( $modifier );
+
+            // update the application's queue if necessary
+            if( $this->db_application->update_queue )
+            {
+              // we need to complete any transactions before continuing
+              lib::create( 'business\session' )->get_database()->complete_transaction();
+
+              try
+              {
+                $cenozo_manager = lib::create( 'business\cenozo_manager', $this->db_application );
+                $cenozo_manager->get( 'queue/1?repopulate=full' );
+              }
+              catch( \cenozo\exception\runtime $e )
+              {
+                // note runtime errors but keep processing anyway
+                log::error( $e->get_message() );
+              }
+            }
           }
         }
         else // any other mode
