@@ -1,0 +1,302 @@
+#!/usr/bin/php
+<?php
+/**
+ * This is a script that creates all dynamic database procedures
+ * 
+ * This script is necessary because mysql does not allow triggers to call procedures with dynamic SQL.
+ * Some procedures depend on which applications are installed so our way around this limitation is to
+ * create those procedures using this script.  The dynamic elements of the procedures are processed by
+ * PHP instead of SQL.
+ * 
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+ini_set( 'display_errors', '1' );
+error_reporting( E_ALL | E_STRICT );
+ini_set( 'date.timezone', 'US/Eastern' );
+
+// utility functions
+function out( $msg ) { printf( '%s: %s'."\n", date( 'Y-m-d H:i:s' ), $msg ); }
+function error( $msg ) { out( sprintf( 'ERROR! %s', $msg ) ); }
+
+
+class patch
+{
+  /**
+   * Reads the framework and application settings
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function read_settings()
+  {
+    // include the initialization settings
+    global $SETTINGS;
+    $base_dir = str_replace( '/aux', '', __DIR__ );
+    require_once $base_dir.'/settings.ini.php';
+    require_once $base_dir.'/settings.local.ini.php';
+    require_once $SETTINGS['path']['CENOZO'].'/src/initial.class.php';
+    $initial = new \cenozo\initial();
+    $this->settings = $initial->get_settings();
+  }
+
+  public function connect_database()
+  {
+    $server = $this->settings['db']['server'];
+    $username = $this->settings['db']['username'];
+    $password = $this->settings['db']['password'];
+    $name = $this->settings['db']['database_prefix'] . $this->settings['general']['instance_name'];
+    $this->db = new \mysqli( $server, $username, $password, $name );
+    if( $this->db->connect_error )
+    {
+      error( $this->db->connect_error );
+      die();
+    }
+  }
+
+  /**
+   * Executes the patch
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function execute()
+  {
+    out( 'Reading configuration parameters' );
+    $this->read_settings();
+
+    out( 'Connecting to database' );
+    $this->connect_database();
+
+    $cenozo_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $this->settings['general']['framework_name'] );
+
+    // loop through all applications which require participant sites to be updated
+    $result = $this->db->query( sprintf(
+      'SELECT id, name, update_participant_site '.
+      'FROM %s.application '.
+      'ORDER BY name',
+      $cenozo_db
+    ) );
+
+    if( false === $result )
+    {
+      error( $this->db->error );
+      die();
+    }
+
+    $update_particiapnt_site_for_participant_sql = sprintf(
+      "CREATE PROCEDURE %s.update_participant_site_for_participant( IN proc_participant_id INT(10) UNSIGNED )\n".
+      "  BEGIN\n\n",
+      $cenozo_db
+    );
+
+    while( $row = $result->fetch_assoc() )
+    {
+      $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['name'] );
+
+      // always drop the procedure in case we're removing an application from the update_participant_site category
+      $sql = sprintf(
+        'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_jurisdiction',
+        $application_db
+      );
+
+      if( false === $this->db->query( $sql ) )
+      {
+        error( $this->db->error );
+        die();
+      }
+
+      if( $row['update_participant_site'] )
+      {
+        $update_particiapnt_site_for_participant_sql .= sprintf(
+          "    -- update %s\n".
+          "    REPLACE INTO participant_site( application_id, participant_id, site_id, default_site_id )\n".
+          "    SELECT application_has_cohort.application_id,\n".
+          "           participant.id,\n".
+          "           IF(\n".
+          "             ISNULL( application_has_participant.preferred_site_id ),\n".
+          "             IF(\n".
+          "               application_has_cohort.grouping = 'jurisdiction',\n".
+          "               jurisdiction.site_id,\n".
+          "               region_site.site_id\n".
+          "             ),\n".
+          "             application_has_participant.preferred_site_id\n".
+          "           ) AS site_id,\n".
+          "           IF(\n".
+          "             application_has_cohort.grouping = 'jurisdiction',\n".
+          "             jurisdiction.site_id,\n".
+          "             region_site.site_id\n".
+          "           ) AS default_site_id\n".
+          "    FROM application_has_cohort\n".
+          "    JOIN participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
+          "    LEFT JOIN participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
+          "    LEFT JOIN address ON participant_primary_address.address_id = address.id\n".
+          "    LEFT JOIN %s.jurisdiction ON address.postcode = jurisdiction.postcode\n".
+          "    LEFT JOIN site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
+          "    LEFT JOIN region ON address.region_id = region.id\n".
+          "    LEFT JOIN %s.region_site ON region.id = region_site.region_id\n".
+          "    LEFT JOIN site AS region_site_site\n".
+          "      ON region_site.site_id = region_site_site.id\n".
+          "      AND participant.language_id = region_site.language_id\n".
+          "    LEFT JOIN application_has_participant\n".
+          "      ON application_has_cohort.application_id = application_has_participant.application_id\n".
+          "      AND application_has_participant.participant_id = participant.id\n".
+          "    WHERE jurisdiction.site_id <=> jurisdiction_site.id\n".
+          "    AND region_site.site_id <=> region_site_site.id\n".
+          "    AND application_has_cohort.application_id = %d\n".
+          "    AND participant.id = proc_participant_id;\n\n",
+          $row['name'],
+          $application_db,
+          $application_db,
+          $row['id']
+        );
+
+        // Create update_participant_site_for_jurisdiction
+        out( sprintf(
+          'Creating %s.update_participant_site_for_jurisdiction procedure',
+          $application_db
+        ) );
+
+        $sql = sprintf(
+          "CREATE PROCEDURE %s.update_participant_site_for_jurisdiction( IN proc_jurisdiction_id INT(10) UNSIGNED )\n".
+          "  BEGIN\n".
+          "    REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
+          "    SELECT application_has_cohort.application_id,\n".
+          "           participant.id,\n".
+          "           IF(\n".
+          "             ISNULL( application_has_participant.preferred_site_id ),\n".
+          "             jurisdiction.site_id,\n".
+          "             application_has_participant.preferred_site_id\n".
+          "           ) AS site_id,\n".
+          "           jurisdiction.site_id AS default_site_id\n".
+          "    FROM %s.application_has_cohort\n".
+          "    JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
+          "    LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
+          "    LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
+          "    LEFT JOIN %s.jurisdiction ON address.postcode = jurisdiction.postcode\n".
+          "    LEFT JOIN %s.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
+          "    LEFT JOIN %s.application_has_participant\n".
+          "      ON application_has_cohort.application_id = application_has_participant.application_id\n".
+          "      AND application_has_participant.participant_id = participant.id\n".
+          "    WHERE jurisdiction.site_id <=> jurisdiction_site.id\n".
+          "    AND application_has_cohort.application_id = %d\n".
+          "    AND application_has_cohort.grouping = 'jurisdiction'\n".
+          "    AND jurisdiction.id = proc_jurisdiction_id;\n".
+          "  END",
+          $application_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $application_db,
+          $cenozo_db,
+          $cenozo_db,
+          $row['id']
+        );
+
+        if( false === $this->db->query( $sql ) )
+        {
+          error( $this->db->error );
+          die();
+        }
+
+        // Create update_participant_site_for_region_site
+        out( sprintf(
+          'Creating %s.update_participant_site_for_region_site procedure',
+          $application_db
+        ) );
+
+        $sql = sprintf(
+          'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_region_site',
+          $application_db
+        );
+
+        if( false === $this->db->query( $sql ) )
+        {
+          error( $this->db->error );
+          die();
+        }
+
+        $sql = sprintf(
+          "CREATE PROCEDURE %s.update_participant_site_for_region_site( IN proc_region_site_id INT(10) UNSIGNED )\n".
+          "  BEGIN\n".
+          "      REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
+          "      SELECT application_has_cohort.application_id,\n".
+          "             participant.id,\n".
+          "             IF(\n".
+          "               ISNULL( application_has_participant.preferred_site_id ),\n".
+          "               region_site.site_id,\n".
+          "               application_has_participant.preferred_site_id\n".
+          "             ) AS site_id,\n".
+          "             region_site.site_id AS default_site_id\n".
+          "      FROM %s.application_has_cohort\n".
+          "      JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
+          "      LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
+          "      LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
+          "      LEFT JOIN %s.region ON address.region_id = region.id\n".
+          "      LEFT JOIN %s.region_site ON region.id = region_site.region_id\n".
+          "      LEFT JOIN %s.site AS region_site_site\n".
+          "        ON region_site.site_id = region_site_site.id\n".
+          "        AND participant.language_id = region_site.language_id\n".
+          "      LEFT JOIN %s.application_has_participant\n".
+          "        ON application_has_cohort.application_id = application_has_participant.application_id\n".
+          "        AND application_has_participant.participant_id = participant.id\n".
+          "      WHERE region_site.site_id <=> region_site_site.id\n".
+          "      AND application_has_cohort.application_id = %d\n".
+          "      AND application_has_cohort.grouping = 'region'\n".
+          "      AND region_site.id = proc_region_site_id;\n".
+          "  END",
+          $application_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $application_db,
+          $cenozo_db,
+          $cenozo_db,
+          $row['id']
+        );
+
+        if( false === $this->db->query( $sql ) )
+        {
+          error( $this->db->error );
+          die();
+        }
+      }
+    }
+
+    $update_particiapnt_site_for_participant_sql .= "  END";
+
+    out( sprintf(
+      'Creating %s.update_participant_site_for_participant procedure',
+      $cenozo_db
+    ) );
+
+    if( false === $this->db->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_participant', $cenozo_db ) ) )
+    {
+      error( $this->db->error );
+      die();
+    }
+
+    if( false === $this->db->query( $update_particiapnt_site_for_participant_sql ) )
+    {
+      error( $this->db->error );
+      die();
+    }
+
+    out( 'Done' );
+  }
+
+  /**
+   * Contains all initialization parameters.
+   * @var array
+   * @access private
+   */
+  private $settings = array();
+}
+
+$patch = new patch();
+$patch->execute();
