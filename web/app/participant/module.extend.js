@@ -29,6 +29,11 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
       var instance = $delegate.instance;
       $delegate.instance = function( parentModel, root ) { 
         var object = instance( parentModel, root );
+
+        object.getChildTitle = function( child ) {
+          return 'application' == child.subject.snake ? 'Release' : this.$$getChildTitle( child );
+        };
+
         if( 'administrator' == CnSession.role.name || 'curator' == CnSession.role.name ) {
           object.downloadOpalForms = function() {
             var modal = CnModalMessageFactory.instance( {
@@ -44,6 +49,7 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
             } ).file().finally( function() { modal.close(); } );
           };
         }
+        
         return object;
       };  
       return $delegate;
