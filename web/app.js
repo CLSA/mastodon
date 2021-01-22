@@ -207,12 +207,12 @@ cenozoApp.initFormEntryModule = function( module, type ) {
   module.addExtraOperation( 'list', {
     title: 'Start New Entry',
     operation: function( $state, model ) { model.listModel.startNewEntry(); },
-    isIncluded: function( $state, model ) { return model.isTypist; }
+    isIncluded: function( $state, model ) { return model.isRole( 'typist' ); }
   } );
   module.addExtraOperation( 'view', {
     title: 'Submit Entry',
     operation: function( $state, model ) { model.viewModel.typistSubmitEntry(); },
-    isIncluded: function( $state, model ) { return model.isTypist; }
+    isIncluded: function( $state, model ) { return model.isRole( 'typist' ); }
   } );
 
   // administrator operations
@@ -222,7 +222,7 @@ cenozoApp.initFormEntryModule = function( module, type ) {
       model.viewModel.deferEntry().then( function() { model.viewModel.onView(); } );
     },
     isDisabled: function( $state, model ) { return model.viewModel.record.completed; },
-    isIncluded: function( $state, model ) { return !model.isTypist && true === model.viewModel.record.submitted; }
+    isIncluded: function( $state, model ) { return !model.isRole( 'typist' ) && true === model.viewModel.record.submitted; }
   } );
   module.addExtraOperation( 'view', {
     title: 'Force Submit',
@@ -230,7 +230,7 @@ cenozoApp.initFormEntryModule = function( module, type ) {
       model.viewModel.submitEntry().then( function() { model.viewModel.onView(); } );
     },
     isDisabled: function( $state, model ) { return model.viewModel.record.completed; },
-    isIncluded: function( $state, model ) { return !model.isTypist && false === model.viewModel.record.submitted; }
+    isIncluded: function( $state, model ) { return !model.isRole( 'typist' ) && false === model.viewModel.record.submitted; }
   } );
 }
 
@@ -518,7 +518,6 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
     return {
       construct: function( object, module ) {
         CnBaseModelFactory.construct( object, module );
-        object.isTypist = true;
 
         // make sure not to allow editing of completed forms
         object.getEditEnabled = function() {
@@ -526,9 +525,7 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
         };
 
         CnSession.promise.then( function() {
-          object.isTypist = 'typist' == CnSession.role.name;
-
-          if( object.isTypist ) {
+          if( object.isRole( 'typist' ) ) {
             module.identifier = {};
             module.columnList.user.type = 'hidden';
             module.columnList.submitted.type = 'hidden';
