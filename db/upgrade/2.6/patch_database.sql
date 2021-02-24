@@ -4,6 +4,8 @@ SET AUTOCOMMIT=0;
 
 SOURCE service.sql
 SOURCE role_has_service.sql
+SOURCE proxy_form.sql
+SOURCE general_proxy_form.sql
 
 SOURCE update_version_number.sql
 

@@ -26,10 +26,6 @@ define( function() {
     date: {
       title: 'Date',
       type: 'date'
-    },
-    from_onyx: {
-      column: 'general_proxy_form.from_onyx',
-      type: 'hidden'
     }
   }, true );
 

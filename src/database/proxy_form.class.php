@@ -22,6 +22,9 @@ class proxy_form extends base_form
   {
     parent::import( $db_proxy_form_entry );
 
+    $note = NULL;
+    if( !is_null( $this->from_instance ) ) $note = sprintf( 'Provided by %s', ucwords( $this->from_instance ) );
+
     // add the physical tests and future HIN consent
     $db_form = $this->get_form();
     if( !is_null( $db_proxy_form_entry->continue_questionnaires ) )
@@ -29,7 +32,7 @@ class proxy_form extends base_form
       $db_form->add_consent(
         'continue questionnaires',
         array( 'accept' => $db_proxy_form_entry->continue_questionnaires ),
-        $this->from_onyx ? 'Provided by Onyx.' : NULL
+        $note
       );
     }
     if( !is_null( $db_proxy_form_entry->continue_physical_tests ) )
@@ -37,7 +40,7 @@ class proxy_form extends base_form
       $db_form->add_consent(
         'continue physical tests',
         array( 'accept' => $db_proxy_form_entry->continue_physical_tests ),
-        $this->from_onyx ? 'Provided by Onyx.' : NULL
+        $note
       );
     }
     if( !is_null( $db_proxy_form_entry->continue_draw_blood ) )
@@ -45,7 +48,7 @@ class proxy_form extends base_form
       $db_form->add_consent(
         'continue draw blood',
         array( 'accept' => $db_proxy_form_entry->continue_draw_blood ),
-        $this->from_onyx ? 'Provided by Onyx.' : NULL
+        $note
       );
     }
     if( !is_null( $db_proxy_form_entry->hin_future_access ) )
@@ -53,7 +56,7 @@ class proxy_form extends base_form
       $db_form->add_consent(
         'HIN future access',
         array( 'accept' => $db_proxy_form_entry->hin_future_access ),
-        $this->from_onyx ? 'Provided by Onyx.' : NULL
+        $note
       );
     }
 
