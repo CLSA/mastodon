@@ -195,20 +195,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnGeneralProxyFormEntryTree', [
-    'CnGeneralProxyFormEntryTreeFactory', 'CnSession',
-    function( CnGeneralProxyFormEntryTreeFactory, CnSession ) {
-      return {
-        templateUrl: module.getFileUrl( 'tree.tpl.html' ),
-        restrict: 'E',
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnGeneralProxyFormEntryTreeFactory.instance();
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnGeneralProxyFormEntryView', [
     'CnGeneralProxyFormEntryModelFactory', '$timeout',
     function( CnGeneralProxyFormEntryModelFactory, $timeout ) {
@@ -225,8 +211,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnGeneralProxyFormEntryListFactory', [
-    'CnBaseFormEntryListFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
-    function( CnBaseFormEntryListFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
+    'CnBaseFormEntryListFactory', 'CnModalMessageFactory',
+    function( CnBaseFormEntryListFactory, CnModalMessageFactory ) {
       var object = function( parentModel ) { CnBaseFormEntryListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
@@ -234,21 +220,17 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnGeneralProxyFormEntryViewFactory', [
-    'CnBaseFormEntryViewFactory', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state',
-    function( CnBaseFormEntryViewFactory, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state ) {
-      var object = function( parentModel, root ) {
-        CnBaseFormEntryViewFactory.construct( this, parentModel, root );
-      };
+    'CnBaseFormEntryViewFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory',
+    function( CnBaseFormEntryViewFactory, CnModalMessageFactory, CnModalConfirmFactory ) {
+      var object = function( parentModel, root ) { CnBaseFormEntryViewFactory.construct( this, parentModel, root ); };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnGeneralProxyFormEntryModelFactory', [
-    'CnBaseFormEntryModelFactory', 'CnGeneralProxyFormEntryListFactory', 'CnGeneralProxyFormEntryViewFactory',
-    'CnSession', 'CnHttpFactory', '$q',
-    function( CnBaseFormEntryModelFactory, CnGeneralProxyFormEntryListFactory, CnGeneralProxyFormEntryViewFactory,
-              CnSession, CnHttpFactory, $q ) {
+    'CnBaseFormEntryModelFactory', 'CnGeneralProxyFormEntryListFactory', 'CnGeneralProxyFormEntryViewFactory', 'CnHttpFactory',
+    function( CnBaseFormEntryModelFactory, CnGeneralProxyFormEntryListFactory, CnGeneralProxyFormEntryViewFactory, CnHttpFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseFormEntryModelFactory.construct( this, module );
