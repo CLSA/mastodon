@@ -1,0 +1,36 @@
+<?php
+/**
+ * proxy_consent_form_entry.class.php
+ * 
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+namespace mastodon\database;
+use cenozo\lib, cenozo\log, mastodon\util;
+
+/**
+ * proxy_consent_form_entry: record
+ */
+class proxy_consent_form_entry extends base_form_entry
+{
+  /**
+   * Returns the errors found by processing this entry
+   * 
+   * @return associative array
+   * @access public
+   */
+  public function get_errors()
+  {
+    $postcode_class_name = lib::get_class_name( 'database\postcode' );
+
+    $errors = parent::get_errors();
+
+    if( is_null( $this->first_name ) )
+      $errors['first_name'] = 'Cannot be blank.';
+
+    if( is_null( $this->last_name ) )
+      $errors['last_name'] = 'Cannot be blank.';
+
+    return $errors;
+  }
+}

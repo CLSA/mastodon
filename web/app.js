@@ -521,6 +521,7 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
 
         // make sure not to allow editing of completed forms
         object.getEditEnabled = function() {
+          console.log( object.viewModel.record.completed );
           return object.$$getEditEnabled() && !object.viewModel.record.completed;
         };
 

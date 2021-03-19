@@ -25,6 +25,43 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    -- add access to proxy_consent_form
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE service.restricted = 1 ",
+      "AND service.subject = 'proxy_consent_form' ",
+      "AND role.name IN ( 'administrator', 'curator' )" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE service.restricted = 1 ",
+      "AND service.subject = 'proxy_consent_form' ",
+      "AND service.method = 'GET' ",
+      "AND service.resource = 1 ",
+      "AND role.name = 'typist'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    -- add access to proxy_consent_form_entry
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE service.restricted = 1 ",
+      "AND service.subject = 'proxy_consent_form_entry' ",
+      "AND role.name IN ( 'administrator', 'curator', 'typist' )" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 

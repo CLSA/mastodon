@@ -27,54 +27,12 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'application' );
     if( !is_null( $module ) && 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
 
-    $module = $this->get_module( 'consent_form' );
-    if( !is_null( $module ) )
-    {
-      $module->add_child( 'consent_form_entry' );
-      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
-    }
-
-    // posting new form-entries is handled specially by the interface
-    $module = $this->get_module( 'consent_form_entry' );
-    if( !is_null( $module ) ) $module->remove_action( 'add' );
-
     $module = $this->get_module( 'participant' );
     if( !is_null( $module ) )
     {
       $module->add_child( 'application', 0 );
       if( 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
     }
-
-    $module = $this->get_module( 'contact_form' );
-    if( !is_null( $module ) )
-    {
-      $module->add_child( 'contact_form_entry' );
-      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
-    }
-
-    // posting new form-entries is handled specially by the interface
-    $module = $this->get_module( 'contact_form_entry' );
-    if( !is_null( $module ) ) $module->remove_action( 'add' );
-
-    $module = $this->get_module( 'hin_form' );
-    if( !is_null( $module ) )
-    {
-      $module->add_child( 'hin_form_entry' );
-      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
-    }
-
-    $module = $this->get_module( 'hin_form_entry' );
-    if( !is_null( $module ) ) $module->remove_action( 'add' );
-
-    $module = $this->get_module( 'extended_hin_form' );
-    if( !is_null( $module ) )
-    {
-      $module->add_child( 'extended_hin_form_entry' );
-      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
-    }
-
-    $module = $this->get_module( 'extended_hin_form_entry' );
-    if( !is_null( $module ) ) $module->remove_action( 'add' );
 
     $module = $this->get_module( 'user' );
     if( !is_null( $module ) )
@@ -83,28 +41,77 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'contact_form_entry', 0 );
       $module->add_child( 'general_proxy_form_entry', 0 );
       $module->add_child( 'proxy_form_entry', 0 );
+      $module->add_child( 'proxy_consent_form_entry', 0 );
     }
 
+    // consent form
+    $module = $this->get_module( 'consent_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'consent_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'consent_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // contact form
+    $module = $this->get_module( 'contact_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'contact_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'contact_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // hin form
+    $module = $this->get_module( 'hin_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'hin_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'hin_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // extended hin form
+    $module = $this->get_module( 'extended_hin_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'extended_hin_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'extended_hin_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // general proxy form
     $module = $this->get_module( 'general_proxy_form' );
     if( !is_null( $module ) )
     {
       $module->add_child( 'general_proxy_form_entry' );
       if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
     }
-
-    // posting new form-entries is handled specially by the interface
     $module = $this->get_module( 'general_proxy_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
 
+    // proxy form
     $module = $this->get_module( 'proxy_form' );
     if( !is_null( $module ) )
     {
       $module->add_child( 'proxy_form_entry' );
       if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
     }
-
-    // posting new form-entries is handled specially by the interface
     $module = $this->get_module( 'proxy_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // proxy consent form
+    $module = $this->get_module( 'proxy_consent_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'proxy_consent_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'proxy_consent_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
   }
 
@@ -129,6 +136,7 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
     if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
+    $this->add_listitem( 'Proxy Consent Forms', 'proxy_consent_form' );
 
     if( 'typist' == $db_role->name )
     {
@@ -138,6 +146,7 @@ class ui extends \cenozo\ui\ui
       $this->add_listitem( 'Extended HIN Form Entries', 'extended_hin_form_entry' );
       $this->add_listitem( 'General Proxy Form Entries', 'general_proxy_form_entry' );
       $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
+      $this->add_listitem( 'Proxy Consent Form Entries', 'proxy_consent_form_entry' );
     }
   }
 
