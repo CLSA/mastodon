@@ -13,8 +13,14 @@ SOURCE proxy_consent_form2.sql
 SOURCE form_type.sql
 SOURCE consent_type.sql
 
+SOURCE consent_form_entry.sql
+SOURCE general_proxy_form_entry.sql
+SOURCE extended_hin_form_entry.sql
+SOURCE hin_form_entry.sql
+SOURCE proxy_form_entry.sql
+
 SOURCE update_version_number.sql
 
-SELECT "TO COMPLETE THE INSTALLATION: you must now run the 'update_form_total.php' script" AS "";
+SELECT "TO COMPLETE THE INSTALLATION: you must now run 'aux/create_dynamic_procedures' script" AS "";
 
 COMMIT;

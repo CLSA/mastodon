@@ -17,7 +17,21 @@ define( function() {
     },
     alternate_id: {
       title: 'Proxy',
-      type: 'enum'
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'alternate',
+        select: 'CONCAT( alternate.first_name, " ", alternate.last_name, " (", IF( ' +
+          'proxy AND informant, ' +
+          '"decision maker and information provider", ' +
+          'IF( proxy, "decision maker", "information provider" ) ' +
+        '), ")" )',
+        where: [ 'alternate.first_name', 'alternate.last_name' ]
+        /*
+        modifier: {
+          where: { column: '', operator: '=', value: 
+        }
+        */
+      }
     },
     signed: {
       title: 'Signed',
@@ -70,8 +84,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyConsentFormEntryViewFactory', [
-    'CnBaseFormEntryViewFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory',
-    function( CnBaseFormEntryViewFactory, CnModalMessageFactory, CnModalConfirmFactory ) {
+    'CnBaseFormEntryViewFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnHttpFactory',
+    function( CnBaseFormEntryViewFactory, CnModalMessageFactory, CnModalConfirmFactory, CnHttpFactory ) {
       var object = function( parentModel, root ) { CnBaseFormEntryViewFactory.construct( this, parentModel, root ); };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -79,33 +93,32 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnProxyConsentFormEntryModelFactory', [
-    'CnBaseFormEntryModelFactory', 'CnProxyConsentFormEntryListFactory', 'CnProxyConsentFormEntryViewFactory', 'CnHttpFactory',
-    function( CnBaseFormEntryModelFactory, CnProxyConsentFormEntryListFactory, CnProxyConsentFormEntryViewFactory, CnHttpFactory ) {
+    'CnBaseFormEntryModelFactory', 'CnProxyConsentFormEntryListFactory', 'CnProxyConsentFormEntryViewFactory',
+    function( CnBaseFormEntryModelFactory, CnProxyConsentFormEntryListFactory, CnProxyConsentFormEntryViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseFormEntryModelFactory.construct( this, module );
         this.listModel = CnProxyConsentFormEntryListFactory.instance( this );
         this.viewModel = CnProxyConsentFormEntryViewFactory.instance( this, root );
 
-        // extend getMetadata
-        this.getMetadata = function() {
-          return this.$$getMetadata().then( function() {
-            return CnHttpFactory.instance( {
-              path: 'alternate',
-              data: {
-                select: { column: [ 'first_name', 'last_name', 'informant', 'proxy' ] },
-                modifier: { where: [ { column: 'informant OR proxy', operator: '=', value: true } ] }
-              }
-            } ).query(). then( function( response ) {
-              self.metadata.columnList.alternate_id.enumList = [];
-              response.data.forEach( function( item ) {
-                self.metadata.columnList.alternate_id.enumList.push( {
-                  value: item.id,
-                  name: item.first_name + ' ' + item.last_name
-                } );
-              } );
-            } )
-          } );
+        this.getTypeaheadData = function( input, viewValue ) {
+          var data = self.$$getTypeaheadData( input, viewValue );
+
+          // only include the selected participant's proxies and infromants
+          if( 'alternate' == input.typeahead.table ) {
+            data.modifier.where.push( {
+              column: '( alternate.proxy OR alternate.informant )',
+              operator: '=',
+              value: true
+            } );
+            data.modifier.where.push( {
+              column: 'alternate.participant_id',
+              operator: '=',
+              value: self.viewModel.record.participant_id
+            } );
+          }
+
+          return data;
         };
       };
 

@@ -72,9 +72,14 @@ class patch
 
     // loop through all applications which require participant sites to be updated
     $result = $this->db->query( sprintf(
-      'SELECT id, name, update_participant_site '.
+      'SELECT application.id AS application_id, '.
+             'application.name AS application_name, '.
+             'application_type.name AS application_type_name, '.
+             'update_participant_site '.
       'FROM %s.application '.
-      'ORDER BY name',
+      'JOIN %s.application_type ON application.application_type_id = application_type.id '.
+      'ORDER BY application.name',
+      $cenozo_db,
       $cenozo_db
     ) );
 
@@ -84,7 +89,7 @@ class patch
       die();
     }
 
-    $update_particiapnt_site_for_participant_sql = sprintf(
+    $update_participant_site_for_participant_sql = sprintf(
       "CREATE PROCEDURE %s.update_participant_site_for_participant( IN proc_participant_id INT(10) UNSIGNED )\n".
       "  BEGIN\n\n",
       $cenozo_db
@@ -92,7 +97,7 @@ class patch
 
     while( $row = $result->fetch_assoc() )
     {
-      $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['name'] );
+      $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['application_name'] );
 
       // always drop the procedure in case we're removing an application from the update_participant_site category
       $sql = sprintf(
@@ -108,7 +113,7 @@ class patch
 
       if( $row['update_participant_site'] )
       {
-        $update_particiapnt_site_for_participant_sql .= sprintf(
+        $update_participant_site_for_participant_sql .= sprintf(
           "    -- update %s\n".
           "    REPLACE INTO participant_site( application_id, participant_id, site_id, default_site_id )\n".
           "    SELECT application_has_cohort.application_id,\n".
@@ -145,10 +150,10 @@ class patch
           "    AND region_site.site_id <=> region_site_site.id\n".
           "    AND application_has_cohort.application_id = %d\n".
           "    AND participant.id = proc_participant_id;\n\n",
-          $row['name'],
+          $row['application_name'],
           $application_db,
           $application_db,
-          $row['id']
+          $row['application_id']
         );
 
         // Create update_participant_site_for_jurisdiction
@@ -192,7 +197,7 @@ class patch
           $application_db,
           $cenozo_db,
           $cenozo_db,
-          $row['id']
+          $row['application_id']
         );
 
         if( false === $this->db->query( $sql ) )
@@ -257,7 +262,7 @@ class patch
           $application_db,
           $cenozo_db,
           $cenozo_db,
-          $row['id']
+          $row['application_id']
         );
 
         if( false === $this->db->query( $sql ) )
@@ -266,9 +271,66 @@ class patch
           die();
         }
       }
+      else if( 'mastodon' == $row['application_type_name'] )
+      {
+        foreach( array( 'consent', 'extended_hin', 'general_proxy', 'hin', 'proxy', 'proxy_consent' ) as $subject )
+        {
+          $procedure_name = sprintf( 'update_%s_form_total', $subject );
+          out( sprintf( 'Creating %s.%s procedure', $application_db, $procedure_name ) );
+
+          if( false === $this->db->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.%s', $application_db, $procedure_name ) ) )
+          {
+            error( $this->db->error );
+            die();
+          }
+
+          $sql = sprintf(
+            "CREATE PROCEDURE %s.%s( IN proc_%s_form_id INT(10) UNSIGNED )\n".
+            "  BEGIN\n".
+            "    REPLACE INTO %s_form_total\n".
+            "    SET %s_form_id = proc_%s_form_id,\n".
+            "        entry_total = (\n".
+            "          SELECT COUNT(*) FROM %s_form_entry\n".
+            "          WHERE %s_form_id = proc_%s_form_id\n".
+            "        ),\n".
+            "        submitted_total = (\n".
+            "          SELECT COUNT(*) FROM %s_form_entry\n".
+            "          WHERE %s_form_id = proc_%s_form_id\n".
+            "          AND submitted = true\n".
+            "        ),\n".
+            "        uid = (\n".
+            "          SELECT GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR ',' )\n".
+            "          FROM %s_form_entry\n".
+            "          LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "          WHERE %s_form_id = proc_%s_form_id\n".
+            "          GROUP BY %s_form_id\n".
+            "        ),\n".
+            "        cohort = (\n".
+            "          SELECT GROUP_CONCAT( DISTINCT cohort.name ORDER BY cohort.name SEPARATOR ',' )\n".
+            "          FROM %s_form_entry\n".
+            "          LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "          LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
+            "          WHERE %s_form_id = proc_%s_form_id\n".
+            "          GROUP BY %s_form_id\n".
+            "        );\n".
+            "  END",
+            $application_db, $procedure_name, $subject,
+            $subject,
+            $subject, $subject, $subject, $subject, $subject,
+            $subject, $subject, $subject,
+            $subject, $cenozo_db, $subject, $subject, $subject, $subject,
+            $subject, $cenozo_db, $subject, $cenozo_db, $subject, $subject, $subject
+          );
+          if( false === $this->db->query( $sql ) )
+          {
+            error( $this->db->error );
+            die();
+          }
+        }
+      }
     }
 
-    $update_particiapnt_site_for_participant_sql .= "  END";
+    $update_participant_site_for_participant_sql .= "  END";
 
     out( sprintf(
       'Creating %s.update_participant_site_for_participant procedure',
@@ -281,7 +343,7 @@ class patch
       die();
     }
 
-    if( false === $this->db->query( $update_particiapnt_site_for_participant_sql ) )
+    if( false === $this->db->query( $update_participant_site_for_participant_sql ) )
     {
       error( $this->db->error );
       die();

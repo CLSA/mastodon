@@ -182,16 +182,14 @@ cenozoApp.initFormEntryModule = function( module, type ) {
   inputGroup[type + '_form_id'] = { type: 'hidden' };
 
   if( 'contact' != type ) {
-    inputGroup.uid = {
-      title: 'UID',
-      type: 'string',
-      regex: '^[A-Z][0-9]{6}$',
-      help: 'Must be in "A000000" format (a letter followed by 6 numbers)'
-    };
-    inputGroup.participant_full_name = {
-      title: 'Participant',
-      type: 'string',
-      isConstant: true
+    inputGroup.participant_id = {
+      title: 'Participant (UID)',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'participant',
+        select: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
+        where: [ 'participant.first_name', 'participant.last_name', 'uid' ]
+      }
     };
   }
 
@@ -423,20 +421,6 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
           }
         } );
 
-        object.onPatch = function( data ) {
-          return object.$$onPatch( data ).then( function() {
-            if( angular.isDefined( data.uid ) ) {
-              // update the participant's name
-              CnHttpFactory.instance( {
-                path: object.parentModel.getServiceResourcePath(),
-                data: { select: { column: [ 'participant_full_name' ] } }
-              } ).get().then( function( response ) {
-                object.record.participant_full_name = response.data.participant_full_name;
-              } );
-            }
-          } );
-        };
-
         object.onPatchError = function( response ) {
           // handle 306 errors (uid doesn't match existing participant)
           if( 306 == response.status ) {
@@ -521,7 +505,6 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
 
         // make sure not to allow editing of completed forms
         object.getEditEnabled = function() {
-          console.log( object.viewModel.record.completed );
           return object.$$getEditEnabled() && !object.viewModel.record.completed;
         };
 

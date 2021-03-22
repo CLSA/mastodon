@@ -28,7 +28,8 @@ class module extends \mastodon\service\base_form_entry_module
       $select->add_column(
         'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         'formatted_user_id',
-        false );
+        false
+      );
     }
 
     // always add the proxy and informant region names

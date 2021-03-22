@@ -23,13 +23,15 @@ class proxy_consent_form extends base_form
     parent::import( $db_proxy_consent_form_entry );
 
     // add the proxy participation consent
-    $datetime_obj = util::get_datetime_object( !is_null( $db_consent_form_entry->date ) ? $db_consent_form_entry->date : $this->date );
+    $datetime_obj = util::get_datetime_object(
+      !is_null( $db_proxy_consent_form_entry->date ) ? $db_proxy_consent_form_entry->date : $this->date
+    );
     $datetime_obj->setTime( 12, 0 );
 
-    $db_form = $this->get_form();
-    $db_form->add_consent(
-      $db_consent_form_entry->type,
-      array( 'accept' => $db_consent_form_entry->accept, 'datetime' => $datetime_obj )
+    $this->get_form()->add_proxy_consent(
+      $db_proxy_consent_form_entry->type,
+      $db_proxy_consent_form_entry->alternate_id,
+      array( 'accept' => $db_proxy_consent_form_entry->accept, 'datetime' => $datetime_obj )
     );
   }
 }

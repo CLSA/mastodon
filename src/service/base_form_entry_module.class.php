@@ -42,15 +42,7 @@ abstract class base_form_entry_module extends \cenozo\service\module
         {
           // when setting the UID, make sure there is a matching participant
           $file = $this->get_file_as_array();
-          if( array_key_exists( 'uid', $file ) )
-          {
-            if( is_null( $participant_class_name::get_unique_record( 'uid', $file['uid'] ) ) )
-            {
-              $this->get_status()->set_code( 306 );
-              $this->set_data( sprintf( 'There is no participant with the UID "%s".', $file['uid'] ) );
-            }
-          }
-          else if( array_key_exists( 'submitted', $file ) && true == $file['submitted'] )
+          if( array_key_exists( 'submitted', $file ) && true == $file['submitted'] )
           {
             // test the entry for errors
             $errors = $this->get_resource()->get_errors();
@@ -121,15 +113,6 @@ abstract class base_form_entry_module extends \cenozo\service\module
 
     $modifier->join( $form_name, sprintf( '%s.%s_id', $form_entry_name, $form_name ), $form_name.'.id' );
 
-    if( $select->has_column( 'participant_full_name' ) )
-    {
-      $modifier->left_join( 'participant', $form_entry_name.'.uid', 'participant.uid' );
-      $select->add_column(
-        'CONCAT( participant.first_name, " ", participant.last_name )',
-        'participant_full_name',
-        false );
-    }
-
     // special restricts for typists
     if( 'typist' == $db_role->name )
     {
@@ -149,6 +132,16 @@ abstract class base_form_entry_module extends \cenozo\service\module
     // always add the user's name
     $modifier->join( 'user', $form_entry_name.'.user_id', 'user.id' );
     $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'user', false );
+
+    if( !is_null( $this->get_resource() ) && 'contact_form_entry' != $form_entry_name )
+    {
+      // include the participant first/last/uid as supplemental data
+      $modifier->left_join( 'participant', sprintf( '%s.participant_id', $form_entry_name ), 'participant.id' );
+      $select->add_column(
+        'CONCAT( participant.first_name, " ", participant.last_name, " (", participant.uid, ")" )',
+        'formatted_participant_id',
+        false );
+    }
   }
 
   /**

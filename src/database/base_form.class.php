@@ -130,7 +130,7 @@ abstract class base_form extends \cenozo\database\record
         __METHOD__ );
 
     $filename = $this->get_filename();
-    $db_participant = $participant_class_name::get_unique_record( 'uid', $db_form_entry->uid );
+    $db_participant = lib::create( 'database\participant', $db_form_entry->participant_id );
 
     // create the form
     $db_form_type = $form_type_class_name::get_unique_record( 'name', $type );

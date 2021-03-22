@@ -26,19 +26,7 @@ abstract class base_form_entry extends \cenozo\database\record
     $type = substr( $table_name, 0, strrpos( $table_name, '_form_entry' ) );
 
     $errors = array();
-
-    if( 'contact' != $type )
-    {
-      if( is_null( $this->uid ) ) $errors['uid'] = 'Cannot be blank.';
-      else
-      {
-        $participant_mod = lib::create( 'database\modifier' );
-        $participant_mod->where( 'uid', '=', $this->uid );
-        if( 0 == $participant_class_name::count( $participant_mod ) )
-          $errors['uid'] = sprintf( 'There is no participant with the UID "%s".', $this->uid );
-      }
-    }
-
+    if( 'contact' != $type && is_null( $this->participant_id ) ) $errors['participant_id'] = 'Cannot be blank.';
     return $errors;
   }
 }

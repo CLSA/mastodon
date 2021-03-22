@@ -25,11 +25,8 @@ class proxy_consent_form_entry extends base_form_entry
 
     $errors = parent::get_errors();
 
-    if( is_null( $this->first_name ) )
-      $errors['first_name'] = 'Cannot be blank.';
-
-    if( is_null( $this->last_name ) )
-      $errors['last_name'] = 'Cannot be blank.';
+    if( is_null( $this->type ) ) $errors['type'] = 'Cannot be blank.';
+    if( is_null( $this->alternate_id ) ) $errors['alternate_id'] = 'Cannot be blank.';
 
     return $errors;
   }
