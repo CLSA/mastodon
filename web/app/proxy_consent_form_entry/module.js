@@ -6,6 +6,13 @@ define( function() {
 
   cenozoApp.initFormEntryModule( module, 'proxy_consent' );
 
+  // give these forms a special name
+  angular.extend( module.name, {
+    singular: 'proxy DMIP entry form',
+    plural: 'proxy DMIP entry forms',
+    possessive: 'proxy DMIP entry form\'s'
+  } );
+
   module.addInputGroup( 'Details', {
     accept: {
       title: 'Consent to Act as Proxy',

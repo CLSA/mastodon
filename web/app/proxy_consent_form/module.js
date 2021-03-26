@@ -5,6 +5,13 @@ define( function() {
 
   cenozoApp.initFormModule( module, 'proxy_consent' );
 
+  // give these forms a special name
+  angular.extend( module.name, {
+    singular: 'proxy DMIP form',
+    plural: 'proxy DMIP forms',
+    possessive: 'proxy DMIP form\'s'
+  } );
+
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnProxyConsentFormAdjudicate', [
     'CnProxyConsentFormAdjudicateFactory',
