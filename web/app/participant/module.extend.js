@@ -183,10 +183,10 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
           self.participant.identifier = $state.params.identifier;
           CnSession.setBreadcrumbTrail( [ {
             title: 'Participants',
-            go: function() { $state.go( 'participant.list' ); }
+            go: async function() { await $state.go( 'participant.list' ); }
           }, {
             title: response.data.uid,
-            go: function() { $state.go( 'participant.view', { identifier: $state.params.identifier } ); }
+            go: async function() { await $state.go( 'participant.view', { identifier: $state.params.identifier } ); }
           }, {
             title: 'Release'
           } ] );
