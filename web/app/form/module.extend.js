@@ -14,8 +14,8 @@ define( [ cenozoApp.module( 'form' ).getFileUrl( 'module.js' ) ], function() {
     isDisabled: function( $state, model ) {
       return angular.isUndefined( model.viewModel.viewDataEntryForm );
     },
-    operation: function( $state, model ) {
-      return model.viewModel.viewDataEntryForm();
+    operation: async function( $state, model ) {
+      await model.viewModel.viewDataEntryForm();
     }
   } );
 
