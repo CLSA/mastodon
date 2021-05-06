@@ -12,6 +12,7 @@ SOURCE ip_consent_form.sql
 SOURCE ip_consent_form_total.sql
 SOURCE ip_consent_form_entry.sql
 SOURCE ip_consent_form2.sql
+SOURCE proxy_consent.sql
 
 SOURCE update_version_number.sql
 
