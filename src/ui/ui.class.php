@@ -41,7 +41,8 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'contact_form_entry', 0 );
       $module->add_child( 'general_proxy_form_entry', 0 );
       $module->add_child( 'proxy_form_entry', 0 );
-      $module->add_child( 'proxy_consent_form_entry', 0 );
+      $module->add_child( 'dm_consent_form_entry', 0 );
+      $module->add_child( 'ip_consent_form_entry', 0 );
     }
 
     // consent form
@@ -104,14 +105,24 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'proxy_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
 
-    // proxy consent form
-    $module = $this->get_module( 'proxy_consent_form' );
+    // decision maker consent form
+    $module = $this->get_module( 'dm_consent_form' );
     if( !is_null( $module ) )
     {
-      $module->add_child( 'proxy_consent_form_entry' );
+      $module->add_child( 'dm_consent_form_entry' );
       if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
     }
-    $module = $this->get_module( 'proxy_consent_form_entry' );
+    $module = $this->get_module( 'dm_consent_form_entry' );
+    if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    // information provider consent form
+    $module = $this->get_module( 'ip_consent_form' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'ip_consent_form_entry' );
+      if( 2 <= $db_role->tier ) $module->add_action( 'adjudicate', '/{identifier}' );
+    }
+    $module = $this->get_module( 'ip_consent_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
   }
 
@@ -136,7 +147,8 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
     if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
-    $this->add_listitem( 'Proxy DMIP Forms', 'proxy_consent_form' );
+    $this->add_listitem( 'Decision Maker Forms', 'dm_consent_form' );
+    $this->add_listitem( 'Information Provider Forms', 'ip_consent_form' );
 
     if( 'typist' == $db_role->name )
     {
@@ -146,7 +158,8 @@ class ui extends \cenozo\ui\ui
       $this->add_listitem( 'Extended HIN Form Entries', 'extended_hin_form_entry' );
       $this->add_listitem( 'General Proxy Form Entries', 'general_proxy_form_entry' );
       $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
-      $this->add_listitem( 'Proxy DMIP Form Entries', 'proxy_consent_form_entry' );
+      $this->add_listitem( 'Decision Maker Form Entries', 'dm_consent_form_entry' );
+      $this->add_listitem( 'Information Provider Form Entries', 'ip_consent_form_entry' );
     }
   }
 

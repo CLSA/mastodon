@@ -1,29 +1,25 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'proxy_consent_form_entry', true ); }
+  try { var module = cenozoApp.module( 'dm_consent_form_entry', true ); }
   catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormEntryModule( module, 'proxy_consent' );
+  cenozoApp.initFormEntryModule( module, 'dm_consent' );
 
   // give these forms a special name
   angular.extend( module.name, {
-    singular: 'proxy DMIP entry form',
-    plural: 'proxy DMIP entry forms',
-    possessive: 'proxy DMIP entry form\'s'
+    singular: 'decision maker entry form',
+    plural: 'decision maker entry forms',
+    possessive: 'decision maker entry form\'s'
   } );
 
   module.addInputGroup( 'Details', {
     accept: {
-      title: 'Consent to Act as Proxy',
+      title: 'Consent to Act as Decision Maker',
       type: 'boolean'
     },
-    type: {
-      title: 'Type of Proxy',
-      type: 'enum'
-    },
     alternate_id: {
-      title: 'Proxy',
+      title: 'Alternate',
       type: 'lookup-typeahead',
       typeahead: {
         table: 'alternate',
@@ -33,11 +29,6 @@ define( function() {
           'IF( proxy, "decision maker", "information provider" ) ' +
         '), ")" )',
         where: [ 'alternate.first_name', 'alternate.last_name' ]
-        /*
-        modifier: {
-          where: { column: '', operator: '=', value: 
-        }
-        */
       }
     },
     signed: {
@@ -51,37 +42,37 @@ define( function() {
   }, true );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyConsentFormEntryList', [
-    'CnProxyConsentFormEntryModelFactory',
-    function( CnProxyConsentFormEntryModelFactory ) {
+  cenozo.providers.directive( 'cnDmConsentFormEntryList', [
+    'CnDmConsentFormEntryModelFactory',
+    function( CnDmConsentFormEntryModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyConsentFormEntryModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDmConsentFormEntryModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyConsentFormEntryView', [
-    'CnProxyConsentFormEntryModelFactory',
-    function( CnProxyConsentFormEntryModelFactory ) {
+  cenozo.providers.directive( 'cnDmConsentFormEntryView', [
+    'CnDmConsentFormEntryModelFactory',
+    function( CnDmConsentFormEntryModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyConsentFormEntryModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDmConsentFormEntryModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormEntryListFactory', [
+  cenozo.providers.factory( 'CnDmConsentFormEntryListFactory', [
     'CnBaseFormEntryListFactory', 'CnModalMessageFactory',
     function( CnBaseFormEntryListFactory, CnModalMessageFactory ) {
       var object = function( parentModel ) { CnBaseFormEntryListFactory.construct( this, parentModel ); };
@@ -90,7 +81,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormEntryViewFactory', [
+  cenozo.providers.factory( 'CnDmConsentFormEntryViewFactory', [
     'CnBaseFormEntryViewFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnHttpFactory',
     function( CnBaseFormEntryViewFactory, CnModalMessageFactory, CnModalConfirmFactory, CnHttpFactory ) {
       var object = function( parentModel, root ) { CnBaseFormEntryViewFactory.construct( this, parentModel, root ); };
@@ -99,22 +90,22 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormEntryModelFactory', [
-    'CnBaseFormEntryModelFactory', 'CnProxyConsentFormEntryListFactory', 'CnProxyConsentFormEntryViewFactory',
-    function( CnBaseFormEntryModelFactory, CnProxyConsentFormEntryListFactory, CnProxyConsentFormEntryViewFactory ) {
+  cenozo.providers.factory( 'CnDmConsentFormEntryModelFactory', [
+    'CnBaseFormEntryModelFactory', 'CnDmConsentFormEntryListFactory', 'CnDmConsentFormEntryViewFactory',
+    function( CnBaseFormEntryModelFactory, CnDmConsentFormEntryListFactory, CnDmConsentFormEntryViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseFormEntryModelFactory.construct( this, module );
-        this.listModel = CnProxyConsentFormEntryListFactory.instance( this );
-        this.viewModel = CnProxyConsentFormEntryViewFactory.instance( this, root );
+        this.listModel = CnDmConsentFormEntryListFactory.instance( this );
+        this.viewModel = CnDmConsentFormEntryViewFactory.instance( this, root );
 
         this.getTypeaheadData = function( input, viewValue ) {
           var data = self.$$getTypeaheadData( input, viewValue );
 
-          // only include the selected participant's proxies and infromants
+          // only include the selected participant's proxies and informants
           if( 'alternate' == input.typeahead.table ) {
             data.modifier.where.push( {
-              column: '( alternate.proxy OR alternate.informant )',
+              column: 'alternate.proxy',
               operator: '=',
               value: true
             } );

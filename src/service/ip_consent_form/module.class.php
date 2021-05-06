@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace mastodon\service\proxy_consent_form;
+namespace mastodon\service\ip_consent_form;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**

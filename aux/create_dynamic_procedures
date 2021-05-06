@@ -273,7 +273,7 @@ class patch
       }
       else if( 'mastodon' == $row['application_type_name'] )
       {
-        foreach( array( 'consent', 'extended_hin', 'general_proxy', 'hin', 'proxy', 'proxy_consent' ) as $subject )
+        foreach( array( 'consent', 'extended_hin', 'general_proxy', 'hin', 'proxy', 'dm_consent', 'ip_consent' ) as $subject )
         {
           $procedure_name = sprintf( 'update_%s_form_total', $subject );
           out( sprintf( 'Creating %s.%s procedure', $application_db, $procedure_name ) );
