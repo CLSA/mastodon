@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace mastodon\service\proxy_consent_form_entry;
+namespace mastodon\service\ip_consent_form_entry;
 use cenozo\lib, cenozo\log, mastodon\util;
 
 /**
@@ -20,7 +20,7 @@ class module extends \mastodon\service\base_form_entry_module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->left_join( 'user', 'proxy_consent_form_entry.user_id', 'user.id' );
+    $modifier->left_join( 'user', 'ip_consent_form_entry.user_id', 'user.id' );
 
     if( !is_null( $this->get_resource() ) )
     {
@@ -32,12 +32,12 @@ class module extends \mastodon\service\base_form_entry_module
       );
 
       // include the alternate first/last/type as supplemental data
-      $modifier->left_join( 'alternate', 'proxy_consent_form_entry.alternate_id', 'alternate.id' );
+      $modifier->left_join( 'alternate', 'ip_consent_form_entry.alternate_id', 'alternate.id' );
       $select->add_column(
         'CONCAT( alternate.first_name, " ", alternate.last_name, " (", IF('.
           'proxy AND informant, '.
-          '"decision maker and information provider", '.
-          'IF( proxy, "decision maker", "information provider" ) '.
+          '"information provider and information provider", '.
+          'IF( proxy, "information provider", "information provider" ) '.
         '), ")" )',
         'formatted_alternate_id',
         false

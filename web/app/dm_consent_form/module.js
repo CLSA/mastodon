@@ -1,28 +1,28 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'proxy_consent_form', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'dm_consent_form', true ); } catch( err ) { console.warn( err ); return; }
 
-  cenozoApp.initFormModule( module, 'proxy_consent' );
+  cenozoApp.initFormModule( module, 'dm_consent' );
 
   // give these forms a special name
   angular.extend( module.name, {
-    singular: 'proxy DMIP form',
-    plural: 'proxy DMIP forms',
-    possessive: 'proxy DMIP form\'s'
+    singular: 'decision maker form',
+    plural: 'decision maker forms',
+    possessive: 'decision maker form\'s'
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyConsentFormAdjudicate', [
-    'CnProxyConsentFormAdjudicateFactory',
-    function( CnProxyConsentFormAdjudicateFactory ) {
+  cenozo.providers.directive( 'cnDmConsentFormAdjudicate', [
+    'CnDmConsentFormAdjudicateFactory',
+    function( CnDmConsentFormAdjudicateFactory ) {
       return {
         // special general template found in application's general module directory
         templateUrl: module.getFileUrl( '../mastodon/adjudicate.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          $scope.model = CnProxyConsentFormAdjudicateFactory.instance();
+          $scope.model = CnDmConsentFormAdjudicateFactory.instance();
 
           $scope.model.onLoad(); // breadcrumbs are handled by the service
         }
@@ -31,37 +31,37 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyConsentFormList', [
-    'CnProxyConsentFormModelFactory',
-    function( CnProxyConsentFormModelFactory ) {
+  cenozo.providers.directive( 'cnDmConsentFormList', [
+    'CnDmConsentFormModelFactory',
+    function( CnDmConsentFormModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyConsentFormModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDmConsentFormModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnProxyConsentFormView', [
-    'CnProxyConsentFormModelFactory',
-    function( CnProxyConsentFormModelFactory ) {
+  cenozo.providers.directive( 'cnDmConsentFormView', [
+    'CnDmConsentFormModelFactory',
+    function( CnDmConsentFormModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnProxyConsentFormModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDmConsentFormModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormAdjudicateFactory', [
+  cenozo.providers.factory( 'CnDmConsentFormAdjudicateFactory', [
     'CnBaseFormAdjudicateFactory',
     function( CnBaseFormAdjudicateFactory ) {
       var object = function( parentModel ) {
@@ -70,13 +70,10 @@ define( function() {
           title: 'UID'
         }, {
           column: 'accept',
-          title: 'Consent to Act as Proxy'
-        }, {
-          column: 'type',
-          title: 'Type of Proxy'
+          title: 'Consent to Act as Decision Maker'
         }, {
           column: 'alternate_id',
-          title: 'Proxy'
+          title: 'Alternate'
         }, {
           column: 'signed',
           title: 'Signed'
@@ -91,7 +88,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormListFactory', [
+  cenozo.providers.factory( 'CnDmConsentFormListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -100,7 +97,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormViewFactory', [
+  cenozo.providers.factory( 'CnDmConsentFormViewFactory', [
     'CnBaseFormViewFactory',
     function( CnBaseFormViewFactory ) {
       var object = function( parentModel, root ) { CnBaseFormViewFactory.construct( this, parentModel, root ); };
@@ -109,14 +106,14 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProxyConsentFormModelFactory', [
-    'CnBaseFormModelFactory', 'CnProxyConsentFormListFactory', 'CnProxyConsentFormViewFactory',
-    function( CnBaseFormModelFactory, CnProxyConsentFormListFactory, CnProxyConsentFormViewFactory ) {
+  cenozo.providers.factory( 'CnDmConsentFormModelFactory', [
+    'CnBaseFormModelFactory', 'CnDmConsentFormListFactory', 'CnDmConsentFormViewFactory',
+    function( CnBaseFormModelFactory, CnDmConsentFormListFactory, CnDmConsentFormViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseFormModelFactory.construct( this, module );
-        this.listModel = CnProxyConsentFormListFactory.instance( this );
-        this.viewModel = CnProxyConsentFormViewFactory.instance( this, root );
+        this.listModel = CnDmConsentFormListFactory.instance( this );
+        this.viewModel = CnDmConsentFormViewFactory.instance( this, root );
       };
 
       return {

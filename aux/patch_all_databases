@@ -1,0 +1,202 @@
+#!/usr/bin/php
+<?php
+/**
+ * This is a script that patches the framework and all application databases
+ * 
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+ini_set( 'display_errors', '1' );
+error_reporting( E_ALL | E_STRICT );
+ini_set( 'date.timezone', 'US/Eastern' );
+
+// utility functions
+function out( $msg, $no_nl = false ) { printf( '%s: %s'.( $no_nl ? '' : "\n" ), date( 'Y-m-d H:i:s' ), $msg ); }
+function error( $msg ) { out( sprintf( 'ERROR! %s', $msg ) ); }
+
+
+class patch
+{
+  /**
+   * Reads the framework and application settings
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function read_settings()
+  {
+    // include the initialization settings
+    global $SETTINGS;
+    $base_dir = str_replace( '/aux', '', __DIR__ );
+    require_once $base_dir.'/settings.ini.php';
+    require_once $base_dir.'/settings.local.ini.php';
+    require_once $SETTINGS['path']['CENOZO'].'/src/initial.class.php';
+    $initial = new \cenozo\initial();
+    $this->settings = $initial->get_settings();
+  }
+
+  public function connect_database()
+  {
+    $server = $this->settings['db']['server'];
+    $username = $this->settings['db']['username'];
+    $password = $this->settings['db']['password'];
+    $name = $this->settings['db']['database_prefix'] . $this->settings['general']['instance_name'];
+    $this->db = new \mysqli( $server, $username, $password, $name );
+    if( $this->db->connect_error )
+    {
+      error( $this->db->connect_error );
+      die();
+    }
+  }
+
+  /**
+   * Executes the patch
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function execute()
+  {
+    if( 2 != $_SERVER['argc'] )
+    {
+      error( 'Script expects exactly one argument: which database version to patch to' );
+      die();
+    }
+    $patch_version = $_SERVER['argv'][1];
+
+    out( 'Reading configuration parameters' );
+    $this->read_settings();
+
+    out( 'Connecting to database' );
+    $this->connect_database();
+
+    $cenozo_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $this->settings['general']['framework_name'] );
+
+    $names = array( $this->settings['general']['framework_name'] );
+
+    // make sure cenozo has the appropriate patch file
+    $cenozo_upgrade_dir = sprintf( '%s/db/upgrade/%s', CENOZO_PATH, $patch_version );
+    if( !file_exists( $cenozo_upgrade_dir ) )
+    {
+      error( sprintf( 'The cenozo framework has no patch version "%s"', $patch_version ) );
+      die();
+    }
+
+    // loop through all applications
+    $result = $this->db->query( sprintf(
+      'SELECT id, name, cenozo, version '.
+      'FROM %s.application '.
+      'ORDER BY application.name',
+      $cenozo_db
+    ) );
+
+    if( false === $result )
+    {
+      error( $this->db->error );
+      die();
+    }
+
+    $cwd = getcwd();
+    $dir_template = sprintf( '%s/%%s', substr( $cwd, 0, strrpos( $cwd, '/' ) ) );
+    $application_list = array();
+    while( $row = $result->fetch_assoc() )
+    {
+      $dir = sprintf( $dir_template, $row['name'] );
+      $db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['name'] );
+
+      $ini_file = sprintf( '%s/settings.ini.php', $dir );
+      $upgrade_dir = sprintf( '%s/db/upgrade/%s', $dir, $patch_version );
+      if( file_exists( $ini_file ) && file_exists( $upgrade_dir ) )
+      {
+        $row['db'] = $db;
+        $row['ini_file'] = $ini_file;
+        $row['upgrade_dir'] = $upgrade_dir;
+        $application_list[] = $row;
+        $names[] = $row['name'];
+      }
+    }
+
+    if( 0 == count( $application_list ) )
+    {
+      error( sprintf( 'There are no applications with a patch for version %s', $patch_version ) );
+      die();
+    }
+
+    printf(
+      "\nThe following applications will be upgraded:\n  %s\n\nAre you sure you wish to proceed? (y/n) ",
+      implode( "\n  ", $names )
+    );
+
+    system("stty -icanon");
+    $response = fread( STDIN, 1 );
+    print "\n";
+
+    if( 'y' != $response )
+    {
+      out( 'Aborting' );
+    }
+    else
+    {
+      // first upgrade cenozo
+      print "\n";
+      out( sprintf( 'Patching %s', $this->settings['general']['framework_name'] ) );
+      chdir( $cenozo_upgrade_dir );
+
+      // run the patch
+      $output = array();
+      exec(
+        sprintf(
+          'mysql --no-auto-rehash -h"%s" -u"%s" -p"%s" %s < patch_database.sql',
+          $this->settings['db']['server'],
+          $this->settings['db']['username'],
+          $this->settings['db']['password'],
+          $cenozo_db
+        ),
+        $output
+      );
+      foreach( $output as $line ) if( 0 < strlen( $line ) ) printf( "  %s\n", $line );
+
+      // now upgrade all applications
+      foreach( $application_list as $application )
+      {
+        print "\n";
+        out( sprintf( 'Patching %s', $application['name'] ) );
+        chdir( $application['upgrade_dir'] );
+
+        // run the patch
+        $output = array();
+        exec(
+          sprintf(
+            'mysql --no-auto-rehash -h"%s" -u"%s" -p"%s" %s < patch_database.sql',
+            $this->settings['db']['server'],
+            $this->settings['db']['username'],
+            $this->settings['db']['password'],
+            $application['db']
+          ),
+          $output
+        );
+        foreach( $output as $line ) if( 0 < strlen( $line ) ) printf( "  %s\n", $line );
+
+        // remove the cached schema
+        chdir( '../../../aux' );
+        $output = array();
+        exec( './remove_cached_schema', $output );
+        foreach( $output as $line ) if( 0 < strlen( $line ) ) printf( "  %s\n", $line );
+      }
+
+      print "\n";
+    }
+
+    out( 'Done' );
+  }
+
+  /**
+   * Contains all initialization parameters.
+   * @var array
+   * @access private
+   */
+  private $settings = array();
+}
+
+$patch = new patch();
+$patch->execute();
