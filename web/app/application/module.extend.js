@@ -8,22 +8,22 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
     module.addExtraOperation( 'list', {
       title: 'Manage Applications',
       isIncluded: function( $state, model ) { return 'participant' == model.getSubjectFromState(); },
-      operation: function( $state, model ) { $state.go( 'participant.release', $state.params ); }
+      operation: async function( $state, model ) { await $state.go( 'participant.release', $state.params ); }
     } );
   }
 
   if( angular.isDefined( module.actions.release ) ) {
     module.addExtraOperation( 'view', {
       title: 'Manage Participants',
-      operation: function( $state, model ) { $state.go( 'application.release', $state.params ); },
+      operation: async function( $state, model ) { await $state.go( 'application.release', $state.params ); },
       isIncluded: function( $state, model ) { return model.viewModel.record.release_based; }
     } );
   }
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnApplicationRelease', [
-    'CnApplicationReleaseFactory', '$timeout',
-    function( CnApplicationReleaseFactory, $timeout ) {
+    'CnApplicationReleaseFactory',
+    function( CnApplicationReleaseFactory ) {
       return {
         // look for the template in the application's path, not the framework
         templateUrl: cenozoApp.baseUrl + '/app/application/release.tpl.html?build=' + cenozoApp.build,
@@ -38,27 +38,53 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnApplicationReleaseFactory', [
-    'CnSession', 'CnHttpFactory', 'CnParticipantSelectionFactory', 'CnModalMessageFactory', '$state', '$q',
-    function( CnSession, CnHttpFactory, CnParticipantSelectionFactory, CnModalMessageFactory, $state, $q ) {
+    'CnSession', 'CnHttpFactory', 'CnParticipantSelectionFactory', 'CnModalMessageFactory', '$state',
+    function( CnSession, CnHttpFactory, CnParticipantSelectionFactory, CnModalMessageFactory, $state ) {
       var object = function() {
-        var self = this;
-        this.application = null;
-        this.preferredSiteId = null;
-        this.applicationSiteList = [];
-        this.participantSelection = CnParticipantSelectionFactory.instance();
+        angular.extend( this, {
+          application: null,
+          preferredSiteId: null,
+          applicationSiteList: [],
+          participantSelection: CnParticipantSelectionFactory.instance(),
+          reset: function() {
+            this.participantSelection.reset();
+            this.cohortSiteList = null;
+            this.preferredSiteId = null;
+          },
+          release: async function() {
+            if( !this.participantSelection.confirmInProgress && 0 < this.participantSelection.confirmedCount ) {
+              var response = await CnHttpFactory.instance( {
+                path: 'participant',
+                data: {
+                  mode: 'release',
+                  application_id: this.application.id,
+                  site_id: this.preferredSiteId,
+                  identifier_id: this.participantSelection.identifierId,
+                  identifier_list: this.participantSelection.getIdentifierList()
+                }
+              } ).post();
 
-        this.reset = function() {
-          self.participantSelection.reset();
-          self.cohortSiteList = null;
-          self.preferredSiteId = null;
-        };
+              await CnModalMessageFactory.instance( {
+                title: 'Participants Released',
+                message: 'You have successfully released ' + this.participantSelection.confirmedCount + ' participants to ' +
+                         this.application.title
+              } ).show();
+             
+              self.reset();
+            }
+          }
+        } );
+
         this.reset();
 
-        // get the application details and set up the breadcrumb trail
-        CnHttpFactory.instance( {
-          path: 'application/' + $state.params.identifier,
-          data: { select: { column: [ 'title', 'release_based' ] } }
-        } ).get().then( function( response ) {
+        var self = this;
+        async function init() {
+          // get the application details and set up the breadcrumb trail
+          var response = await CnHttpFactory.instance( {
+            path: 'application/' + $state.params.identifier,
+            data: { select: { column: [ 'title', 'release_based' ] } }
+          } ).get();
+
           self.application = response.data;
           self.application.identifier = $state.params.identifier;
 
@@ -75,49 +101,31 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
           } );
 
           // immediately send a 404 if this application is not release-based
-          if( !self.application.release_based ) $state.go( 'error.404' );
-          else {
+          if( !self.application.release_based ) {
+            $state.go( 'error.404' );
+          } else {
             CnSession.setBreadcrumbTrail( [ {
               title: 'Applications',
-              go: function() { $state.go( 'application.list' ); }
+              go: async function() { await $state.go( 'application.list' ); }
             }, {
               title: response.data.title,
-              go: function() { $state.go( 'application.view', { identifier: $state.params.identifier } ); }
+              go: async function() { await $state.go( 'application.view', { identifier: $state.params.identifier } ); }
             }, {
               title: 'Release'
             } ] );
           }
-        } );
 
-        // get the application's site list
-        CnHttpFactory.instance( {
-          path: 'application/' + $state.params.identifier + '/site',
-          data: { select: { column: [ 'name' ] } }
-        } ).get().then( function( response ) {
+          // get the application's site list
+          var response = await CnHttpFactory.instance( {
+            path: 'application/' + $state.params.identifier + '/site',
+            data: { select: { column: [ 'name' ] } }
+          } ).get();
+
           self.applicationSiteList = response.data;
           response.data.unshift( { id: null, name: 'No Preferred Site' } );
-        } );
+        }
 
-        this.release = function() {
-          if( !this.participantSelection.confirmInProgress && 0 < this.participantSelection.confirmedCount ) {
-            CnHttpFactory.instance( {
-              path: 'participant',
-              data: {
-                mode: 'release',
-                application_id: self.application.id,
-                site_id: this.preferredSiteId,
-                identifier_id: self.participantSelection.identifierId,
-                identifier_list: this.participantSelection.getIdentifierList()
-              }
-            } ).post().then( function( response ) {
-              CnModalMessageFactory.instance( {
-                title: 'Participants Released',
-                message: 'You have successfully released ' + self.participantSelection.confirmedCount + ' participants to ' +
-                         self.application.title
-              } ).show().then( function() { self.reset(); } );
-            } );
-          }
-        };
+        init();
       };
 
       return { instance: function() { return new object( false ); } };

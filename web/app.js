@@ -5,9 +5,9 @@ var cenozo = angular.module( 'cenozo' );
 /* ######################################################################################################## */
 cenozo.controller( 'HeaderCtrl', [
   '$scope', 'CnBaseHeader',
-  function( $scope, CnBaseHeader ) {
+  async function( $scope, CnBaseHeader ) {
     // copy all properties from the base header
-    CnBaseHeader.construct( $scope );
+    await CnBaseHeader.construct( $scope );
   }
 ] );
 
@@ -107,14 +107,14 @@ cenozoApp.initFormModule = function( module, type ) {
   if( angular.isDefined( module.actions.adjudicate ) ) {
     module.addExtraOperation( 'view', {
       title: 'Adjudicate',
-      operation: function( $state, model ) { $state.go( type + '_form.adjudicate', $state.params ); },
+      operation: async function( $state, model ) { await $state.go( type + '_form.adjudicate', $state.params ); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.adjudicate; }
     } );
   }
 
   module.addExtraOperation( 'view', {
     title: 'View Imported Form',
-    operation: function( $state, model ) { return $state.go( 'form.view', { identifier: model.viewModel.record.form_id } ); },
+    operation: async function( $state, model ) { await $state.go( 'form.view', { identifier: model.viewModel.record.form_id } ); },
     isIncluded: function( $state, model ) { return model.viewModel.record.form_id; }
   } );
 };
@@ -198,34 +198,36 @@ cenozoApp.initFormEntryModule = function( module, type ) {
   module.addExtraOperation( 'view', {
     title: 'Download',
     isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
-    operation: function( $state, model ) { model.viewModel.downloadFile(); }
+    operation: async function( $state, model ) { await model.viewModel.downloadFile(); }
   } );
 
   // typist operations
   module.addExtraOperation( 'list', {
     title: 'Start New Entry',
-    operation: function( $state, model ) { model.listModel.startNewEntry(); },
+    operation: async function( $state, model ) { await model.listModel.startNewEntry(); },
     isIncluded: function( $state, model ) { return model.isRole( 'typist' ); }
   } );
   module.addExtraOperation( 'view', {
     title: 'Submit Entry',
-    operation: function( $state, model ) { model.viewModel.typistSubmitEntry(); },
+    operation: async function( $state, model ) { await model.viewModel.typistSubmitEntry(); },
     isIncluded: function( $state, model ) { return model.isRole( 'typist' ); }
   } );
 
   // administrator operations
   module.addExtraOperation( 'view', {
     title: 'Return to Typist',
-    operation: function( $state, model ) {
-      model.viewModel.deferEntry().then( function() { model.viewModel.onView(); } );
+    operation: async function( $state, model ) {
+      await model.viewModel.deferEntry();
+      await model.viewModel.onView();
     },
     isDisabled: function( $state, model ) { return model.viewModel.record.completed; },
     isIncluded: function( $state, model ) { return !model.isRole( 'typist' ) && true === model.viewModel.record.submitted; }
   } );
   module.addExtraOperation( 'view', {
     title: 'Force Submit',
-    operation: function( $state, model ) {
-      model.viewModel.submitEntry().then( function() { model.viewModel.onView(); } );
+    operation: async function( $state, model ) {
+      await model.viewModel.submitEntry();
+      await model.viewModel.onView();
     },
     isDisabled: function( $state, model ) { return model.viewModel.record.completed; },
     isIncluded: function( $state, model ) { return !model.isRole( 'typist' ) && false === model.viewModel.record.submitted; }
@@ -256,37 +258,55 @@ cenozo.factory( 'CnBaseFormViewFactory', [
 
 /* ######################################################################################################## */
 cenozo.factory( 'CnBaseFormAdjudicateFactory', [
-  'CnSession', 'CnHttpFactory', '$state', '$q',
-  function( CnSession, CnHttpFactory, $state, $q ) {
+  'CnSession', 'CnHttpFactory', '$state',
+  function( CnSession, CnHttpFactory, $state ) {
     return {
       construct: function( object, module ) {
         var formName = module.subject.snake;
         var formEntryName = formName + '_entry';
         var validatedEntryColumn = 'validated_' + formEntryName + '_id';
 
-        object.module = module;
+        angular.extend( object, {
+          module: module,
 
-        object.reset = function() {
-          object.form = null;
-          object.isLoading = false;
-          object.formEntryList = [];
-          object.conflictColumnList = [];
-        };
-        object.reset();
+          reset: function() {
+            object.form = null;
+            object.isLoading = false;
+            object.formEntryList = [];
+            object.conflictColumnList = [];
+          },
 
-        object.onLoad = function() {
-          object.reset();
-          object.isLoading = true;
-          return $q.all( [
-            CnHttpFactory.instance( {
-              path: formName + '/' + $state.params.identifier,
-              data: { select: { column: [
-                'completed',
-                'invalid',
-                'adjudicate',
-                { column: validatedEntryColumn, alias: 'validated_form_id' }
-              ] } }
-            } ).get().then( function( response ) {
+          view: async function( entryId ) { await $state.go( formEntryName + '.view', { identifier: entryId } ); },
+
+          validate: async function( entryId ) {
+            var data = { completed: true };
+            await CnHttpFactory.instance( {
+              path: formName + '/' + object.form.id,
+              data: { adjudicate: entryId }
+            } ).patch();
+
+            //object.form[validatedEntryColumn] = entryId;
+            await object.onLoad();
+          },
+
+          viewParent: async function() {
+            await $state.go( '^.view', { identifier: $state.params.identifier } );
+          },
+
+          onLoad: async function() {
+            object.reset();
+            try {
+              object.isLoading = true;
+              var response = await CnHttpFactory.instance( {
+                path: formName + '/' + $state.params.identifier,
+                data: { select: { column: [
+                  'completed',
+                  'invalid',
+                  'adjudicate',
+                  { column: validatedEntryColumn, alias: 'validated_form_id' }
+                ] } }
+              } ).get();
+
               object.form = response.data;
               object.form.identifier = $state.params.identifier;
 
@@ -298,18 +318,18 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
 
               CnSession.setBreadcrumbTrail( [ {
                 title: module.name.plural.ucWords(),
-                go: function() { $state.go( '^.list' ); }
+                go: async function() { await $state.go( '^.list' ); }
               }, {
                 title: object.form.id,
-                go: function() { $state.go( '^.view', { identifier: $state.params.identifier } ); }
+                go: async function() { await $state.go( '^.view', { identifier: $state.params.identifier } ); }
               }, {
                 title: 'Adjudicate'
               } ] );
-            } ),
 
-            CnHttpFactory.instance( {
-              path: formName + '/' + $state.params.identifier + '/' + formEntryName
-            } ).get().then( function( response ) {
+              var response = await CnHttpFactory.instance( {
+                path: formName + '/' + $state.params.identifier + '/' + formEntryName
+              } ).get();
+
               object.formEntryList = response.data;
 
               // go through each entry to determine which columns don't match
@@ -330,26 +350,13 @@ cenozo.factory( 'CnBaseFormAdjudicateFactory', [
                 }
                 return list;
               }, [] );
-            } )
-          ] ).finally( function() { object.isLoading = false; } );
-        };
+            } finally {
+              object.isLoading = false;
+            }
+          }
+        } );
 
-        object.view = function( entryId ) { $state.go( formEntryName + '.view', { identifier: entryId } ); };
-
-        object.validate = function( entryId ) {
-          var data = { completed: true };
-          CnHttpFactory.instance( {
-            path: formName + '/' + object.form.id,
-            data: { adjudicate: entryId }
-          } ).patch().then( function() {
-            //object.form[validatedEntryColumn] = entryId;
-            object.onLoad();
-          } );
-        };
-
-        object.viewParent = function() {
-          $state.go( '^.view', { identifier: $state.params.identifier } );
-        }
+        object.reset();
       }
     };
   }
@@ -382,21 +389,21 @@ cenozo.factory( 'CnBaseFormEntryListFactory', [
         var formEntryName = parentModel.module.subject.snake;
         var formType = formEntryName.substring( 0, formEntryName.length - 11 ).camelToSnake().replace( /_/g, ' ' );
 
-        object.startNewEntry = function() {
-          CnHttpFactory.instance( {
+        object.startNewEntry = async function() {
+          var response = await CnHttpFactory.instance( {
             path: formEntryName,
             data: { user_id: CnSession.user.id },
-            onError: function( response ) {
-              if( 404 == response.status ) {
+            onError: function( error ) {
+              if( 404 == error.status ) {
                 CnModalMessageFactory.instance( {
                   title: 'No Forms Available',
                   message: 'There are no new ' + formType + ' forms available for transcription at this time.'
                 } ).show();
-              } else { CnModalMessageFactory.httpError( response ); }
+              } else { CnModalMessageFactory.httpError( error ); }
             }
-          } ).post().then( function( response ) {
-            $state.go( formEntryName + '.view', { identifier: response.data } );
-          } );
+          } ).post();
+
+          await $state.go( formEntryName + '.view', { identifier: response.data } );
         };
       }
     };
@@ -421,32 +428,32 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
           }
         } );
 
-        object.onPatchError = function( response ) {
+        object.onPatchError = async function( error ) {
           // handle 306 errors (uid doesn't match existing participant)
-          if( 306 == response.status ) {
-            CnModalMessageFactory.instance( {
+          if( 306 == error.status ) {
+            await CnModalMessageFactory.instance( {
               title: 'Participant Not Found',
-              message: JSON.parse( response.data ),
+              message: JSON.parse( error.data ),
               error: true
-            } ).show().then( function() {
-              object.record.uid = object.backupRecord.uid;
-            } );
-          } else object.$$onPatchError( response );
+            } ).show();
+            object.record.uid = object.backupRecord.uid;
+          } else object.$$onPatchError( error );
         };
 
-        object.deferEntry = function() {
-          return CnHttpFactory.instance( {
+        object.deferEntry = async function() {
+          await CnHttpFactory.instance( {
             path: formEntryName + '/' + object.record.id,
             data: { submitted: false }
-          } ).patch().then( object.onLoad );
+          } ).patch();
+          await object.onLoad();
         };
 
-        object.submitEntry = function() {
-          return CnHttpFactory.instance( {
+        object.submitEntry = async function() {
+          await CnHttpFactory.instance( {
             path: formEntryName +'/' + object.record.id,
             data: { submitted: true },
-            onError: function( response ) {
-              if( 400 == response.status && angular.isObject( response.data ) ) {
+            onError: function( error ) {
+              if( 400 == error.status && angular.isObject( error.data ) ) {
                 CnModalMessageFactory.instance( {
                   title: 'Error Found in Form',
                   message: 'There were errors found in the form which have been highlighted in red. ' +
@@ -454,19 +461,19 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
                 } ).show();
 
                 cenozo.forEachFormElement( 'form', function( element ) { element.$error = {}; } );
-                for( var name in response.data ) {
+                for( var name in error.data ) {
                   var element = cenozo.getFormElement( name );
                   if( element ) {
-                    if( 'Cannot be blank.' == response.data[name] ) element.$error.required = true;
-                    else element.$error.custom = response.data[name];
+                    if( 'Cannot be blank.' == error.data[name] ) element.$error.required = true;
+                    else element.$error.custom = error.data[name];
                   }
                 }
                 cenozo.forEachFormElement( 'form', function( element ) {
                   cenozo.updateFormElement( element, true );
                 } );
-              } else if( 409 == response.status ) {
+              } else if( 409 == error.status ) {
                 // highlight the duplicate rows
-                response.data.forEach( function( item ) {
+                error.data.forEach( function( item ) {
                   // convert participant_id to uid
                   if( 'participant_id' == item ) item = 'uid';
                   var element = cenozo.getFormElement( item );
@@ -475,20 +482,22 @@ cenozo.factory( 'CnBaseFormEntryViewFactory', [
                     cenozo.updateFormElement( element, true );
                   }
                 } );
-              } else CnModalMessageFactory.httpError( response );
+              } else CnModalMessageFactory.httpError( error );
             }
           } ).patch();
         };
 
-        object.typistSubmitEntry = function() {
-          CnModalConfirmFactory.instance( {
+        object.typistSubmitEntry = async function() {
+          var response = await CnModalConfirmFactory.instance( {
             title: 'Submit Entry',
             message: 'Are you sure you wish to submit this form?  This should only be done after you have ' +
                      'entered all information on the form.'
-          } ).show().then( function( response ) {
-            if( response )
-              object.submitEntry().then( function( response ) { $state.go( formEntryName + '.list' ); } );
-          } );
+          } ).show();
+
+          if( response ) {
+            await object.submitEntry();
+            await $state.go( formEntryName + '.list' );
+          }
         };
       }
     };
@@ -508,7 +517,9 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
           return object.$$getEditEnabled() && !object.viewModel.record.completed;
         };
 
-        CnSession.promise.then( function() {
+        async function init() {
+          await CnSession.promise;
+
           if( object.isRole( 'typist' ) ) {
             module.identifier = {};
             module.columnList.user.type = 'hidden';
@@ -520,7 +531,7 @@ cenozo.factory( 'CnBaseFormEntryModelFactory', [
               mainInputGroup.inputList.submitted.type = 'hidden';
             }
           }
-        } );
+        }
       }
     };
   }

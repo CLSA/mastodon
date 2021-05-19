@@ -196,8 +196,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnGeneralProxyFormEntryView', [
-    'CnGeneralProxyFormEntryModelFactory', '$timeout',
-    function( CnGeneralProxyFormEntryModelFactory, $timeout ) {
+    'CnGeneralProxyFormEntryModelFactory',
+    function( CnGeneralProxyFormEntryModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
@@ -232,42 +232,42 @@ define( function() {
     'CnBaseFormEntryModelFactory', 'CnGeneralProxyFormEntryListFactory', 'CnGeneralProxyFormEntryViewFactory', 'CnHttpFactory',
     function( CnBaseFormEntryModelFactory, CnGeneralProxyFormEntryListFactory, CnGeneralProxyFormEntryViewFactory, CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseFormEntryModelFactory.construct( this, module );
         this.listModel = CnGeneralProxyFormEntryListFactory.instance( this );
         this.viewModel = CnGeneralProxyFormEntryViewFactory.instance( this, root );
 
         // extend getMetadata
-        this.getMetadata = function() {
-          return this.$$getMetadata().then( function() {
-            return CnHttpFactory.instance( {
-              path: 'region',
-              data: {
-                select: {
-                  column: [
-                    'id',
-                    'country',
-                    { column: 'CONCAT_WS( ", ", name, country )', alias: 'name', table_prefix: false }
-                  ]
-                },
-                modifier: { order: ['country','name'], limit: 1000 }
-              }
-            } ).query().then( function success( response ) {
-              self.metadata.columnList.proxy_region_id.enumList = [];
-              self.metadata.columnList.informant_region_id.enumList = [];
-              response.data.forEach( function( item ) {
-                self.metadata.columnList.proxy_region_id.enumList.push( {
-                  value: item.id,
-                  country: item.country,
-                  name: item.name
-                } );
-                self.metadata.columnList.informant_region_id.enumList.push( {
-                  value: item.id,
-                  country: item.country,
-                  name: item.name
-                } );
-              } );
-            } )
+        this.getMetadata = async function() {
+          var self = this;
+          await this.$$getMetadata();
+
+          var response = await CnHttpFactory.instance( {
+            path: 'region',
+            data: {
+              select: {
+                column: [
+                  'id',
+                  'country',
+                  { column: 'CONCAT_WS( ", ", name, country )', alias: 'name', table_prefix: false }
+                ]
+              },
+              modifier: { order: ['country','name'], limit: 1000 }
+            }
+          } ).query();
+
+          this.metadata.columnList.proxy_region_id.enumList = [];
+          this.metadata.columnList.informant_region_id.enumList = [];
+          response.data.forEach( function( item ) {
+            self.metadata.columnList.proxy_region_id.enumList.push( {
+              value: item.id,
+              country: item.country,
+              name: item.name
+            } );
+            self.metadata.columnList.informant_region_id.enumList.push( {
+              value: item.id,
+              country: item.country,
+              name: item.name
+            } );
           } );
         };
       };

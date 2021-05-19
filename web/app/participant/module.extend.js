@@ -35,7 +35,7 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
         };
 
         if( 'administrator' == CnSession.role.name || 'curator' == CnSession.role.name ) {
-          object.downloadOpalForms = function() {
+          object.downloadOpalForms = async function() {
             var modal = CnModalMessageFactory.instance( {
               title: 'Please Wait',
               message: 'Please wait while the participant\'s data is retrieved from Opal.',
@@ -43,10 +43,14 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
             } );
             modal.show();
 
-            return CnHttpFactory.instance( {
-              path: 'participant/' + object.record.getIdentifier() + '?opal_forms=1',
-              format: 'zip'
-            } ).file().finally( function() { modal.close(); } );
+            try {
+              await CnHttpFactory.instance( {
+                path: 'participant/' + object.record.getIdentifier() + '?opal_forms=1',
+                format: 'zip'
+              } ).file();
+            } finally {
+              modal.close();
+            }
           };
         }
         
@@ -75,57 +79,41 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnParticipantReleaseFactory', [
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state', '$q',
-    function( CnSession, CnHttpFactory, CnModalMessageFactory, $state, $q ) {
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', '$state',
+    function( CnSession, CnHttpFactory, CnModalMessageFactory, $state ) {
       var object = function() {
-        var self = this;
-        this.participant = null;
+        angular.extend( this, {
+          promise: null,
+          participant: null,
 
-        // set up the breadcrumb trail
-        this.promise = CnHttpFactory.instance( {
-          path: 'participant/' + $state.params.identifier,
-          data: { select: { column: [ 'uid' ] } }
-        } ).get().then( function( response ) {
-          self.participant = response.data;
-          self.participant.identifier = $state.params.identifier;
-          CnSession.setBreadcrumbTrail( [ {
-            title: 'Participants',
-            go: function() { $state.go( 'participant.list' ); }
-          }, {
-            title: response.data.uid,
-            go: function() { $state.go( 'participant.view', { identifier: $state.params.identifier } ); }
-          }, {
-            title: 'Release'
-          } ] );
-        } );
+          viewParticipant: async function() {
+            await $state.go( 'participant.view', { identifier: $state.params.identifier } );
+          },
 
-        this.viewParticipant = function() {
-          $state.go( 'participant.view', { identifier: $state.params.identifier } );
-        };
+          releaseParticipant: async function( application ) {
+            await this.promise;
 
-        this.releaseParticipant = function( application ) {
-          self.promise.then( function() {
-            CnHttpFactory.instance( {
+            await CnHttpFactory.instance( {
               path: 'application/' + application.id + '/participant',
-              data: self.participant.id
-            } ).post().then( function() {
-              application.datetime = moment().format();
-            } );
-          } );
-        };
+              data: this.participant.id
+            } ).post();
 
-        this.setPreferredSite = function( application ) {
-          self.promise.then( function() {
+            application.datetime = moment().format();
+          },
+
+          setPreferredSite: async function( application ) {
+            await this.promise;
+
             // get the new site
             var site = application.siteList.findByProperty( 'id', application.preferred_site_id );
 
-            CnHttpFactory.instance( {
+            await CnHttpFactory.instance( {
               path: 'participant/' + $state.params.identifier,
               data: {
                 application_id: application.id,
                 preferred_site_id: angular.isDefined( site.id ) ? site.id : null
               },
-              onError: function( response ) {
+              onError: function( error ) {
                 CnModalMessageFactory.instance( {
                   title: 'Unable To Set Preferred Site',
                   message: 'There was a problem while trying to set the participant\'s preferred site for ' +
@@ -134,47 +122,78 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
                 } ).show();
               }
             } ).patch();
-          } );
-        };
+          },
 
-        this.reset = function() {
-          self.isLoading = false;
-          self.applicationList = [];
-        };
-        this.reset();
+          reset: function() {
+            this.isLoading = false;
+            this.applicationList = [];
+          },
 
-        this.onLoad = function() {
-          return self.promise.then( function() {
-            self.reset();
-            self.isLoading = true;
+          onLoad: async function() {
+            await this.promise;
+            this.reset();
 
-            // get the application list with respect to this participant
-            return CnHttpFactory.instance( {
-              path: 'participant/' + $state.params.identifier + '/application',
-              data: { select: { column: [
-                'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
-              ] } }
-            } ).get().then( function( response ) {
-              self.applicationList = response.data;
+            try {
+              // get the application list with respect to this participant
+              this.isLoading = true;
+              var response = await CnHttpFactory.instance( {
+                path: 'participant/' + $state.params.identifier + '/application',
+                data: { select: { column: [
+                  'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
+                ] } }
+              } ).get();
+
+              this.applicationList = response.data;
 
               // get the site list for each application
-              var promiseList = [];
-              self.applicationList.forEach( function( application ) {
-                if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
-                promiseList.push(
-                  CnHttpFactory.instance( {
+              var promiseList = this.applicationList.reduce( function( list, application ) {
+                var getSiteListFn = async function() {
+                  if( null == application.preferred_site_id ) application.preferred_site_id = undefined;
+                  var response = await CnHttpFactory.instance( {
                     path: 'application/' + application.id + '/site',
                     data: { select: { column: [ 'name' ] } }
-                  } ).get().then( function( response ) {
-                    application.siteList = response.data;
-                    application.siteList.unshift( { id: undefined, name: '(none)' } );
-                  } )
-                );
-              } );
-              return $q.all( promiseList );
-            } ).finally( function() { self.isLoading = false; } );
-          } );
-        };
+                  } ).get();
+
+                  application.siteList = response.data;
+                  application.siteList.unshift( { id: undefined, name: '(none)' } );
+                }
+
+                list.push( getSiteListFn() );
+                return list;
+              }, [] );
+
+              await Promise.all( promiseList );
+            } finally {
+              this.isLoading = false;
+            }
+          }
+        } );
+
+        var self = this;
+        async function init() {
+          // set up the breadcrumb trail
+          self.promise = CnHttpFactory.instance( {
+            path: 'participant/' + $state.params.identifier,
+            data: { select: { column: [ 'uid' ] } }
+          } ).get();
+          
+          var response = await self.promise;
+
+          self.participant = response.data;
+          self.participant.identifier = $state.params.identifier;
+          CnSession.setBreadcrumbTrail( [ {
+            title: 'Participants',
+            go: async function() { await $state.go( 'participant.list' ); }
+          }, {
+            title: response.data.uid,
+            go: async function() { await $state.go( 'participant.view', { identifier: $state.params.identifier } ); }
+          }, {
+            title: 'Release'
+          } ] );
+        }
+
+        init();
+        this.reset();
       };
 
       return { instance: function() { return new object( false ); } };
