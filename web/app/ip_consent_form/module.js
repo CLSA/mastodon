@@ -72,8 +72,8 @@ define( function() {
           column: 'accept',
           title: 'Consent to Act as Information Provider'
         }, {
-          column: 'alternate_id',
-          title: 'Alternate'
+          column: 'alternate_full_name',
+          title: 'Information Provider'
         }, {
           column: 'signed',
           title: 'Signed'

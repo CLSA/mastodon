@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.7';
-$SETTINGS['general']['build'] = 'e99827c';
+$SETTINGS['general']['build'] = '4e6a154';
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );

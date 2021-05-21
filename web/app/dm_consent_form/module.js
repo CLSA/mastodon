@@ -72,8 +72,8 @@ define( function() {
           column: 'accept',
           title: 'Consent to Act as Decision Maker'
         }, {
-          column: 'alternate_id',
-          title: 'Alternate'
+          column: 'alternate_full_name',
+          title: 'Decision Maker'
         }, {
           column: 'signed',
           title: 'Signed'

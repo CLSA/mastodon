@@ -21,6 +21,10 @@ class module extends \mastodon\service\base_form_entry_module
     parent::prepare_read( $select, $modifier );
 
     $modifier->left_join( 'user', 'dm_consent_form_entry.user_id', 'user.id' );
+    $modifier->left_join( 'participant', 'dm_consent_form_entry.participant_id', 'participant.id' );
+    $modifier->left_join( 'alternate', 'dm_consent_form_entry.alternate_id', 'alternate.id' );
+    $select->add_table_column( 'participant', 'uid' );
+    $select->add_column( 'CONCAT_WS( " ", alternate.first_name, alternate.last_name )', 'alternate_full_name', false );
 
     if( !is_null( $this->get_resource() ) )
     {
