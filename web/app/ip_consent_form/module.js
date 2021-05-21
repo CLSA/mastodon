@@ -70,7 +70,7 @@ define( function() {
           title: 'UID'
         }, {
           column: 'accept',
-          title: 'Consent to Act as Decision Maker'
+          title: 'Consent to Act as Information Provider'
         }, {
           column: 'alternate_id',
           title: 'Alternate'
