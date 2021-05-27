@@ -15,7 +15,7 @@ define( function() {
 
   module.addInputGroup( 'Details', {
     accept: {
-      title: 'Consent to Act as Decision Maker',
+      title: 'Consent to Act as Information Provider',
       type: 'boolean'
     },
     alternate_id: {

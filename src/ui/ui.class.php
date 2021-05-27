@@ -147,8 +147,8 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
     if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
-    $this->add_listitem( 'Decision Maker Forms', 'dm_consent_form' );
-    $this->add_listitem( 'Information Provider Forms', 'ip_consent_form' );
+    $this->add_listitem( 'Proxy DM Forms', 'dm_consent_form' );
+    $this->add_listitem( 'Proxy IP Forms', 'ip_consent_form' );
 
     if( 'typist' == $db_role->name )
     {
@@ -158,8 +158,8 @@ class ui extends \cenozo\ui\ui
       $this->add_listitem( 'Extended HIN Form Entries', 'extended_hin_form_entry' );
       $this->add_listitem( 'General Proxy Form Entries', 'general_proxy_form_entry' );
       $this->add_listitem( 'Proxy Form Entries', 'proxy_form_entry' );
-      $this->add_listitem( 'Decision Maker Form Entries', 'dm_consent_form_entry' );
-      $this->add_listitem( 'Information Provider Form Entries', 'ip_consent_form_entry' );
+      $this->add_listitem( 'Proxy DM Form Entries', 'dm_consent_form_entry' );
+      $this->add_listitem( 'Proxy IP Form Entries', 'ip_consent_form_entry' );
     }
   }
 
