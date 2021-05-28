@@ -16,4 +16,5 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'ip_consent_form_entry', 'GET', 0, 1 ),
 ( 'ip_consent_form_entry', 'GET', 1, 1 ),
 ( 'ip_consent_form_entry', 'PATCH', 1, 1 ),
-( 'ip_consent_form_entry', 'POST', 0, 1 );
+( 'ip_consent_form_entry', 'POST', 0, 1 ),
+( 'proxy_type', 'PATCH', 1, 1 );
