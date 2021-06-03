@@ -25,15 +25,10 @@ define( function() {
         table: 'alternate',
         select: 'CONCAT( alternate.first_name, " ", alternate.last_name, " (", IF( ' +
           'proxy AND informant, ' +
-          '"information provider and information provider", ' +
-          'IF( proxy, "information provider", "information provider" ) ' +
+          '"decision maker and information provider", ' +
+          'IF( proxy, "decision maker", "information provider" ) ' +
         '), ")" )',
         where: [ 'alternate.first_name', 'alternate.last_name' ]
-        /*
-        modifier: {
-          where: { column: '', operator: '=', value: 
-        }
-        */
       }
     },
     signed: {
