@@ -138,9 +138,10 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
               this.isLoading = true;
               var response = await CnHttpFactory.instance( {
                 path: 'participant/' + $state.params.identifier + '/application',
-                data: { select: { column: [
-                  'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id'
-                ] } }
+                data: {
+                  select: { column: [ 'title', 'release_based', 'datetime', 'default_site_id', 'preferred_site_id' ] },
+                  modifier: { order: 'title' }
+                }
               } ).get();
 
               this.applicationList = response.data;
