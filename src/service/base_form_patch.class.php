@@ -75,7 +75,23 @@ class base_form_patch extends \cenozo\service\patch
         );
       }
 
-      $record->import( $db_form_entry );
+      try
+      {
+        $record->import( $db_form_entry );
+      }
+      catch( \cenozo\exception\database $e )
+      {
+        if( $e->is_duplicate_entry() )
+        {
+          throw lib::create( 'exception\notice',
+            'A form of the same type and date already exists for this participant. '.
+            'The form cannot be imported and must be invalidated by an administrator.',
+            __METHOD__,
+            $e
+          );
+        }
+        else throw $e;
+      }
     }
   }
 
