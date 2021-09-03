@@ -75,22 +75,36 @@ class base_form_patch extends \cenozo\service\patch
         );
       }
 
-      try
+      // make sure the entry has no errors
+      $errors = $db_form_entry->get_errors();
+      if( 0 < count( $errors ) )
       {
-        $record->import( $db_form_entry );
+        foreach( $errors as $column => $message )
+          $errors[$column] = sprintf( '%s => %s', ucwords( str_replace( '_', ' ', str_replace( '_id', '', $column ) ) ), $message );
+        throw lib::create( 'exception\notice',
+          "The entry cannot be imported because it has the following error(s):\n".implode( "\n", $errors ),
+          __METHOD__
+        );
       }
-      catch( \cenozo\exception\database $e )
+      else
       {
-        if( $e->is_duplicate_entry() )
+        try
         {
-          throw lib::create( 'exception\notice',
-            'A form of the same type and date already exists for this participant. '.
-            'The form cannot be imported and must be invalidated by an administrator.',
-            __METHOD__,
-            $e
-          );
+          $record->import( $db_form_entry );
         }
-        else throw $e;
+        catch( \cenozo\exception\database $e )
+        {
+          if( $e->is_duplicate_entry() )
+          {
+            throw lib::create( 'exception\notice',
+              'A form of the same type and date already exists for this participant. '.
+              'The form cannot be imported and must be invalidated by an administrator.',
+              __METHOD__,
+              $e
+            );
+          }
+          else throw $e;
+        }
       }
     }
   }
