@@ -42,6 +42,8 @@ define( 'ARGUMENT__MASTODON_SERVICE_APPLICATION_PARTICIPANT_POST__EXECUTE__ERRNO
 /**
  * "notice" error codes
  */
+define( 'NOTICE__MASTODON_SERVICE_BASE_FORM_PATCH__EXECUTE__ERRNO',
+        NOTICE_MASTODON_BASE_ERRNO + 1 );
 
 /**
  * "permission" error codes
