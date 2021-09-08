@@ -75,7 +75,7 @@ class patch
       'SELECT application.id AS application_id, '.
              'application.name AS application_name, '.
              'application_type.name AS application_type_name, '.
-             'update_participant_site '.
+             'site_based '.
       'FROM %s.application '.
       'JOIN %s.application_type ON application.application_type_id = application_type.id '.
       'ORDER BY application.name',
@@ -99,7 +99,7 @@ class patch
     {
       $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['application_name'] );
 
-      // always drop the procedure in case we're removing an application from the update_participant_site category
+      // always drop the procedure in case we're removing an application from the site_based category
       $sql = sprintf(
         'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_jurisdiction',
         $application_db
@@ -111,7 +111,7 @@ class patch
         die();
       }
 
-      if( $row['update_participant_site'] )
+      if( $row['site_based'] )
       {
         $update_participant_site_for_participant_sql .= sprintf(
           "    -- update %s\n".
