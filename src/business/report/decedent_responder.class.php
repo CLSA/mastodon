@@ -36,7 +36,7 @@ class decedent_responder extends \cenozo\business\report\base_report
     $select->add_column( 'address.city', 'City', false );
     $select->add_column( 'region.abbreviation', 'Province/State', false );
     $select->add_column( 'address.postcode', 'Postcode', false );
-    $select->add_column( 'region.country', 'Country', false );
+    $select->add_column( 'country.name', 'Country', false );
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'language', 'participant.language_id', 'language.id' );
@@ -49,6 +49,7 @@ class decedent_responder extends \cenozo\business\report\base_report
     $modifier->left_join( 'alternate_first_address', 'alternate.id', 'alternate_first_address.alternate_id' );
     $modifier->left_join( 'address', 'alternate_first_address.address_id', 'address.id' );
     $modifier->left_join( 'region', 'address.region_id', 'region.id' );
+    $modifier->left_join( 'country', 'region.country_id', 'country.id' );
 
     // set up requirements
     $this->apply_restrictions( $modifier );
