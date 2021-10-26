@@ -1,8 +1,4 @@
-// extend the framework's module
-define( [ cenozoApp.module( 'form' ).getFileUrl( 'module.js' ) ], function() {
-  'use strict';
-
-  var module = cenozoApp.module( 'form' );
+cenozoApp.extendModule( { name: 'form', create: module => {
 
   module.addInput( '', 'form_type_name', {
     column: 'form_type.name',
@@ -50,4 +46,4 @@ define( [ cenozoApp.module( 'form' ).getFileUrl( 'module.js' ) ], function() {
     }
   ] );
 
-} );
+} } );

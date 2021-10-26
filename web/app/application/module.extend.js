@@ -1,8 +1,4 @@
-// extend the framework's module
-define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], function() {
-  'use strict';
-
-  var module = cenozoApp.module( 'application' );
+cenozoApp.extendModule( { name: 'application', create: module => {
 
   if( angular.isDefined( cenozoApp.module( 'participant' ).actions.release ) ) {
     module.addExtraOperation( 'list', {
@@ -132,4 +128,4 @@ define( [ cenozoApp.module( 'application' ).getFileUrl( 'module.js' ) ], functio
     }
   ] );
 
-} );
+} } );

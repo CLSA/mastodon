@@ -1,8 +1,5 @@
-// extend the framework's module
-define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], function() {
-  'use strict';
+cenozoApp.extendModule( { name: 'participant', create: module => {
 
-  var module = cenozoApp.module( 'participant' );
   delete module.columnList.site;
   var index = module.inputGroupList.findIndexByProperty( 'title', 'Site & Contact Details' );
   if( null != index ) {
@@ -201,4 +198,4 @@ define( [ cenozoApp.module( 'participant' ).getFileUrl( 'module.js' ) ], functio
     }
   ] );
 
-} );
+} } );
