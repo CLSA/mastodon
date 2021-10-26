@@ -84,7 +84,6 @@ define( function() {
     function( CnBaseFormEntryModelFactory,
               CnConsentFormEntryListFactory, CnConsentFormEntryViewFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseFormEntryModelFactory.construct( this, module );
         this.listModel = CnConsentFormEntryListFactory.instance( this );
         this.viewModel = CnConsentFormEntryViewFactory.instance( this, root );
