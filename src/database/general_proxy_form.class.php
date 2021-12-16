@@ -50,7 +50,10 @@ class general_proxy_form extends base_form
     if( !is_null( $db_general_proxy_form_entry->proxy_first_name ) &&
         !is_null( $db_general_proxy_form_entry->proxy_last_name ) )
     {
-      $db_form->add_proxy_alternate( array(
+      $alternate_type_list = ['proxy'];
+      if( $informant_same && $informant_same ) $alternate_type_list[] = 'informant';
+      $db_form->add_alternate( array(
+        'alternate_type_list' => $alternate_type_list,
         'first_name' => $db_general_proxy_form_entry->proxy_first_name,
         'last_name' => $db_general_proxy_form_entry->proxy_last_name,
         'global_note' => $db_general_proxy_form_entry->proxy_note,
@@ -65,15 +68,14 @@ class general_proxy_form extends base_form
         'postcode' => $db_general_proxy_form_entry->proxy_postcode,
         'address_note' => $db_general_proxy_form_entry->proxy_address_note,
         'phone' => $db_general_proxy_form_entry->proxy_phone,
-        'phone_note' => $db_general_proxy_form_entry->proxy_phone_note,
-        'informant' => $informant_same,
-        'same_as_proxy' => $informant_same
-      ) );
+        'phone_note' => $db_general_proxy_form_entry->proxy_phone_note
+      ));
     }
 
     if( $informant_exists && !$informant_same )
     {
-      $db_form->add_informant_alternate( array(
+      $db_form->add_alternate( array(
+        'alternate_type_list' => ['informant'],
         'first_name' => $db_general_proxy_form_entry->informant_first_name,
         'last_name' => $db_general_proxy_form_entry->informant_last_name,
         'global_note' => $db_general_proxy_form_entry->informant_note,

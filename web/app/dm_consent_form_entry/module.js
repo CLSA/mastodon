@@ -23,11 +23,7 @@ define( function() {
       type: 'lookup-typeahead',
       typeahead: {
         table: 'alternate',
-        select: 'CONCAT( alternate.first_name, " ", alternate.last_name, " (", IF( ' +
-          'proxy AND informant, ' +
-          '"decision maker and information provider", ' +
-          'IF( proxy, "decision maker", "information provider" ) ' +
-        '), ")" )',
+        select: 'CONCAT( alternate.first_name, " ", alternate.last_name, " (", alternate_type_list, ")" )',
         where: [ 'alternate.first_name', 'alternate.last_name' ]
       }
     },
@@ -102,13 +98,21 @@ define( function() {
         this.getTypeaheadData = function( input, viewValue ) {
           var data = self.$$getTypeaheadData( input, viewValue );
 
-          // only include the selected participant's proxies and informants
+          // only include the selected participant's DMs and IPs
           if( 'alternate' == input.typeahead.table ) {
+            data.modifier.where.push( { bracket: true, open: true } );
             data.modifier.where.push( {
-              column: 'alternate.proxy',
-              operator: '=',
-              value: true
+              column: 'alternate_type_list',
+              operator: 'LIKE',
+              value: '%decision maker%'
             } );
+            data.modifier.where.push( {
+              column: 'alternate_type_list',
+              operator: 'LIKE',
+              value: '%information provider%',
+              or: true
+            } );
+            data.modifier.where.push( { bracket: true, open: false } );
             data.modifier.where.push( {
               column: 'alternate.participant_id',
               operator: '=',

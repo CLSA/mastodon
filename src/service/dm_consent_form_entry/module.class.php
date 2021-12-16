@@ -36,13 +36,11 @@ class module extends \mastodon\service\base_form_entry_module
       );
 
       // include the alternate first/last/type as supplemental data
-      $modifier->left_join( 'alternate', 'dm_consent_form_entry.alternate_id', 'alternate.id' );
+      $modifier->left_join( 'alternate_has_alternate_type', 'alternate.id', 'alternate_has_alternate_type.alternate_id' );
+      $modifier->left_join( 'alternate_type', 'alternate_has_alternate_type.alternate_type_id', 'alternate_type.id' );
+      $modifier->group( 'alternate.id' );
       $select->add_column(
-        'CONCAT( alternate.first_name, " ", alternate.last_name, " (", IF('.
-          'proxy AND informant, '.
-          '"decision maker and information provider", '.
-          'IF( proxy, "decision maker", "information provider" ) '.
-        '), ")" )',
+        'CONCAT( alternate.first_name, " ", alternate.last_name, " (", GROUP_CONCAT( alternate_type.title ), ")" )',
         'formatted_alternate_id',
         false
       );

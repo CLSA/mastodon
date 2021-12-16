@@ -62,7 +62,10 @@ class proxy_form extends base_form
 
     if( $db_proxy_form_entry->proxy )
     {
-      $db_form->add_proxy_alternate( array(
+      $alternate_type_list = ['proxy'];
+      if( $db_proxy_form_entry->informant, $db_proxy_form_entry->same_as_proxy ) $alternate_type_list[] = 'informant';
+      $db_form->add_alternate( array(
+        'alternate_type_list' => $alternate_type_list,
         'first_name' => $db_proxy_form_entry->proxy_first_name,
         'last_name' => $db_proxy_form_entry->proxy_last_name,
         'global_note' => $db_proxy_form_entry->proxy_note,
@@ -78,14 +81,13 @@ class proxy_form extends base_form
         'address_note' => $db_proxy_form_entry->proxy_address_note,
         'phone' => $db_proxy_form_entry->proxy_phone,
         'phone_note' => $db_proxy_form_entry->proxy_phone_note,
-        'informant' => $db_proxy_form_entry->informant,
-        'same_as_proxy' => $db_proxy_form_entry->same_as_proxy
       ) );
     }
 
     if( $db_proxy_form_entry->informant && !$db_proxy_form_entry->same_as_proxy )
     {
-      $db_form->add_informant_alternate( array(
+      $db_form->add_alternate( array(
+        'alternate_type_list' => ['informant'],
         'first_name' => $db_proxy_form_entry->informant_first_name,
         'last_name' => $db_proxy_form_entry->informant_last_name,
         'global_note' => $db_proxy_form_entry->informant_note,
