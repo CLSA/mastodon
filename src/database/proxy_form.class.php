@@ -63,7 +63,7 @@ class proxy_form extends base_form
     if( $db_proxy_form_entry->proxy )
     {
       $alternate_type_list = ['proxy'];
-      if( $db_proxy_form_entry->informant, $db_proxy_form_entry->same_as_proxy ) $alternate_type_list[] = 'informant';
+      if( $db_proxy_form_entry->informant && $db_proxy_form_entry->same_as_proxy ) $alternate_type_list[] = 'informant';
       $db_form->add_alternate( array(
         'alternate_type_list' => $alternate_type_list,
         'first_name' => $db_proxy_form_entry->proxy_first_name,
