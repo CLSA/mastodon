@@ -28,9 +28,17 @@ class dm_consent_form extends base_form
     );
     $datetime_obj->setTime( 12, 0 );
 
+    // reactivate if necessary
+    $db_alternate = $db_dm_consent_form_entry->get_alternate();
+    if( !$db_alternate->active )
+    {
+      $db_alternate->active = true;
+      $db_alternate->save();
+    }
+
     $this->get_form()->add_proxy_consent(
       'decision maker',
-      $db_dm_consent_form_entry->alternate_id,
+      $db_alternate->id,
       array( 'accept' => $db_dm_consent_form_entry->accept, 'datetime' => $datetime_obj )
     );
   }
