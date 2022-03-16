@@ -54,7 +54,7 @@ class opal_form_template extends \cenozo\database\record
 
         if( !file_exists( $pdf_template ) )
         {
-          log::warning( 'Unable to find a PDF template "%s"', $pdf_template );
+          log::warning( sprintf( 'Unable to find a PDF template "%s"', $pdf_template ) );
         }
         else
         {
