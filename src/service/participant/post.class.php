@@ -147,7 +147,7 @@ class post extends \cenozo\service\participant\post
             $site_sel = lib::create( 'database\select' );
             $site_sel->from( 'participant' );
             $site_sel->add_table_column( 'cohort', 'name', 'cohort' );
-            $site_sel->add_table_column( 'site', 'name', 'site' );
+            $site_sel->add_column( 'IFNULL( site.name, "(none)" )', 'site', false );
             $site_sel->add_column( 'COUNT(*)', 'total', false );
             $site_mod = lib::create( 'database\modifier' );
             $site_mod->join( 'cohort', 'participant.cohort_id', 'cohort.id' );
@@ -155,7 +155,7 @@ class post extends \cenozo\service\participant\post
             $join_mod->where( 'participant.id', '=', 'participant_site.participant_id', false );
             $join_mod->where( 'participant_site.application_id', '=', $this->db_application->id );
             $site_mod->join_modifier( 'participant_site', $join_mod );
-            $site_mod->join( 'site', 'participant_site.site_id', 'site.id' );
+            $site_mod->left_join( 'site', 'participant_site.site_id', 'site.id' );
             
             if( is_null( $db_identifier ) )
             {
