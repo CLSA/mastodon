@@ -30,6 +30,8 @@ class application extends \cenozo\database\application
     if( !is_a( $participant_mod, lib::get_class_name( 'database\modifier' ) ) )
       throw lib::create( 'exception\argument', 'participant_mod', $participant_mod, __METHOD__ );
     
+    $participant_class_name = lib::get_class_name( 'database\participant' );
+
     $participant_sel = lib::create( 'database\select' );
     $participant_sel->from( 'participant' );
     $participant_sel->add_table_column( 'application', 'id', 'application_id' );
@@ -45,6 +47,19 @@ class application extends \cenozo\database\application
     $sub_mod->where( 'participant.id', '=', 'app_has_participant.participant_id', false );
     $sub_mod->where( 'app_has_participant.application_id', '=', 'application.id', false );
     $participant_mod->join_modifier( 'application_has_participant', $sub_mod, 'left', 'app_has_participant' );
+
+    // get a list of all participants who are being released (used to add to the study below)
+    $idlist_select = lib::create( 'database\select' );
+    $idlist_select->from( 'participant' );
+    $idlist_select->add_column( 'id', 'participant_id' );
+
+    $idlist_mod = clone $participant_mod;
+
+    $id_list = array_reduce(
+      $participant_class_name::select( $idlist_select, $participant_mod ),
+      function( $id_list, $row ) { $id_list[] = $row['participant_id']; return $id_list; },
+      array()
+    );
 
     // used below
     $event_mod = clone $participant_mod;
@@ -77,24 +92,17 @@ class application extends \cenozo\database\application
     static::db()->execute( $event_sql );
 
     // add the participant to the application's study, if there is one
-    $db_study_phase = $this->get_study_phase();
-    if( !is_null( $db_study_phase ) )
+    if( 0 < count( $id_list ) )
     {
-      $db_study = $db_study_phase->get_study();
-
-      $select = lib::create( 'database\select' );
-      $select->from( 'participant' );
-      $select->add_column( 'id', 'participant_id' );
-
-      $id_list = array_reduce(
-        $participant_class_name::select( $select, $participant_mod ),
-        function( $id_list, $row ) { $id_list[] = $row['participant_id']; return $id_list; },
-        array()
-      );
-
-      if( 0 < count( $id_list ) )
+      $db_study_phase = $this->get_study_phase();
+      if( !is_null( $db_study_phase ) )
       {
-        $db_study->add_participant( $id_list );
+        $db_study = $db_study_phase->get_study();
+
+        if( 0 < count( $id_list ) )
+        {
+          $db_study->add_participant( $id_list );
+        }
       }
     }
   }
