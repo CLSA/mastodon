@@ -61,6 +61,7 @@ class application extends \cenozo\database\application
 
     static::db()->execute( $sql );
 
+    // add the release event
     $event_sel = lib::create( 'database\select' );
     $event_sel->from( 'participant' );
     $event_sel->add_column( 'id', 'participant_id' );
@@ -74,5 +75,27 @@ class application extends \cenozo\database\application
       $event_mod->get_sql() );
 
     static::db()->execute( $event_sql );
+
+    // add the participant to the application's study, if there is one
+    $db_study_phase = $this->get_study_phase();
+    if( !is_null( $db_study_phase ) )
+    {
+      $db_study = $db_study_phase->get_study();
+
+      $select = lib::create( 'database\select' );
+      $select->from( 'participant' );
+      $select->add_column( 'id', 'participant_id' );
+
+      $id_list = array_reduce(
+        $participant_class_name::select( $select, $participant_mod ),
+        function( $id_list, $row ) { $id_list[] = $row['participant_id']; return $id_list; },
+        array()
+      );
+
+      if( 0 < count( $id_list ) )
+      {
+        $db_study->add_participant( $id_list );
+      }
+    }
   }
 }
