@@ -4,6 +4,7 @@ SET AUTOCOMMIT=0;
 
 SOURCE table_character_sets.sql
 
+SOURCE consent_type.sql
 SOURCE service.sql
 SOURCE role_has_service.sql
 
