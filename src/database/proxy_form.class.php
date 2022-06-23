@@ -54,7 +54,7 @@ class proxy_form extends base_form
     if( !is_null( $db_proxy_form_entry->hin_future_access ) )
     {
       $db_form->add_consent(
-        'HIN future access',
+        'continue health card',
         array( 'accept' => $db_proxy_form_entry->hin_future_access ),
         $note
       );

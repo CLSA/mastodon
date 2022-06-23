@@ -32,7 +32,7 @@ class general_proxy_form extends base_form
         'continue DCS visits', array( 'accept' => $db_general_proxy_form_entry->continue_dcs_visits ) );
     if( !is_null( $db_general_proxy_form_entry->hin_future_access ) )
       $db_form->add_consent(
-        'HIN future access', array( 'accept' => $db_general_proxy_form_entry->hin_future_access ) );
+        'continue health card', array( 'accept' => $db_general_proxy_form_entry->hin_future_access ) );
 
     $informant_exists =
       !is_null( $db_general_proxy_form_entry->informant_first_name ) &&
