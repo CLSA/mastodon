@@ -25,5 +25,6 @@ $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
 $SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/form_out';
 
 // add modules used by the application
+$SETTINGS['module']['equipment'] = true;
 $SETTINGS['module']['pdf'] = true;
 $SETTINGS['module']['script'] = true;
