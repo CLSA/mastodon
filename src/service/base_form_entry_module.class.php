@@ -133,14 +133,19 @@ abstract class base_form_entry_module extends \cenozo\service\module
     $modifier->join( 'user', $form_entry_name.'.user_id', 'user.id' );
     $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'user', false );
 
-    if( !is_null( $this->get_resource() ) && 'contact_form_entry' != $form_entry_name )
+    if( 'contact_form_entry' != $form_entry_name )
     {
-      // include the participant first/last/uid as supplemental data
       $modifier->left_join( 'participant', sprintf( '%s.participant_id', $form_entry_name ), 'participant.id' );
-      $select->add_column(
-        'CONCAT( participant.first_name, " ", participant.last_name, " (", participant.uid, ")" )',
-        'formatted_participant_id',
-        false );
+      $select->add_table_column( 'participant', 'uid' );
+
+      if( !is_null( $this->get_resource() ) && 'contact_form_entry' != $form_entry_name )
+      {
+        // include the participant first/last/uid as supplemental data
+        $select->add_column(
+          'CONCAT( participant.first_name, " ", participant.last_name, " (", participant.uid, ")" )',
+          'formatted_participant_id',
+          false );
+      }
     }
   }
 
