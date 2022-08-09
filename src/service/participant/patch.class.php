@@ -37,7 +37,7 @@ class patch extends \cenozo\service\participant\patch
   {
     parent::validate();
 
-    if( 300 > $this->status->get_code() )
+    if( $this->may_continue() )
     {
       // make sure that, if we are updating the preferred site, that an application is also included
       if( $this->update_preferred_site && is_null( $this->db_application ) ) $this->status->set_code( 400 );

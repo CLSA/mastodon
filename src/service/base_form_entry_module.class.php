@@ -25,7 +25,7 @@ abstract class base_form_entry_module extends \cenozo\service\module
     $form_entry_name = $this->get_subject();
     $form_name = str_replace( '_entry', '', $form_entry_name );
 
-    if( 300 > $this->get_status()->get_code() )
+    if( $this->service->may_continue() )
     {
       $method = $this->get_method();
 

@@ -37,7 +37,7 @@ class base_form_patch extends \cenozo\service\patch
   {
     parent::validate();
 
-    if( 300 > $this->status->get_code() )
+    if( $this->may_continue() )
     {
       $this->get_file_as_array(); // make sure to process the site array before the following check
 
