@@ -23,7 +23,7 @@ class application extends \cenozo\database\application
   public function release_participants( $participant_mod )
   {
     if( is_null( $this->id ) )
-      throw lib::create( 'database\runtime',
+      throw lib::create( 'exception\runtime',
         'Tried to release participants to application with no primary key.',
         __METHOD__ );
 
