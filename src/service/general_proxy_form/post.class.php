@@ -25,7 +25,6 @@ class post extends \cenozo\service\post
     $form_type_class_name = lib::create( 'database\form_type' );
 
     // make sure the form's data doesn't already exist
-    $unique_columns = array( 'participant_id', 'form_type_id', 'date' );
     $post_object = $this->get_file_as_object();
     $db_form_type = $form_type_class_name::get_unique_record( 'name', 'general_proxy' );
 
@@ -33,7 +32,12 @@ class post extends \cenozo\service\post
                     ? $participant_class_name::get_unique_record( 'uid', $post_object->uid )->id
                     : $post_object->participant_id;
     $date = !is_null( $post_object->date ) ? $post_object->date : util::get_datetime_object()->format( 'Y-m-d' );
-    $db_form = $form_class_name::get_unique_record( $unique_columns, array( $participant_id, $db_form_type->id, $date ) );
+
+    $unique_columns = array( 'participant_id', 'form_type_id', 'date' );
+    $db_form = $form_class_name::get_unique_record(
+      $unique_columns,
+      array( $participant_id, $db_form_type->id, $date )
+    );
 
     if( !is_null( $db_form ) )
     {
@@ -50,6 +54,7 @@ class post extends \cenozo\service\post
     parent::execute();
 
     $general_proxy_form_entry_class_name = lib::get_class_name( 'database\general_proxy_form_entry' );
+    $participant_class_name = lib::create( 'database\participant' );
 
     $db_general_proxy_form = $this->get_leaf_record();
     $post_object = $this->get_file_as_object();
@@ -60,7 +65,12 @@ class post extends \cenozo\service\post
       if( 'id' != $column_name && property_exists( $post_object, $column_name ) )
         $db_general_proxy_form_entry->$column_name = $post_object->$column_name;
 
-    // write the form
+    if( property_exists( $post_object, 'uid' ) )
+    {
+      $db_general_proxy_form_entry->participant_id =
+        $participant_class_name::get_unique_record( 'uid', $post_object->uid )->id;
+    }
+
     if( property_exists( $post_object, 'data' ) )
     {
       $form_decoded = base64_decode( chunk_split( $post_object->data ) );
@@ -71,6 +81,7 @@ class post extends \cenozo\service\post
       $db_general_proxy_form_entry->signed = true;
     }
 
+    // write the form
     $db_general_proxy_form_entry->general_proxy_form_id = $db_general_proxy_form->id;
     $db_general_proxy_form_entry->submitted = true;
     $db_general_proxy_form_entry->save();
