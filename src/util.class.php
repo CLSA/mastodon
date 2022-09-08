@@ -26,7 +26,7 @@ class util extends \cenozo\util
    * @access public
    */
   public static function parse_address(
-    $value_number = NULL,
+    $apartment_number = NULL,
     $street_number = NULL,
     $street_name = NULL,
     $box = NULL,
@@ -43,9 +43,9 @@ class util extends \cenozo\util
       $address[0] = $street_number.' '.$street_name;
     }
 
-    if( !is_null( $value_number ) )
+    if( !is_null( $apartment_number ) )
     {
-      $value = 'Apt '.$value_number;
+      $value = 'Apt '.$apartment_number;
       $address[0] = is_null( $address[0] ) ? $value : $address[0] = $value.', '.$address[0];
     }
 
