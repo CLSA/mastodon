@@ -57,6 +57,7 @@ class general_proxy_form extends base_form
         'first_name' => $db_general_proxy_form_entry->proxy_first_name,
         'last_name' => $db_general_proxy_form_entry->proxy_last_name,
         'global_note' => $db_general_proxy_form_entry->proxy_note,
+        'address_international' => $db_general_proxy_form_entry->proxy_address_international,
         'apartment_number' => $db_general_proxy_form_entry->proxy_apartment_number,
         'street_number' => $db_general_proxy_form_entry->proxy_street_number,
         'street_name' => $db_general_proxy_form_entry->proxy_street_name,
@@ -65,8 +66,11 @@ class general_proxy_form extends base_form
         'address_other' => $db_general_proxy_form_entry->proxy_address_other,
         'city' => $db_general_proxy_form_entry->proxy_city,
         'region_id' => $db_general_proxy_form_entry->proxy_region_id,
+        'international_region' => $db_general_proxy_form_entry->proxy_international_region,
+        'international_country_id' => $db_general_proxy_form_entry->proxy_international_country_id,
         'postcode' => $db_general_proxy_form_entry->proxy_postcode,
         'address_note' => $db_general_proxy_form_entry->proxy_address_note,
+        'phone_international' => $db_general_proxy_form_entry->proxy_phone_international,
         'phone' => $db_general_proxy_form_entry->proxy_phone,
         'phone_note' => $db_general_proxy_form_entry->proxy_phone_note
       ));
@@ -79,6 +83,7 @@ class general_proxy_form extends base_form
         'first_name' => $db_general_proxy_form_entry->informant_first_name,
         'last_name' => $db_general_proxy_form_entry->informant_last_name,
         'global_note' => $db_general_proxy_form_entry->informant_note,
+        'address_international' => $db_general_proxy_form_entry->informant_address_international,
         'apartment_number' => $db_general_proxy_form_entry->informant_apartment_number,
         'street_number' => $db_general_proxy_form_entry->informant_street_number,
         'street_name' => $db_general_proxy_form_entry->informant_street_name,
@@ -87,8 +92,11 @@ class general_proxy_form extends base_form
         'address_other' => $db_general_proxy_form_entry->informant_address_other,
         'city' => $db_general_proxy_form_entry->informant_city,
         'region_id' => $db_general_proxy_form_entry->informant_region_id,
+        'international_region' => $db_general_proxy_form_entry->informant_international_region,
+        'international_country_id' => $db_general_proxy_form_entry->informant_international_country_id,
         'postcode' => $db_general_proxy_form_entry->informant_postcode,
         'address_note' => $db_general_proxy_form_entry->informant_address_note,
+        'phone_international' => $db_general_proxy_form_entry->informant_phone_international,
         'phone' => $db_general_proxy_form_entry->informant_phone,
         'phone_note' => $db_general_proxy_form_entry->informant_phone_note
       ) );

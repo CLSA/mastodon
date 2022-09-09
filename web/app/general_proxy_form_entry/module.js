@@ -48,6 +48,10 @@ define(function () {
         title: "Last Name",
         type: "string",
       },
+      proxy_address_international: {
+        title: "International Address",
+        type: "boolean",
+      },
       proxy_apartment_number: {
         title: "Apartment Number",
         type: "string",
@@ -83,23 +87,44 @@ define(function () {
       proxy_region_id: {
         title: "Region",
         type: "enum",
+        isExcluded: function ($state, model) {
+          return !angular.isUndefined(model.viewModel.record.proxy_address_international) &&
+            true === model.viewModel.record.proxy_address_international;
+        },
+      },
+      proxy_international_region: {
+        title: "International Region",
+        type: "string",
+        isExcluded: function ($state, model) {
+          return angular.isUndefined(model.viewModel.record.proxy_address_international) ||
+            true !== model.viewModel.record.proxy_address_international;
+        },
+      },
+      proxy_international_country_id: {
+        title: "International Country",
+        type: "enum",
+        isExcluded: function ($state, model) {
+          return angular.isUndefined(model.viewModel.record.proxy_address_international) ||
+            true !== model.viewModel.record.proxy_address_international;
+        },
       },
       proxy_postcode: {
         title: "Postcode",
         type: "string",
-        regex: "^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$",
-        help: 'Must be in "A1A 1A1" format, zip codes in "01234" format.',
+        help: 'Must be in "A1A 1A1" format, zip codes in "01234" format (if not international).',
       },
       proxy_address_note: {
         title: "Address Note",
         type: "text",
       },
+      proxy_phone_international: {
+        title: "International Phone",
+        type: "boolean",
+      },
       proxy_phone: {
         title: "Phone",
         type: "string",
-        regex:
-          "^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$",
-        help: "Must be in NNN-NNN-NNNN format.",
+        help: "Must be a valid North American phone number in XXX-XXX-XXXX format (if not international).",
       },
       proxy_phone_note: {
         title: "Phone Note",
@@ -134,6 +159,10 @@ define(function () {
         type: "string",
         help: "If informant is same as proxy then enter the first and last name only",
       },
+      informant_address_international: {
+        title: "International",
+        type: "boolean",
+      },
       informant_apartment_number: {
         title: "Apartment Number",
         type: "string",
@@ -167,23 +196,44 @@ define(function () {
       informant_region_id: {
         title: "Region",
         type: "enum",
+        isExcluded: function ($state, model) {
+          return !angular.isUndefined(model.viewModel.record.informant_address_international) &&
+            true === model.viewModel.record.informant_address_international;
+        },
+      },
+      informant_international_region: {
+        title: "International Region",
+        type: "string",
+        isExcluded: function ($state, model) {
+          return angular.isUndefined(model.viewModel.record.informant_address_international) ||
+            true !== model.viewModel.record.informant_address_international;
+        },
+      },
+      informant_international_country_id: {
+        title: "International Country",
+        type: "enum",
+        isExcluded: function ($state, model) {
+          return angular.isUndefined(model.viewModel.record.informant_address_international) ||
+            true !== model.viewModel.record.informant_address_international;
+        },
       },
       informant_postcode: {
         title: "Postcode",
         type: "string",
-        regex: "^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$",
-        help: 'Must be in "A1A 1A1" format, zip codes in "01234" format.',
+        help: 'Must be in "A1A 1A1" format, zip codes in "01234" format (if not international).',
       },
       informant_address_note: {
         title: "Address Note",
         type: "text",
       },
+      informant_phone_international: {
+        title: "International",
+        type: "boolean",
+      },
       informant_phone: {
         title: "Phone",
         type: "string",
-        regex:
-          "^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$",
-        help: "Must be in XXX-XXX-XXXX format.",
+        help: "Must be a valid North American phone number in XXX-XXX-XXXX format (if not international).",
       },
       informant_phone_note: {
         title: "Phone Note",
@@ -257,6 +307,29 @@ define(function () {
     ) {
       var object = function (parentModel, root) {
         CnBaseFormEntryViewFactory.construct(this, parentModel, root);
+        this.onPatchError = function(response) {
+          if( 400 == response.status && 'invalid format' == angular.fromJson( response.data ) ) {
+            // use the config data to determine the error message
+            let message = "";
+            if( angular.isDefined(response.config.data.proxy_postcode) || 
+                angular.isDefined(response.config.data.informant_postcode) ) {
+              message = 'Postcodes must either be in "A1A 1A1" or "01234" format (if not international).';
+            } else if( angular.isDefined(response.config.data.proxy_phone) ||
+                       angular.isDefined(response.config.data.informant_phone) ) {
+              message = 'Phone numbers must be a valid North American phone number in "XXX-XXX-XXXX" format (if not international).';
+            } else {
+              message = "An unknown error has occurred.";
+            }
+
+            // this will only happen when a postcode is invalid
+            angular.extend( response, {
+              status: 306,
+              data: angular.toJson( message ),
+            });
+          }
+
+          this.$$onPatchError(response);
+        };
       };
       return {
         instance: function (parentModel, root) {
@@ -291,38 +364,58 @@ define(function () {
           var self = this;
           await this.$$getMetadata();
 
-          var response = await CnHttpFactory.instance({
-            path: "region",
-            data: {
-              select: {
-                column: [
-                  "id",
-                  { table: "country", column: "name", alias: "country" },
-                  {
-                    column: 'CONCAT_WS( ", ", region.name, country.name )',
-                    alias: "name",
-                    table_prefix: false,
-                  },
-                ],
+          const [countryResponse, regionResponse] = await Promise.all([
+            CnHttpFactory.instance({
+              path: "country",
+              data: {
+                select: { column: [ "id", "name" ], },
+                modifier: { order: "name", limit: 1000 },
               },
-              modifier: { order: ["country.name", "region.name"], limit: 1000 },
-            },
-          }).query();
+            }).query(),
 
-          this.metadata.columnList.proxy_region_id.enumList = [];
-          this.metadata.columnList.informant_region_id.enumList = [];
-          response.data.forEach(function (item) {
-            self.metadata.columnList.proxy_region_id.enumList.push({
-              value: item.id,
-              country: item.country,
-              name: item.name,
-            });
-            self.metadata.columnList.informant_region_id.enumList.push({
-              value: item.id,
-              country: item.country,
-              name: item.name,
-            });
-          });
+            CnHttpFactory.instance({
+              path: "region",
+              data: {
+                select: {
+                  column: [
+                    "id",
+                    { table: "country", column: "name", alias: "country" },
+                    {
+                      column: 'CONCAT_WS( ", ", region.name, country.name )',
+                      alias: "name",
+                      table_prefix: false,
+                    },
+                  ],
+                },
+                modifier: { order: ["country.name", "region.name"], limit: 1000 },
+              },
+            }).query(),
+          ]);
+
+          this.metadata.columnList.proxy_international_country_id.enumList =
+            countryResponse.data.reduce((list, item) => {
+              list.push({
+                value: item.id,
+                name: item.name,
+              });
+              return list;
+            }, []);
+          this.metadata.columnList.informant_international_country_id.enumList = angular.copy(
+            this.metadata.columnList.proxy_international_country_id.enumList
+          );
+
+          this.metadata.columnList.proxy_region_id.enumList =
+            regionResponse.data.reduce((list, item) => {
+              list.push({
+                value: item.id,
+                country: item.country,
+                name: item.name,
+              });
+              return list;
+            }, []);
+          this.metadata.columnList.informant_region_id.enumList = angular.copy(
+            this.metadata.columnList.proxy_region_id.enumList
+          );
         };
       };
 

@@ -99,6 +99,10 @@ define(function () {
             title: "Proxy Last Name",
           },
           {
+            column: "proxy_address_international",
+            title: "Proxy Address International",
+          },
+          {
             column: "proxy_apartment_number",
             title: "Proxy Apartment Number",
           },
@@ -131,12 +135,24 @@ define(function () {
             title: "Proxy Region",
           },
           {
+            column: "proxy_international_region",
+            title: "Proxy International Region",
+          },
+          {
+            column: "proxy_international_country",
+            title: "Proxy International Country",
+          },
+          {
             column: "proxy_postcode",
             title: "Proxy Postcode",
           },
           {
             column: "proxy_address_note",
             title: "Proxy Address Note",
+          },
+          {
+            column: "proxy_phone_international",
+            title: "Proxy Phone International",
           },
           {
             column: "proxy_phone",
@@ -165,6 +181,10 @@ define(function () {
           {
             column: "informant_last_name",
             title: "Informant Last Name",
+          },
+          {
+            column: "informant_address_international",
+            title: "Informant Address International",
           },
           {
             column: "informant_apartment_number",
@@ -199,12 +219,24 @@ define(function () {
             title: "Informant Region",
           },
           {
+            column: "proxy_international_region",
+            title: "Proxy International Region",
+          },
+          {
+            column: "proxy_international_country",
+            title: "Proxy International Country",
+          },
+          {
             column: "informant_postcode",
             title: "Informant Postcode",
           },
           {
             column: "informant_address_note",
             title: "Informant Address Note",
+          },
+          {
+            column: "informant_phone_international",
+            title: "Informant Phone International",
           },
           {
             column: "informant_phone",

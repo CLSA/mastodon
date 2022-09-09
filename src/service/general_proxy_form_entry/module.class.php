@@ -32,12 +32,34 @@ class module extends \mastodon\service\base_form_entry_module
       );
     }
 
-    // always add the proxy and informant region names
+    // always add the proxy and informant country and region names
     $modifier->left_join(
-      'region', 'general_proxy_form_entry.proxy_region_id', 'proxy_region.id', 'proxy_region' );
+      'country',
+      'general_proxy_form_entry.proxy_international_country_id',
+      'proxy_country.id',
+      'proxy_country'
+    );
+    $select->add_table_column( 'proxy_country', 'name', 'proxy_international_country' );
+    $modifier->left_join(
+      'region',
+      'general_proxy_form_entry.proxy_region_id',
+      'proxy_region.id',
+      'proxy_region'
+    );
     $select->add_table_column( 'proxy_region', 'name', 'proxy_region' );
     $modifier->left_join(
-      'region', 'general_proxy_form_entry.informant_region_id', 'informant_region.id', 'informant_region' );
+      'country',
+      'general_proxy_form_entry.informant_international_country_id',
+      'informant_country.id',
+      'informant_country'
+    );
+    $select->add_table_column( 'informant_country', 'name', 'informant_international_country' );
+    $modifier->left_join(
+      'region',
+      'general_proxy_form_entry.informant_region_id',
+      'informant_region.id',
+      'informant_region'
+    );
     $select->add_table_column( 'informant_region', 'name', 'informant_region' );
   }
 }
