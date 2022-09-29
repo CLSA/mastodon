@@ -116,8 +116,7 @@ class post extends \cenozo\service\participant\post
               $modifier->where( 'participant_identifier.value', 'IN', $identifier_list );
             }
 
-            if( !is_null( $this->db_site ) ) $this->db_application->set_preferred_site( $modifier, $this->db_site );
-            $this->db_application->release_participants( $modifier );
+            $this->db_application->release_participants( $modifier, $this->db_site );
 
             // update the application's queue if necessary
             if( $this->db_application->update_queue )

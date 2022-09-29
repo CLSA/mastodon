@@ -20,7 +20,7 @@ class application extends \cenozo\database\application
    * @param array $modifier A modifier identifying which participants to release
    * @access public
    */
-  public function release_participants( $participant_mod )
+  public function release_participants( $participant_mod, $db_preferred_site = NULL )
   {
     if( is_null( $this->id ) )
       throw lib::create( 'exception\runtime',
@@ -38,6 +38,8 @@ class application extends \cenozo\database\application
     $participant_sel->add_column( 'id', 'participant_id' );
     $participant_sel->add_constant( NULL, 'create_timestamp' );
     $participant_sel->add_constant( 'UTC_TIMESTAMP()', 'datetime', NULL, false );
+    if( !is_null( $db_preferred_site ) )
+      $participant_sel->add_constant( $db_preferred_site->id, 'preferred_site_id' );
 
     $participant_mod->join(
       'application_has_cohort', 'participant.cohort_id', 'application_has_cohort.cohort_id' );
@@ -67,14 +69,17 @@ class application extends \cenozo\database\application
     // make sure the participant hasn't already been exported
     $participant_mod->where( 'app_has_participant.datetime', '=', NULL );
 
-    $sql = sprintf(
-      "INSERT INTO application_has_participant( application_id, participant_id, create_timestamp, datetime )\n".
+    $column_list = 'application_id, participant_id, create_timestamp, datetime';
+    if( !is_null( $db_preferred_site ) ) $column_list .= ', preferred_site_id';
+
+    static::db()->execute( sprintf(
+      "INSERT INTO application_has_participant( %s )\n".
       "%s%s\n".
       'ON DUPLICATE KEY UPDATE datetime = IFNULL( application_has_participant.datetime, UTC_TIMESTAMP() )',
+      $column_list,
       $participant_sel->get_sql(),
-      $participant_mod->get_sql() );
-
-    static::db()->execute( $sql );
+      $participant_mod->get_sql()
+    ) );
 
     // add the release event
     $event_sel = lib::create( 'database\select' );
@@ -87,7 +92,8 @@ class application extends \cenozo\database\application
       "INSERT IGNORE INTO event( participant_id, event_type_id, datetime )\n".
       '%s%s',
       $event_sel->get_sql(),
-      $event_mod->get_sql() );
+      $event_mod->get_sql()
+    );
 
     static::db()->execute( $event_sql );
 
