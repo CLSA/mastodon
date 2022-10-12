@@ -62,8 +62,8 @@ define(function () {
 
   /* ############################################################################################## */
   cenozo.providers.factory("CnProxyFormAdjudicateFactory", [
-    "CnBaseFormAdjudicateFactory",
-    function (CnBaseFormAdjudicateFactory) {
+    "CnBaseFormAdjudicateFactory", "CnProxyFormModelFactory",
+    function (CnBaseFormAdjudicateFactory, CnProxyFormModelFactory) {
       var object = function (parentModel) {
         this.formColumnList = [
           {
@@ -232,6 +232,7 @@ define(function () {
           },
         ];
         CnBaseFormAdjudicateFactory.construct(this, module);
+        this.parentModel = CnProxyFormModelFactory.root;
       };
       return {
         instance: function (parentModel) {

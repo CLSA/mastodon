@@ -1,6 +1,16 @@
 <div class="utility-view rounded">
   <div class="container-fluid bg-primary rounded-top">
-    <h4>Participant Management For {{ model.application.title }}</h4>
+    <h4>
+      <div class="pull-right">
+        <i class="glyphicon glyphicon-question-sign glyph-hover btn-primary btn-header"
+           ng-class="{'glyph-disabled':!model.parentModel.module.hasNotation()}"
+           ng-if="model.parentModel.isRole('administrator') || model.parentModel.module.hasNotation()"
+           uib-tooltip="Click to view documentation"
+           tooltip-placement="left"
+           ng-click="model.parentModel.showNotation(); $event.stopPropagation()"></i>
+      </div>
+      Participant Management For {{ model.application.title }}
+    </h4>
   </div>
   <div class="container-fluid">
     <div class="spacer">

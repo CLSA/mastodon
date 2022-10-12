@@ -22,6 +22,9 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'equipment_type', 'GET', 1, 1 ),
 ( 'equipment_type', 'PATCH', 1, 1 ),
 ( 'equipment_type', 'POST', 0, 1 ),
+( 'notation', 'DELETE', 1, 1 ),
+( 'notation', 'PATCH', 1, 1 ),
+( 'notation', 'POST', 0, 1 ),
 ( 'pine_response', 'POST', 0, 1 );
 
 UPDATE service SET restricted = 1 WHERE subject = 'pine_response' AND method = 'GET';

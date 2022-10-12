@@ -102,13 +102,15 @@ cenozoApp.extendModule({
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnParticipantReleaseFactory", [
+      "CnParticipantModelFactory",
       "CnSession",
       "CnHttpFactory",
       "CnModalMessageFactory",
       "$state",
-      function (CnSession, CnHttpFactory, CnModalMessageFactory, $state) {
+      function (CnParticipantModelFactory, CnSession, CnHttpFactory, CnModalMessageFactory, $state) {
         var object = function () {
           angular.extend(this, {
+            parentModel: CnParticipantModelFactory.root,
             promise: null,
             participant: null,
 
