@@ -23,6 +23,8 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'equipment_type', 'PATCH', 1, 1 ),
 ( 'equipment_type', 'POST', 0, 1 ),
 ( 'notation', 'DELETE', 1, 1 ),
+( 'notation', 'GET', 0, 1 ),
+( 'notation', 'GET', 1, 1 ),
 ( 'notation', 'PATCH', 1, 1 ),
 ( 'notation', 'POST', 0, 1 ),
 ( 'pine_response', 'POST', 0, 1 );
@@ -34,3 +36,6 @@ UPDATE service SET restricted = 0 WHERE subject = 'event' AND method = 'POST';
 
 -- don't allow alternate types to be deleted by anyone
 DELETE FROM service WHERE subject = 'alternate_type' AND method = 'DELETE';
+
+-- all roles need access to the stratum module, otherwise the UI will fail to load
+UPDATE service SET restricted = 0 WHERE subject = 'stratum' AND method = 'GET' AND resource = 0;
