@@ -45,10 +45,13 @@ class decedent_responder extends \cenozo\business\report\base_report
     $participant_class_name::db()->execute( $sql );
 
     $select = lib::create( 'database\select' );
+    $modifier = lib::create( 'database\modifier' );
+
     $select->from( 'participant' );
     $select->add_column( 'cohort.name', 'Cohort', false );
     $select->add_column( 'language.name', 'Language', false );
     $select->add_column( 'uid', 'UID' );
+    $this->add_application_identifier_columns( $select, $modifier );
     $select->add_column( 'honorific', 'Participant Honorific' );
     $select->add_column( 'first_name', 'Participant First Name' );
     $select->add_column( 'last_name', 'Participant Last Name' );
@@ -61,7 +64,6 @@ class decedent_responder extends \cenozo\business\report\base_report
     $select->add_column( 'address.postcode', 'Postcode', false);
     $select->add_column( 'country.name', 'Country', false);
 
-    $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'language', 'participant.language_id', 'language.id' );
     $modifier->join( 'cohort', 'participant.cohort_id', 'cohort.id' );
 
