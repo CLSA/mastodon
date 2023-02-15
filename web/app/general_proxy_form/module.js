@@ -219,11 +219,11 @@ define(function () {
             title: "Informant Region",
           },
           {
-            column: "proxy_international_region",
+            column: "informant_international_region",
             title: "Proxy International Region",
           },
           {
-            column: "proxy_international_country",
+            column: "informant_international_country",
             title: "Proxy International Country",
           },
           {
