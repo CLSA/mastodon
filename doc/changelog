@@ -1,5 +1,0 @@
-Version 2.1
-===========
-Adapted existing HIN form to be used as a general HIN access consent
-Fixing bug in hin_form module (replacing option1/2 with accept)
-Integrated new general-proxy form
