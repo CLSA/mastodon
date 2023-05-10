@@ -32,6 +32,8 @@ class ui extends \cenozo\ui\ui
     {
       $module->add_child( 'application', 0 );
       if( 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
+      if( in_array( $db_role->name, ['administrator', 'curator'] ) )
+        $module->add_action( 'data', '/{identifier}?{study_phase_id}' );
     }
 
     $module = $this->get_module( 'user' );
@@ -145,7 +147,6 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'HIN Forms', 'hin_form' );
     $this->add_listitem( 'Extended HIN Forms', 'extended_hin_form' );
     $this->add_listitem( 'General Proxy Forms', 'general_proxy_form' );
-    if( 3 <= $db_role->tier ) $this->add_listitem( 'Opal Form Template', 'opal_form_template' );
     $this->add_listitem( 'Proxy Forms', 'proxy_form' );
     $this->add_listitem( 'Proxy DM Forms', 'dm_consent_form' );
     $this->add_listitem( 'Proxy IP Forms', 'ip_consent_form' );

@@ -1,0 +1,66 @@
+<div class="utility-view rounded">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>
+      <div class="pull-right">
+        <i class="glyphicon glyphicon-question-sign glyph-hover btn-primary btn-header"
+           ng-class="{'glyph-disabled':!model.parentModel.module.hasNotation()}"
+           ng-if="model.parentModel.isRole('administrator') || model.parentModel.module.hasNotation()"
+           uib-tooltip="Click to view documentation"
+           tooltip-placement="left"
+           ng-click="model.parentModel.showNotation(); $event.stopPropagation()"></i>
+        <i class="glyphicon glyphicon-refresh glyph-hover btn-primary btn-header"
+           ng-if="!model.isLoading"
+           ng-click="refresh( true )"
+           uib-tooltip="Click to refresh data"
+           tooltip-placement="left"></i>
+      </div>
+      Participant Data for {{ name }}
+      <span ng-if="model.isLoading">(Loading&hellip;)</span>
+    </h4>
+  </div>
+  <div class="container-fluid vertical-spacer">
+    <p class="text-info" style="margin-top: 1em;">
+      The following is data that is appropriate to release to the participant.
+    </p>
+    <cn-loading ng-if="model.isLoading" class="spacer"></cn-loading>
+    <div ng-if="!model.isLoading">
+      <ul class="nav nav-tabs">
+        <li
+          ng-repeat="studyPhase in model.studyPhaseList"
+          ng-class="{'active': studyPhase.id == model.activeStudyPhaseId}"
+        >
+          <a ng-click="model.setActiveStudyPhase(studyPhase.id)" ng-bind-html="studyPhase.name"></a>
+        </li>
+      </ul>
+      <div
+        ng-repeat="studyPhase in model.studyPhaseList"
+        ng-show="studyPhase.id == model.activeStudyPhaseId"
+        class="panel panel-default"
+        style="border-top-left-radius: 0px;"
+      >
+        <div class="panel-body">
+          <div class="spacer">
+            <div ng-if="0 == studyPhase.categoryList.length">
+              There is no data available for this phase of the study.
+            </div>
+            <div ng-repeat="category in studyPhase.categoryList">
+              <h4 ng-bind-html="category.name" style="margin-top: 1em;"></h4>
+              <a
+                class="btn btn-default full-width"
+                ng-repeat="item in category.dataList"
+                ng-bind-html="item.name"
+                ng-disabled="!item.available"
+                ng-click="model.download(item)"
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-footer text-right rounded-bottom bg-info">
+    <button type="button" class="btn btn-primary" ng-click="model.viewRecord()">
+      View Participant
+    </button>
+  </div>
+</div>

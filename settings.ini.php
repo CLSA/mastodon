@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = '50b26d7';
+$SETTINGS['general']['build'] = 'a38f744';
 
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -23,6 +23,9 @@ $SETTINGS['path']['FORM_IN'] = $SETTINGS['path']['APPLICATION'].'/doc/form_in';
 
 // the location of new forms which have been processed but not transferred to form system yet
 $SETTINGS['path']['FORM_OUT'] = $SETTINGS['path']['APPLICATION'].'/doc/form_out';
+
+// the location of supplementary data (for participant data access)
+$SETTINGS['path']['SUPPLEMENTARY_DATA'] = NULL;
 
 // add modules used by the application
 $SETTINGS['module']['equipment'] = true;
