@@ -65,6 +65,21 @@ class get extends \cenozo\service\downloadable
   }
 
   /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    parent::finish();
+
+    // clean up by deleting temporary files
+    if( $this->get_argument( 'download', false ) && !is_null( $this->db_participant ) )
+    {
+      $filename = $this->get_leaf_record()->get_filename( $this->db_participant );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+  }
+
+  /**
    * The participant's record, (only when getting the participant's data)
    * @var database\participant
    * @access private

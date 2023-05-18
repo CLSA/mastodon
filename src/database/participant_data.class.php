@@ -114,7 +114,10 @@ class participant_data extends \cenozo\database\record
           $pdf_writer = lib::create( 'business\pdf_writer' );
           $pdf_writer->set_template( $db_participant_data_template->get_filename() );
           $pdf_writer->fill_form( $form_data );
-          if( !$pdf_writer->save( $filename ) )
+          $success = $pdf_writer->save( $filename );
+          $db_participant_data_template->delete_template_file();
+
+          if( !$success )
           {
             $db_study_phase = $this->get_study_phase();
             throw lib::create( 'exception\runtime',

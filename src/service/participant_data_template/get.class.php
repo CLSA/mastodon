@@ -69,4 +69,16 @@ class get extends \cenozo\service\downloadable
       parent::execute();
     }
   }
+
+  /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    parent::finish();
+
+    // clean up by deleting temporary files
+    $file = $this->get_argument( 'file', NULL );
+    if( 'filename' == $file ) $this->get_leaf_record()->delete_template_file();
+  }
 }

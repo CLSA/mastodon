@@ -26,6 +26,15 @@ class participant_data_template extends \cenozo\database\record
   }
 
   /**
+   * Deletes the template from disk
+   */
+  public function delete_template_file()
+  {
+    $filename = $this->get_filename();
+    if( file_exists( $filename ) ) unlink( $filename );
+  }
+
+  /**
    * Gets the path of the template when written to disk
    * @return string
    * @access public
