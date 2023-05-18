@@ -126,6 +126,12 @@ class ui extends \cenozo\ui\ui
     }
     $module = $this->get_module( 'ip_consent_form_entry' );
     if( !is_null( $module ) ) $module->remove_action( 'add' );
+
+    $module = $this->get_module( 'participant_data' );
+    if( !is_null( $module ) ) $module->add_child( 'participant_data_template' );
+
+    $module = $this->get_module( 'study_phase' );
+    if( !is_null( $module ) ) $module->add_child( 'participant_data' );
   }
 
   /**
