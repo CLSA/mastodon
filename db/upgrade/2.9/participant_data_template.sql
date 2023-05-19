@@ -29,7 +29,7 @@ CREATE PROCEDURE patch_participant_data_template()
           "rank INT UNSIGNED NOT NULL, ",
           "language_id INT(10) UNSIGNED NOT NULL, ",
           "opal_view VARCHAR(255) NOT NULL, ",
-          "data MEDIUMTEXT NOT NULL, ",
+          "data LONGTEXT NOT NULL, ",
           "PRIMARY KEY (id), ",
           "INDEX fk_participant_data_id (participant_data_id ASC), ",
           "INDEX fk_language_id (language_id ASC), ",
