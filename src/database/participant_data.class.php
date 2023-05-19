@@ -107,15 +107,15 @@ class participant_data extends \cenozo\database\record
           // write the template data to disk
           $db_participant_data_template =
             lib::create( 'database\participant_data_template', $template['id'] );
-          $db_participant_data_template->create_template_file();
+          $db_participant_data_template->create_data_file();
 
           // fill in the template and write it to disk
           $filename = $this->get_filename( $db_participant );
           $pdf_writer = lib::create( 'business\pdf_writer' );
-          $pdf_writer->set_template( $db_participant_data_template->get_filename() );
+          $pdf_writer->set_template( $db_participant_data_template->get_data_filename() );
           $pdf_writer->fill_form( $form_data );
           $success = $pdf_writer->save( $filename );
-          $db_participant_data_template->delete_template_file();
+          $db_participant_data_template->delete_data_file();
 
           if( !$success )
           {

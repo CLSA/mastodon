@@ -45,7 +45,7 @@ class module extends \cenozo\service\module
       if( $select->has_column( 'filename' ) )
       {
         $select->add_constant(
-          sprintf( 'participant_data_template_%d.pdf', $db_participant_data_template->id ),
+          basename( $db_participant_data_template->get_data_filename() ),
           'filename'
         );
       }

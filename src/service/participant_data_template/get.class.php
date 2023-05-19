@@ -28,7 +28,7 @@ class get extends \cenozo\service\downloadable
   protected function get_downloadable_public_name()
   {
     $file = $this->get_argument( 'file', NULL );
-    if( 'filename' == $file ) return sprintf( 'participant_data_template_%d.pdf', $this->get_leaf_record()->id );
+    if( 'filename' == $file ) basename( $this->get_leaf_record()->get_data_filename() );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -40,13 +40,12 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    $db_participant_data_template = $this->get_leaf_record();
-
     $file = $this->get_argument( 'file', NULL );
     if( 'filename' == $file )
     {
-      $db_participant_data_template->create_template_file();
-      return $db_participant_data_template->get_filename();
+      $db_participant_data_template = $this->get_leaf_record();
+      $db_participant_data_template->create_data_file();
+      return $db_participant_data_template->get_data_filename();
     }
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
@@ -79,6 +78,6 @@ class get extends \cenozo\service\downloadable
 
     // clean up by deleting temporary files
     $file = $this->get_argument( 'file', NULL );
-    if( 'filename' == $file ) $this->get_leaf_record()->delete_template_file();
+    if( 'filename' == $file ) $this->get_leaf_record()->delete_data_file();
   }
 }
