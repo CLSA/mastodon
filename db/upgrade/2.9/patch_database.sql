@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE import_entry.sql
+SOURCE import.sql
 SOURCE participant_data.sql
 SOURCE participant_data_template.sql
 SOURCE opal_form_template.sql
