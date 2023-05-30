@@ -50,7 +50,7 @@
                 ng-repeat="item in category.dataList"
                 ng-bind-html="item.name"
                 ng-disabled="!item.available"
-                ng-click="model.download(item)"
+                ng-click="item.available && model.download(item)"
               ></a>
             </div>
           </div>
