@@ -30,4 +30,5 @@ $SETTINGS['path']['SUPPLEMENTARY_DATA'] = NULL;
 // add modules used by the application
 $SETTINGS['module']['equipment'] = true;
 $SETTINGS['module']['pdf'] = true;
+$SETTINGS['module']['relation'] = true;
 $SETTINGS['module']['script'] = true;
