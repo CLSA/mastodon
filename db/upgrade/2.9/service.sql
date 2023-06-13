@@ -12,7 +12,7 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'participant_data_template', 'PATCH', 1, 1 ),
 ( 'participant_data_template', 'POST', 0, 1 ),
 ( 'relation', 'DELETE', 1, 1 ),
-( 'relation', 'GET', 0, 1 ),
+( 'relation', 'GET', 0, 0 ),
 ( 'relation', 'GET', 1, 1 ),
 ( 'relation', 'PATCH', 1, 1 ),
 ( 'relation', 'POST', 0, 1 ),
