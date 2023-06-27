@@ -30,8 +30,7 @@ class get extends \cenozo\service\downloadable
     $db_participant_data = $this->get_leaf_record();
     $db_study_phase = $db_participant_data->get_study_phase();
     return sprintf(
-      '%s %s %s %s %s.%s',
-      $this->db_participant->uid,
+      '%s %s %s %s.%s',
       $db_study_phase->get_study()->name,
       strtoupper( $db_study_phase->code ),
       $db_participant_data->category,
