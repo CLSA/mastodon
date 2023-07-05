@@ -91,7 +91,9 @@ class participant_data extends \cenozo\database\record
       $select = lib::create( 'database\select' );
       $select->add_column( 'id' );
       $select->add_column( 'opal_view' );
+      $select->add_table_column( 'language', 'code', 'language' );
       $modifier = lib::create( 'database\modifier' );
+      $modifier->join( 'language', 'participant_data_template.language_id', 'language.id' );
       $modifier->order( 'rank' );
       foreach( $this->get_participant_data_template_list( $select, $modifier ) as $template )
       {
@@ -100,6 +102,9 @@ class participant_data extends \cenozo\database\record
           // if the participant has no data then an argument exception is thrown
           // (silently caught below effectively preventing the form from being created)
           $form_data = $opal_manager->get_values( 'mastodon', $template['opal_view'], $db_participant );
+
+          // check the form data to make sure the template language matches the view data's language
+          if( $form_data['LANGUAGE'] != $template['language'] ) continue;
 
           array_walk( $form_data, function( &$item, $key ) { $item = '' == $item ? 'NA' : $item; } );
           $form_data['NAME'] = sprintf( '%s %s', $db_participant->first_name, $db_participant->last_name );
