@@ -15,6 +15,9 @@ $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name']
 $SETTINGS['general']['version'] = '2.9';
 $SETTINGS['general']['build'] = 'f67a192';
 
+// which identifier to use when downloading participant data
+$SETTINGS['general']['participant_data_identifier'] = NULL;
+
 // the location of mastodon internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
