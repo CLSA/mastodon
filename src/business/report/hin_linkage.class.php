@@ -153,8 +153,6 @@ class hin_linkage extends \cenozo\business\report\base_report
     $id_select = lib::create( 'database\select' );
     $id_select->from( 'participant' );
     $id_select->add_column( 'uid', 'UID' );
-    if( !is_null( $db_identifier ) )
-      $id_select->add_column( 'participant_identifier.value', sprintf( '%s ID', $db_identifier->name ), false );
     $id_modifier = clone $modifier;
 
     $this->add_table_from_select(
