@@ -29,6 +29,7 @@ class hin_linkage extends \cenozo\business\report\base_report
 
     $select = lib::create( 'database\select' );
     $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'participant.exclusion_id', '=', NULL );
 
     $select->from( 'participant' );
     if( is_null( $db_identifier ) ) $select->add_column( 'uid', 'UID' );
