@@ -22,7 +22,8 @@ abstract class base_form extends \cenozo\database\record
     // first load any scans in the form directory into the database
     $table_name = static::get_table_name();
     $path = sprintf( '%s/%s', FORM_IN_PATH, str_replace( '_form', '', $table_name ) );
-    foreach( scandir( $path ) as $filename )
+
+    foreach( util::scandir( $path ) as $filename )
     {
       $filename = $path.'/'.$filename;
       if( '.pdf' == substr( $filename, -4 ) )
