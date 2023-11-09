@@ -44,41 +44,12 @@ cenozoApp.defineModule({
         type: "string",
         help: "The name of the view in Opal's \"mastodon\" project that contains the data needed to fill in the template.",
       },
-      filename: { title: "File", type: "file" },
+      data: {
+        title: "File",
+        type: "base64",
+        mimeType: "application/pdf",
+      },
     });
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnParticipantDataTemplateAddFactory", [
-      "CnBaseAddFactory",
-      function (CnBaseAddFactory) {
-        var object = function (parentModel) {
-          CnBaseAddFactory.construct(this, parentModel);
-          this.configureFileInput("filename", "pdf");
-        };
-        return {
-          instance: function (parentModel) {
-            return new object(parentModel);
-          },
-        };
-      },
-    ]);
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnParticipantDataTemplateViewFactory", [
-      "CnBaseViewFactory",
-      "CnHttpFactory",
-      function (CnBaseViewFactory, CnHttpFactory) {
-        var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
-          this.configureFileInput("filename", "pdf");
-        };
-        return {
-          instance: function (parentModel, root) {
-            return new object(parentModel, root);
-          },
-        };
-      },
-    ]);
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnParticipantDataTemplateModelFactory", [
