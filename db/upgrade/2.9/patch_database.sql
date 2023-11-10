@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE custom_report.sql
+SOURCE role_has_custom_report.sql
 SOURCE import_entry.sql
 SOURCE import.sql
 SOURCE participant_data.sql
