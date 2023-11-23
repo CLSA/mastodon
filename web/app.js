@@ -288,10 +288,8 @@ cenozo.factory("CnBaseFormViewFactory", [
           if (angular.isUndefined(object.downloadFile)) {
             object.downloadFile = function () {
               return CnHttpFactory.instance({
-                path:
-                  parentModel.module.subject.snake +
-                  "/" +
-                  object.record.getIdentifier(),
+                path: parentModel.module.subject.snake + "/" + object.record.getIdentifier(),
+                format: "pdf",
               }).file();
             };
           }
@@ -370,6 +368,7 @@ cenozo.factory("CnBaseFormAdjudicateFactory", [
                 object.downloadFile = function () {
                   return CnHttpFactory.instance({
                     path: formName + "/" + object.form.id,
+                    format: "pdf",
                   }).file();
                 };
               }
@@ -538,6 +537,7 @@ cenozo.factory("CnBaseFormEntryViewFactory", [
             object.downloadFile = function () {
               return CnHttpFactory.instance({
                 path: formName + "/" + object.record[formName + "_id"],
+                format: "pdf",
               }).file();
             };
           }
