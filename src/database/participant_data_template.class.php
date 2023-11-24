@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, cenozo\util;
 /**
  * participant_data_template: record
  */
-class participant_data_template extends \cenozo\database\record {}
+class participant_data_template extends \cenozo\database\has_data {}
