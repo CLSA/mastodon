@@ -287,34 +287,71 @@ class patch
           $sql = sprintf(
             "CREATE PROCEDURE %s.%s( IN proc_%s_form_id INT(10) UNSIGNED )\n".
             "  BEGIN\n".
-            "    REPLACE INTO %s_form_total\n".
-            "    SET %s_form_id = proc_%s_form_id,\n".
-            "        entry_total = (\n".
-            "          SELECT COUNT(*) FROM %s_form_entry\n".
-            "          WHERE %s_form_id = proc_%s_form_id\n".
-            "        ),\n".
-            "        submitted_total = (\n".
-            "          SELECT COUNT(*) FROM %s_form_entry\n".
-            "          WHERE %s_form_id = proc_%s_form_id\n".
-            "          AND submitted = true\n".
-            "        ),\n".
-            "        uid = (\n".
-            "          SELECT GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR ',' )\n".
-            "          FROM %s_form_entry\n".
-            "          LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "          WHERE %s_form_id = proc_%s_form_id\n".
-            "          GROUP BY %s_form_id\n".
-            "        ),\n".
-            "        cohort = (\n".
-            "          SELECT GROUP_CONCAT( DISTINCT cohort.name ORDER BY cohort.name SEPARATOR ',' )\n".
-            "          FROM %s_form_entry\n".
-            "          LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "          LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
-            "          WHERE %s_form_id = proc_%s_form_id\n".
-            "          GROUP BY %s_form_id\n".
-            "        );\n".
+            "    SELECT validated_%s_form_entry_id INTO @validated_id\n".
+            "    FROM %s_form\n".
+            "    WHERE id = proc_%s_form_id;\n".
+            "\n".
+            "    IF @validated_id THEN\n".
+            "      REPLACE INTO %s_form_total\n".
+            "      SET %s_form_id = proc_%s_form_id,\n".
+            "          entry_total = (\n".
+            "            SELECT COUNT(*) FROM %s_form_entry\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "          ),\n".
+            "          submitted_total = (\n".
+            "            SELECT COUNT(*) FROM %s_form_entry\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "            AND submitted = true\n".
+            "          ),\n".
+            "          uid = (\n".
+            "            SELECT participant.uid\n".
+            "            FROM %s_form_entry\n".
+            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "            WHERE %s_form_entry.id = @validated_id\n".
+            "          ),\n".
+            "          cohort = (\n".
+            "            SELECT cohort.name\n".
+            "            FROM %s_form_entry\n".
+            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "            LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
+            "            WHERE %s_form_entry.id = @validated_id\n".
+            "          );\n".
+            "    ELSE\n".
+            "      REPLACE INTO %s_form_total\n".
+            "      SET %s_form_id = proc_%s_form_id,\n".
+            "          entry_total = (\n".
+            "            SELECT COUNT(*) FROM %s_form_entry\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "          ),\n".
+            "          submitted_total = (\n".
+            "            SELECT COUNT(*) FROM %s_form_entry\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "            AND submitted = true\n".
+            "          ),\n".
+            "          uid = (\n".
+            "            SELECT GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR ',' )\n".
+            "            FROM %s_form_entry\n".
+            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "            GROUP BY %s_form_id\n".
+            "          ),\n".
+            "          cohort = (\n".
+            "            SELECT GROUP_CONCAT( DISTINCT cohort.name ORDER BY cohort.name SEPARATOR ',' )\n".
+            "            FROM %s_form_entry\n".
+            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
+            "            LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
+            "            WHERE %s_form_id = proc_%s_form_id\n".
+            "            GROUP BY %s_form_id\n".
+            "          );\n".
+            "    END IF;\n".
             "  END",
             $application_db, $procedure_name, $subject,
+            $subject, $subject, $subject,
+            $subject,
+            $subject, $subject, $subject, $subject, $subject,
+            $subject, $subject, $subject,
+            $subject, $cenozo_db, $subject, $subject,
+            $subject, $cenozo_db, $subject, $cenozo_db, $subject,
             $subject,
             $subject, $subject, $subject, $subject, $subject,
             $subject, $subject, $subject,
