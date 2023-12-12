@@ -2,6 +2,14 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE consent_form.sql
+SOURCE dm_consent_form.sql
+SOURCE extended_hin_form.sql
+SOURCE general_proxy_form.sql
+SOURCE hin_form.sql
+SOURCE ip_consent_form.sql
+SOURCE proxy_form.sql
+
 SOURCE custom_report.sql
 SOURCE role_has_custom_report.sql
 SOURCE import_entry.sql
