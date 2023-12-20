@@ -16,18 +16,11 @@ class patch extends \cenozo\service\participant\patch
   /**
    * Override parent method
    */
-  public function get_file_as_array()
+  protected function prepare()
   {
-    // remove preferred_site_id from the patch array
-    $patch_array = parent::get_file_as_array();
-    if( array_key_exists( 'application_id', $patch_array ) )
-    {
-      try { $this->db_application = lib::create( 'database\application', $patch_array['application_id'] ); }
-      catch( \cenozo\exception\runtime $e ) {} // handled in the validate method
-      unset( $patch_array['application_id'] );
-    }
+    $this->extract_parameter_list[] = 'application_id';
 
-    return $patch_array;
+    parent::prepare();
   }
 
   /**
@@ -39,8 +32,19 @@ class patch extends \cenozo\service\participant\patch
 
     if( $this->may_continue() )
     {
-      // make sure that, if we are updating the preferred site, that an application is also included
-      if( $this->update_preferred_site && is_null( $this->db_application ) ) $this->status->set_code( 400 );
+      // a specific application_id may be provided when updating the participant's preferred site
+      $application_id = $this->get_argument( 'application_id', NULL );
+      if( !is_null( $application_id ) )
+      {
+        try
+        {
+          $this->db_application = lib::create( 'database\application', $application_id );
+        }
+        catch( \cenozo\exception\runtime $e )
+        {
+          $this->status->set_code( 400 );
+        }
+      }
     }
   }
 
@@ -49,7 +53,10 @@ class patch extends \cenozo\service\participant\patch
    */
   protected function set_preferred_site()
   {
-    $this->get_leaf_record()->set_preferred_site( $this->db_application, $this->preferred_site_id );
+    $this->get_leaf_record()->set_preferred_site(
+      $this->db_application,
+      $this->get_argument( 'preferred_site_id' )
+    );
   }
 
   /**
