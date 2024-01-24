@@ -37,8 +37,15 @@ class query extends \cenozo\service\query
       $application_mod->where( 'id', '!=', $db_application->id );
       foreach( $application_class_name::select_objects( $application_mod ) as $db_application )
       {
-        $cenozo_manager = lib::create( 'business\cenozo_manager', $db_application );
-        if( $cenozo_manager->exists() ) $cenozo_manager->get( 'log_entry?update=1' );
+        try
+        {
+          $cenozo_manager = lib::create( 'business\cenozo_manager', $db_application );
+          if( $cenozo_manager->exists() ) $cenozo_manager->get( 'log_entry?update=1' );
+        }
+        catch( \cenozo\exception\runtime $e )
+        {
+          // ignore errors if we can't reach other applications
+        }
       }
     }
   }
