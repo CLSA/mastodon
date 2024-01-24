@@ -11,7 +11,7 @@ use cenozo\lib, cenozo\log, mastodon\util;
 /**
  * Special queue for handling the query meta-resource
  */
-class query extends \cenozo\service\query
+class query extends \cenozo\service\log_entry\query
 {
   /**
    * Override parent method
