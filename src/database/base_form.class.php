@@ -23,7 +23,18 @@ abstract class base_form extends \cenozo\database\record
     $table_name = static::get_table_name();
     $path = sprintf( '%s/%s', FORM_IN_PATH, str_replace( '_form', '', $table_name ) );
 
-    foreach( util::scandir( $path ) as $filename )
+    $filename_list = util::scandir( $path );
+    if( !is_array( $filename_list ) )
+    {
+      log::warning( sprintf( 'Failed to read data-entry forms in "%s".', $path ) );
+      throw lib::create( 'exception\notice',
+        'Unable to connect to the filesystem where forms are stored.  '.
+        'Please wait a few moments then try again.  If this message keeps re-appearing then contact support.',
+        __METHOD__
+      );
+    }
+
+    foreach( $filename_list as $filename )
     {
       $filename = $path.'/'.$filename;
       if( '.pdf' == substr( $filename, -4 ) )
