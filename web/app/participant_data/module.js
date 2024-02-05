@@ -34,8 +34,16 @@ cenozoApp.defineModule({
         type: "string",
         isConstant: true,
       },
-      category: { title: "Category", type: "string", },
-      name: { title: "Name", type: "string", },
+      category: {
+        title: "Category",
+        type: "string",
+        format: "identifier",
+      },
+      name: {
+        title: "Name",
+        type: "string",
+        format: "identifier",
+      },
       filetype: {
         title: "File Type",
         type: "string",
