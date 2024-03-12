@@ -36,7 +36,6 @@ class application extends \cenozo\database\application
     $participant_sel->from( 'participant' );
     $participant_sel->add_table_column( 'application', 'id', 'application_id' );
     $participant_sel->add_column( 'id', 'participant_id' );
-    $participant_sel->add_constant( NULL, 'create_timestamp' );
     $participant_sel->add_constant( 'UTC_TIMESTAMP()', 'datetime', NULL, false );
     if( !is_null( $db_preferred_site ) )
       $participant_sel->add_constant( $db_preferred_site->id, 'preferred_site_id' );
@@ -69,7 +68,7 @@ class application extends \cenozo\database\application
     // make sure the participant hasn't already been exported
     $participant_mod->where( 'app_has_participant.datetime', '=', NULL );
 
-    $column_list = 'application_id, participant_id, create_timestamp, datetime';
+    $column_list = 'application_id, participant_id, datetime';
     if( !is_null( $db_preferred_site ) ) $column_list .= ', preferred_site_id';
 
     static::db()->execute( sprintf(
