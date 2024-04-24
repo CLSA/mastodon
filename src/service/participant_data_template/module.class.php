@@ -14,6 +14,11 @@ use cenozo\lib, cenozo\log, cenozo\util;
 class module extends \cenozo\service\module
 {
   /**
+   * Extend parent property
+   */
+  protected static $base64_column_list = ['data' => 'application/pdf'];
+
+  /**
    * Extend parent method
    */
   public function prepare_read( $select, $modifier )
