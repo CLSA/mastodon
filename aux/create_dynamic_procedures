@@ -111,7 +111,7 @@ class patch
         die();
       }
 
-      if( $row['site_based'] )
+      if( $row['site_based'] && 'alder' != $row['application_type_name'] )
       {
         $update_participant_site_for_participant_sql .= sprintf(
           "    -- update %s\n".
