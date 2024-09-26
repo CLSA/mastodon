@@ -42,7 +42,7 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name IN( 'curator', 'helpline' ) ",
-      "AND service.subject = 'relation_type' ",
+      "AND service.subject IN( 'participant_data', 'relation_type' ) ",
       "AND service.method = 'GET' ",
       "AND service.restricted = 1"
     );
