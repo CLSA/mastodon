@@ -11,7 +11,6 @@
  */
 define( 'ARGUMENT_MASTODON_BASE_ERRNO',   140000 );
 define( 'DATABASE_MASTODON_BASE_ERRNO',   240000 );
-define( 'LDAP_MASTODON_BASE_ERRNO',       340000 );
 define( 'NOTICE_MASTODON_BASE_ERRNO',     440000 );
 define( 'PERMISSION_MASTODON_BASE_ERRNO', 540000 );
 define( 'RUNTIME_MASTODON_BASE_ERRNO',    640000 );
@@ -38,16 +37,12 @@ define( 'ARGUMENT__MASTODON_SERVICE_APPLICATION_PARTICIPANT_POST__EXECUTE__ERRNO
  */
 
 /**
- * "ldap" error codes
- * 
- * Since ldap errors already have codes this list is likely to stay empty.
- */
-
-/**
  * "notice" error codes
  */
-define( 'NOTICE__MASTODON_SERVICE_BASE_FORM_PATCH__EXECUTE__ERRNO',
+define( 'NOTICE__MASTODON_DATABASE_BASE_FORM__SELECT__ERRNO',
         NOTICE_MASTODON_BASE_ERRNO + 1 );
+define( 'NOTICE__MASTODON_SERVICE_BASE_FORM_PATCH__EXECUTE__ERRNO',
+        NOTICE_MASTODON_BASE_ERRNO + 2 );
 
 /**
  * "permission" error codes
