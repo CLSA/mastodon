@@ -15,10 +15,10 @@ use cenozo\lib, cenozo\log, cenozo\util;
 class participant_data extends \cenozo\database\record
 {
   /**
-   * Determines whether the data exists for a particular participant
+   * Determines the number of files available for download for a particular participant
    * 
    * @param database\participant @db_participant The participant to generate all forms for
-   * @return boolean
+   * @return integer
    * @access public
    */
   public function is_available( $db_participant )
@@ -31,7 +31,7 @@ class participant_data extends \cenozo\database\record
     {
       // look for supplementary data in the given path
       $filename = $this->get_filename( $db_participant );
-      return is_null( $filename ) ? false : file_exists( $filename );
+      return is_null( $filename ) ? 0 : count( glob( $filename ) );
     }
 
     $opal_manager = lib::create( 'business\opal_manager' );
@@ -49,7 +49,7 @@ class participant_data extends \cenozo\database\record
           // if the participant has no data then an argument exception is thrown
           // (silently caught below effectively preventing the form from being created)
           $opal_manager->get_values( 'mastodon', $template['opal_view'], $db_participant );
-          return true;
+          return 1;
         }
         catch( \cenozo\exception\argument $e )
         {
@@ -58,7 +58,7 @@ class participant_data extends \cenozo\database\record
       }
     }
 
-    return false;
+    return 0;
   }
 
   /**
@@ -78,8 +78,56 @@ class participant_data extends \cenozo\database\record
 
     if( !is_null( $this->path ) )
     {
-      // return the full path to the supplementary data
-      return $this->get_filename( $db_participant );
+      $glob_list = glob( $this->get_filename( $db_participant ) );
+      log::debug( $glob_list );
+
+      // if there are multiple files then zip them and provide that zip file
+      if( 1 < count( $glob_list ) )
+      {
+        $zip_file_list = [];
+        foreach( $glob_list as $index => $file )
+        {
+          $temp_filename = sprintf(
+            '%s %d.%s',
+            $this->name,
+            $index + 1,
+            pathinfo( $file, PATHINFO_EXTENSION )
+          );
+          copy( $file, sprintf( '%s/%s', TEMP_PATH, $temp_filename ) );
+          $zip_file_list[] = $temp_filename;
+        }
+
+        $zip_filename = sprintf( '%s/%s.zip', TEMP_PATH, bin2hex( openssl_random_pseudo_bytes( 8 ) ) );
+        $zip = new \ZipArchive();
+        if( true !== $zip->open( $zip_filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE ) )
+        {
+          throw lib::create( 'exception\runtime',
+            sprintf(
+              'Unable to create zip file "%s" for participant %s data (%s)',
+              $zip_filename,
+              $db_participant->uid,
+              $this->name
+            ),
+            __METHOD__
+          );
+        }
+
+        // zip the temporary files then delete them
+        foreach( $zip_file_list as $file ) $zip->addFile( sprintf( '%s/%s', TEMP_PATH, $file ), $file );
+        $zip->close();
+        foreach( $zip_file_list as $file ) unlink( sprintf( '%s/%s', TEMP_PATH, $file ) );
+
+        // now return the zip filename
+        return $zip_filename;
+      }
+      else if( 1 == count( $glob_list ) )
+      {
+        // directly return the only matching file
+        return current( $glob_list );
+      }
+
+      // there is not file
+      return NULL;
     }
 
     $opal_manager = lib::create( 'business\opal_manager' );

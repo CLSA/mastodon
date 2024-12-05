@@ -17,7 +17,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'image/jpeg', 'application/pdf' );
+    return array( 'image/jpeg', 'application/pdf', 'application/zip' );
   }
 
   /**
@@ -55,7 +55,8 @@ class get extends \cenozo\service\downloadable
       strtoupper( $db_study_phase->code ),
       $db_participant_data->category,
       $db_participant_data->name,
-      $db_participant_data->filetype
+      // multiple files are provided as a zip file
+      1 < $db_participant_data->is_available( $this->db_participant ) ? 'zip' : $db_participant_data->filetype
     );
   }
 
@@ -66,7 +67,8 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return $this->get_leaf_record()->generate( $this->db_participant );
+    $this->filename = $this->get_leaf_record()->generate( $this->db_participant );
+    return $this->filename;
   }
 
   /**
@@ -90,15 +92,11 @@ class get extends \cenozo\service\downloadable
   {
     parent::finish();
 
-    // clean up by deleting temporary files
-    if( $this->get_argument( 'download', false ) && !is_null( $this->db_participant ) )
+    // clean up by deleting any generated pdf or zip file
+    if( !is_null( $this->filename ) && file_exists( $this->filename ) )
     {
-      $db_participant_data = $this->get_leaf_record();
-      if( is_null( $db_participant_data ) )
-      {
-        $filename = $db_participant_data->get_filename( $this->db_participant );
-        if( file_exists( $filename ) ) unlink( $filename );
-      }
+      $extension = pathinfo( $this->filename, PATHINFO_EXTENSION );
+      if( in_array( $extension, ['pdf', 'zip'] ) ) unlink( $this->filename );
     }
   }
 
@@ -110,7 +108,7 @@ class get extends \cenozo\service\downloadable
   private $db_participant = NULL;
 
   /**
-   * The name of the temporary zip file containing the participant's forms
+   * The downloadable file path (stored as it may need to be deleted)
    * @var string
    * @access private
    */

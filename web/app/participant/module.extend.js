@@ -126,7 +126,7 @@ cenozoApp.extendModule({
                 // download the file
                 await CnHttpFactory.instance({
                   path: "participant_data/" + item.id + "?identifier=" + $state.params.identifier,
-                  format: item.filetype,
+                  format: 1 < item.available ? "zip" : item.filetype,
                 }).file();
               } finally {
                 modal.close();

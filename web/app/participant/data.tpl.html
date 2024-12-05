@@ -49,8 +49,8 @@
                 class="btn btn-default full-width"
                 ng-repeat="item in category.dataList"
                 ng-bind-html="item.name"
-                ng-disabled="!item.available"
-                ng-click="item.available && model.download(item)"
+                ng-disabled="0 == item.available"
+                ng-click="0 < item.available && model.download(item)"
               ></a>
             </div>
           </div>
