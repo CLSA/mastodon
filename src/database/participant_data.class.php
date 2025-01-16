@@ -157,6 +157,12 @@ class participant_data extends \cenozo\database\record
           array_walk( $form_data, function( &$item, $key ) { $item = '' == $item ? 'NA' : $item; } );
           $form_data['NAME'] = sprintf( '%s %s', $db_participant->first_name, $db_participant->last_name );
 
+          // determine the participant's age at the time of the DCS visit
+          $dob = $db_participant->date_of_birth;
+          $dcs_date = $form_data['DATE'];
+          $form_data['AGE'] = !is_null( $dob ) && preg_match( '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $dcs_date ) ?
+            $dob->diff( util::get_datetime_object( $form_data['DATE'] ) )->y : '';
+
           // write the template data to disk
           $db_participant_data_template =
             lib::create( 'database\participant_data_template', $template['id'] );
