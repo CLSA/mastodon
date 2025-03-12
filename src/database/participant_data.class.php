@@ -79,7 +79,6 @@ class participant_data extends \cenozo\database\record
     if( !is_null( $this->path ) )
     {
       $glob_list = glob( $this->get_filename( $db_participant ) );
-      log::debug( $glob_list );
 
       // if there are multiple files then zip them and provide that zip file
       if( 1 < count( $glob_list ) )
