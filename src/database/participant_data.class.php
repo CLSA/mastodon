@@ -51,6 +51,15 @@ class participant_data extends \cenozo\database\record
           $opal_manager->get_values( 'mastodon', $template['opal_view'], $db_participant );
           return 1;
         }
+        catch( \cenozo\exception\runtime $e )
+        {
+          // note in the log that Opal can't be reached but otherwise proceed
+          log::warning( sprintf(
+            'Unable to get participant data from Opal view "mastodon/%s" for %s',
+            $template['opal_view'],
+            $db_participant->uid
+          ) );
+        }
         catch( \cenozo\exception\argument $e )
         {
           // ignore argument errors as they simply mean the participant does not have data
