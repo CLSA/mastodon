@@ -40,4 +40,36 @@ foreach( $file_list as $file )
   }
 }
 
+chdir( '..' );
+
+if( !file_exists( 'web3' ) )
+{
+  print "Cannot find web3 directory\n";
+  exit( 1 );
+}
+chdir( 'web3/js' );
+
+$file_list = array();
+exec( implode( ' | ', array(
+  'find -type f',
+  'grep "\.js\|\.css$"',
+  'grep -v "\.min\."',
+  'grep -v "\.swp"'
+) ), $file_list );
+
+foreach( $file_list as $file )
+{
+  $file_type = false === strpos( $file, '.js' ) ? 'css' : 'js';
+  if( 'js' == $file_type ) $min_file = str_replace( '.js', '.min.js', $file );
+  if( 'css' == $file_type ) $min_file = str_replace( '.css', '.min.css', $file );
+
+  // if the minified file doesn't exist or is older than the file, re-create it
+  if( !file_exists( $min_file ) || filemtime( $file ) > filemtime( $min_file ) )
+  {
+    printf( "Creating %s\n", preg_replace( '/^\./', 'web', $min_file ) );
+    exec( sprintf( 'uglify%s %s > %s', $file_type, $file, $min_file ) );
+  }
+}
+
+
 print "Done, all files minified\n";
