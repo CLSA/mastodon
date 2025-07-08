@@ -99,12 +99,31 @@ class patch
     {
       $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['application_name'] );
 
-      // always drop the procedure in case we're removing an application from the site_based category
+      // always drop the triggers and procedure in case we're removing an application from the site_based category
+      $sql = sprintf(
+        'DROP TRIGGER IF EXISTS %s.jurisdiction_BEFORE_DELETE',
+        $application_db
+      );
+      if( false === $this->db->query( $sql ) )
+      {
+        error( $this->db->error );
+        die();
+      }
+
+      $sql = sprintf(
+        'DROP TRIGGER IF EXISTS %s.region_site_BEFORE_DELETE',
+        $application_db
+      );
+      if( false === $this->db->query( $sql ) )
+      {
+        error( $this->db->error );
+        die();
+      }
+
       $sql = sprintf(
         'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_jurisdiction',
         $application_db
       );
-
       if( false === $this->db->query( $sql ) )
       {
         error( $this->db->error );
@@ -115,7 +134,7 @@ class patch
       {
         $update_participant_site_for_participant_sql .= sprintf(
           "    -- update %s\n".
-          "    REPLACE INTO participant_site( application_id, participant_id, site_id, default_site_id )\n".
+          "    REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
           "    SELECT application_has_cohort.application_id,\n".
           "           participant.id,\n".
           "           IF(\n".
@@ -132,18 +151,18 @@ class patch
           "             jurisdiction.site_id,\n".
           "             region_site.site_id\n".
           "           ) AS default_site_id\n".
-          "    FROM application_has_cohort\n".
-          "    JOIN participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
-          "    LEFT JOIN participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
-          "    LEFT JOIN address ON participant_primary_address.address_id = address.id\n".
+          "    FROM %s.application_has_cohort\n".
+          "    JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
+          "    LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
+          "    LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
           "    LEFT JOIN %s.jurisdiction ON address.postcode = jurisdiction.postcode\n".
-          "    LEFT JOIN site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
-          "    LEFT JOIN region ON address.region_id = region.id\n".
+          "    LEFT JOIN %s.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
+          "    LEFT JOIN %s.region ON address.region_id = region.id\n".
           "    LEFT JOIN %s.region_site ON region.id = region_site.region_id\n".
-          "    LEFT JOIN site AS region_site_site\n".
+          "    LEFT JOIN %s.site AS region_site_site\n".
           "      ON region_site.site_id = region_site_site.id\n".
           "      AND participant.language_id = region_site.language_id\n".
-          "    LEFT JOIN application_has_participant\n".
+          "    LEFT JOIN %s.application_has_participant\n".
           "      ON application_has_cohort.application_id = application_has_participant.application_id\n".
           "      AND application_has_participant.participant_id = participant.id\n".
           "    WHERE jurisdiction.site_id <=> jurisdiction_site.id\n".
@@ -151,10 +170,61 @@ class patch
           "    AND application_has_cohort.application_id = %d\n".
           "    AND participant.id = proc_participant_id;\n\n",
           $row['application_name'],
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
+          $cenozo_db,
           $application_db,
+          $cenozo_db,
+          $cenozo_db,
           $application_db,
+          $cenozo_db,
+          $cenozo_db,
           $row['application_id']
         );
+
+        // Create update_participant_site_for_jurisdiction
+        out( sprintf(
+          'Creating %s.jurisdiction_BEFORE_DELETE trigger',
+          $application_db
+        ) );
+
+        $sql = sprintf(
+          "CREATE DEFINER=CURRENT_USER TRIGGER %s.jurisdiction_BEFORE_DELETE\n".
+          "  BEFORE DELETE ON %s.jurisdiction\n".
+          "  FOR EACH ROW\n".
+          "  BEGIN\n".
+          "    DELETE FROM %s.participant_site WHERE site_id = OLD.site_id;\n".
+          "  END",
+          $application_db,
+          $application_db,
+          $cenozo_db
+        );
+
+        if( false === $this->db->query( $sql ) )
+        {
+          error( $this->db->error );
+          die();
+        }
+
+        $sql = sprintf(
+          "CREATE DEFINER=CURRENT_USER TRIGGER %s.region_site_BEFORE_DELETE\n".
+          "  BEFORE DELETE ON %s.region_site\n".
+          "  FOR EACH ROW\n".
+          "  BEGIN\n".
+          "    DELETE FROM %s.participant_site WHERE site_id = OLD.site_id;\n".
+          "  END",
+          $application_db,
+          $application_db,
+          $cenozo_db
+        );
+
+        if( false === $this->db->query( $sql ) )
+        {
+          error( $this->db->error );
+          die();
+        }
 
         // Create update_participant_site_for_jurisdiction
         out( sprintf(
