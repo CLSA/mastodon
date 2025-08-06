@@ -16,8 +16,8 @@ error_reporting( E_ALL | E_STRICT );
 ini_set( 'date.timezone', 'US/Eastern' );
 
 // utility functions
-function out( $msg ) { printf( '%s: %s'."\n", date( 'Y-m-d H:i:s' ), $msg ); }
-function error( $msg ) { out( sprintf( 'ERROR! %s', $msg ) ); }
+function out( $msg ) { printf( $msg."\n", $msg ); }
+function error( $msg ) { out( sprintf( 'ERROR! %s', $msg ) ); die(); }
 
 
 class patch
@@ -47,11 +47,14 @@ class patch
     $password = $this->settings['db']['password'];
     $name = $this->settings['db']['database_prefix'] . $this->settings['general']['instance_name'];
     $this->db = new \mysqli( $server, $username, $password, $name );
-    if( $this->db->connect_error )
-    {
-      error( $this->db->connect_error );
-      die();
-    }
+    if( $this->db->connect_error ) error( $this->db->connect_error );
+  }
+
+  public function query( $sql )
+  {
+    $result = $this->db->query( $sql );
+    if( false === $result ) error( $this->db->error );
+    return $result;
   }
 
   /**
@@ -71,391 +74,299 @@ class patch
     $cenozo_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $this->settings['general']['framework_name'] );
 
     // loop through all applications which require participant sites to be updated
-    $result = $this->db->query( sprintf(
-      'SELECT application.id AS application_id, '.
-             'application.name AS application_name, '.
-             'application_type.name AS application_type_name, '.
-             'site_based '.
-      'FROM %s.application '.
-      'JOIN %s.application_type ON application.application_type_id = application_type.id '.
-      'ORDER BY application.name',
-      $cenozo_db,
-      $cenozo_db
-    ) );
+    $result = $this->query( <<<SQL
+SELECT
+  application.id AS application_id,
+  application.name AS application_name,
+  application_type.name AS application_type_name,
+  site_based
+FROM $cenozo_db.application
+JOIN $cenozo_db.application_type ON application.application_type_id = application_type.id
+ORDER BY application.name
+SQL );
 
-    if( false === $result )
-    {
-      error( $this->db->error );
-      die();
-    }
+    $update_participant_site_for_participant_sql = <<<SQL
+CREATE PROCEDURE $cenozo_db.update_participant_site_for_participant( IN proc_participant_id INT(10) UNSIGNED )
+  BEGIN
 
-    $update_participant_site_for_participant_sql = sprintf(
-      "CREATE PROCEDURE %s.update_participant_site_for_participant( IN proc_participant_id INT(10) UNSIGNED )\n".
-      "  BEGIN\n\n",
-      $cenozo_db
-    );
+SQL;
 
     while( $row = $result->fetch_assoc() )
     {
-      $application_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['application_name'] );
+      $app_db = sprintf( '%s%s', $this->settings['db']['database_prefix'], $row['application_name'] );
 
       // always drop the triggers and procedure in case we're removing an application from the site_based category
-      $sql = sprintf(
-        'DROP TRIGGER IF EXISTS %s.jurisdiction_BEFORE_DELETE',
-        $application_db
-      );
-      if( false === $this->db->query( $sql ) )
-      {
-        error( $this->db->error );
-        die();
-      }
-
-      $sql = sprintf(
-        'DROP TRIGGER IF EXISTS %s.region_site_BEFORE_DELETE',
-        $application_db
-      );
-      if( false === $this->db->query( $sql ) )
-      {
-        error( $this->db->error );
-        die();
-      }
-
-      $sql = sprintf(
-        'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_jurisdiction',
-        $application_db
-      );
-      if( false === $this->db->query( $sql ) )
-      {
-        error( $this->db->error );
-        die();
-      }
+      $this->query( sprintf( 'DROP TRIGGER IF EXISTS %s.jurisdiction_BEFORE_DELETE', $app_db ) );
+      $this->query( sprintf( 'DROP TRIGGER IF EXISTS %s.region_site_BEFORE_DELETE', $app_db ) );
+      $this->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_jurisdiction', $app_db ) );
 
       if( $row['site_based'] && 'alder' != $row['application_type_name'] )
       {
-        $update_participant_site_for_participant_sql .= sprintf(
-          "    -- update %s\n".
-          "    REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
-          "    SELECT application_has_cohort.application_id,\n".
-          "           participant.id,\n".
-          "           IF(\n".
-          "             ISNULL( application_has_participant.preferred_site_id ),\n".
-          "             IF(\n".
-          "               application_has_cohort.grouping = 'jurisdiction',\n".
-          "               jurisdiction.site_id,\n".
-          "               region_site.site_id\n".
-          "             ),\n".
-          "             application_has_participant.preferred_site_id\n".
-          "           ) AS site_id,\n".
-          "           IF(\n".
-          "             application_has_cohort.grouping = 'jurisdiction',\n".
-          "             jurisdiction.site_id,\n".
-          "             region_site.site_id\n".
-          "           ) AS default_site_id\n".
-          "    FROM %s.application_has_cohort\n".
-          "    JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
-          "    LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
-          "    LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
-          "    LEFT JOIN %s.jurisdiction ON address.postcode = jurisdiction.postcode\n".
-          "    LEFT JOIN %s.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
-          "    LEFT JOIN %s.region ON address.region_id = region.id\n".
-          "    LEFT JOIN %s.region_site ON region.id = region_site.region_id\n".
-          "    LEFT JOIN %s.site AS region_site_site\n".
-          "      ON region_site.site_id = region_site_site.id\n".
-          "      AND participant.language_id = region_site.language_id\n".
-          "    LEFT JOIN %s.application_has_participant\n".
-          "      ON application_has_cohort.application_id = application_has_participant.application_id\n".
-          "      AND application_has_participant.participant_id = participant.id\n".
-          "    WHERE jurisdiction.site_id <=> jurisdiction_site.id\n".
-          "    AND region_site.site_id <=> region_site_site.id\n".
-          "    AND application_has_cohort.application_id = %d\n".
-          "    AND participant.id = proc_participant_id;\n\n",
-          $row['application_name'],
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $row['application_id']
-        );
+        $update_participant_site_for_participant_sql .= <<<SQL
+    -- update {$row['application_name']}
+    REPLACE INTO $cenozo_db.participant_site( application_id, participant_id, site_id, default_site_id )
+    SELECT
+      application_has_cohort.application_id,
+      participant.id,
+      IF(
+        ISNULL( application_has_participant.preferred_site_id ),
+        IF(
+          application_has_cohort.grouping = "jurisdiction",
+          jurisdiction.site_id,
+          region_site.site_id
+        ),
+        application_has_participant.preferred_site_id
+      ) AS site_id,
+      IF(
+        application_has_cohort.grouping = "jurisdiction",
+        jurisdiction.site_id,
+        region_site.site_id
+      ) AS default_site_id
+    FROM $cenozo_db.application_has_cohort
+    JOIN $cenozo_db.participant ON application_has_cohort.cohort_id = participant.cohort_id
+    LEFT JOIN $cenozo_db.participant_primary_address ON participant.id = participant_primary_address.participant_id
+    LEFT JOIN $cenozo_db.address ON participant_primary_address.address_id = address.id
+    LEFT JOIN $app_db.jurisdiction ON address.postcode = jurisdiction.postcode
+    LEFT JOIN $cenozo_db.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id
+    LEFT JOIN $cenozo_db.region ON address.region_id = region.id
+    LEFT JOIN $app_db.region_site ON region.id = region_site.region_id
+    LEFT JOIN $cenozo_db.site AS region_site_site
+      ON region_site.site_id = region_site_site.id
+      AND participant.language_id = region_site.language_id
+    LEFT JOIN $cenozo_db.application_has_participant
+      ON application_has_cohort.application_id = application_has_participant.application_id
+      AND application_has_participant.participant_id = participant.id
+    WHERE jurisdiction.site_id <=> jurisdiction_site.id
+    AND region_site.site_id <=> region_site_site.id
+    AND application_has_cohort.application_id = {$row['application_id']}
+    AND participant.id = proc_participant_id;
+SQL;
 
-        // Create update_participant_site_for_jurisdiction
-        out( sprintf(
-          'Creating %s.jurisdiction_BEFORE_DELETE trigger',
-          $application_db
-        ) );
+        out( sprintf( 'Creating %s.jurisdiction_BEFORE_DELETE trigger', $app_db ) );
+        $this->query( <<<SQL
+CREATE DEFINER=CURRENT_USER TRIGGER $app_db.jurisdiction_BEFORE_DELETE
+  BEFORE DELETE ON $app_db.jurisdiction
+  FOR EACH ROW
 
-        $sql = sprintf(
-          "CREATE DEFINER=CURRENT_USER TRIGGER %s.jurisdiction_BEFORE_DELETE\n".
-          "  BEFORE DELETE ON %s.jurisdiction\n".
-          "  FOR EACH ROW\n".
-          "  BEGIN\n".
-          "    DELETE FROM %s.participant_site WHERE site_id = OLD.site_id;\n".
-          "  END",
-          $application_db,
-          $application_db,
-          $cenozo_db
-        );
+  BEGIN
 
-        if( false === $this->db->query( $sql ) )
-        {
-          error( $this->db->error );
-          die();
-        }
+    REPLACE INTO $cenozo_db.participant_site( application_id, participant_id, site_id, default_site_id )
+    SELECT
+      application_has_cohort.application_id,
+      participant.id,
+      application_has_participant.preferred_site_id,
+      NULL
+    FROM $cenozo_db.application_has_cohort
+    JOIN $cenozo_db.participant ON application_has_cohort.cohort_id = participant.cohort_id
+    LEFT JOIN $cenozo_db.participant_primary_address ON participant.id = participant_primary_address.participant_id
+    LEFT JOIN $cenozo_db.address ON participant_primary_address.address_id = address.id
+    LEFT JOIN $app_db.jurisdiction ON address.postcode = jurisdiction.postcode
+    LEFT JOIN $cenozo_db.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id
+    LEFT JOIN $cenozo_db.application_has_participant
+      ON application_has_cohort.application_id = application_has_participant.application_id
+      AND application_has_participant.participant_id = participant.id
+    WHERE jurisdiction.site_id <=> jurisdiction_site.id
+    AND application_has_cohort.application_id = {$row['application_id']}
+    AND application_has_cohort.grouping = "jurisdiction"
+    AND jurisdiction.id = OLD.id;
 
-        $sql = sprintf(
-          "CREATE DEFINER=CURRENT_USER TRIGGER %s.region_site_BEFORE_DELETE\n".
-          "  BEFORE DELETE ON %s.region_site\n".
-          "  FOR EACH ROW\n".
-          "  BEGIN\n".
-          "    DELETE FROM %s.participant_site WHERE site_id = OLD.site_id;\n".
-          "  END",
-          $application_db,
-          $application_db,
-          $cenozo_db
-        );
+  END
+SQL );
 
-        if( false === $this->db->query( $sql ) )
-        {
-          error( $this->db->error );
-          die();
-        }
+        out( sprintf( 'Creating %s.region_site_BEFORE_DELETE trigger', $app_db ) );
+        $this->query( <<<SQL
+CREATE DEFINER=CURRENT_USER TRIGGER $app_db.region_site_BEFORE_DELETE
+  BEFORE DELETE ON $app_db.region_site
+  FOR EACH ROW
 
-        // Create update_participant_site_for_jurisdiction
-        out( sprintf(
-          'Creating %s.update_participant_site_for_jurisdiction procedure',
-          $application_db
-        ) );
+  BEGIN
 
-        $sql = sprintf(
-          "CREATE PROCEDURE %s.update_participant_site_for_jurisdiction( IN proc_jurisdiction_id INT(10) UNSIGNED )\n".
-          "  BEGIN\n".
-          "    REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
-          "    SELECT application_has_cohort.application_id,\n".
-          "           participant.id,\n".
-          "           IF(\n".
-          "             ISNULL( application_has_participant.preferred_site_id ),\n".
-          "             jurisdiction.site_id,\n".
-          "             application_has_participant.preferred_site_id\n".
-          "           ) AS site_id,\n".
-          "           jurisdiction.site_id AS default_site_id\n".
-          "    FROM %s.application_has_cohort\n".
-          "    JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
-          "    LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
-          "    LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
-          "    LEFT JOIN %s.jurisdiction ON address.postcode = jurisdiction.postcode\n".
-          "    LEFT JOIN %s.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id\n".
-          "    LEFT JOIN %s.application_has_participant\n".
-          "      ON application_has_cohort.application_id = application_has_participant.application_id\n".
-          "      AND application_has_participant.participant_id = participant.id\n".
-          "    WHERE jurisdiction.site_id <=> jurisdiction_site.id\n".
-          "    AND application_has_cohort.application_id = %d\n".
-          "    AND application_has_cohort.grouping = 'jurisdiction'\n".
-          "    AND jurisdiction.id = proc_jurisdiction_id;\n".
-          "  END",
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $row['application_id']
-        );
+    REPLACE INTO $cenozo_db.participant_site( application_id, participant_id, site_id, default_site_id )
+    SELECT
+      application_has_cohort.application_id,
+      participant.id,
+      application_has_participant.preferred_site_id,
+      NULL
+    FROM $cenozo_db.application_has_cohort
+    JOIN $cenozo_db.participant ON application_has_cohort.cohort_id = participant.cohort_id
+    LEFT JOIN $cenozo_db.participant_primary_address ON participant.id = participant_primary_address.participant_id
+    LEFT JOIN $cenozo_db.address ON participant_primary_address.address_id = address.id
+    LEFT JOIN $cenozo_db.region ON address.region_id = region.id
+    LEFT JOIN $app_db.region_site ON region.id = region_site.region_id
+    LEFT JOIN $cenozo_db.site AS region_site_site
+      ON region_site.site_id = region_site_site.id
+      AND participant.language_id = region_site.language_id
+    LEFT JOIN $cenozo_db.application_has_participant
+      ON application_has_cohort.application_id = application_has_participant.application_id
+      AND application_has_participant.participant_id = participant.id
+    WHERE region_site.site_id <=> region_site_site.id
+    AND application_has_cohort.application_id = {$row['application_id']}
+    AND application_has_cohort.grouping = "region"
+    AND region_site.id = OLD.id;
 
-        if( false === $this->db->query( $sql ) )
-        {
-          error( $this->db->error );
-          die();
-        }
+  END
+SQL );
+
+        out( sprintf( 'Creating %s.update_participant_site_for_jurisdiction procedure', $app_db ) );
+        $this->query( <<<SQL
+CREATE PROCEDURE $app_db.update_participant_site_for_jurisdiction( IN proc_jurisdiction_id INT(10) UNSIGNED )
+  BEGIN
+
+    REPLACE INTO $cenozo_db.participant_site( application_id, participant_id, site_id, default_site_id )
+    SELECT
+      application_has_cohort.application_id,
+      participant.id,
+      IF(
+        ISNULL( application_has_participant.preferred_site_id ),
+        jurisdiction.site_id,
+        application_has_participant.preferred_site_id
+      ) AS site_id,
+      jurisdiction.site_id AS default_site_id
+    FROM $cenozo_db.application_has_cohort
+    JOIN $cenozo_db.participant ON application_has_cohort.cohort_id = participant.cohort_id
+    LEFT JOIN $cenozo_db.participant_primary_address ON participant.id = participant_primary_address.participant_id
+    LEFT JOIN $cenozo_db.address ON participant_primary_address.address_id = address.id
+    LEFT JOIN $app_db.jurisdiction ON address.postcode = jurisdiction.postcode
+    LEFT JOIN $cenozo_db.site AS jurisdiction_site ON jurisdiction.site_id = jurisdiction_site.id
+    LEFT JOIN $cenozo_db.application_has_participant
+      ON application_has_cohort.application_id = application_has_participant.application_id
+      AND application_has_participant.participant_id = participant.id
+    WHERE jurisdiction.site_id <=> jurisdiction_site.id
+    AND application_has_cohort.application_id = {$row['application_id']}
+    AND application_has_cohort.grouping = "jurisdiction"
+    AND jurisdiction.id = proc_jurisdiction_id;
+
+  END
+SQL );
 
         // Create update_participant_site_for_region_site
-        out( sprintf(
-          'Creating %s.update_participant_site_for_region_site procedure',
-          $application_db
-        ) );
+        out( sprintf( 'Creating %s.update_participant_site_for_region_site procedure', $app_db ) );
+        $this->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_region_site', $app_db ) );
 
-        $sql = sprintf(
-          'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_region_site',
-          $application_db
-        );
-
-        if( false === $this->db->query( $sql ) )
-        {
-          error( $this->db->error );
-          die();
-        }
-
-        $sql = sprintf(
-          "CREATE PROCEDURE %s.update_participant_site_for_region_site( IN proc_region_site_id INT(10) UNSIGNED )\n".
-          "  BEGIN\n".
-          "      REPLACE INTO %s.participant_site( application_id, participant_id, site_id, default_site_id )\n".
-          "      SELECT application_has_cohort.application_id,\n".
-          "             participant.id,\n".
-          "             IF(\n".
-          "               ISNULL( application_has_participant.preferred_site_id ),\n".
-          "               region_site.site_id,\n".
-          "               application_has_participant.preferred_site_id\n".
-          "             ) AS site_id,\n".
-          "             region_site.site_id AS default_site_id\n".
-          "      FROM %s.application_has_cohort\n".
-          "      JOIN %s.participant ON application_has_cohort.cohort_id = participant.cohort_id\n".
-          "      LEFT JOIN %s.participant_primary_address ON participant.id = participant_primary_address.participant_id\n".
-          "      LEFT JOIN %s.address ON participant_primary_address.address_id = address.id\n".
-          "      LEFT JOIN %s.region ON address.region_id = region.id\n".
-          "      LEFT JOIN %s.region_site ON region.id = region_site.region_id\n".
-          "      LEFT JOIN %s.site AS region_site_site\n".
-          "        ON region_site.site_id = region_site_site.id\n".
-          "        AND participant.language_id = region_site.language_id\n".
-          "      LEFT JOIN %s.application_has_participant\n".
-          "        ON application_has_cohort.application_id = application_has_participant.application_id\n".
-          "        AND application_has_participant.participant_id = participant.id\n".
-          "      WHERE region_site.site_id <=> region_site_site.id\n".
-          "      AND application_has_cohort.application_id = %d\n".
-          "      AND application_has_cohort.grouping = 'region'\n".
-          "      AND region_site.id = proc_region_site_id;\n".
-          "  END",
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $cenozo_db,
-          $application_db,
-          $cenozo_db,
-          $cenozo_db,
-          $row['application_id']
-        );
-
-        if( false === $this->db->query( $sql ) )
-        {
-          error( $this->db->error );
-          die();
-        }
+        $this->query( <<<SQL
+CREATE PROCEDURE $app_db.update_participant_site_for_region_site( IN proc_region_site_id INT(10) UNSIGNED )
+  BEGIN
+      REPLACE INTO $cenozo_db.participant_site( application_id, participant_id, site_id, default_site_id )
+      SELECT
+        application_has_cohort.application_id,
+        participant.id,
+        IF(
+          ISNULL( application_has_participant.preferred_site_id ),
+          region_site.site_id,
+          application_has_participant.preferred_site_id
+        ) AS site_id,
+        region_site.site_id AS default_site_id
+      FROM $cenozo_db.application_has_cohort
+      JOIN $cenozo_db.participant ON application_has_cohort.cohort_id = participant.cohort_id
+      LEFT JOIN $cenozo_db.participant_primary_address
+        ON participant.id = participant_primary_address.participant_id
+      LEFT JOIN $cenozo_db.address ON participant_primary_address.address_id = address.id
+      LEFT JOIN $cenozo_db.region ON address.region_id = region.id
+      LEFT JOIN $app_db.region_site ON region.id = region_site.region_id
+      LEFT JOIN $cenozo_db.site AS region_site_site
+        ON region_site.site_id = region_site_site.id
+        AND participant.language_id = region_site.language_id
+      LEFT JOIN $cenozo_db.application_has_participant
+        ON application_has_cohort.application_id = application_has_participant.application_id
+        AND application_has_participant.participant_id = participant.id
+      WHERE region_site.site_id <=> region_site_site.id
+      AND application_has_cohort.application_id = {$row['application_id']}
+      AND application_has_cohort.grouping = "region"
+      AND region_site.id = proc_region_site_id;
+  END
+SQL );
       }
       else if( 'mastodon' == $row['application_type_name'] )
       {
-        foreach( array( 'consent', 'extended_hin', 'general_proxy', 'hin', 'proxy', 'dm_consent', 'ip_consent' ) as $subject )
+        $forms = ['consent', 'extended_hin', 'general_proxy', 'hin', 'proxy', 'dm_consent', 'ip_consent'];
+        foreach( $forms as $name )
         {
-          $procedure_name = sprintf( 'update_%s_form_total', $subject );
-          out( sprintf( 'Creating %s.%s procedure', $application_db, $procedure_name ) );
+          $procedure_name = sprintf( 'update_%s_form_total', $name );
+          out( sprintf( 'Creating %s.%s procedure', $app_db, $procedure_name ) );
 
-          if( false === $this->db->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.%s', $application_db, $procedure_name ) ) )
-          {
-            error( $this->db->error );
-            die();
-          }
+          $sql = sprintf( 'DROP PROCEDURE IF EXISTS %s.%s', $app_db, $procedure_name );
+          $this->query( $sql );
 
-          $sql = sprintf(
-            "CREATE PROCEDURE %s.%s( IN proc_%s_form_id INT(10) UNSIGNED )\n".
-            "  BEGIN\n".
-            "    SELECT validated_%s_form_entry_id INTO @validated_id\n".
-            "    FROM %s_form\n".
-            "    WHERE id = proc_%s_form_id;\n".
-            "\n".
-            "    IF @validated_id THEN\n".
-            "      REPLACE INTO %s_form_total\n".
-            "      SET %s_form_id = proc_%s_form_id,\n".
-            "          entry_total = (\n".
-            "            SELECT COUNT(*) FROM %s_form_entry\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "          ),\n".
-            "          submitted_total = (\n".
-            "            SELECT COUNT(*) FROM %s_form_entry\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "            AND submitted = true\n".
-            "          ),\n".
-            "          uid = (\n".
-            "            SELECT participant.uid\n".
-            "            FROM %s_form_entry\n".
-            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "            WHERE %s_form_entry.id = @validated_id\n".
-            "          ),\n".
-            "          cohort = (\n".
-            "            SELECT cohort.name\n".
-            "            FROM %s_form_entry\n".
-            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "            LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
-            "            WHERE %s_form_entry.id = @validated_id\n".
-            "          );\n".
-            "    ELSE\n".
-            "      REPLACE INTO %s_form_total\n".
-            "      SET %s_form_id = proc_%s_form_id,\n".
-            "          entry_total = (\n".
-            "            SELECT COUNT(*) FROM %s_form_entry\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "          ),\n".
-            "          submitted_total = (\n".
-            "            SELECT COUNT(*) FROM %s_form_entry\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "            AND submitted = true\n".
-            "          ),\n".
-            "          uid = (\n".
-            "            SELECT GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR ',' )\n".
-            "            FROM %s_form_entry\n".
-            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "            GROUP BY %s_form_id\n".
-            "          ),\n".
-            "          cohort = (\n".
-            "            SELECT GROUP_CONCAT( DISTINCT cohort.name ORDER BY cohort.name SEPARATOR ',' )\n".
-            "            FROM %s_form_entry\n".
-            "            LEFT JOIN %s.participant ON %s_form_entry.participant_id = participant.id\n".
-            "            LEFT JOIN %s.cohort ON participant.cohort_id = cohort.id\n".
-            "            WHERE %s_form_id = proc_%s_form_id\n".
-            "            GROUP BY %s_form_id\n".
-            "          );\n".
-            "    END IF;\n".
-            "  END",
-            $application_db, $procedure_name, $subject,
-            $subject, $subject, $subject,
-            $subject,
-            $subject, $subject, $subject, $subject, $subject,
-            $subject, $subject, $subject,
-            $subject, $cenozo_db, $subject, $subject,
-            $subject, $cenozo_db, $subject, $cenozo_db, $subject,
-            $subject,
-            $subject, $subject, $subject, $subject, $subject,
-            $subject, $subject, $subject,
-            $subject, $cenozo_db, $subject, $subject, $subject, $subject,
-            $subject, $cenozo_db, $subject, $cenozo_db, $subject, $subject, $subject
-          );
-          if( false === $this->db->query( $sql ) )
-          {
-            error( $this->db->error );
-            die();
-          }
+          $this->query( <<<SQL
+CREATE PROCEDURE $app_db.$procedure_name( IN proc_{$name}_form_id INT(10) UNSIGNED )
+  BEGIN
+
+    SELECT validated_{$name}_form_entry_id INTO @validated_id
+    FROM $app_db.{$name}_form
+    WHERE id = proc_{$name}_form_id;
+
+    IF @validated_id THEN
+
+      REPLACE INTO $app_db.{$name}_form_total
+      SET
+        {$name}_form_id = proc_{$name}_form_id,
+        entry_total = (
+          SELECT COUNT(*) FROM $app_db.{$name}_form_entry
+          WHERE {$name}_form_id = proc_{$name}_form_id
+        ),
+        submitted_total = (
+          SELECT COUNT(*) FROM $app_db.{$name}_form_entry
+          WHERE {$name}_form_id = proc_{$name}_form_id
+          AND submitted = true
+        ),
+        uid = (
+          SELECT participant.uid
+          FROM $app_db.{$name}_form_entry
+          LEFT JOIN $cenozo_db.participant ON {$name}_form_entry.participant_id = participant.id
+          WHERE {$name}_form_entry.id = @validated_id
+        ),
+        cohort = (
+          SELECT cohort.name
+          FROM $app_db.{$name}_form_entry
+          LEFT JOIN $cenozo_db.participant ON {$name}_form_entry.participant_id = participant.id
+          LEFT JOIN $cenozo_db.cohort ON participant.cohort_id = cohort.id
+          WHERE {$name}_form_entry.id = @validated_id
+        );
+
+    ELSE
+
+      REPLACE INTO $app_db.{$name}_form_total
+      SET
+        {$name}_form_id = proc_{$name}_form_id,
+        entry_total = (
+          SELECT COUNT(*) FROM $app_db.{$name}_form_entry
+          WHERE {$name}_form_id = proc_{$name}_form_id
+        ),
+        submitted_total = (
+          SELECT COUNT(*) FROM $app_db.{$name}_form_entry
+          WHERE {$name}_form_id = proc_{$name}_form_id
+          AND submitted = true
+        ),
+        uid = (
+          SELECT GROUP_CONCAT( DISTINCT participant.uid ORDER BY participant.uid SEPARATOR ',' )
+          FROM $app_db.{$name}_form_entry
+          LEFT JOIN $cenozo_db.participant ON {$name}_form_entry.participant_id = participant.id
+          WHERE {$name}_form_id = proc_{$name}_form_id
+          GROUP BY {$name}_form_id
+        ),
+        cohort = (
+          SELECT GROUP_CONCAT( DISTINCT cohort.name ORDER BY cohort.name SEPARATOR ',' )
+          FROM $app_db.{$name}_form_entry
+          LEFT JOIN $cenozo_db.participant ON {$name}_form_entry.participant_id = participant.id
+          LEFT JOIN $cenozo_db.cohort ON participant.cohort_id = cohort.id
+          WHERE {$name}_form_id = proc_{$name}_form_id
+          GROUP BY {$name}_form_id
+        );
+
+    END IF;
+
+  END
+SQL );
         }
       }
     }
 
     $update_participant_site_for_participant_sql .= "  END";
 
-    out( sprintf(
-      'Creating %s.update_participant_site_for_participant procedure',
-      $cenozo_db
-    ) );
-
-    if( false === $this->db->query( sprintf( 'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_participant', $cenozo_db ) ) )
-    {
-      error( $this->db->error );
-      die();
-    }
-
-    if( false === $this->db->query( $update_participant_site_for_participant_sql ) )
-    {
-      error( $this->db->error );
-      die();
-    }
-
+    out( sprintf( 'Creating %s.update_participant_site_for_participant procedure', $cenozo_db ) );
+    $sql = sprintf( 'DROP PROCEDURE IF EXISTS %s.update_participant_site_for_participant', $cenozo_db );
+    $this->query( $sql );
+    $this->query( $update_participant_site_for_participant_sql );
     out( 'Done' );
   }
 
@@ -464,7 +375,7 @@ class patch
    * @var array
    * @access private
    */
-  private $settings = array();
+  private $settings = [];
 }
 
 $patch = new patch();
