@@ -35,6 +35,7 @@ class query extends \cenozo\service\log_entry\query
       $db_application = lib::create( 'business\session' )->get_application();
       $application_mod = lib::create( 'database\modifier' );
       $application_mod->where( 'id', '!=', $db_application->id );
+      $application_mod->where( 'active', '=', true );
       foreach( $application_class_name::select_objects( $application_mod ) as $db_application )
       {
         try
