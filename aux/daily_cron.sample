@@ -36,6 +36,51 @@ function write_log( $message )
 }
 
 /**
+ * Send a command to archive records
+ */
+write_log( sprintf(
+  'Archiving records more than %d days old',
+  $settings['general']['table_archive_offset']
+) );
+
+$curl = curl_init();
+curl_setopt( $curl, CURLOPT_URL, URL.'application?archive=1' );
+curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+curl_setopt( $curl, CURLOPT_HTTPHEADER, array( AUTH, 'X-No-Activity:true' ) );
+
+$result = curl_exec( $curl );
+if( curl_errno( $curl ) )
+{
+  write_log( sprintf(
+    "Returned error code %s when trying to archive records\nMessage: %s",
+    curl_errno( $curl ),
+    curl_error( $curl )
+  ) );
+}
+else
+{
+  $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+  if( 200 != $code && 503 != $code )
+  {
+    write_log( sprintf( 'Failed to archive records (response code: %s)', $code ) );
+  }
+  else
+  {
+    foreach( (array) json_decode( $result ) as $table => $total )
+    {
+      write_log( sprintf(
+        'Archived %d %s record%s',
+        $total,
+        $table,
+        1 != $total ? 's' : ''
+      ) );
+    }
+  }
+}
+curl_close( $curl );
+
+/**
  * Send a command to run all scheduled reports
  */
 write_log( 'Updating all scheduled reports' );
