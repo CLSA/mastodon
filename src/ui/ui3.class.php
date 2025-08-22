@@ -18,9 +18,9 @@ class ui3 extends \cenozo\ui\ui3
    */
   public static function generate()
   {
-    $db_role = lib::create( 'business\session' )->get_role();
-
     $data = parent::generate();
+
+    $db_role = lib::create( 'business\session' )->get_role();
 
     // add child actions to certain modules
     if( 2 <= $db_role->tier && array_key_exists( 'application', $data['module_list'] ) )
@@ -173,25 +173,39 @@ class ui3 extends \cenozo\ui\ui3
     if( 3 > $db_role->tier ) unset( $data['menu']['lists']['Applications'] );
 
     // add application-specific states to the base list
-    $data['menu']['lists']['consent_form'] = 'Consent Forms';
-    $data['menu']['lists']['contact_form'] = 'Contact Forms';
-    $data['menu']['lists']['hin_form'] = 'HIN Forms';
-    $data['menu']['lists']['extended_hin_form'] = 'Extended HIN Forms';
-    $data['menu']['lists']['general_proxy_form'] = 'General Proxy Forms';
-    $data['menu']['lists']['proxy_form'] = 'Proxy Forms';
-    $data['menu']['lists']['dm_consent_form'] = 'Proxy DM Forms';
-    $data['menu']['lists']['ip_consent_form'] = 'Proxy IP Forms';
+    $menu_list_items = [
+      ['subject' => 'consent_form', 'title' => 'Consent Forms'],
+      ['subject' => 'contact_form', 'title' => 'Contact Forms'],
+      ['subject' => 'hin_form', 'title' => 'HIN Forms'],
+      ['subject' => 'extended_hin_form', 'title' => 'Extended HIN Forms'],
+      ['subject' => 'general_proxy_form', 'title' => 'General Proxy Forms'],
+      ['subject' => 'proxy_form', 'title' => 'Proxy Forms'],
+      ['subject' => 'dm_consent_form', 'title' => 'Proxy DM Forms'],
+      ['subject' => 'ip_consent_form', 'title' => 'Proxy IP Forms'],
+    ];
 
     if( 'typist' == $db_role->name )
     {
-      $data['menu']['lists']['consent_form_entry'] = 'Consent Form Entries';
-      $data['menu']['lists']['contact_form_entry'] = 'Contact Form Entries';
-      $data['menu']['lists']['hin_form_entry'] = 'HIN Form Entries';
-      $data['menu']['lists']['extended_hin_form_entry'] = 'Extended HIN Form Entries';
-      $data['menu']['lists']['general_proxy_form_entry'] = 'General Proxy Form Entries';
-      $data['menu']['lists']['proxy_form_entry'] = 'Proxy Form Entries';
-      $data['menu']['lists']['dm_consent_form_entry'] = 'Proxy DM Form Entries';
-      $data['menu']['lists']['ip_consent_form_entry'] = 'Proxy IP Form Entries';
+      $menu_list_items = [
+        ['subject' => 'consent_form_entry', 'title' => 'Consent Form Entries'],
+        ['subject' => 'contact_form_entry', 'title' => 'Contact Form Entries'],
+        ['subject' => 'hin_form_entry', 'title' => 'HIN Form Entries'],
+        ['subject' => 'extended_hin_form_entry', 'title' => 'Extended HIN Form Entries'],
+        ['subject' => 'general_proxy_form_entry', 'title' => 'General Proxy Form Entries'],
+        ['subject' => 'proxy_form_entry', 'title' => 'Proxy Form Entries'],
+        ['subject' => 'dm_consent_form_entry', 'title' => 'Proxy DM Form Entries'],
+        ['subject' => 'ip_consent_form_entry', 'title' => 'Proxy IP Form Entries'],
+      ];
+    }
+
+    foreach( $menu_list_items as $item )
+    {
+      if( array_key_exists( $item['subject'], $data['module_list'] ) )
+      {
+        $module = $data['module_list'][$item['subject']];
+        if( $module->get_list_menu() && $module->has_action( 'list' ) )
+          $data['menu']['lists'][$item['title']] = $item['subject'];
+      }
     }
 
     return $data;
