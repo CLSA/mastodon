@@ -19,7 +19,7 @@ export class CN_base_form_entry_model extends CN_base_model {
         type: "typeahead",
         typeahead: {
           get_list: async (value) => {
-            const response = await CN_api.get("user", {
+            return await CN_api.get("user", {
               select: {
                 columns: [{
                   table: "user",
@@ -41,7 +41,6 @@ export class CN_base_form_entry_model extends CN_base_model {
               },
               order: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
             });
-            return (await response.json());
           },
           table: "user",
           select: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
@@ -58,7 +57,7 @@ export class CN_base_form_entry_model extends CN_base_model {
           type: "typeahead",
           typeahead: {
             get_list: async (value) => {
-              const response = await CN_api.get("", {
+              return await CN_api.get("", {
                 select: {
                   column: [{
                     table: "participant",
@@ -80,7 +79,6 @@ export class CN_base_form_entry_model extends CN_base_model {
                   order: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
                 },
               });
-              return (await response.json());
             },
             table: "participant",
             select: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',

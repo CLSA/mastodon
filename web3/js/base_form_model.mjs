@@ -90,15 +90,11 @@ export class CN_base_form_view extends CN_base_view {
       '<button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>'
     );
     download_btn_el.addEventListener("click", async () => {
-      const response = await CN_api.file(`${this.#form_type}_form/${model.get_identifier()}`, "application/pdf" );
-      const blob = await response.blob();
-
-      // create a temporary link element and click it so the file is downloaded by the browser
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = response.headers.get('content-disposition').match(/filename=(.*);/)[1];
-      link.click();
-      URL.revokeObjectURL(link.href);
+      await CN_api.file(
+        `${this.#form_type}_form/${model.get_identifier()}`,
+        "application/pdf",
+        true // open in new tab
+      );
     });
     footer_el.append(download_btn_el);
 
