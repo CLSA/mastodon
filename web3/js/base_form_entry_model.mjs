@@ -1,18 +1,22 @@
+const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
+
 const { CN_base_model } = await import(`${CENOZO_URL}/js/base_model.mjs`);
-// import { CN_base_model } from "./base_model.mjs"
 
 export class CN_base_form_entry_model extends CN_base_model {
-  constructor(form_type) {
+  #form_type;
+
+  constructor(params) {
     let columns = {};
-    columns[`${form_type}_form_id`] = { column: `${form_type}_form.id`, title: "ID" };
+    columns[`${params.type}_form_id`] = { column: `${params.type}_form.id`, title: "ID" };
     columns = {
       ...columns,
       user: { column: "user.name", title: "User" },  
       submitted: { title: "Submitted", type: "boolean" },  
       validated: { title: "Validated", type: "boolean", table_prefix: false },  
-      date: { column: `${form_type}_form.date`, title: "Date Added", type: "date" },  
+      date: { column: `${params.type}_form.date`, title: "Date Added", type: "date" },  
     };
 
+    // all forms have the user property
     let properties = {
       user_id: {
         title: "User",
@@ -49,7 +53,8 @@ export class CN_base_form_entry_model extends CN_base_model {
       },
     };
 
-    if ("contact" != form_type) {
+    // all but the contact form have the participant property
+    if ("contact" != params.type) {
       properties = {
         ...properties,
         participant_id: {
@@ -57,7 +62,7 @@ export class CN_base_form_entry_model extends CN_base_model {
           type: "typeahead",
           typeahead: {
             get_list: async (value) => {
-              return await CN_api.get("", {
+              return await CN_api.get("participant", {
                 select: {
                   column: [{
                     table: "participant",
@@ -88,14 +93,24 @@ export class CN_base_form_entry_model extends CN_base_model {
       };
     }
 
+    // finally, add the form's specific properties
+    properties = {
+      ...properties,
+      ...params.properties
+    };
+
     super({
-      wording: {
-        singular: `${form_type.replace(/_/, " ")} form entry`,
-        plural: `${form_type.replace(/_/, " ")} form entries`,
-        posessive: `${form_type.replace(/_/, " ")} form entry's`,
-      },
+      wording: params.wording,
       columns: columns,
       properties: properties,
     });
+
+    this.#form_type = params.type;
   }
+
+  /**
+   * Returns the form type
+   * @return string
+   */
+  get_form_type() { return this.#form_type; }
 }
