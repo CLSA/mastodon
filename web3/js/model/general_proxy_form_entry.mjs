@@ -14,10 +14,10 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
           title: "Details",
           open: true,
           properties: {
-            continue_questionnaires: { title: "Continue Questionnaires", type: "boolean" },  
-            hin_future_access: { title: "Continue Health Card", type: "boolean" },  
-            continue_dcs_visits: { title: "Continue DCS Visits", type: "boolean" },  
-            signed: { title: "Signed", type: "boolean" },  
+            continue_questionnaires: { title: "Continue Questionnaires", type: "boolean" },
+            hin_future_access: { title: "Continue Health Card", type: "boolean" },
+            continue_dcs_visits: { title: "Continue DCS Visits", type: "boolean" },
+            signed: { title: "Signed", type: "boolean" }
             date: { title: "Date", type: "date" },
           },
         },

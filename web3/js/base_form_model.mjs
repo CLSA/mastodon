@@ -331,7 +331,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
         const prop = group.properties[prop_name];
         const tr_el = document.createElement("tr");
         tr_el.setAttribute("name", prop_name);
-        tr_el.innerHTML = ` 
+        tr_el.innerHTML = `
           <th scope="row" class="text-end">${prop.title}</th>
           <td name="a" class="text-center"></td>
           <td name="b" class="text-center"></td>
@@ -343,7 +343,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
     return body_el;
   }
 
-  /** 
+  /*
    * ADD DOCS
    */
   create_all_footer_elements(el) {

@@ -10,10 +10,10 @@ export class CN_base_form_entry_model extends CN_base_model {
     columns[`${params.type}_form_id`] = { column: `${params.type}_form.id`, title: "ID" };
     columns = {
       ...columns,
-      user: { column: "user.name", title: "User" },  
-      submitted: { title: "Submitted", type: "boolean" },  
-      validated: { title: "Validated", type: "boolean", table_prefix: false },  
-      date: { column: `${params.type}_form.date`, title: "Date Added", type: "date" },  
+      user: { column: "user.name", title: "User" },
+      submitted: { title: "Submitted", type: "boolean" },
+      validated: { title: "Validated", type: "boolean", table_prefix: false },
+      date: { column: `${params.type}_form.date`, title: "Date Added", type: "date" },
     };
 
     // all forms have the user property
@@ -73,8 +73,8 @@ export class CN_base_form_entry_model extends CN_base_model {
                     column: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
                     alias: "value",
                     table_prefix: false,
-                  }], 
-                },  
+                  }],
+                },
                 modifier: {
                   where: [
                     { column: "uid", operator: "like", value: `%${value}%` },
