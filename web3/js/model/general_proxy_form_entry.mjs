@@ -83,12 +83,14 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             },
             proxy_postcode: {
               title: "Postcode",
+              regex: "^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$",
               help: 'Must be in "A1A 1A1" format, zip codes in "01234" format (if not international).',
             },
             proxy_address_note: { title: "Address Note", type: "text" },
             proxy_phone_international: { title: "International Phone", type: "boolean" },
             proxy_phone: {
               title: "Phone",
+              regex: "^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$",
               help: "Must be a valid North American phone number in XXX-XXX-XXXX format (if not international).",
             },
             proxy_phone_note: { title: "Phone Note", type: "text" },
@@ -165,12 +167,14 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             },
             informant_postcode: {
               title: "Postcode",
+              regex: "^(([A-Z][0-9][A-Z] [0-9][A-Z][0-9])|([0-9]{5}))$",
               help: 'Must be in "A1A 1A1" format, zip codes in "01234" format (if not international).',
             },
             informant_address_note: { title: "Address Note", type: "text" },
             informant_phone_international: { title: "International", type: "boolean" },
             informant_phone: {
               title: "Phone",
+              regex: "^[2-9](1[02-9]|[02-8]1|[02-8][02-9])-[2-9](1[02-9]|[02-9]1|[02-9]{2})-[0-9]{4}$",
               help: "Must be a valid North American phone number in XXX-XXX-XXXX format (if not international).",
             },
             informant_phone_note: { title: "Phone Note", type: "text" },
