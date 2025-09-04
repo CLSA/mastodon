@@ -95,11 +95,11 @@ export class CN_base_form_model extends CN_base_model {
    * Downloads the form
    */
   async download_form() {
-    await CN_api.file(
-      this.get_view_url(null, "api"),
-      "application/pdf",
-      {}, // no query parameters
-      true // open in new tab
+    const response = await CN_api.file(this.get_view_url(null, "api"), "application/pdf", {}, true);
+    //const response = await CN_api.file2(this.get_view_url(null, "api"), "application/pdf");
+    CN_common.download_file(
+      await response.blob(),
+      response.headers.get('content-disposition').match(/filename=(.*);/)[1],
     );
   }
 }
