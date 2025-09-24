@@ -1,0 +1,24 @@
+const classes = await import(`${CENOZO_URL}/js/model/log_entry.mjs`);
+
+const base_model_class = classes.CN_log_entry_model;
+export class CN_log_entry_model extends base_model_class {
+  /**
+   * Extend parent method to add application column
+   */
+  clone_properties() {
+    return {
+      application: { meta: { table: "application", column: "title" }, title: "Application" },
+      ...super.clone_properties()
+    };
+  }
+
+  /**
+   * Extend parent method to add application column
+   */
+  clone_columns() {
+    return {
+      application: { column: "application.title", title: "Application" },
+      ...super.clone_columns()
+    };
+  }
+}
