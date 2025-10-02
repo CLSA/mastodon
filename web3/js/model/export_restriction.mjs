@@ -44,7 +44,7 @@ export class CN_export_restriction_model extends classes.CN_export_restriction_m
         }, []);
       }
 
-      return await get_enums_fn(model, record);
+      return await get_enums_fn(model);
     };
     return properties;
   }
