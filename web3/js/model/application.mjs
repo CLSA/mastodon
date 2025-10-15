@@ -6,7 +6,7 @@ const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 const { CN_base_action } = await import(`${CENOZO_URL}/js/base_action.mjs`);
 const { CN_base_view } = await import(`${CENOZO_URL}/js/base_view.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
-const { CN_create_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
+const { CN_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 
 const base_view_class = classes.CN_application_view ? classes.CN_application_view : CN_base_view;
 export class CN_application_view extends base_view_class {
@@ -38,13 +38,12 @@ export class CN_application_view extends base_view_class {
 export class CN_application_release extends CN_base_action {
   #application = null;
   #participant_model = null;
-  #participant_selection_el = CN_create_participant_selection({
+  #participant_selection = new CN_participant_selection({
     data: {
       mode: "unreleased_only",
       application_id: this.get_model().get_identifier(),
     },
   });
-  #participant_selection = null;
 
   /**
    * Constructor
@@ -83,14 +82,15 @@ export class CN_application_release extends CN_base_action {
     const model = this.get_model();
 
     // reset the list and confirm components
-    this.#participant_selection_el.reset();
+    this.#participant_selection.reset();
     this.get_body_element().querySelector("[name=participant-confirm]").style.display = "none";
 
     // load the application details and site list
     this.#application = await CN_api.get(`application/${model.get_identifier()}`);
 
     // populate the preferred site selection list
-    const preferred_site_el = this.get_body_element().querySelector(`#preferred_site_id`);
+    const preferred_site_el = this.get_body_element().querySelector("#preferred_site_id");
+    preferred_site_el.innerHTML = "";
     preferred_site_el.append(CN_element.create('<option value="null" selected>No Preferred Site</option>'));
     const site_list = await CN_api.get(
       `${model.get_view_url(null, "api")}/site`,
@@ -128,24 +128,24 @@ export class CN_application_release extends CN_base_action {
       </div>
     `);
 
-    this.#participant_selection_el.addEventListener("selected", event => {
+    this.#participant_selection.on_selection_changed(() => {
       const confirm_el = body_el.querySelector("[name=participant-confirm]");
       const summary_el = confirm_el.querySelector("div.card-body");
       summary_el.innerHTML = "";
-      this.#participant_selection = CN_common.clone(event.detail);
-      if (null != event.detail.response && 0 < event.detail.response.identifier_list.length) {
+      if (this.#participant_selection.get_identifier_list().length) {
         confirm_el.style.removeProperty("display");
 
         let first = true;
-        for (let cohort_name in event.detail.response.site_list) {
+        const site_list = this.#participant_selection.get_site_list();
+        for (let cohort_name in site_list) {
           if (!first) summary_el.append(CN_element.create("<hr />"));
           summary_el.append(CN_element.create(
             `<div class="text-center fs-5 fw-bold">${CN_common.uc_words(cohort_name)}</div>`
           ));
           
-          for (let site_name in event.detail.response.site_list[cohort_name]) {
+          for (let site_name in site_list[cohort_name]) {
             const row_el = CN_element.create('<div class="d-flex justify-content-center">');
-            const total = event.detail.response.site_list[cohort_name][site_name];
+            const total = site_list[cohort_name][site_name];
             row_el.append(CN_element.create(
               `<label class="col-form-label text-end fw-bold">${site_name}:</label>`
             ));
@@ -160,7 +160,7 @@ export class CN_application_release extends CN_base_action {
       }
     });
 
-    body_el.querySelector("[name=participant-list]").append(this.#participant_selection_el);
+    body_el.querySelector("[name=participant-list]").append(this.#participant_selection.get_element());
 
     const footer_el = CN_element.create('<div class="row"></div>');
 
@@ -172,9 +172,33 @@ export class CN_application_release extends CN_base_action {
       id: "preferred_site_id",
       required: true,
       // add the release participants button as a postfix to the site selector
-      set_postfix: () => CN_element.create(
-        '<button name="confirm" type="button" class="btn btn-primary ms-2">Release Participants</button>'
-      ),
+      set_postfix: () => {
+        const btn_el = CN_element.create(
+          '<button name="confirm" type="button" class="btn btn-primary ms-2">Release Participants</button>'
+        );
+        btn_el.addEventListener("click", async () => {
+          let response = null;
+          await CN_element.wait_for(async () => {
+            const site_id = document.getElementById("preferred_site_id").value;
+            response = await CN_api.post("participant", {
+              mode: "release",
+              application_id: this.get_model().get_identifier(),
+              site_id: "null" == site_id ? null : Number(site_id),
+              identifier_id: this.#participant_selection.get_idtype(),
+              identifier_list: this.#participant_selection.get_identifier_list(),
+            });
+          });
+
+          await CN_element.message_modal({
+            static: true,
+            title: "Participants Released",
+            message: `A total of ${response} participant(s) have been successfully released.`,
+          }).block();
+
+          await this.#participant_selection.reset();
+        });
+        return btn_el;
+      },
     });
     element_el.classList.add("col-sm-9");
     footer_el.append(element_el);

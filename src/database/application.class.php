@@ -71,7 +71,7 @@ class application extends \cenozo\database\application
     $column_list = 'application_id, participant_id, datetime';
     if( !is_null( $db_preferred_site ) ) $column_list .= ', preferred_site_id';
 
-    static::db()->execute( sprintf(
+    $affected_rows = static::db()->execute( sprintf(
       "INSERT INTO application_has_participant( %s )\n".
       "%s%s\n".
       'ON DUPLICATE KEY UPDATE datetime = IFNULL( application_has_participant.datetime, UTC_TIMESTAMP() )',
@@ -110,5 +110,7 @@ class application extends \cenozo\database\application
         }
       }
     }
+
+    return $affected_rows;
   }
 }
