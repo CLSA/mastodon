@@ -1,6 +1,8 @@
 const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
 
 const { CN_base_model } = await import(`${CENOZO_URL}/js/base_model.mjs`);
+const { CN_participant_model } = await import(`${CENOZO_URL}/js/model/participant.mjs`);
+const { CN_user_model } = await import(`${CENOZO_URL}/js/model/user.mjs`);
 
 export class CN_base_form_entry_model extends CN_base_model {
   #form_type;
@@ -18,39 +20,7 @@ export class CN_base_form_entry_model extends CN_base_model {
 
     // all forms have the user property
     let properties = {
-      user_id: {
-        title: "User",
-        type: "typeahead",
-        typeahead: {
-          get_list: async (value) => {
-            return await CN_api.get("user", {
-              select: {
-                columns: [{
-                  table: "user",
-                  column: "id",
-                  alias: "key",
-                }, {
-                  table: "user",
-                  column: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
-                  alias: "value",
-                  table_prefix: false,
-                }],
-              },
-              modifier: {
-                where: [
-                  { column: "name", operator: "like", value: `%${value}%` },
-                  { column: "first_name", operator: "like", value: `%${value}%`, or: true },
-                  { column: "last_name", operator: "like", value: `%${value}%`, or: true },
-                ],
-              },
-              order: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
-            });
-          },
-          table: "user",
-          select: 'CONCAT( first_name, " ", last_name, " (", name, ")" )',
-          where: ["first_name", "last_name", "name"],
-        },
-      },
+      user_id: { title: "User", type: "typeahead", typeahead: CN_user_model.get_typeahead() },
     };
 
     // all but the contact form have the participant property
@@ -60,35 +30,7 @@ export class CN_base_form_entry_model extends CN_base_model {
         participant_id: {
           title: "Participant (UID)",
           type: "typeahead",
-          typeahead: {
-            get_list: async (value) => {
-              return await CN_api.get("participant", {
-                select: {
-                  column: [{
-                    table: "participant",
-                    column: "id",
-                    alias: "key",
-                  }, {
-                    table: "participant",
-                    column: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
-                    alias: "value",
-                    table_prefix: false,
-                  }],
-                },
-                modifier: {
-                  where: [
-                    { column: "uid", operator: "like", value: `%${value}%` },
-                    { column: "first_name", operator: "like", value: `%${value}%`, or: true },
-                    { column: "last_name", operator: "like", value: `%${value}%`, or: true },
-                  ],
-                  order: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
-                },
-              });
-            },
-            table: "participant",
-            select: 'CONCAT( participant.first_name, " ", participant.last_name, " (", uid, ")" )',
-            where: ["participant.first_name", "participant.last_name", "uid"],
-          },
+          typeahead: CN_participant_model.get_typeahead(),
         },
       };
     }

@@ -1,4 +1,5 @@
 import { CN_base_form_entry_model } from "../base_form_entry_model.mjs"
+const { CN_country_model } = await import(`${CENOZO_URL}/js/model/country.mjs`);
 
 export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model {
   constructor() {
@@ -61,22 +62,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             proxy_international_country_id: {
               title: "International Country",
               type: "typeahead",
-              typeahead: {
-                get_list: async (value) => {
-                  return await CN_api.get("country", {
-                    select: {
-                      column: [
-                        { column: "id", alias: "key" },
-                        { column: "name", alias: "value" },
-                      ],
-                    },
-                    modifier: {
-                      where: { column: "name", operator: "like", value: `%${value}%` },
-                      order: 'name',
-                    },
-                  });
-                },
-              },
+              typeahead: CN_country_model.get_typeahead(),
               is_hidden: (model) => (
                 !model.get_action().get_property("proxy_address_international").state.get()
               ),
@@ -145,22 +131,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             informant_international_country_id: {
               title: "International Country",
               type: "typeahead",
-              typeahead: {
-                get_list: async (value) => {
-                  return await CN_api.get("country", {
-                    select: {
-                      column: [
-                        { column: "id", alias: "key" },
-                        { column: "name", alias: "value" },
-                      ],
-                    },
-                    modifier: {
-                      where: { column: "name", operator: "like", value: `%${value}%` },
-                      order: 'name',
-                    },
-                  });
-                },
-              },
+              typeahead: CN_country_model.get_typeahead(),
               is_hidden: (model) => (
                 !model.get_action().get_property("informant_address_international").state.get()
               ),

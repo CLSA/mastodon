@@ -142,7 +142,7 @@ export class CN_application_release extends CN_base_action {
           summary_el.append(CN_element.create(
             `<div class="text-center fs-5 fw-bold">${CN_common.uc_words(cohort_name)}</div>`
           ));
-          
+
           for (let site_name in site_list[cohort_name]) {
             const row_el = CN_element.create('<div class="d-flex justify-content-center">');
             const total = site_list[cohort_name][site_name];
