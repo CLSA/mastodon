@@ -107,18 +107,18 @@ export class CN_application_release extends CN_base_action {
   create_body_element() {
     const body_el = CN_element.create(`
       <div class="container-fluid">
-        <div class="container-fluid text-info">
+        <div class="container-fluid text-info-emphasis">
           This utility allows you to release a batch of participants to, or update their preferred site for
           Sabretooth F2.  In order to do either you must first select which participants to affect.
           This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
           included in the operation, then confirm that list to ensure each of the identifiers can be linked
           to a participant.
         </div>
-        <div class="container-fluid text-info">
+        <div class="container-fluid text-info-emphasis">
           Once you have confirmed the list of participant identifiers you will be presented with a summary
           of how many participants belong to which sites, broken down by cohort.
         </div>
-        <div class="container-fluid text-warning">
+        <div class="container-fluid text-warning-emphasis">
           Note: only participants with the correct cohort and who have not already been released will be allowed.
           If you wish to update the preferred site for participants who have already been released you must use
           that application's <em>participant multi-edit</em> utility instead.
