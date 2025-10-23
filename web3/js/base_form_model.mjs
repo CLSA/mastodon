@@ -72,6 +72,11 @@ export class CN_base_form_model extends CN_base_model {
         invalid: { title: "Invalid", type: "boolean" },
         date: { title: "Date", type: "date" },
         adjudicate: { meta: true, is_hidden: () => true },
+        form_id: { meta: true, is_hidden: () => true },
+        validated_form_entry_id: {
+          meta: { table: `${form_type}_form`, column: `validated_${form_type}_form_entry_id` },
+          is_hidden: () => true,
+        }
       },
     });
 
@@ -389,6 +394,22 @@ export class CN_base_form_view extends CN_base_view {
   }
 
   /**
+   * Extend parent method
+   */
+  update_element() {
+    super.update_element();
+
+    if ("contact" != this.get_model().get_form_type()) {
+      const view_btn_el = this.get_footer_element().querySelector("button[name=view]");
+      if (this.get_property("form_id").state.get()) {
+        view_btn_el.style.removeProperty("display");
+      } else {
+        view_btn_el.style.display = "none";
+      }
+    }
+  }
+
+  /**
    * Add operations to the footer element
    */
   create_footer_element() {
@@ -418,13 +439,28 @@ export class CN_base_form_view extends CN_base_view {
     }
     footer_el.append(adjudicate_btn_el);
 
-    const view_btn_el = CN_element.create(
-      '<button name="view" type="button" class="btn btn-light btn-outline-primary">View Imported Form</button>'
-    );
-    view_btn_el.addEventListener("click", async () => {
-      console.log("TODO: implement");
-    });
-    footer_el.append(view_btn_el);
+    const form_type = this.get_model().get_form_type();
+    if ("contact" != form_type) {
+      const view_btn_el = CN_element.create(`
+        <button
+          name="view"
+          type="button"
+          class="btn btn-light btn-outline-primary"
+          style="display: none;"
+        >View Imported Form</button>
+      `);
+      view_btn_el.addEventListener("click", async () => {
+        const form_id = this.get_property("form_id").state.get();
+        if (form_id) {
+          const entry_id = this.get_property("validated_form_entry_id").state.get();
+          const response = await CN_api.get(`${form_type}_form_entry/${entry_id}`, {
+            select: { column: "participant_id" },
+          });
+          await CN_session.navigate_to(`participant/view/${response.participant_id}/form/view/${form_id}`);
+        }
+      });
+      footer_el.append(view_btn_el);
+    }
 
     return footer_el;
   }
