@@ -21,8 +21,8 @@ export class CN_proxy_form_entry_model extends CN_base_form_entry_model {
             proxy_apartment_number: { title: "Apartment Number" },
             proxy_street_number: { title: "Street Number" },
             proxy_street_name: { title: "Street Name" },
-            proxy_box: { title: "Box", format: "integer", help: "Include numbers only." },
-            proxy_rural_route: { title: "Rural Route", format: "integer", help: "Include numbers only." },
+            proxy_box: { title: "Box", type: "integer", help: "Include numbers only." },
+            proxy_rural_route: { title: "Rural Route", type: "integer", help: "Include numbers only." },
             proxy_address_other: { title: "Address Other" },
             proxy_city: { title: "City" },
             proxy_region_id: {
@@ -65,8 +65,8 @@ export class CN_proxy_form_entry_model extends CN_base_form_entry_model {
             informant_apartment_number: { title: "Apartment Number" },
             informant_street_number: { title: "Street Number" },
             informant_street_name: { title: "Street Name" },
-            informant_box: { title: "Box", format: "integer" },
-            informant_rural_route: { title: "Rural Route", format: "integer" },
+            informant_box: { title: "Box", type: "integer" },
+            informant_rural_route: { title: "Rural Route", type: "integer" },
             informant_address_other: { title: "Address Other" },
             informant_city: { title: "City" },
             informant_region_id: {
