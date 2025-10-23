@@ -347,8 +347,9 @@ export class CN_base_form_adjudicate extends CN_base_action {
     return body_el;
   }
 
-  /*
-   * ADD DOCS
+  /**
+   * Convenience method used by the create_footer_element() and create_topfooter_element() methods
+   * @param element el
    */
   create_all_footer_elements(el) {
     // wire up the buttons
