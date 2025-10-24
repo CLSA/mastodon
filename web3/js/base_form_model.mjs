@@ -174,7 +174,6 @@ export class CN_base_form_adjudicate extends CN_base_action {
    */
   update_element() {
     super.update_element();
-    const model = this.get_model();
 
     // add in the header data
     const thead_el = this.get_element().querySelector("thead");
@@ -202,27 +201,6 @@ export class CN_base_form_adjudicate extends CN_base_action {
         }
       });
     }
-
-    // wire up the buttons
-    const tfoot_el = this.get_element().querySelector("tfoot");
-
-    const td_a_el = tfoot_el.querySelector("[name=a]");
-    td_a_el.querySelector("[name=view]").onclick = async () => await CN_session.navigate_to(
-      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[0].id].join("/")
-    );
-    td_a_el.querySelector("[name=validate]").onclick = async () => {
-      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[0].id });
-      await this.on_navigate_to_parent();
-    };
-
-    const td_b_el = tfoot_el.querySelector("[name=b]");
-    td_b_el.querySelector("[name=view]").onclick = async () => await CN_session.navigate_to(
-      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[1].id].join("/")
-    );
-    td_b_el.querySelector("[name=validate]").onclick = async () => {
-      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[1].id });
-      await this.on_navigate_to_parent();
-    };
   }
 
   /**
@@ -343,6 +321,28 @@ export class CN_base_form_adjudicate extends CN_base_action {
         tbody_el.append(tr_el);
       }
     }
+
+    // wire up the buttons
+    const model = this.get_model();
+    const tfoot_el = body_el.querySelector("tfoot");
+
+    const td_a_el = tfoot_el.querySelector("[name=a]");
+    td_a_el.querySelector("[name=view]").addEventListener("click", async () => await CN_session.navigate_to(
+      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[0].id].join("/")
+    ));
+    td_a_el.querySelector("[name=validate]").addEventListener("click", async () => {
+      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[0].id });
+      await this.on_navigate_to_parent();
+    });
+
+    const td_b_el = tfoot_el.querySelector("[name=b]");
+    td_b_el.querySelector("[name=view]").addEventListener("click", async () => await CN_session.navigate_to(
+      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[1].id].join("/")
+    ));
+    td_b_el.querySelector("[name=validate]").addEventListener("click", async () => {
+      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[1].id });
+      await this.on_navigate_to_parent();
+    });
 
     return body_el;
   }
