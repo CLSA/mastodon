@@ -58,7 +58,7 @@ export class CN_base_form_model extends CN_base_model {
       properties: {
         id: { title: "ID", is_constant: () => true },
         status: {
-          meta: true,
+          meta: {}, // predefined by the service
           title: "Status",
           is_constant: () => true,
           help:
@@ -71,8 +71,8 @@ export class CN_base_form_model extends CN_base_model {
         completed: { title: "Complete", type: "boolean", is_constant: () => true },
         invalid: { title: "Invalid", type: "boolean" },
         date: { title: "Date", type: "date" },
-        adjudicate: { meta: true, is_hidden: () => true },
-        form_id: { meta: true, is_hidden: () => true },
+        adjudicate: { meta: {}, is_hidden: () => true },
+        form_id: { meta: {}, is_hidden: () => true },
         validated_form_entry_id: {
           meta: { table: `${form_type}_form`, column: `validated_${form_type}_form_entry_id` },
           is_hidden: () => true,
