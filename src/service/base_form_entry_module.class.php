@@ -124,9 +124,16 @@ abstract class base_form_entry_module extends \cenozo\service\module
     if( $select->has_column( 'validated' ) )
     {
       $select->add_column(
-        sprintf( 'IF( %s.validated_%s_id = %s.id, true, false )', $form_name, $form_entry_name, $form_entry_name ),
+        sprintf(
+          'IF( %s.validated_%s_id = %s.id, true, false )',
+          $form_name,
+          $form_entry_name,
+          $form_entry_name
+        ),
         'validated',
-        false );
+        false,
+        'boolean'
+      );
     }
 
     // always add the user's name
