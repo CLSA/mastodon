@@ -354,10 +354,10 @@ export class CN_base_form_adjudicate extends CN_base_action {
   create_all_footer_elements(el) {
     // wire up the buttons
     const back_btn_el = el.querySelector("button[name=back]");
-    back_btn_el.addEventListener("click", async () => await this.on_navigate_to_parent());
+    back_btn_el.addEventListener("click", this.on_navigate_to_parent.bind(this));
 
     const download_btn_el = el.querySelector("button[name=download]");
-    download_btn_el.addEventListener("click", async () => await this.get_model().download_form());
+    download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
   }
 
   /**
@@ -421,7 +421,7 @@ export class CN_base_form_view extends CN_base_view {
     const download_btn_el = CN_element.create(
       '<button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>'
     );
-    download_btn_el.addEventListener("click", async () => await this.get_model().download_form());
+    download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
     footer_el.append(download_btn_el);
 
     const adjudicate = this.get_property("adjudicate").state.get();

@@ -222,12 +222,7 @@ export class CN_application_release extends CN_base_action {
         <button name="back" type="button" class="btn btn-primary">View Application</button>
       </div>
     `);
-
-    footer_el.querySelector("button[name=back]").addEventListener(
-      "click",
-      async () => await this.on_navigate_to_parent()
-    );
-
+    footer_el.querySelector("button[name=back]").addEventListener("click", this.on_navigate_to_parent.bind(this));
     return footer_el;
   }
 }
