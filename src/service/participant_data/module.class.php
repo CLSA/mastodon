@@ -22,16 +22,8 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'study_phase', 'participant_data.study_phase_id', 'study_phase.id' );
     $modifier->join( 'study', 'study_phase.study_id', 'study.id' );
-
-    if( $select->has_column( 'full_study_name' ) )
-    {
-      $select->add_column( 'CONCAT( study.name, ": ", study_phase.name )', 'full_study_name', false );
-    }
-
-    if( $select->has_column( 'available' ) )
-    {
-      $select->add_constant( false, 'available', 'boolean' );
-    }
+    $select->add_column( 'CONCAT( study.name, ": ", study_phase.name )', 'formatted_study_phase_id', false );
+    if( $select->has_column( 'available' ) ) $select->add_constant( false, 'available', 'boolean' );
   }
 
   /**

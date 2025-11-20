@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'mastodon';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.10';
-$SETTINGS['general']['build'] = 'c6fcd90';
+$SETTINGS['general']['build'] = '912d9a7';
 
 // which identifier to use when downloading participant data
 $SETTINGS['general']['participant_data_identifier'] = NULL;
