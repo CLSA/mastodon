@@ -153,6 +153,7 @@ class ui3 extends \cenozo\ui\ui3
     if( array_key_exists( 'participant_data', $data['module_list'] ) )
     {
       $module = $data['module_list']['participant_data'];
+      $module->add_choose( 'cohort' );
       $module->add_child( 'participant_data_template' );
     }
 

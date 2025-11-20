@@ -26,10 +26,9 @@ export class CN_participant_view extends base_view_class {
   create_footer_element() {
     const footer_el = super.create_footer_element();
 
-    // add the data action for comprehensive participants only (TODO: make dynamic)
     if (
-      "comprehensive" == this.get_property("cohort").state.get() &&
-      ["administrator", "curator"].includes(CN_session.data.role.name)
+      ["administrator", "curator"].includes(CN_session.data.role.name) &&
+      CN_session.data.application.participant_data_cohort_list.includes(this.get_property("cohort").state.get())
     ) {
       const token_module = CN_session.get_module("token");
       if (token_module && token_module.action_allowed("add")) {
