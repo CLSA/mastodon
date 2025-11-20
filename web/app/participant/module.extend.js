@@ -15,9 +15,7 @@ cenozoApp.extendModule({
 
     module.addExtraOperation("view", {
       title: "Data",
-      isIncluded: function ($state, model) {
-        return "comprehensive" == model.viewModel.record.cohort && model.isRole("administrator", "curator");
-      },
+      isIncluded: function ($state, model) { return model.viewModel.hasData(); },
       help: "Download various data available to the participant.",
       operation: async function ($state, model) {
         await model.viewModel.onViewPromise;
@@ -230,6 +228,13 @@ cenozoApp.extendModule({
             return title;
           };
 
+          object.hasData = function () {
+            return (
+              parentModel.isRole("administrator", "curator") &&
+              CnSession.application.participantDataCohortList.includes(object.record.cohort)
+            );
+          };
+
           if (
             "administrator" == CnSession.role.name ||
             "curator" == CnSession.role.name
@@ -237,18 +242,14 @@ cenozoApp.extendModule({
             object.downloadOpalForms = async function () {
               var modal = CnModalMessageFactory.instance({
                 title: "Please Wait",
-                message:
-                  "Please wait while the participant's data is retrieved from Opal.",
+                message: "Please wait while the participant's data is retrieved from Opal.",
                 block: true,
               });
               modal.show();
 
               try {
                 await CnHttpFactory.instance({
-                  path:
-                    "participant/" +
-                    object.record.getIdentifier() +
-                    "?opal_forms=1",
+                  path: "participant/" + object.record.getIdentifier() + "?opal_forms=1",
                   format: "zip",
                 }).file();
               } finally {

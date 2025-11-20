@@ -15,7 +15,7 @@ cenozoApp.defineModule({
         possessive: "participant data's",
       },
       columnList: {
-        full_study_name: {
+        formatted_study_phase_id: {
           title: "Study & Phase Name",
           isIncluded: function( $state, model ) { return 'study_phase' != model.getSubjectFromState(); },
         },
@@ -23,15 +23,20 @@ cenozoApp.defineModule({
         name: { title: "Name", },
       },
       defaultOrder: {
-        column: "category",
+        column: "study_phase.rank",
         reverse: false,
       },
     });
 
     module.addInputGroup("", {
-      full_study_name: {
+      study_phase_id: {
         title: "Full Study Name",
-        type: "string",
+        type: "lookup-typeahead",
+        typeahead: {
+          table: "study_phase",
+          select: 'CONCAT( study.name, ": ", study_phase.name )',
+          where: ["study.name", "study_phase.name"],
+        },
         isConstant: true,
       },
       category: {
@@ -55,5 +60,33 @@ cenozoApp.defineModule({
         help: "For supplemental data only: the path to the data file (where <UID> should be used in place of the participant's unique identifier."
       },
     });
+
+    /* ############################################################################################## */
+    cenozo.providers.factory("CnParticipantDataViewFactory", [
+      "CnBaseViewFactory",
+      function (CnBaseViewFactory) {
+        var object = function (parentModel, root) {
+          CnBaseViewFactory.construct(this, parentModel, root, "cohort");
+
+          async function init(object) {
+            await object.deferred.promise;
+
+            // allow cohorts to be added/removed
+            if (angular.isDefined(object.cohortModel)) {
+              object.cohortModel.getChooseEnabled = function () {
+                return parentModel.getEditEnabled();
+              };
+            }
+          }
+
+          init(this);
+        };
+        return {
+          instance: function (parentModel, root) {
+            return new object(parentModel, root);
+          },
+        };
+      },
+    ]);
   },
 });
