@@ -189,7 +189,6 @@ export class CN_application_release extends CN_base_action {
           });
 
           await CN_element.message_modal({
-            static: true,
             title: "Participants Released",
             message: `A total of ${response} participant(s) have been successfully released.`,
           }).block();
