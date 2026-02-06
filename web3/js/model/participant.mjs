@@ -3,11 +3,11 @@ const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
 const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
-const { CN_base_action } = await import(`${CENOZO_URL}/js/base_action.mjs`);
-const { CN_base_view } = await import(`${CENOZO_URL}/js/base_view.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 
-const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_base_view;
+const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_action_view;
 export class CN_participant_view extends base_view_class {
   /**
    * Extend parent method
@@ -28,7 +28,7 @@ export class CN_participant_view extends base_view_class {
 
     if (
       ["administrator", "curator"].includes(CN_session.data.role.name) &&
-      CN_session.data.application.participant_data_cohort_list.includes(this.get_property("cohort").state.get())
+      CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))
     ) {
       const token_module = CN_session.get_module("token");
       if (token_module && token_module.action_allowed("add")) {

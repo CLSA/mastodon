@@ -3,12 +3,12 @@ const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
 const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
-const { CN_base_action } = await import(`${CENOZO_URL}/js/base_action.mjs`);
-const { CN_base_view } = await import(`${CENOZO_URL}/js/base_view.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
 const { CN_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 
-const base_view_class = classes.CN_application_view ? classes.CN_application_view : CN_base_view;
+const base_view_class = classes.CN_application_view ? classes.CN_application_view : CN_action_view;
 export class CN_application_view extends base_view_class {
   /**
    * Add extra operations to the footer
@@ -18,7 +18,7 @@ export class CN_application_view extends base_view_class {
 
     if (
       this.get_model().get_module().action_allowed("release") &&
-      this.get_property("release_based").state.get()
+      this.get_property_value("release_based")
     ) {
       const release_btn_el = CN_element.create(`
         <button name="release" type="button" class="btn btn-light btn-outline-primary">
@@ -171,7 +171,7 @@ export class CN_application_release extends CN_base_action {
       id: "preferred_site_id",
       required: true,
       // add the release participants button as a postfix to the site selector
-      set_postfix: () => {
+      postfix: (el) => {
         const btn_el = CN_element.create(
           '<button name="confirm" type="button" class="btn btn-primary ms-2">Release Participants</button>'
         );
@@ -195,7 +195,7 @@ export class CN_application_release extends CN_base_action {
 
           await this.#participant_selection.reset();
         });
-        return btn_el;
+        el.append(btn_el);
       },
     });
     element_el.classList.add("col-sm-9");

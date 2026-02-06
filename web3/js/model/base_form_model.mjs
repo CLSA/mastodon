@@ -3,9 +3,9 @@ const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
 const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
-const { CN_base_action } = await import(`${CENOZO_URL}/js/base_action.mjs`);
-const { CN_base_model } = await import(`${CENOZO_URL}/js/base_model.mjs`);
-const { CN_base_view } = await import(`${CENOZO_URL}/js/base_view.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
+const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 
 export class CN_base_form_model extends CN_base_model {
   #form_type;
@@ -385,7 +385,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
   }
 }
 
-export class CN_base_form_view extends CN_base_view {
+export class CN_base_form_view extends CN_action_view {
   /**
    * Constructor
    * @param base_model model: The model that the action belongs to
@@ -402,7 +402,7 @@ export class CN_base_form_view extends CN_base_view {
 
     if ("contact" != this.get_model().get_form_type()) {
       const view_btn_el = this.get_footer_element().querySelector("button[name=view]");
-      if (this.get_property("form_id").state.get()) {
+      if (this.get_property_value("form_id")) {
         view_btn_el.style.removeProperty("display");
       } else {
         view_btn_el.style.display = "none";
@@ -424,7 +424,7 @@ export class CN_base_form_view extends CN_base_view {
     download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
     footer_el.append(download_btn_el);
 
-    const adjudicate = this.get_property("adjudicate").state.get();
+    const adjudicate = this.get_property_value("adjudicate");
     const adjudicate_btn_el = CN_element.create(`
       <button
         name="adjudicate"
@@ -451,9 +451,9 @@ export class CN_base_form_view extends CN_base_view {
         >View Imported Form</button>
       `);
       view_btn_el.addEventListener("click", async () => {
-        const form_id = this.get_property("form_id").state.get();
+        const form_id = this.get_property_value("form_id");
         if (form_id) {
-          const entry_id = this.get_property("validated_form_entry_id").state.get();
+          const entry_id = this.get_property_value("validated_form_entry_id");
           const response = await CN_api.get(`${form_type}_form_entry/${entry_id}`, {
             select: { column: "participant_id" },
           });

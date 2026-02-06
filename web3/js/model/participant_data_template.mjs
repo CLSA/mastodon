@@ -1,4 +1,4 @@
-const { CN_base_model } = await import(`${CENOZO_URL}/js/base_model.mjs`);
+const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
 
 export class CN_participant_data_template_model extends CN_base_model {
   constructor() {
@@ -41,7 +41,7 @@ export class CN_participant_data_template_model extends CN_base_model {
           title: "File",
           type: "base64",
           mime_type: "application/pdf",
-          get_filename: async (action) => action.get_property("opal_view").state.get() + ".pdf",
+          get_filename: async (action) => action.get_property_value("opal_view") + ".pdf",
         },
       },
     });
