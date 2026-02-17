@@ -1,10 +1,10 @@
 const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
 const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
-const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
 const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
+const { CN_base_element } = await import(`${CENOZO_URL}/js/element/base_element.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 
 const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_action_view;
@@ -32,7 +32,7 @@ export class CN_participant_view extends base_view_class {
     ) {
       const token_module = CN_session.get_module("token");
       if (token_module && token_module.action_allowed("add")) {
-        const data_btn_el = CN_element.create(
+        const data_btn_el = CN_base_element.html(
           '<button name="data" type="button" class="btn btn-light btn-outline-primary">Data</button>'
         );
         data_btn_el.addEventListener("click", async () => {
@@ -143,11 +143,11 @@ export class CN_participant_data extends CN_base_action {
     if (0 == this.#study_phase_data.length) return;
     const last_study_phase_id = this.#study_phase_data[this.#study_phase_data.length-1].id;
 
-    const nav_el = CN_element.create('<ul class="nav nav-tabs" role="tablist"></ul>');
-    const content_el = CN_element.create('<div class="tab-content"></div>');
+    const nav_el = CN_base_element.html('<ul class="nav nav-tabs" role="tablist"></ul>');
+    const content_el = CN_base_element.html('<div class="tab-content"></div>');
     this.#study_phase_data.forEach(study_phase => {
       const active = last_study_phase_id == study_phase.id;
-      const study_phase_el = CN_element.create(`
+      const study_phase_el = CN_base_element.html(`
         <li class="nav-item" role="presentation">
           <button
             class="nav-link ${active ? "active" : ""}"
@@ -163,7 +163,7 @@ export class CN_participant_data extends CN_base_action {
       `);
       nav_el.append(study_phase_el);
 
-      const tab_el = CN_element.create(`
+      const tab_el = CN_base_element.html(`
         <div
           class="tab-pane fade border border-top-0 pt-3 ${active ? "show active" : ""}"
           id="study-phase-${study_phase.id}-tab-pane"
@@ -175,14 +175,14 @@ export class CN_participant_data extends CN_base_action {
       content_el.append(tab_el);
 
       study_phase.categories.forEach(category => {
-        const category_el = CN_element.create(`
+        const category_el = CN_base_element.html(`
           <div class="container-fluid pb-3">
             <div class="fs-5">${category.name}</div>
           </div>
         `);
         tab_el.append(category_el);
         category.data_list.forEach(item => {
-          const item_el = CN_element.create(`
+          const item_el = CN_base_element.html(`
             <button
               class="btn btn-outline-primary w-100 ${item.available ? "fw-bold" : ""}"
               type="button"
@@ -192,7 +192,7 @@ export class CN_participant_data extends CN_base_action {
 
           if (item.available) {
             item_el.addEventListener("click", async () => {
-              await CN_element.wait_for(async () => {
+              await CN_base_element.wait_for(async () => {
                 const response = await CN_api.file(
                   `participant_data/${item.id}`,
                   item.filetype,
@@ -220,7 +220,7 @@ export class CN_participant_data extends CN_base_action {
    * Extend parent method
    */
   create_body_element() {
-    return CN_element.create(`
+    return CN_base_element.html(`
       <div>
         <div class="text-info-emphasis pb-2">
           The following is data that is appropriate to release to the participant.
@@ -234,7 +234,7 @@ export class CN_participant_data extends CN_base_action {
    * Extend parent method
    */
   create_footer_element() {
-    const footer_el = CN_element.create(`
+    const footer_el = CN_base_element.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Participant</button>
       </div>

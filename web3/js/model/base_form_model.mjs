@@ -1,10 +1,10 @@
 const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
 const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
-const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
 const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
+const { CN_base_element } = await import(`${CENOZO_URL}/js/element/base_element.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 
 export class CN_base_form_model extends CN_base_model {
@@ -219,7 +219,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
         </td>
       </tr>
     `);
-    return CN_element.create(`
+    return CN_base_element.html(`
       <table class="table table-hover">
         <thead>
           <tr>
@@ -247,7 +247,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
    * Extend parent method
    */
   create_body_element() {
-    const body_el = CN_element.create(`
+    const body_el = CN_base_element.html(`
       <table class="table table-hover">
         <thead>
           <tr>
@@ -364,7 +364,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
    * Extend parent method
    */
   create_footer_element() {
-    const footer_el = CN_element.create(`
+    const footer_el = CN_base_element.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View ${this.get_model().get_singular()}</button>
         <button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>
@@ -418,14 +418,14 @@ export class CN_base_form_view extends CN_action_view {
     const footer_el = super.create_footer_element();
 
     // add all form actions
-    const download_btn_el = CN_element.create(
+    const download_btn_el = CN_base_element.html(
       '<button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>'
     );
     download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
     footer_el.append(download_btn_el);
 
     const adjudicate = this.get_property_value("adjudicate");
-    const adjudicate_btn_el = CN_element.create(`
+    const adjudicate_btn_el = CN_base_element.html(`
       <button
         name="adjudicate"
         type="button"
@@ -442,7 +442,7 @@ export class CN_base_form_view extends CN_action_view {
 
     const form_type = this.get_model().get_form_type();
     if ("contact" != form_type) {
-      const view_btn_el = CN_element.create(`
+      const view_btn_el = CN_base_element.html(`
         <button
           name="view"
           type="button"

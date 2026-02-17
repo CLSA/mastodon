@@ -1,10 +1,14 @@
 const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
 const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
-const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
 const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
 const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
+const { CN_base_element } = await import(`${CENOZO_URL}/js/element/base_element.mjs`);
+const { CN_element_card } = await import(`${CENOZO_URL}/js/element/card.mjs`);
+const { CN_element_label } = await import(`${CENOZO_URL}/js/element/label.mjs`);
+const { CN_input_enum } = await import(`${CENOZO_URL}/js/element/input/enum.mjs`);
+const { CN_modal_message } = await import(`${CENOZO_URL}/js/element/modal/message.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
 const { CN_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 
@@ -20,7 +24,7 @@ export class CN_application_view extends base_view_class {
       this.get_model().get_module().action_allowed("release") &&
       this.get_property_value("release_based")
     ) {
-      const release_btn_el = CN_element.create(`
+      const release_btn_el = CN_base_element.html(`
         <button name="release" type="button" class="btn btn-light btn-outline-primary">
           Manage Participants
         </button>
@@ -90,13 +94,13 @@ export class CN_application_release extends CN_base_action {
     // populate the preferred site selection list
     const preferred_site_el = this.get_body_element().querySelector("#preferred_site_id");
     preferred_site_el.innerHTML = "";
-    preferred_site_el.append(CN_element.create('<option value="null" selected>No Preferred Site</option>'));
+    preferred_site_el.append(CN_base_element.html('<option value="null" selected>No Preferred Site</option>'));
     const site_list = await CN_api.get(
       `${model.get_view_url(null, "api")}/site`,
       { select: { column: ['id', 'name'] } }
     );
     site_list.forEach(site => {
-      preferred_site_el.append(CN_element.create(`<option value="${site.id}">${site.name}</option>`));
+      preferred_site_el.append(CN_base_element.html(`<option value="${site.id}">${site.name}</option>`));
     });
   }
 
@@ -104,7 +108,7 @@ export class CN_application_release extends CN_base_action {
    * Extend parent method
    */
   create_body_element() {
-    const body_el = CN_element.create(`
+    const body_el = CN_base_element.html(`
       <div class="container-fluid text-info-emphasis">
         <div class="pb-2">
           This utility allows you to release a batch of participants to, or update their preferred site for
@@ -137,18 +141,16 @@ export class CN_application_release extends CN_base_action {
         let first = true;
         const site_list = this.#participant_selection.get_site_list();
         for (let cohort_name in site_list) {
-          if (!first) summary_el.append(CN_element.create("<hr />"));
-          summary_el.append(CN_element.create(
+          if (!first) summary_el.append(CN_base_element.html("<hr />"));
+          summary_el.append(CN_base_element.html(
             `<div class="text-center fs-5 fw-bold">${CN_common.uc_words(cohort_name)}</div>`
           ));
 
           for (let site_name in site_list[cohort_name]) {
-            const row_el = CN_element.create('<div class="d-flex justify-content-center">');
+            const row_el = CN_base_element.html('<div class="d-flex justify-content-center">');
             const total = site_list[cohort_name][site_name];
-            row_el.append(CN_element.create(
-              `<label class="col-form-label text-end fw-bold">${site_name}:</label>`
-            ));
-            row_el.append(CN_element.create(`<div class="col-form-label px-2">${total}</div>`));
+            row_el.append(CN_element_label.create({ value: site_name }));
+            row_el.append(CN_base_element.html(`<div class="col-form-label px-2">${total}</div>`));
             summary_el.append(row_el);
           }
 
@@ -161,23 +163,24 @@ export class CN_application_release extends CN_base_action {
 
     body_el.querySelector("[name=participant-list]").append(this.#participant_selection.get_element());
 
-    const footer_el = CN_element.create('<div class="row"></div>');
+    const footer_el = CN_base_element.html('<div class="row"></div>');
 
-    const label_el = CN_element.create_form_label({ for: "preferred_site_id", value: "Preferred Site" });
+    const label_el = CN_element_label.create({ for: "preferred_site_id", value: "Preferred Site" });
     label_el.classList.add("col-sm-3");
     footer_el.append(label_el);
 
-    const element_el = CN_element.create_form_element("enum", {
+    const form_input = new CN_input_enum({
       id: "preferred_site_id",
+      class: "d-flex align-items-center col-sm-9",
       required: true,
       // add the release participants button as a postfix to the site selector
       postfix: (el) => {
-        const btn_el = CN_element.create(
+        const btn_el = CN_base_element.html(
           '<button name="confirm" type="button" class="btn btn-primary ms-2">Release Participants</button>'
         );
         btn_el.addEventListener("click", async () => {
           let response = null;
-          await CN_element.wait_for(async () => {
+          await CN_base_element.wait_for(async () => {
             const site_id = document.getElementById("preferred_site_id").value;
             response = await CN_api.post("participant", {
               mode: "release",
@@ -188,20 +191,20 @@ export class CN_application_release extends CN_base_action {
             });
           });
 
-          await CN_element.message_modal({
+          await (new CN_modal_message({
             title: "Participants Released",
             message: `A total of ${response} participant(s) have been successfully released.`,
-          }).block();
+          })).open();
 
           await this.#participant_selection.reset();
         });
         el.append(btn_el);
       },
     });
-    element_el.classList.add("col-sm-9");
-    footer_el.append(element_el);
+    form_input.set_parent_element(footer_el);
+    footer_el.append(form_input.render());
 
-    const confirm_selection_el = CN_element.create_card({
+    const confirm_selection_el = CN_element_card.create({
       header: "Confirm Selection",
       body: "",
       footer: footer_el,
@@ -216,7 +219,7 @@ export class CN_application_release extends CN_base_action {
    * Extend parent method
    */
   create_footer_element() {
-    const footer_el = CN_element.create(`
+    const footer_el = CN_base_element.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Application</button>
       </div>
