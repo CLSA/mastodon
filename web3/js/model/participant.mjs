@@ -55,8 +55,8 @@ export class CN_participant_data extends CN_base_action {
    * Constructor
    * @param base_model model: The model that the action belongs to
    */
-  constructor(model) {
-    super("data", model);
+  constructor(parent_el, model) {
+    super("data", parent_el, model);
   }
 
   /**

@@ -52,8 +52,8 @@ export class CN_application_release extends CN_base_action {
    * Constructor
    * @param base_model model: The model that the action belongs to
    */
-  constructor(model) {
-    super("release", model);
+  constructor(parent_el, model) {
+    super("release", parent_el, model);
   }
 
   /**

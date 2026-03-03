@@ -4,7 +4,6 @@ const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
 
 const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
-const { CN_base_element } = await import(`${CENOZO_URL}/js/element/base_element.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 
 export class CN_base_form_model extends CN_base_model {
@@ -55,6 +54,7 @@ export class CN_base_form_model extends CN_base_model {
         posessive: entry_model.get_posessive().replace( /form entry's$/, "form's" ),
       },
       columns: columns,
+      default_order: { column: "id", desc: true }, // sort by ID descending
       properties: {
         id: { title: "ID", is_constant: () => true },
         status: {
@@ -110,14 +110,14 @@ export class CN_base_form_model extends CN_base_model {
 
 export class CN_base_form_adjudicate extends CN_base_action {
   #property_groups;
-  #entries;
+  #entries = [];
 
   /**
    * Constructor
    * @param base_model model: The model that the action belongs to
    */
-  constructor(model) {
-    super("adjudicate", model);
+  constructor(parent_el, model) {
+    super("adjudicate", parent_el, model);
     this.set_footer_at_top(true);
 
     // add all form groups from the entry model
@@ -132,8 +132,6 @@ export class CN_base_form_adjudicate extends CN_base_action {
       }
     }
   }
-
-  get_entries() { return this.#entries; }
 
   /**
    * Extend parent method
@@ -175,6 +173,8 @@ export class CN_base_form_adjudicate extends CN_base_action {
   update_element() {
     super.update_element();
 
+    if (0 == this.#entries.length) return;
+
     // add in the header data
     const thead_el = this.get_element().querySelector("thead");
     thead_el.querySelector("[name=a]").innerHTML = this.#entries[0].user;
@@ -209,8 +209,8 @@ export class CN_base_form_adjudicate extends CN_base_action {
   create_placeholder_element() {
     const tr_list = Array.from(Array(10).keys()).map((e,index) => `
       <tr>
-        <th scope="row" class="text-end placeholder-glow">
-        </th>
+        <td scope="row" class="text-end placeholder-glow">
+        </td>
         <td class="text-center placeholder-glow">
           <span class="placeholder placeholder-lg col-${Math.ceil(Math.random()*3)+4}"></span>
         </td>
@@ -219,22 +219,22 @@ export class CN_base_form_adjudicate extends CN_base_action {
         </td>
       </tr>
     `);
-    return CN_base_element.html(`
+    return this.constructor.html(`
       <table class="table table-hover">
         <thead>
           <tr>
-            <th scope="col"></th>
-            <th scope="col" class="text-center placeholder-glow">
+            <td scope="col"></td>
+            <td scope="col" class="text-center placeholder-glow">
               <span class="placeholder placeholder-lg col-${Math.ceil(Math.random()*3)+2}"></span>
-            </th>
-            <th scope="col" class="text-center placeholder-glow">
+            </td>
+            <td scope="col" class="text-center placeholder-glow">
               <span class="placeholder placeholder-lg col-${Math.ceil(Math.random()*3)+2}"></span>
-            </th>
+            </td>
           </tr>
         </thead>
         <tbody class="table-group-divider">${tr_list.join("")}</tbody>
           <tr>
-            <th scope="row"></th>
+            <td scope="row"></td>
             <td class="text-center"></td>
             <td class="text-center"></td>
           </tr>
@@ -247,26 +247,26 @@ export class CN_base_form_adjudicate extends CN_base_action {
    * Extend parent method
    */
   create_body_element() {
-    const body_el = CN_base_element.html(`
+    const body_el = this.constructor.html(`
       <table class="table table-hover">
         <thead>
           <tr>
-            <th scope="col" style="border-style: none;"></th>
-            <th name="a" scope="col" class="text-center" style="border-style: none;"></th>
-            <th name="b" scope="col" class="text-center" style="border-style: none;"></th>
+            <th scope="col" class="border-0"></th>
+            <th name="a" scope="col" class="text-center border-0"></th>
+            <th name="b" scope="col" class="text-center border-0"></th>
           </tr>
           <tr>
-            <th scope="row"></th>
+            <td scope="row"></td>
             <td name="a" class="text-center">
               <div class="btn-group">
-                <button name="view" type="button" class="btn btn-outline-primary">View</button>
-                <button name="validate" type="button" class="btn btn-outline-primary">Validate</button>
+                <button name="view_a" type="button" class="btn btn-outline-primary">View</button>
+                <button name="validate_a" type="button" class="btn btn-outline-primary">Validate</button>
               </div>
             </td>
             <td name="b" class="text-center">
               <div class="btn-group">
-                <button name="view" type="button" class="btn btn-outline-primary">View</button>
-                <button name="validate" type="button" class="btn btn-outline-primary">Validate</button>
+                <button name="view_b" type="button" class="btn btn-outline-primary">View</button>
+                <button name="validate_b" type="button" class="btn btn-outline-primary">Validate</button>
               </div>
             </td>
           </tr>
@@ -275,17 +275,17 @@ export class CN_base_form_adjudicate extends CN_base_action {
         </tbody>
         <tfoot class="table-group-divider">
           <tr>
-            <th scope="row" style="border-style: none;"></th>
-            <td name="a" class="text-center" style="border-style: none;">
+            <td scope="row" class="border-0"></td>
+            <td name="a" class="text-center border-0">
               <div class="btn-group">
-                <button name="view" type="button" class="btn btn-outline-primary">View</button>
-                <button name="validate" type="button" class="btn btn-outline-primary">Validate</button>
+                <button name="view_a" type="button" class="btn btn-outline-primary">View</button>
+                <button name="validate_a" type="button" class="btn btn-outline-primary">Validate</button>
               </div>
             </td>
-            <td name="b" class="text-center" style="border-style: none;">
+            <td name="b" class="text-center border-0">
               <div class="btn-group">
-                <button name="view" type="button" class="btn btn-outline-primary">View</button>
-                <button name="validate" type="button" class="btn btn-outline-primary">Validate</button>
+                <button name="view_b" type="button" class="btn btn-outline-primary">View</button>
+                <button name="validate_b" type="button" class="btn btn-outline-primary">Validate</button>
               </div>
             </td>
           </tr>
@@ -300,10 +300,9 @@ export class CN_base_form_adjudicate extends CN_base_action {
       // add the group header
       if ("$main" != group_name) {
         const tr_el = document.createElement("tr");
-        tr_el.classList.add("table-active");
         tr_el.innerHTML = `
-          <th style="box-shadow: none;"></th>
-          <th colspan="2" class="align-bottom text-center" style="box-shadow: none; height: 4em; border-bottom: 2px black solid;">${group.title}</th>
+          <th class="bg-body border-0"></th>
+          <th colspan="2" class="table-active align-bottom text-center">${group.title}</th>
         `;
         tbody_el.append(tr_el);
       }
@@ -314,7 +313,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
         const tr_el = document.createElement("tr");
         tr_el.setAttribute("name", prop_name);
         tr_el.innerHTML = `
-          <th scope="row" class="text-end">${prop.title}</th>
+          <th scope="row" class="text-end border-0">${prop.title}</th>
           <td name="a" class="text-center"></td>
           <td name="b" class="text-center"></td>
         `;
@@ -326,24 +325,20 @@ export class CN_base_form_adjudicate extends CN_base_action {
     const model = this.get_model();
     const tfoot_el = body_el.querySelector("tfoot");
 
-    const td_a_el = tfoot_el.querySelector("[name=a]");
-    td_a_el.querySelector("[name=view]").addEventListener("click", async () => await CN_session.navigate_to(
-      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[0].id].join("/")
-    ));
-    td_a_el.querySelector("[name=validate]").addEventListener("click", async () => {
-      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[0].id });
-      await this.on_navigate_to_parent();
-    });
+    Array.from(body_el.querySelectorAll("button[name=view_a]")).forEach(
+      btn_el => btn_el.addEventListener("click", this._view_entry.bind(this, 0))
+    );
+    Array.from(body_el.querySelectorAll("button[name=view_b]")).forEach(
+      btn_el => btn_el.addEventListener("click", this._view_entry.bind(this, 1))
+    );
+    Array.from(body_el.querySelectorAll("button[name=validate_a]")).forEach(
+      btn_el => btn_el.addEventListener("click", this._adjudicate_entry.bind(this, 0))
+    );
+    Array.from(body_el.querySelectorAll("button[name=validate_b]")).forEach(
+      btn_el => btn_el.addEventListener("click", this._adjudicate_entry.bind(this, 1))
+    );
 
     const td_b_el = tfoot_el.querySelector("[name=b]");
-    td_b_el.querySelector("[name=view]").addEventListener("click", async () => await CN_session.navigate_to(
-      [model.get_view_url(), `${model.get_name()}_entry`, "view", this.#entries[1].id].join("/")
-    ));
-    td_b_el.querySelector("[name=validate]").addEventListener("click", async () => {
-      await CN_api.patch(model.get_view_url(null, "api"), { adjudicate: this.#entries[1].id });
-      await this.on_navigate_to_parent();
-    });
-
     return body_el;
   }
 
@@ -364,7 +359,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
    * Extend parent method
    */
   create_footer_element() {
-    const footer_el = CN_base_element.html(`
+    const footer_el = this.constructor.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View ${this.get_model().get_singular()}</button>
         <button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>
@@ -383,15 +378,53 @@ export class CN_base_form_adjudicate extends CN_base_action {
     this.create_all_footer_elements(topfooter_el);
     return topfooter_el;
   }
+
+  /**
+   * ADD DOCS
+   */
+  async _view_entry(index) {
+    const model = this.get_model();
+    await CN_session.navigate_to([
+      model.get_view_url(),
+      `${model.get_name()}_entry`,
+      "view",
+      this.#entries[index].id
+    ].join("/"));
+  }
+
+  /**
+   * ADD DOCS
+   */
+  async _adjudicate_entry(index) {
+    const btn_el_list = Array.from(this.get_body_element().querySelectorAll("button"));
+    btn_el_list.forEach(el => el.setAttribute("disabled", true));
+    try {
+      await this.constructor.wait_for(async () => {
+        await CN_api.patch(
+          this.get_model().get_view_url(null, "api"),
+          { adjudicate: this.#entries[index].id }
+        );
+      });
+    } catch (error) {
+      // convert newlines in error message to line breaks
+      error.message = error.message.replace(/\n/g, "<br/>\n");
+      throw error;
+    } finally {
+      btn_el_list.forEach(el => el.removeAttribute("disabled"));
+    }
+    await this.on_navigate_to_parent();
+  }
 }
 
 export class CN_base_form_view extends CN_action_view {
+  #view_imported_form_btn_el;
+
   /**
    * Constructor
    * @param base_model model: The model that the action belongs to
    */
-  constructor(model) {
-    super(model);
+  constructor(parent_el, model) {
+    super(parent_el, model);
   }
 
   /**
@@ -400,12 +433,20 @@ export class CN_base_form_view extends CN_action_view {
   update_element() {
     super.update_element();
 
+    const footer_el = this.get_footer_element();
+
+    const adjudicate_btn_el = footer_el.querySelector("button[name=adjudicate]");
+    if (this.get_property_value("adjudicate")) {
+      adjudicate_btn_el.removeAttribute("disabled");
+    } else {
+      adjudicate_btn_el.setAttribute("disabled", true);
+    }
+
     if ("contact" != this.get_model().get_form_type()) {
-      const view_btn_el = this.get_footer_element().querySelector("button[name=view]");
       if (this.get_property_value("form_id")) {
-        view_btn_el.style.removeProperty("display");
+        footer_el.append(this.#view_imported_form_btn_el);
       } else {
-        view_btn_el.style.display = "none";
+        this.#view_imported_form_btn_el.remove();
       }
     }
   }
@@ -418,39 +459,32 @@ export class CN_base_form_view extends CN_action_view {
     const footer_el = super.create_footer_element();
 
     // add all form actions
-    const download_btn_el = CN_base_element.html(
+    const download_btn_el = this.constructor.html(
       '<button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>'
     );
     download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
     footer_el.append(download_btn_el);
 
-    const adjudicate = this.get_property_value("adjudicate");
-    const adjudicate_btn_el = CN_base_element.html(`
+    const adjudicate_btn_el = this.constructor.html(`
       <button
         name="adjudicate"
         type="button"
         class="btn btn-light btn-outline-primary"
-        ${adjudicate ? "" : "disabled"}
+        disabled
       >Adjudicate</button>
     `);
-    if (adjudicate) {
-      adjudicate_btn_el.addEventListener("click", async () => {
-        await CN_session.navigate_to([model.get_base_path("url"), "adjudicate", model.get_identifier()].join("/"));
-      });
-    }
+    adjudicate_btn_el.addEventListener("click", async () => {
+      await CN_session.navigate_to([model.get_base_path("url"), "adjudicate", model.get_identifier()].join("/"));
+    });
     footer_el.append(adjudicate_btn_el);
 
+    // create the view imported form button but don't add it (that's done when updating the element)
     const form_type = this.get_model().get_form_type();
     if ("contact" != form_type) {
-      const view_btn_el = CN_base_element.html(`
-        <button
-          name="view"
-          type="button"
-          class="btn btn-light btn-outline-primary"
-          style="display: none;"
-        >View Imported Form</button>
-      `);
-      view_btn_el.addEventListener("click", async () => {
+      this.#view_imported_form_btn_el = this.constructor.html(
+        '<button name="view" type="button" class="btn btn-light btn-outline-primary">View Imported Form</button>'
+      );
+      this.#view_imported_form_btn_el.addEventListener("click", async () => {
         const form_id = this.get_property_value("form_id");
         if (form_id) {
           const entry_id = this.get_property_value("validated_form_entry_id");
@@ -460,7 +494,6 @@ export class CN_base_form_view extends CN_action_view {
           await CN_session.navigate_to(`participant/view/${response.participant_id}/form/view/${form_id}`);
         }
       });
-      footer_el.append(view_btn_el);
     }
 
     return footer_el;
