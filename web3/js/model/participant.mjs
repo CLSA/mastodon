@@ -1,11 +1,10 @@
+const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
-const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
-const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
-
 const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_action_view;
 export class CN_participant_view extends base_view_class {
   /**
@@ -310,8 +309,20 @@ export class CN_participant_release extends CN_base_action {
     const tbody_el = this.get_body_element().querySelector("tbody");
     tbody_el.innerHTML = "";
 
+    console.log(this.#application_list);
     this.#application_list.forEach(application => {
-      // TODONEXT
+      tbody_el.append(this.constructor.html(`
+        <tr>
+          <td>${application.title}</td>
+          <td>${
+            null == application.datetime ?
+            `<button></button>` :
+            CN_common.format_datetime(application.datetime, "datetime")
+          }</td>
+          <td></td>
+          <td></td>
+        </tr>
+      `));
     });
   }
 

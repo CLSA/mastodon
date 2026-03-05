@@ -1,4 +1,5 @@
 import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
+
 const { CN_country_model } = await import(`${CENOZO_URL}/js/model/country.mjs`);
 
 export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model {

@@ -1,7 +1,6 @@
-const classes = await import(`${CENOZO_URL}/js/model/log_entry.mjs`);
+const { CN_log_entry_model } = await import(`${CENOZO_URL}/js/model/log_entry.mjs`);
 
-const base_model_class = classes.CN_log_entry_model;
-export class CN_log_entry_model extends base_model_class {
+export class CN_log_entry_model extends CN_log_entry_model {
   /**
    * Extend parent method to add application column
    */

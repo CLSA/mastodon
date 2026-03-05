@@ -1,16 +1,15 @@
-const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
-const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
-const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
-
-const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
+const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
 const { CN_element_card } = await import(`${CENOZO_URL}/js/element/card.mjs`);
 const { CN_element_label } = await import(`${CENOZO_URL}/js/element/label.mjs`);
 const { CN_input_enum } = await import(`${CENOZO_URL}/js/element/input/enum.mjs`);
 const { CN_modal_message } = await import(`${CENOZO_URL}/js/element/modal/message.mjs`);
-const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
 const { CN_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
+const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
+const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
 const base_view_class = classes.CN_application_view ? classes.CN_application_view : CN_action_view;
 export class CN_application_view extends base_view_class {
   /**
@@ -40,7 +39,7 @@ export class CN_application_view extends base_view_class {
 
 export class CN_application_release extends CN_base_action {
   #application = null;
-  #participant_selection = new CN_participant_selection({
+  #participant_selection = new CN_participant_selection(null, {
     data: {
       mode: "unreleased_only",
       application_id: this.get_model().get_identifier(),
@@ -84,7 +83,7 @@ export class CN_application_release extends CN_base_action {
     const model = this.get_model();
 
     // reset the list and confirm components
-    this.#participant_selection.reset();
+    await this.#participant_selection.reset();
     this.get_body_element().querySelector("[name=participant-confirm]").style.display = "none";
 
     // load the application details and site list
@@ -130,6 +129,13 @@ export class CN_application_release extends CN_base_action {
       </div>
     `);
 
+    const footer_el = this.constructor.html('<div class="row"></div>');
+    CN_element_card.create_element(body_el.querySelector("[name=participant-confirm]"), {
+      header: "Confirm Selection",
+      body: "",
+      footer: footer_el,
+    });
+
     this.#participant_selection.on_selection_changed(() => {
       const confirm_el = body_el.querySelector("[name=participant-confirm]");
       const summary_el = confirm_el.querySelector("div.card-body");
@@ -148,7 +154,7 @@ export class CN_application_release extends CN_base_action {
           for (let site_name in site_list[cohort_name]) {
             const row_el = this.constructor.html('<div class="d-flex justify-content-center">');
             const total = site_list[cohort_name][site_name];
-            row_el.append(CN_element_label.create({ value: site_name }));
+            CN_element_label.create_element(row_el, { value: site_name });
             row_el.append(this.constructor.html(`<div class="col-form-label px-2">${total}</div>`));
             summary_el.append(row_el);
           }
@@ -160,15 +166,17 @@ export class CN_application_release extends CN_base_action {
       }
     });
 
-    body_el.querySelector("[name=participant-list]").append(this.#participant_selection.get_element());
+    const participant_list_el = body_el.querySelector("[name=participant-list]");
+    this.#participant_selection.set_parent_element(participant_list_el);
+    participant_list_el.append(this.#participant_selection.get_element());
 
-    const footer_el = this.constructor.html('<div class="row"></div>');
+    CN_element_label.create_element(footer_el, {
+      for: "preferred_site_id",
+      value: "Preferred Site",
+      class: "col-sm-3",
+    });
 
-    const label_el = CN_element_label.create({ for: "preferred_site_id", value: "Preferred Site" });
-    label_el.classList.add("col-sm-3");
-    footer_el.append(label_el);
-
-    const form_input = new CN_input_enum({
+    CN_input_enum.create_element(footer_el, {
       id: "preferred_site_id",
       class: "d-flex align-items-center col-sm-9",
       required: true,
@@ -200,16 +208,6 @@ export class CN_application_release extends CN_base_action {
         el.append(btn_el);
       },
     });
-    form_input.set_parent_element(footer_el);
-    footer_el.append(form_input.render());
-
-    const confirm_selection_el = CN_element_card.create({
-      header: "Confirm Selection",
-      body: "",
-      footer: footer_el,
-    });
-
-    body_el.querySelector("[name=participant-confirm]").append(confirm_selection_el);
 
     return body_el;
   }

@@ -1,5 +1,4 @@
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
-
 const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
 const { CN_participant_model } = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 const { CN_user_model } = await import(`${CENOZO_URL}/js/model/user.mjs`);

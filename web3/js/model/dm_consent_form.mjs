@@ -1,5 +1,5 @@
-import { CN_dm_consent_form_entry_model } from "./dm_consent_form_entry.mjs"
 import { CN_base_form_model, CN_base_form_adjudicate, CN_base_form_view } from "./base_form_model.mjs"
+import { CN_dm_consent_form_entry_model } from "./dm_consent_form_entry.mjs"
 
 const entry_model = new CN_dm_consent_form_entry_model();
 
