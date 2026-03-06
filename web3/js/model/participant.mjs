@@ -2,6 +2,7 @@ const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mj
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
 const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
+const { CN_input_enum } = await import(`${CENOZO_URL}/js/element/input/enum.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
@@ -309,20 +310,67 @@ export class CN_participant_release extends CN_base_action {
     const tbody_el = this.get_body_element().querySelector("tbody");
     tbody_el.innerHTML = "";
 
-    console.log(this.#application_list);
     this.#application_list.forEach(application => {
-      tbody_el.append(this.constructor.html(`
-        <tr>
-          <td>${application.title}</td>
-          <td>${
-            null == application.datetime ?
-            `<button></button>` :
-            CN_common.format_datetime(application.datetime, "datetime")
+      const tr_el = this.constructor.html(`
+        <tr class="align-middle">
+          <td name="title" class="fw-bold">${application.title}</td>
+          <td name="released"></td>
+          <td name="default-site">${
+            application.default_site_id ?
+            application.site_list.find(site => application.default_site_id == site.id).name :
+            "(none)"
           }</td>
-          <td></td>
-          <td></td>
+          <td name="preferred-site"></td>
         </tr>
-      `));
+      `);
+
+      const released_el = tr_el.querySelector("td[name=released]");
+      if (application.release_based) {
+        if (null == application.datetime) {
+          const release_btn_el = this.constructor.html(
+            '<button class="btn btn-outline-primary w-75">Release Now</button>'
+          );
+          release_btn_el.addEventListener("click", async () => {
+            release_btn_el.setAttribute("disabled", true);
+            try {
+              await this.constructor.wait_for(async () => {
+                await CN_api.post(
+                  `application/${application.id}/participant`,
+                  Number(this.get_model().get_identifier()),
+                );
+                release_btn_el.remove();
+                application.datetime = CN_common.format_datetime(new Date, "record");
+                released_el.innerHTML = CN_common.format_datetime(new Date, "datetime");
+              });
+            } finally {
+              release_btn_el.removeAttribute("disabled");
+            }
+          });
+          released_el.append(release_btn_el);
+        } else {
+          released_el.innerHTML = CN_common.format_datetime(application.datetime, "datetime");
+        }
+      } else {
+        released_el.innerHTML = "Not release-based";
+      }
+
+      CN_input_enum.create_element(tr_el.querySelector("td[name=preferred-site]"), {
+        enum: { values: application.site_list.map(site => ({ key: site.id, value: site.name })) },
+        get_default: () => application.preferred_site_id,
+        on_change: async (form_input) => {
+          form_input.set_disabled(true);
+          try {
+            await CN_api.patch(this.get_model().get_view_url(null, "api"), {
+              application_id: application.id,
+              preferred_site_id: await form_input.get_value_for_record(),
+            });
+          } finally {
+            form_input.set_disabled(false);
+          }
+        },
+      });
+
+      tbody_el.append(tr_el);
     });
   }
 
@@ -343,10 +391,10 @@ export class CN_participant_release extends CN_base_action {
           <table class="table table-striped m-0">
             <thead>
               <tr>
-                <th class="border border-light border-2 border-top-0 p-0" scope="col"></th>
-                <th class="border border-light border-2 border-top-0 p-0" scope="col">Released</th>
-                <th class="border border-light border-2 border-top-0 p-0" scope="col">Default Site</th>
-                <th class="border border-light border-2 border-top-0 p-0" scope="col">Preferred Site</th>
+                <th scope="col"></th>
+                <th scope="col">Released</th>
+                <th scope="col">Default Site</th>
+                <th scope="col">Preferred Site</th>
               </tr>
             </thead>
             <tbody></tbody>
