@@ -1,5 +1,5 @@
-const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
-const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
+const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
+const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
 
 import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
 
@@ -23,8 +23,8 @@ export class CN_base_alternate_consent_form_entry_model extends CN_base_form_ent
               typeahead: {
                 // NOTE: this is a special typeahead that can't be pulled from the alternate model because it
                 // references this model's participant_id property
-                get_list: async (value, element) => {
-                  const participant_id = await element.params.action.get_formatted_property("participant_id");
+                get_list: async (value, form_input) => {
+                  const participant_id = await form_input.get_action().get_formatted_property("participant_id");
                   return await CN_api.get(`participant/${participant_id}/alternate`, {
                     select: {
                       column: [{

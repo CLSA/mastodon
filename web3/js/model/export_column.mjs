@@ -1,4 +1,4 @@
-const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
+const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/export_column.mjs`);
 
 export class CN_export_column_model extends classes.CN_export_column_model {
@@ -28,7 +28,7 @@ export class CN_export_column_model extends classes.CN_export_column_model {
     const properties = super.clone_properties();
     const get_enums_fn = properties.subtype.enum.get_enums
     properties.subtype.enum.get_enums = async (model) => {
-      const table_name = model.get_action().get_property("table_name").state.get();
+      const table_name = model.get_action().get_property_value("table_name");
       if ("site" == table_name) {
         // the site must include the site type and application ID separated by an underscore
         const types = ["default", "effective", "preferred"];

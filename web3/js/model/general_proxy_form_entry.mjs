@@ -1,4 +1,5 @@
-import { CN_base_form_entry_model } from "../base_form_entry_model.mjs"
+import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
+
 const { CN_country_model } = await import(`${CENOZO_URL}/js/model/country.mjs`);
 
 export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model {
@@ -50,13 +51,13 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
                 modifier: { order: ["country.name", "region.name"] },
               },
               is_hidden: (model) => (
-                model.get_action().get_property("proxy_address_international").state.get()
+                model.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_international_region: {
               title: "International Region",
               is_hidden: (model) => (
-                !model.get_action().get_property("proxy_address_international").state.get()
+                !model.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_international_country_id: {
@@ -64,7 +65,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
               type: "typeahead",
               typeahead: CN_country_model.get_typeahead(),
               is_hidden: (model) => (
-                !model.get_action().get_property("proxy_address_international").state.get()
+                !model.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_postcode: {
@@ -119,13 +120,13 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
                 modifier: { order: ["country.name", "region.name"] },
               },
               is_hidden: (model) => (
-                model.get_action().get_property("informant_address_international").state.get()
+                model.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_international_region: {
               title: "International Region",
               is_hidden: (model) => (
-                !model.get_action().get_property("informant_address_international").state.get()
+                !model.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_international_country_id: {
@@ -133,7 +134,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
               type: "typeahead",
               typeahead: CN_country_model.get_typeahead(),
               is_hidden: (model) => (
-                !model.get_action().get_property("informant_address_international").state.get()
+                !model.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_postcode: {

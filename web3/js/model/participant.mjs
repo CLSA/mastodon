@@ -1,13 +1,12 @@
-const CN_api = (await import(`${CENOZO_URL}/js/api.mjs`)).default;
-const CN_common = (await import(`${CENOZO_URL}/js/common.mjs`)).default;
-const CN_element = (await import(`${CENOZO_URL}/js/element.mjs`)).default;
-const CN_session = (await import(`${CENOZO_URL}/js/session.mjs`)).default;
+const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
+const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
+const { CN_input_enum } = await import(`${CENOZO_URL}/js/element/input/enum.mjs`);
+const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
-const { CN_base_action } = await import(`${CENOZO_URL}/js/base_action.mjs`);
-const { CN_base_view } = await import(`${CENOZO_URL}/js/base_view.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
-
-const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_base_view;
+const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_action_view;
 export class CN_participant_view extends base_view_class {
   /**
    * Extend parent method
@@ -28,11 +27,11 @@ export class CN_participant_view extends base_view_class {
 
     if (
       ["administrator", "curator"].includes(CN_session.data.role.name) &&
-      CN_session.data.application.participant_data_cohort_list.includes(this.get_property("cohort").state.get())
+      CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))
     ) {
       const token_module = CN_session.get_module("token");
       if (token_module && token_module.action_allowed("add")) {
-        const data_btn_el = CN_element.create(
+        const data_btn_el = this.constructor.html(
           '<button name="data" type="button" class="btn btn-light btn-outline-primary">Data</button>'
         );
         data_btn_el.addEventListener("click", async () => {
@@ -55,8 +54,8 @@ export class CN_participant_data extends CN_base_action {
    * Constructor
    * @param base_model model: The model that the action belongs to
    */
-  constructor(model) {
-    super("data", model);
+  constructor(parent_el, model) {
+    super("data", parent_el, model);
   }
 
   /**
@@ -143,11 +142,11 @@ export class CN_participant_data extends CN_base_action {
     if (0 == this.#study_phase_data.length) return;
     const last_study_phase_id = this.#study_phase_data[this.#study_phase_data.length-1].id;
 
-    const nav_el = CN_element.create('<ul class="nav nav-tabs" role="tablist"></ul>');
-    const content_el = CN_element.create('<div class="tab-content"></div>');
+    const nav_el = this.constructor.html('<ul class="nav nav-tabs" role="tablist"></ul>');
+    const content_el = this.constructor.html('<div class="tab-content"></div>');
     this.#study_phase_data.forEach(study_phase => {
       const active = last_study_phase_id == study_phase.id;
-      const study_phase_el = CN_element.create(`
+      const study_phase_el = this.constructor.html(`
         <li class="nav-item" role="presentation">
           <button
             class="nav-link ${active ? "active" : ""}"
@@ -163,7 +162,7 @@ export class CN_participant_data extends CN_base_action {
       `);
       nav_el.append(study_phase_el);
 
-      const tab_el = CN_element.create(`
+      const tab_el = this.constructor.html(`
         <div
           class="tab-pane fade border border-top-0 pt-3 ${active ? "show active" : ""}"
           id="study-phase-${study_phase.id}-tab-pane"
@@ -175,14 +174,14 @@ export class CN_participant_data extends CN_base_action {
       content_el.append(tab_el);
 
       study_phase.categories.forEach(category => {
-        const category_el = CN_element.create(`
+        const category_el = this.constructor.html(`
           <div class="container-fluid pb-3">
             <div class="fs-5">${category.name}</div>
           </div>
         `);
         tab_el.append(category_el);
         category.data_list.forEach(item => {
-          const item_el = CN_element.create(`
+          const item_el = this.constructor.html(`
             <button
               class="btn btn-outline-primary w-100 ${item.available ? "fw-bold" : ""}"
               type="button"
@@ -192,7 +191,7 @@ export class CN_participant_data extends CN_base_action {
 
           if (item.available) {
             item_el.addEventListener("click", async () => {
-              await CN_element.wait_for(async () => {
+              await this.constructor.wait_for(async () => {
                 const response = await CN_api.file(
                   `participant_data/${item.id}`,
                   item.filetype,
@@ -220,7 +219,7 @@ export class CN_participant_data extends CN_base_action {
    * Extend parent method
    */
   create_body_element() {
-    return CN_element.create(`
+    return this.constructor.html(`
       <div>
         <div class="text-info-emphasis pb-2">
           The following is data that is appropriate to release to the participant.
@@ -234,7 +233,182 @@ export class CN_participant_data extends CN_base_action {
    * Extend parent method
    */
   create_footer_element() {
-    const footer_el = CN_element.create(`
+    const footer_el = this.constructor.html(`
+      <div class="btn-group" role="group">
+        <button name="back" type="button" class="btn btn-primary">View Participant</button>
+      </div>
+    `);
+    footer_el.querySelector("button[name=back]").addEventListener("click", this.on_navigate_to_parent.bind(this));
+    return footer_el;
+  }
+}
+
+export class CN_participant_release extends CN_base_action {
+  #application_list = [];
+  
+  /**
+   * Constructor
+   * @param base_model model: The model that the action belongs to
+   */
+  constructor(parent_el, model) {
+    super("release", parent_el, model);
+  }
+
+  /**
+   * Extend parent method
+   */
+  async get_text(type) {
+    if ("crumb" == type) {
+      return (await CN_api.get(
+        `participant/${this.get_model().get_identifier()}`,
+        { select: { column: "uid" },
+      })).uid;
+    }
+
+    if ("header" == type) {
+      const data = await CN_api.get(`participant/${this.get_model().get_identifier()}`, {
+        select: { column: ["uid", "first_name", "last_name"] },
+      });
+      return `Application Management for ${data.first_name} ${data.last_name} (${data.uid})`;
+    }
+
+    return super.get_text(type);
+  }
+
+  /**
+   * Extend parent method
+   */
+  async on_navigate_to_parent() {
+    await CN_session.navigate_to(`participant/view/${this.get_model().get_identifier()}`);
+  }
+
+  /**
+   * Extend parent method
+   */
+  async on_load() {
+    await super.on_load();
+
+    // get the application list
+    this.#application_list = await CN_api.get(`participant/${this.get_model().get_identifier()}/application`, {
+      select: { column: ["title", "release_based", "datetime", "default_site_id", "preferred_site_id"] },
+      modifier: { order: "title" },
+    });
+
+    // get the site list for all applications in parallel
+    await Promise.all(this.#application_list.map(application => (async () => {
+      application.site_list = await CN_api.get(`application/${application.id}/site`, {
+        select: { column: "name" },
+        modifier: { order: "name" },
+      });
+    })()));
+  }
+
+  /**
+   * Extend parent method
+   */
+  update_element() {
+    const tbody_el = this.get_body_element().querySelector("tbody");
+    tbody_el.innerHTML = "";
+
+    this.#application_list.forEach(application => {
+      const tr_el = this.constructor.html(`
+        <tr class="align-middle">
+          <td name="title" class="fw-bold">${application.title}</td>
+          <td name="released"></td>
+          <td name="default-site">${
+            application.default_site_id ?
+            application.site_list.find(site => application.default_site_id == site.id).name :
+            "(none)"
+          }</td>
+          <td name="preferred-site"></td>
+        </tr>
+      `);
+
+      const released_el = tr_el.querySelector("td[name=released]");
+      if (application.release_based) {
+        if (null == application.datetime) {
+          const release_btn_el = this.constructor.html(
+            '<button class="btn btn-outline-primary w-75">Release Now</button>'
+          );
+          release_btn_el.addEventListener("click", async () => {
+            release_btn_el.setAttribute("disabled", true);
+            try {
+              await this.constructor.wait_for(async () => {
+                await CN_api.post(
+                  `application/${application.id}/participant`,
+                  Number(this.get_model().get_identifier()),
+                );
+                release_btn_el.remove();
+                application.datetime = CN_common.format_datetime(new Date, "record");
+                released_el.innerHTML = CN_common.format_datetime(new Date, "datetime");
+              });
+            } finally {
+              release_btn_el.removeAttribute("disabled");
+            }
+          });
+          released_el.append(release_btn_el);
+        } else {
+          released_el.innerHTML = CN_common.format_datetime(application.datetime, "datetime");
+        }
+      } else {
+        released_el.innerHTML = "Not release-based";
+      }
+
+      CN_input_enum.create_element(tr_el.querySelector("td[name=preferred-site]"), {
+        enum: { values: application.site_list.map(site => ({ key: site.id, value: site.name })) },
+        get_default: () => application.preferred_site_id,
+        on_change: async (form_input) => {
+          form_input.set_disabled(true);
+          try {
+            await CN_api.patch(this.get_model().get_view_url(null, "api"), {
+              application_id: application.id,
+              preferred_site_id: await form_input.get_value_for_record(),
+            });
+          } finally {
+            form_input.set_disabled(false);
+          }
+        },
+      });
+
+      tbody_el.append(tr_el);
+    });
+  }
+
+  /**
+   * Extend parent method
+   */
+  create_body_element() {
+    return this.constructor.html(`
+      <div>
+        <div class="text-info-emphasis pb-2">
+          Below is a list of all applications the participant may be released to.
+          You may update the participant's preferred site or release them now.
+        </div>
+        <div class="text-info-emphasis text-danger pb-2">
+          Warning: Once a participant has been released they cannot be unreleased.
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped m-0">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Released</th>
+                <th scope="col">Default Site</th>
+                <th scope="col">Preferred Site</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    `);
+  }
+
+  /**
+   * Extend parent method
+   */
+  create_footer_element() {
+    const footer_el = this.constructor.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Participant</button>
       </div>
