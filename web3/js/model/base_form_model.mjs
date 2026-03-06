@@ -53,7 +53,7 @@ export class CN_base_form_model extends CN_base_model {
         posessive: entry_model.get_posessive().replace( /form entry's$/, "form's" ),
       },
       columns: columns,
-      default_order: { column: "id", desc: true }, // sort by ID descending
+      get_default_order: () => ({ column: "id", desc: true }), // sort by ID descending
       properties: {
         id: { title: "ID", is_constant: () => true },
         status: {
