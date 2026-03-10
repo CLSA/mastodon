@@ -135,7 +135,7 @@ export class CN_application_release extends CN_base_action {
       footer: footer_el,
     });
 
-    this.#participant_selection.on_selection_changed(() => {
+    this.#participant_selection.add_event_listener("selectionchanged", () => {
       const confirm_el = body_el.querySelector("[name=participant-confirm]");
       const summary_el = confirm_el.querySelector("div.card-body");
       summary_el.innerHTML = "";
