@@ -84,7 +84,6 @@ export class CN_application_release extends CN_base_action {
 
     // reset the list and confirm components
     await this.#participant_selection.reset();
-    this.get_body_element().querySelector("[name=participant-confirm]").style.display = "none";
 
     // load the application details and site list
     this.#application = await CN_api.get(`application/${model.get_identifier()}`);
@@ -125,7 +124,7 @@ export class CN_application_release extends CN_base_action {
           that application's <em>participant multi-edit</em> utility instead.
         </div>
         <div name="participant-list" class="py-1"></div>
-        <div name="participant-confirm" class="py-1" style="display: none;"></div>
+        <div name="participant-confirm" class="py-1 d-none"></div>
       </div>
     `);
 
@@ -141,7 +140,7 @@ export class CN_application_release extends CN_base_action {
       const summary_el = confirm_el.querySelector("div.card-body");
       summary_el.innerHTML = "";
       if (this.#participant_selection.get_identifier_list().length) {
-        confirm_el.style.removeProperty("display");
+        confirm_el.className.remove("d-none");
 
         let first = true;
         const site_list = this.#participant_selection.get_site_list();
@@ -162,7 +161,7 @@ export class CN_application_release extends CN_base_action {
           first = false;
         }
       } else {
-        confirm_el.style.display = "none";
+        confirm_el.className.add("d-none");
       }
     });
 
