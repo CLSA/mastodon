@@ -24,26 +24,38 @@ export class CN_participant_view extends base_view_class {
    */
   create_footer_element() {
     const footer_el = super.create_footer_element();
+    const left_btn_group_el = footer_el.querySelector("div[name=left-btn-group]");
 
-    if (
-      ["administrator", "curator"].includes(CN_session.data.role.name) &&
-      CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))
-    ) {
-      const token_module = CN_session.get_module("token");
-      if (token_module && token_module.action_allowed("add")) {
-        const data_btn_el = this.constructor.html(
-          '<button name="data" type="button" class="btn btn-light btn-outline-primary">Data</button>'
-        );
-        data_btn_el.addEventListener("click", async () => {
-          await CN_session.navigate_to(
-            this.get_model().get_view_url().replace(/participant\/view/, "participant/data")
-          )
-        });
-        footer_el.append(data_btn_el);
-      }
+    const participant_data_module = CN_session.get_module("participant_data");
+    if (participant_data_module && participant_data_module.action_allowed("view")) {
+      const data_btn_el = this.constructor.html(
+        '<button name="data" type="button" class="btn btn-light btn-outline-primary" disabled>Data</button>'
+      );
+      data_btn_el.addEventListener("click", async () => {
+        await CN_session.navigate_to(
+          this.get_model().get_view_url().replace(/participant\/view/, "participant/data")
+        )
+      });
+      left_btn_group_el.append(data_btn_el);
     }
 
     return footer_el;
+  }
+
+  /**
+   * Extend parent method
+   */
+  async on_load() {
+    await super.on_load();
+
+    const data_btn_el = this.get_footer_element().querySelector("button[name=data]");
+    if (data_btn_el) {
+      if (CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))) {
+        data_btn_el.removeAttribute("disabled");
+      } else {
+        data_btn_el.setAttribute("disabled", true);
+      }
+    }
   }
 }
 
@@ -245,7 +257,7 @@ export class CN_participant_data extends CN_base_action {
 
 export class CN_participant_release extends CN_base_action {
   #application_list = [];
-  
+
   /**
    * Constructor
    * @param base_model model: The model that the action belongs to
