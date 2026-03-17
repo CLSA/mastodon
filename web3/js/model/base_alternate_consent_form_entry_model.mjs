@@ -51,6 +51,7 @@ export class CN_base_alternate_consent_form_entry_model extends CN_base_form_ent
                         { bracket: true, open: false },
                       ],
                       order: 'CONCAT( alternate.first_name, " ", alternate.last_name )',
+                      limit: 20,
                     },
                   });
                 },
