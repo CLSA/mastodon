@@ -29,8 +29,9 @@ export class CN_participant_view extends base_view_class {
     const participant_data_module = CN_session.get_module("participant_data");
     if (participant_data_module && participant_data_module.action_allowed("view")) {
       const data_btn_el = this.constructor.html(
-        '<button name="data" type="button" class="btn btn-light btn-outline-primary" disabled>Data</button>'
+        '<button name="data" type="button" class="btn btn-light btn-outline-primary">Data</button>'
       );
+      this.constructor.set_disabled(data_btn_el, true);
       data_btn_el.addEventListener("click", async () => {
         await CN_session.navigate_to(
           this.get_model().get_view_url().replace(/participant\/view/, "participant/data")
@@ -50,11 +51,10 @@ export class CN_participant_view extends base_view_class {
 
     const data_btn_el = this.get_footer_element().querySelector("button[name=data]");
     if (data_btn_el) {
-      if (CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))) {
-        data_btn_el.removeAttribute("disabled");
-      } else {
-        data_btn_el.setAttribute("disabled", true);
-      }
+      this.constructor.set_disabled(
+        data_btn_el,
+        !CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))
+      );
     }
   }
 }
@@ -189,19 +189,17 @@ export class CN_participant_data extends CN_base_action {
         const category_el = this.constructor.html(`
           <div class="container-fluid pb-3">
             <div class="fs-5">${category.name}</div>
+            <div class="btn-group-vertical w-100"></div>
           </div>
         `);
         tab_el.append(category_el);
         category.data_list.forEach(item => {
-          const item_el = this.constructor.html(`
-            <button
-              class="btn btn-outline-primary w-100 ${item.available ? "fw-bold" : ""}"
-              type="button"
-              ${item.available ? "" : "disabled"}
-            >${item.name}</button>
-          `);
+          const item_el = this.constructor.html(
+            `<button class="btn btn-outline-primary w-100" type="button" >${item.name}</button>`
+          );
 
           if (item.available) {
+            item_el.classList.add("fw-bold");
             item_el.addEventListener("click", async () => {
               await this.constructor.wait_for(async () => {
                 const response = await CN_api.file(
@@ -216,9 +214,11 @@ export class CN_participant_data extends CN_base_action {
                 );
               });
             });
+          } else {
+            this.constructor.set_disabled(item_el, true);
           }
 
-          category_el.append(item_el);
+          category_el.querySelector("div.btn-group-vertical").append(item_el);
         });
       });
     });
@@ -343,7 +343,7 @@ export class CN_participant_release extends CN_base_action {
             '<button class="btn btn-outline-primary w-75">Release Now</button>'
           );
           release_btn_el.addEventListener("click", async () => {
-            release_btn_el.setAttribute("disabled", true);
+            this.constructor.set_disabled(release_btn_el, true);
             try {
               await this.constructor.wait_for(async () => {
                 await CN_api.post(
@@ -355,7 +355,7 @@ export class CN_participant_release extends CN_base_action {
                 released_el.innerHTML = CN_common.format_datetime(new Date, "datetime");
               });
             } finally {
-              release_btn_el.removeAttribute("disabled");
+              this.constructor.set_disabled(release_btn_el, false);
             }
           });
           released_el.append(release_btn_el);

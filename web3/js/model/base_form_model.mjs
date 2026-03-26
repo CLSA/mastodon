@@ -396,7 +396,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
    */
   async _adjudicate_entry(index) {
     const btn_el_list = Array.from(this.get_body_element().querySelectorAll("button"));
-    btn_el_list.forEach(el => el.setAttribute("disabled", true));
+    btn_el_list.forEach(el => this.constructor.set_disabled(el, true));
     try {
       await this.constructor.wait_for(async () => {
         await CN_api.patch(
@@ -409,7 +409,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
       error.message = error.message.replace(/\n/g, "<br/>\n");
       throw error;
     } finally {
-      btn_el_list.forEach(el => el.removeAttribute("disabled"));
+      btn_el_list.forEach(el => this.constructor.set_disabled(el, false));
     }
     await this.on_navigate_to_parent();
   }
@@ -435,11 +435,7 @@ export class CN_base_form_view extends CN_action_view {
     const footer_el = this.get_footer_element();
 
     const adjudicate_btn_el = footer_el.querySelector("button[name=adjudicate]");
-    if (this.get_property_value("adjudicate")) {
-      adjudicate_btn_el.removeAttribute("disabled");
-    } else {
-      adjudicate_btn_el.setAttribute("disabled", true);
-    }
+    this.constructor.set_disabled(adjudicate_btn_el, this.get_property_value("adjudicate"));
 
     if ("contact" != this.get_model().get_form_type()) {
       if (this.get_property_value("form_id")) {
@@ -469,9 +465,9 @@ export class CN_base_form_view extends CN_action_view {
         name="adjudicate"
         type="button"
         class="btn btn-light btn-outline-primary"
-        disabled
       >Adjudicate</button>
     `);
+    this.constructor.set_disabled(adjudicate_btn_el, true);
     adjudicate_btn_el.addEventListener("click", async () => {
       await CN_session.navigate_to([model.get_base_path("url"), "adjudicate", model.get_identifier()].join("/"));
     });
