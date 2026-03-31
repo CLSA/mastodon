@@ -15,4 +15,6 @@ CREATE TABLE participant_data (
     REFERENCES cenozo.study_phase (id)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
