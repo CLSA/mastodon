@@ -1,0 +1,6 @@
+CREATE TRIGGER proxy_form_AFTER_INSERT
+AFTER INSERT ON mastodon.proxy_form
+FOR EACH ROW
+BEGIN
+  CALL update_proxy_form_total( NEW.id );
+END$$
