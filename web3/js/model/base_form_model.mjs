@@ -439,7 +439,7 @@ export class CN_base_form_view extends CN_action_view {
 
     if ("contact" != this.get_model().get_form_type()) {
       if (this.get_property_value("form_id")) {
-        footer_el.append(this.#view_imported_form_btn_el);
+        footer_el.querySelector("div[name=left-btn-group]").append(this.#view_imported_form_btn_el);
       } else {
         this.#view_imported_form_btn_el.remove();
       }
@@ -458,7 +458,7 @@ export class CN_base_form_view extends CN_action_view {
       '<button name="download" type="button" class="btn btn-light btn-outline-primary">Download</button>'
     );
     download_btn_el.addEventListener("click", this.get_model().download_form.bind(this));
-    footer_el.append(download_btn_el);
+    footer_el.querySelector("div[name=left-btn-group]").append(download_btn_el);
 
     const adjudicate_btn_el = this.constructor.html(`
       <button
@@ -471,7 +471,7 @@ export class CN_base_form_view extends CN_action_view {
     adjudicate_btn_el.addEventListener("click", async () => {
       await CN_session.navigate_to([model.get_base_path("url"), "adjudicate", model.get_identifier()].join("/"));
     });
-    footer_el.append(adjudicate_btn_el);
+    footer_el.querySelector("div[name=left-btn-group]").append(adjudicate_btn_el);
 
     // create the view imported form button but don't add it (that's done when updating the element)
     const form_type = this.get_model().get_form_type();

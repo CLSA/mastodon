@@ -53,7 +53,7 @@ export class CN_participant_view extends base_view_class {
     if (data_btn_el) {
       this.constructor.set_disabled(
         data_btn_el,
-        !CN_session.data.application.participant_data_cohort_list.includes(this.get_property_value("cohort"))
+        !CN_session.get("application", "participant_data_cohort_list").includes(this.get_property_value("cohort"))
       );
     }
   }
@@ -366,7 +366,7 @@ export class CN_participant_release extends CN_base_action {
         released_el.innerHTML = "Not release-based";
       }
 
-      CN_input_enum.create_element(tr_el.querySelector("td[name=preferred-site]"), {
+      CN_input_enum.append(tr_el.querySelector("td[name=preferred-site]"), {
         enum: { values: application.site_list.map(site => ({ key: site.id, value: site.name })) },
         get_default: () => application.preferred_site_id,
         on_change: async (form_input) => {

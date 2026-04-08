@@ -90,8 +90,9 @@ export class CN_application_release extends CN_base_action {
 
     // populate the preferred site selection list
     const preferred_site_el = this.get_body_element().querySelector("#preferred_site_id");
-    preferred_site_el.innerHTML = "";
-    preferred_site_el.append(this.constructor.html('<option value="null" selected>No Preferred Site</option>'));
+    preferred_site_el.replaceChildren(this.constructor.html(
+      '<option value="null" selected>No Preferred Site</option>'
+    ));
     const site_list = await CN_api.get(
       `${model.get_view_url(null, "api")}/site`,
       { select: { column: ['id', 'name'] } }
@@ -129,7 +130,7 @@ export class CN_application_release extends CN_base_action {
     `);
 
     const footer_el = this.constructor.html('<div class="row"></div>');
-    CN_element_card.create_element(body_el.querySelector("[name=participant-confirm]"), {
+    CN_element_card.append(body_el.querySelector("[name=participant-confirm]"), {
       header: "Confirm Selection",
       body: "",
       footer: footer_el,
@@ -153,7 +154,7 @@ export class CN_application_release extends CN_base_action {
           for (let site_name in site_list[cohort_name]) {
             const row_el = this.constructor.html('<div class="d-flex justify-content-center">');
             const total = site_list[cohort_name][site_name];
-            CN_element_label.create_element(row_el, { value: site_name });
+            CN_element_label.append(row_el, { value: site_name });
             row_el.append(this.constructor.html(`<div class="col-form-label px-2">${total}</div>`));
             summary_el.append(row_el);
           }
@@ -169,13 +170,13 @@ export class CN_application_release extends CN_base_action {
     this.#participant_selection.set_parent_element(participant_list_el);
     participant_list_el.append(this.#participant_selection.get_element());
 
-    CN_element_label.create_element(footer_el, {
+    CN_element_label.append(footer_el, {
       for: "preferred_site_id",
       value: "Preferred Site",
       class: "col-sm-3",
     });
 
-    CN_input_enum.create_element(footer_el, {
+    CN_input_enum.append(footer_el, {
       id: "preferred_site_id",
       class: "d-flex align-items-center col-sm-9",
       required: true,
@@ -197,10 +198,10 @@ export class CN_application_release extends CN_base_action {
             });
           });
 
-          await (new CN_modal_message({
+          await CN_modal_message.create_and_open({
             title: "Participants Released",
             message: `A total of ${response} participant(s) have been successfully released.`,
-          })).open();
+          });
 
           await this.#participant_selection.reset();
         });
