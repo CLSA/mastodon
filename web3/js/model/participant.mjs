@@ -1,12 +1,12 @@
-const { CN_action_list } = await import(`${CENOZO_URL}/js/element/action/list.mjs`);
-const { CN_action_view } = await import(`${CENOZO_URL}/js/element/action/view.mjs`);
+const { CN_action_list } = await import(`${CENOZO_URL}/js/action/list.mjs`);
+const { CN_action_view } = await import(`${CENOZO_URL}/js/action/view.mjs`);
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
-const { CN_base_action } = await import(`${CENOZO_URL}/js/element/action/base_action.mjs`);
+const { CN_base_action } = await import(`${CENOZO_URL}/js/action/base_action.mjs`);
 const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
 const { CN_element_card } = await import(`${CENOZO_URL}/js/element/card.mjs`);
-const { CN_input_enum } = await import(`${CENOZO_URL}/js/element/input/enum.mjs`);
-const { CN_input_file } = await import(`${CENOZO_URL}/js/element/input/file.mjs`);
-const { CN_modal_message } = await import(`${CENOZO_URL}/js/element/modal/message.mjs`);
+const { CN_input_enum } = await import(`${CENOZO_URL}/js/input/enum.mjs`);
+const { CN_input_file } = await import(`${CENOZO_URL}/js/input/file.mjs`);
+const { CN_modal_message } = await import(`${CENOZO_URL}/js/modal/message.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
@@ -21,14 +21,6 @@ export class CN_participant_list extends base_list_class {
     const footer_el = super.create_footer_element();
 
     if ("participant" == CN_session.get_leaf_model().get_name()) {
-      const search_btn_el = this.constructor.html(
-        '<button name="search" class="btn btn-light btn-outline-primary">Search</button>'
-      );
-      search_btn_el.addEventListener("click", () => {
-        CN_session.navigate_to("search_result/list");
-      });
-      footer_el.querySelector("div.btn-group").append(search_btn_el);
-
       const multiedit_btn_el = this.constructor.html(
         '<button name="multiedit" class="btn btn-light btn-outline-primary">Multi-Edit</button>'
       );
