@@ -26,7 +26,7 @@ export class CN_export_restriction_model extends classes.CN_export_restriction_m
    */
   clone_properties() {
     const properties = super.clone_properties();
-    const get_enums_fn = properties.subtype.enum.get_enums
+    const get_enums_fn = properties.subtype.enum.get_enums;
     properties.subtype.enum.get_enums = async (model) => {
       const table_name = model.get_action().get_property_value("table_name");
       if ("site" == table_name) {
