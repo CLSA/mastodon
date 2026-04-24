@@ -206,7 +206,7 @@ export class CN_base_form_adjudicate extends CN_base_action {
    * Extend parent method
    */
   create_placeholder_element() {
-    const tr_list = Array.from(Array(10).keys()).map((e,index) => `
+    const tr_list = CN_common.get_list_of_numbers(10).map((e,index) => `
       <tr>
         <td scope="row" class="text-end placeholder-glow">
         </td>
