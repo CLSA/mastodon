@@ -10,10 +10,10 @@ const { CN_modal_message } = await import(`${CENOZO_URL}/js/modal/message.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
 const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
-const base_list_class = classes.CN_participant_list ? classes.CN_participant_list : CN_action_list;
-const base_view_class = classes.CN_participant_view ? classes.CN_participant_view : CN_action_view;
+const base_list_class = classes.CN_list_participant ? classes.CN_list_participant : CN_action_list;
+const base_view_class = classes.CN_view_participant ? classes.CN_view_participant : CN_action_view;
 
-export class CN_participant_list extends base_list_class {
+export class CN_list_participant extends base_list_class {
   /**
    * Extends the parent method
    */
@@ -52,7 +52,7 @@ export class CN_participant_list extends base_list_class {
   }
 }
 
-export class CN_participant_view extends base_view_class {
+export class CN_view_participant extends base_view_class {
   /**
    * Extend parent method
    */
@@ -104,7 +104,7 @@ export class CN_participant_view extends base_view_class {
   }
 }
 
-export class CN_participant_data extends CN_base_action {
+export class CN_data_participant extends CN_base_action {
   #study_phase_data = [];
 
   /**
@@ -304,7 +304,7 @@ const participant_module = CN_session.get_module("participant");
 const address_module = CN_session.get_module("address");
 const phone_module = CN_session.get_module("phone");
 
-export class CN_participant_import extends CN_base_action {
+export class CN_import_participant extends CN_base_action {
   #file_form_input;
   #data = {
     source: "(loading...)",
@@ -867,7 +867,7 @@ export class CN_participant_import extends CN_base_action {
   }
 }
 
-export class CN_participant_release extends CN_base_action {
+export class CN_release_participant extends CN_base_action {
   #application_list = [];
 
   /**

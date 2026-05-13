@@ -1,6 +1,6 @@
-import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
+import { CN_model_base_form_entry } from "./base_form_entry.mjs"
 
-export class CN_extended_hin_form_entry_model extends CN_base_form_entry_model {
+export class CN_model_extended_hin_form_entry extends CN_model_base_form_entry {
   constructor() {
     super({
       type: "extended_hin",

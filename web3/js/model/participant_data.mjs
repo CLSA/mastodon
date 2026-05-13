@@ -1,7 +1,7 @@
-const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
-const { CN_study_phase_model } = await import(`${CENOZO_URL}/js/model/study_phase.mjs`);
+const { CN_model_base } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
+const { CN_model_study_phase } = await import(`${CENOZO_URL}/js/model/study_phase.mjs`);
 
-export class CN_participant_data_model extends CN_base_model {
+export class CN_model_participant_data extends CN_model_base {
   constructor() {
     super({
       wording: {
@@ -22,7 +22,7 @@ export class CN_participant_data_model extends CN_base_model {
         study_phase_id: {
           title: "Study & Phase Name",
           type: "typeahead",
-          typeahead: CN_study_phase_model.get_typeahead(),
+          typeahead: CN_model_study_phase.get_typeahead(),
           is_constant: () => true,
         },
         category: { title: "Category", format: "identifier" },

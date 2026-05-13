@@ -1,8 +1,8 @@
-import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
+import { CN_model_base_form_entry } from "./base_form_entry.mjs"
 
-const { CN_country_model } = await import(`${CENOZO_URL}/js/model/country.mjs`);
+const { CN_model_country } = await import(`${CENOZO_URL}/js/model/country.mjs`);
 
-export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model {
+export class CN_model_general_proxy_form_entry extends CN_model_base_form_entry {
   constructor() {
     super({
       type: "general_proxy",
@@ -63,7 +63,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             proxy_international_country_id: {
               title: "International Country",
               type: "typeahead",
-              typeahead: CN_country_model.get_typeahead(),
+              typeahead: CN_model_country.get_typeahead(),
               is_hidden: (model) => (
                 !model.get_action().get_property_value("proxy_address_international")
               ),
@@ -132,7 +132,7 @@ export class CN_general_proxy_form_entry_model extends CN_base_form_entry_model 
             informant_international_country_id: {
               title: "International Country",
               type: "typeahead",
-              typeahead: CN_country_model.get_typeahead(),
+              typeahead: CN_model_country.get_typeahead(),
               is_hidden: (model) => (
                 !model.get_action().get_property_value("informant_address_international")
               ),

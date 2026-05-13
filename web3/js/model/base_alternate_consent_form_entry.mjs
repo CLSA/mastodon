@@ -1,8 +1,8 @@
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 
-import { CN_base_form_entry_model } from "./base_form_entry_model.mjs"
+import { CN_model_base_form_entry } from "./base_form_entry.mjs"
 
-export class CN_base_alternate_consent_form_entry_model extends CN_base_form_entry_model {
+export class CN_model_base_alternate_consent_form_entry extends CN_model_base_form_entry {
   constructor(params) {
     super({
       type: `${params.type}_consent`,

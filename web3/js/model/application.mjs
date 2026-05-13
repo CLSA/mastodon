@@ -6,12 +6,12 @@ const { CN_element_card } = await import(`${CENOZO_URL}/js/element/card.mjs`);
 const { CN_element_label } = await import(`${CENOZO_URL}/js/element/label.mjs`);
 const { CN_input_enum } = await import(`${CENOZO_URL}/js/input/enum.mjs`);
 const { CN_modal_message } = await import(`${CENOZO_URL}/js/modal/message.mjs`);
-const { CN_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
+const { CN_element_participant_selection }  = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
 const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
-const base_view_class = classes.CN_application_view ? classes.CN_application_view : CN_action_view;
-export class CN_application_view extends base_view_class {
+const base_view_class = classes.CN_view_application ? classes.CN_view_application : CN_action_view;
+export class CN_view_application extends base_view_class {
   /**
    * Add extra operations to the footer
    */
@@ -37,9 +37,9 @@ export class CN_application_view extends base_view_class {
   }
 }
 
-export class CN_application_release extends CN_base_action {
+export class CN_release_application extends CN_base_action {
   #application = null;
-  #participant_selection = new CN_participant_selection(null, {
+  #participant_selection = new CN_element_participant_selection(null, {
     data: {
       mode: "unreleased_only",
       application_id: this.get_model().get_identifier(),

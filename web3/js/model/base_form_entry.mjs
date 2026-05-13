@@ -1,8 +1,8 @@
-const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
-const { CN_participant_model } = await import(`${CENOZO_URL}/js/model/participant.mjs`);
-const { CN_user_model } = await import(`${CENOZO_URL}/js/model/user.mjs`);
+const { CN_model_base } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
+const { CN_model_participant } = await import(`${CENOZO_URL}/js/model/participant.mjs`);
+const { CN_model_user } = await import(`${CENOZO_URL}/js/model/user.mjs`);
 
-export class CN_base_form_entry_model extends CN_base_model {
+export class CN_model_base_form_entry extends CN_model_base {
   #form_type;
 
   constructor(params) {
@@ -18,7 +18,7 @@ export class CN_base_form_entry_model extends CN_base_model {
 
     // all forms have the user property
     let properties = {
-      user_id: { title: "User", type: "typeahead", typeahead: CN_user_model.get_typeahead() },
+      user_id: { title: "User", type: "typeahead", typeahead: CN_model_user.get_typeahead() },
     };
 
     // all but the contact form have the participant property
@@ -28,7 +28,7 @@ export class CN_base_form_entry_model extends CN_base_model {
         participant_id: {
           title: "Participant (UID)",
           type: "typeahead",
-          typeahead: CN_participant_model.get_typeahead(),
+          typeahead: CN_model_participant.get_typeahead(),
         },
       };
     }
