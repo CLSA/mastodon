@@ -1,7 +1,7 @@
-const { CN_model_base } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
+const { CN_base_model } = await import(`${CENOZO_URL}/js/model/base_model.mjs`);
 const { CN_model_study_phase } = await import(`${CENOZO_URL}/js/model/study_phase.mjs`);
 
-export class CN_model_participant_data extends CN_model_base {
+export class CN_model_participant_data extends CN_base_model {
   constructor() {
     super({
       wording: {
