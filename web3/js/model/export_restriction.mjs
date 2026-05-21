@@ -27,8 +27,8 @@ export class CN_model_export_restriction extends classes.CN_model_export_restric
   clone_properties() {
     const properties = super.clone_properties();
     const get_enums_fn = properties.subtype.enum.get_enums;
-    properties.subtype.enum.get_enums = async (model) => {
-      const table_name = model.get_action().get_property_value("table_name");
+    properties.subtype.enum.get_enums = async (form_input) => {
+      const table_name = form_input.get_action().get_property_value("table_name");
       if ("site" == table_name) {
         // the site must include the site type and application ID separated by an underscore
         const types = ["default", "effective", "preferred"];
@@ -44,7 +44,7 @@ export class CN_model_export_restriction extends classes.CN_model_export_restric
         }, []);
       }
 
-      return await get_enums_fn(model);
+      return await get_enums_fn(form_input);
     };
     return properties;
   }
