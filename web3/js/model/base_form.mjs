@@ -406,7 +406,7 @@ export class CN_adjudicate_base_form extends CN_base_action {
       });
     } catch (error) {
       // convert newlines in error message to line breaks
-      error.message = error.message.replace(/\n/g, "<br/>\n");
+      error.message = CN_common.nl_to_br(error.message);
       throw error;
     } finally {
       btn_el_list.forEach(el => this.constructor.set_disabled(el, false));

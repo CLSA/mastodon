@@ -58,8 +58,8 @@ export class CN_view_participant extends base_view_class {
    */
   get_selector_child_list() {
     return super.get_selector_child_list().map(child => {
-      if ("Applications" == child.title) child.title = "Release";
-      if ("Studies" == child.title) child.title = "Eligible Studies";
+      if ("Application" == child.title) child.title = "Release";
+      if ("Study" == child.title) child.title = "Eligible Study";
       return child;
     }).sort((a,b) => a.title>b.title);
   }
