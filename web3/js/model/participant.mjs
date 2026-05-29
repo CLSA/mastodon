@@ -144,6 +144,8 @@ export class CN_data_participant extends CN_base_action {
    * Extend parent method
    */
   async on_load() {
+    await super.on_load();
+
     const response = await CN_api.get("participant_data", {
       identifier: this.get_model().get_identifier(),
       select: {
@@ -408,6 +410,7 @@ export class CN_import_participant extends CN_base_action {
    * Extend parent method
    */
   async on_load() {
+    await super.on_load();
     const [
       source_response,
       cohort_response,

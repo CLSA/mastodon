@@ -35,7 +35,7 @@ export class CN_model_general_proxy_form_entry extends CN_model_base_form_entry 
             proxy_street_number: { title: "Street Number" },
             proxy_street_name: { title: "Street Name" },
             proxy_box: { title: "Box", type: "integer", help: "Include numbers only." },
-            proxy_rural_route: { title: "Rural Route", type: "float", help: "Include numbers only." },
+            proxy_rural_route: { title: "Rural Route", type: "integer", help: "Include numbers only." },
             proxy_address_other: { title: "Address Other" },
             proxy_city: { title: "City" },
             proxy_region_id: {

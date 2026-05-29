@@ -36,12 +36,12 @@ export class CN_model_base_form extends CN_base_model {
       entry_total: {
         column: `${form_type}_form_total.entry_total`,
         title: "Entries",
-        type: "number",
+        type: "integer",
       },
       submitted_total: {
         column: `${form_type}_form_total.submitted_total`,
         title: "Submitted Entries",
-        type: "number",
+        type: "integer",
       },
       date: { title: "Date", type: "date" },
     };

@@ -80,6 +80,7 @@ export class CN_release_application extends CN_base_action {
    * Extend parent method
    */
   async on_load() {
+    await super.on_load();
     const model = this.get_model();
 
     // reset the list and confirm components
