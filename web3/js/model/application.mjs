@@ -142,7 +142,7 @@ export class CN_release_application extends CN_base_action {
       const summary_el = confirm_el.querySelector("div.card-body");
       summary_el.innerHTML = "";
       if (this.#participant_selection.get_identifier_list().length) {
-        confirm_el.className.remove("d-none");
+        confirm_el.classList.remove("d-none");
 
         let first = true;
         const site_list = this.#participant_selection.get_site_list();
@@ -163,7 +163,7 @@ export class CN_release_application extends CN_base_action {
           first = false;
         }
       } else {
-        confirm_el.className.add("d-none");
+        confirm_el.classList.add("d-none");
       }
     });
 
