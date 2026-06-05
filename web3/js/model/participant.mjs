@@ -17,8 +17,8 @@ export class CN_list_participant extends base_list_class {
   /**
    * Extends the parent method
    */
-  create_footer_element() {
-    const footer_el = super.create_footer_element();
+  _create_footer_element() {
+    const footer_el = super._create_footer_element();
 
     if ("participant" == CN_session.get_leaf_model().get_name()) {
       const multiedit_btn_el = this.constructor.html(
@@ -67,8 +67,8 @@ export class CN_view_participant extends base_view_class {
   /**
    * Extend parent method
    */
-  create_footer_element() {
-    const footer_el = super.create_footer_element();
+  _create_footer_element() {
+    const footer_el = super._create_footer_element();
     const left_btn_group_el = footer_el.querySelector("div[name=left-btn-group]");
 
     const participant_data_module = CN_session.get_module("participant_data");
@@ -91,8 +91,8 @@ export class CN_view_participant extends base_view_class {
   /**
    * Extend parent method
    */
-  async on_load() {
-    await super.on_load();
+  update_element() {
+    super.update_element();
 
     const data_btn_el = this.get_footer_element().querySelector("button[name=data]");
     if (data_btn_el) {
@@ -277,7 +277,7 @@ export class CN_data_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_body_element() {
+  _create_body_element() {
     return this.constructor.html(`
       <div>
         <div class="text-info-emphasis pb-2">
@@ -291,7 +291,7 @@ export class CN_data_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_footer_element() {
+  _create_footer_element() {
     const footer_el = this.constructor.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Participant</button>
@@ -505,7 +505,7 @@ export class CN_import_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_body_element() {
+  _create_body_element() {
     const body_el = this.constructor.html(`
       <div>
         <div class="m-2 text-info-emphasis">
@@ -802,7 +802,7 @@ export class CN_import_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_footer_element() {
+  _create_footer_element() {
     const footer_el = this.constructor.html(`
       <div class="d-flex w-100">
         <div class="me-auto btn-group" role="group" name="right-btn-group"></div>
@@ -1004,7 +1004,7 @@ export class CN_release_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_body_element() {
+  _create_body_element() {
     return this.constructor.html(`
       <div>
         <div class="text-info-emphasis pb-2">
@@ -1034,7 +1034,7 @@ export class CN_release_participant extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_footer_element() {
+  _create_footer_element() {
     const footer_el = this.constructor.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Participant</button>

@@ -13,25 +13,34 @@ const classes = await import(`${CENOZO_URL}/js/model/application.mjs`);
 const base_view_class = classes.CN_view_application ? classes.CN_view_application : CN_action_view;
 export class CN_view_application extends base_view_class {
   /**
-   * Add extra operations to the footer
+   * Extend parent method
    */
-  create_footer_element() {
-    const footer_el = super.create_footer_element();
-
+  update_element() {
     if (
       this.get_model().get_module().action_allowed("release") &&
       this.get_property_value("release_based")
     ) {
-      const release_btn_el = this.constructor.html(`
-        <button name="release" type="button" class="btn btn-light btn-outline-primary">
-          Manage Participants
-        </button>
-      `);
-      release_btn_el.addEventListener("click", async () => {
-        await CN_session.navigate_to(`application/release/${this.get_model().get_identifier()}`);
-      });
-      footer_el.append(release_btn_el);
+      this.get_footer_element().querySelector("button[name=release]").classList.remove("d-none");
+    } else {
+      this.get_footer_element().querySelector("button[name=release]").classList.add("d-none");
     }
+  }
+
+  /**
+   * Extend parent method
+   */
+  _create_footer_element() {
+    const footer_el = super._create_footer_element();
+
+    const release_btn_el = this.constructor.html(`
+      <button name="release" type="button" class="btn btn-light btn-outline-primary d-none">
+        Manage Participants
+      </button>
+    `);
+    release_btn_el.addEventListener("click", async () => {
+      await CN_session.navigate_to(`application/release/${this.get_model().get_identifier()}`);
+    });
+    footer_el.append(release_btn_el);
 
     return footer_el;
   }
@@ -39,6 +48,7 @@ export class CN_view_application extends base_view_class {
 
 export class CN_release_application extends CN_base_action {
   #application = null;
+  #site_list = [];
   #participant_selection = new CN_element_participant_selection(null, {
     data: {
       mode: "unreleased_only",
@@ -59,10 +69,12 @@ export class CN_release_application extends CN_base_action {
    */
   async get_text(type) {
     if ("crumb" == type) {
+      await this.after_first_load();
       return `${this.#application.title} Release`;
     }
 
     if ("header" == type) {
+      await this.after_first_load();
       return `Participant Management for ${this.#application.title}`;
     }
 
@@ -79,43 +91,62 @@ export class CN_release_application extends CN_base_action {
   /**
    * Extend parent method
    */
-  async on_load() {
-    await super.on_load();
-    const model = this.get_model();
-
-    // reset the list and confirm components
-    await this.#participant_selection.reset();
-
-    // load the application details and site list
-    this.#application = await CN_api.get(`application/${model.get_identifier()}`);
+  update_element() {
+    super.update_element();
 
     // populate the preferred site selection list
     const preferred_site_el = this.get_body_element().querySelector("#preferred_site_id");
     preferred_site_el.replaceChildren(this.constructor.html(
       '<option value="null" selected>No Preferred Site</option>'
     ));
-    const site_list = await CN_api.get(
-      `${model.get_view_url(null, "api")}/site`,
-      { select: { column: ['id', 'name'] } }
-    );
-    site_list.forEach(site => {
+    this.#site_list.forEach(site => {
       preferred_site_el.append(this.constructor.html(`<option value="${site.id}">${site.name}</option>`));
     });
+
+    // update the body text
+    if (this.#application) {
+      this.get_body_element().querySelector("div[name=instructions]").replaceChildren(this.constructor.html(`
+        <div class="pb-2">
+          This utility allows you to release a batch of participants to, or update their preferred site for
+          ${this.#application.title}.  In order to do either you must first select which participants to affect.
+          This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
+          included in the operation, then confirm that list to ensure each of the identifiers can be linked
+          to a participant.
+        </div>
+      `));
+    }
   }
 
   /**
    * Extend parent method
    */
-  create_body_element() {
+  async on_load() {
+    await super.on_load();
+
+    const [reset_response, application_response, site_list_response] = await Promise.all([
+      // reset the list and confirm components
+      this.#participant_selection.reset(),
+
+      // load the application details and site list
+      CN_api.get(`application/${this.get_model().get_identifier()}`),
+
+      CN_api.get(
+        `${this.get_model().get_view_url(null, "api")}/site`,
+        { select: { column: ['id', 'name'] } }
+      ),
+    ]);
+
+    this.#application = application_response;
+    this.#site_list = site_list_response;
+  }
+
+  /**
+   * Extend parent method
+   */
+  _create_body_element() {
     const body_el = this.constructor.html(`
       <div class="container-fluid text-info-emphasis">
-        <div class="pb-2">
-          This utility allows you to release a batch of participants to, or update their preferred site for
-          Sabretooth F2.  In order to do either you must first select which participants to affect.
-          This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
-          included in the operation, then confirm that list to ensure each of the identifiers can be linked
-          to a participant.
-        </div>
+        <div name="instructions" class="pb-2"></div>
         <div class="pb-2">
           Once you have confirmed the list of participant identifiers you will be presented with a summary
           of how many participants belong to which sites, broken down by cohort.
@@ -216,7 +247,7 @@ export class CN_release_application extends CN_base_action {
   /**
    * Extend parent method
    */
-  create_footer_element() {
+  _create_footer_element() {
     const footer_el = this.constructor.html(`
       <div class="btn-group" role="group">
         <button name="back" type="button" class="btn btn-primary">View Application</button>
