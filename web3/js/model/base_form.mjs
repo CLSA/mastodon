@@ -60,12 +60,16 @@ export class CN_model_base_form extends CN_base_model {
           meta: {}, // predefined by the service
           title: "Status",
           is_constant: () => true,
-          help:
-            'Set to "completed" when done, ' +
-            '"invalid" when marked invalid, ' +
-            '"adjudication" when two entries have been submitted but do not match, ' +
-            '"started" when there are less than two entries submitted and ' +
-            '"new" when no entries have been submitted.',
+          help: `
+            Set to one of the following:<br/>
+            <ul>
+              <li>"completed" when done</li>
+              <li>"invalid" when marked invalid</li>
+              <li>"adjudication" when two entries have been submitted but do not match</li>
+              <li>"started" when there are less than two entries submitted</li>
+              <li>"new" when no entries have been submitted</li>
+            </ul>
+          `,
         },
         completed: { title: "Complete", type: "boolean", is_constant: () => true },
         invalid: { title: "Invalid", type: "boolean" },

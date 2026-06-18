@@ -790,7 +790,7 @@ export class CN_import_participant extends CN_base_action {
       file: { encoding: "text", mime_type: "text/csv" },
       on_change: async (form_input) => {
         const csv_file = await CN_common.convert_from_blob("text", form_input.get_value()[0]);
-        this.#file_form_input.set_value(null);
+        await this.#file_form_input.set_value(null);
         await this.#import_csv_data(CN_common.parse_csv(csv_file));
       },
     });
@@ -922,12 +922,14 @@ export class CN_release_participant extends CN_base_action {
     });
 
     // get the site list for all applications in parallel
-    await Promise.all(this.#application_list.map(application => (async () => {
-      application.site_list = await CN_api.get(`application/${application.id}/site`, {
-        select: { column: "name" },
-        modifier: { order: "name" },
-      });
-    })()));
+    await Promise.all(
+      this.#application_list.map(application => (async () => {
+        application.site_list = await CN_api.get(`application/${application.id}/site`, {
+          select: { column: "name" },
+          modifier: { order: "name" },
+        });
+      })())
+    );
   }
 
   /**

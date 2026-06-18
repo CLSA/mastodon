@@ -16,6 +16,8 @@ export class CN_view_application extends base_view_class {
    * Extend parent method
    */
   update_element() {
+    super.update_element();
+
     if (
       this.get_model().get_module().action_allowed("release") &&
       this.get_property_value("release_based")
