@@ -832,8 +832,8 @@ export class CN_import_participant extends CN_base_action {
 
     if (0 == header.filter(col => null != col).length) {
       await CN_modal_message.create_and_open({
+        header_class: "text-bg-danger",
         title: "Unable to Parse File",
-        type: "danger",
         message: `
           <div class="pb-2">There were no valid columns in the first line of the file.</div>
           <div>
