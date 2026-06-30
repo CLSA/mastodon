@@ -22,7 +22,7 @@ export class CN_list_participant extends base_list_class {
 
     if ("participant" == CN_session.get_leaf_model().get_name()) {
       const multiedit_btn_el = this.constructor.html(
-        '<button name="multiedit" class="btn btn-light btn-outline-primary">Multi-Edit</button>'
+        '<button type="button" name="multiedit" class="btn btn-light btn-outline-primary">Multi-Edit</button>'
       );
       multiedit_btn_el.addEventListener("click", () => {
         CN_session.navigate_to("participant/multiedit");
@@ -31,7 +31,7 @@ export class CN_list_participant extends base_list_class {
 
       if (this.get_model().get_module().action_allowed("import")) {
         const import_btn_el = this.constructor.html(
-          '<button name="import" class="btn btn-light btn-outline-primary">Import</button>'
+          '<button type="button" name="import" class="btn btn-light btn-outline-primary">Import</button>'
         );
         import_btn_el.addEventListener("click", () => {
           CN_session.navigate_to("participant/import");
@@ -40,7 +40,7 @@ export class CN_list_participant extends base_list_class {
       }
 
       const export_btn_el = this.constructor.html(
-        '<button name="export" class="btn btn-light btn-outline-primary">Export</button>'
+        '<button type="button" name="export" class="btn btn-light btn-outline-primary">Export</button>'
       );
       export_btn_el.addEventListener("click", () => {
         CN_session.navigate_to("export/list");
@@ -242,7 +242,7 @@ export class CN_data_participant extends CN_base_action {
         tab_el.append(category_el);
         category.data_list.forEach(item => {
           const item_el = this.constructor.html(
-            `<button class="btn btn-outline-primary w-100" type="button" >${item.name}</button>`
+            `<button class="btn btn-outline-primary w-100" type="button">${item.name}</button>`
           );
 
           if (item.available) {
@@ -957,7 +957,7 @@ export class CN_release_participant extends CN_base_action {
       if (application.release_based) {
         if (null == application.datetime) {
           const release_btn_el = this.constructor.html(
-            '<button class="btn btn-outline-primary w-75">Release Now</button>'
+            '<button type="button" class="btn btn-outline-primary w-75">Release Now</button>'
           );
           release_btn_el.addEventListener("click", async () => {
             this.constructor.set_disabled(release_btn_el, true);
@@ -968,8 +968,8 @@ export class CN_release_participant extends CN_base_action {
                   Number(this.get_model().get_identifier()),
                 );
                 release_btn_el.remove();
-                application.datetime = CN_common.format_datetime(new Date, "record");
-                released_el.innerHTML = CN_common.format_datetime(new Date, "datetime");
+                application.datetime = CN_common.format_datetime(CN_common.get_date(), "record");
+                released_el.innerHTML = CN_common.format_datetime(CN_common.get_date(), "datetime");
               });
             } finally {
               this.constructor.set_disabled(release_btn_el, false);
