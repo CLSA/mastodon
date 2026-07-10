@@ -33,6 +33,7 @@ class ui3 extends \cenozo\ui\ui3
       if( 2 <= $db_role->tier ) $module->add_action( 'release', '/{identifier}' );
       if( in_array( $db_role->name, ['administrator', 'curator'] ) )
         $module->add_action( 'data', '/{identifier}?{study_phase_id}' );
+      $module->add_child( 'study_phase_status' );
     }
 
     if( array_key_exists( 'user', $data['module_list'] ) )
@@ -161,6 +162,7 @@ class ui3 extends \cenozo\ui\ui3
     {
       $module = $data['module_list']['study_phase'];
       $module->add_child( 'participant_data' );
+      $module->add_child( 'study_phase_status' );
     }
 
     // remove all parent list and utilities for typists
@@ -183,6 +185,7 @@ class ui3 extends \cenozo\ui\ui3
       ['subject' => 'proxy_form', 'title' => 'Proxy Forms'],
       ['subject' => 'dm_consent_form', 'title' => 'Proxy DM Forms'],
       ['subject' => 'ip_consent_form', 'title' => 'Proxy IP Forms'],
+      ['subject' => 'study', 'title' => 'Studies'],
     ];
 
     if( 'typist' == $db_role->name )

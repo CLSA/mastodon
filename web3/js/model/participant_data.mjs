@@ -10,11 +10,8 @@ export class CN_model_participant_data extends CN_base_model {
         posessive: "participant data's",
       },
       columns: {
-        full_study_phase: {
-          column: "CONCAT(study.name, ': ', study_phase.name)",
-          title: "Study & Phase Name",
-          table_prefix: false,
-        },
+        study: { column: "study.name", title: "Study" },
+        study_phase: { column: "study_phase.name", title: "Phase" },
         category: { title: "Category" },
         name: { title: "Name" },
       },
