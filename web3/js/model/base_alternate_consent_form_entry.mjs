@@ -23,8 +23,7 @@ export class CN_model_base_alternate_consent_form_entry extends CN_model_base_fo
                 // NOTE: this is a special typeahead that can't be pulled from the alternate model because it
                 // references this model's participant_id property
                 get_list: async (value, form_input) => {
-                  const participant_id =
-                    await form_input.get_action().get_property_value_for_record("participant_id");
+                  const participant_id = form_input.get_action().get_property_value_for_record("participant_id");
                   return (
                     !participant_id ?
                     [] :

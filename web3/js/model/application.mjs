@@ -71,12 +71,10 @@ export class CN_release_application extends CN_base_action {
    */
   async get_text(type) {
     if ("crumb" == type) {
-      await this.after_first_load();
       return `${this.#application.title} Release`;
     }
 
     if ("header" == type) {
-      await this.after_first_load();
       return `Participant Management for ${this.#application.title}`;
     }
 

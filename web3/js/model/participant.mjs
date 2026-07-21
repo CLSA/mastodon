@@ -992,7 +992,7 @@ export class CN_release_participant extends CN_base_action {
           try {
             await CN_api.patch(this.get_model().get_view_url(null, "api"), {
               application_id: application.id,
-              preferred_site_id: await form_input.get_value_for_record(),
+              preferred_site_id: form_input.get_value_for_record(),
             });
           } finally {
             form_input.set_disabled(false);
