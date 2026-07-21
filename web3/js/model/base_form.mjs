@@ -402,12 +402,10 @@ export class CN_adjudicate_base_form extends CN_base_action {
     const btn_el_list = Array.from(this.get_body_element().querySelectorAll("button"));
     btn_el_list.forEach(el => this.constructor.set_disabled(el, true));
     try {
-      await this.constructor.wait_for(async () => {
-        await CN_api.patch(
-          this.get_model().get_view_url(null, "api"),
-          { adjudicate: this.#entries[index].id }
-        );
-      });
+      await this.constructor.wait_for(CN_api.patch(
+        this.get_model().get_view_url(null, "api"),
+        { adjudicate: this.#entries[index].id },
+      ));
     } catch (error) {
       // convert newlines in error message to line breaks
       error.message = CN_common.nl_to_br(error.message);

@@ -963,15 +963,13 @@ export class CN_release_participant extends CN_base_action {
           release_btn_el.addEventListener("click", async () => {
             this.constructor.set_disabled(release_btn_el, true);
             try {
-              await this.constructor.wait_for(async () => {
-                await CN_api.post(
-                  `application/${application.id}/participant`,
-                  Number(this.get_model().get_identifier()),
-                );
-                release_btn_el.remove();
-                application.datetime = CN_common.format_datetime(CN_common.get_date(), "record");
-                released_el.innerHTML = CN_common.format_datetime(CN_common.get_date(), "datetime");
-              });
+              await this.constructor.wait_for(CN_api.post(
+                `application/${application.id}/participant`,
+                Number(this.get_model().get_identifier()),
+              ));
+              release_btn_el.remove();
+              application.datetime = CN_common.format_datetime(CN_common.get_date(), "record");
+              released_el.innerHTML = CN_common.format_datetime(CN_common.get_date(), "datetime");
             } finally {
               this.constructor.set_disabled(release_btn_el, false);
             }
