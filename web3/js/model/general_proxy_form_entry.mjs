@@ -50,22 +50,22 @@ export class CN_model_general_proxy_form_entry extends CN_model_base_form_entry 
                 } },
                 modifier: { order: ["country.name", "region.name"] },
               },
-              is_hidden: (model) => (
-                model.get_action().get_property_value("proxy_address_international")
+              is_hidden: () => (
+                this.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_international_region: {
               title: "International Region",
-              is_hidden: (model) => (
-                !model.get_action().get_property_value("proxy_address_international")
+              is_hidden: () => (
+                !this.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_international_country_id: {
               title: "International Country",
               type: "typeahead",
               typeahead: CN_model_country.get_typeahead(),
-              is_hidden: (model) => (
-                !model.get_action().get_property_value("proxy_address_international")
+              is_hidden: () => (
+                !this.get_action().get_property_value("proxy_address_international")
               ),
             },
             proxy_postcode: {
@@ -119,22 +119,22 @@ export class CN_model_general_proxy_form_entry extends CN_model_base_form_entry 
                 } },
                 modifier: { order: ["country.name", "region.name"] },
               },
-              is_hidden: (model) => (
-                model.get_action().get_property_value("informant_address_international")
+              is_hidden: () => (
+                this.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_international_region: {
               title: "International Region",
-              is_hidden: (model) => (
-                !model.get_action().get_property_value("informant_address_international")
+              is_hidden: () => (
+                !this.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_international_country_id: {
               title: "International Country",
               type: "typeahead",
               typeahead: CN_model_country.get_typeahead(),
-              is_hidden: (model) => (
-                !model.get_action().get_property_value("informant_address_international")
+              is_hidden: () => (
+                !this.get_action().get_property_value("informant_address_international")
               ),
             },
             informant_postcode: {

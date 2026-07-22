@@ -194,6 +194,8 @@ export class CN_data_participant extends CN_base_action {
    * Extend parent method
    */
   update_element() {
+    super.update_element();
+
     const data_categories_el = this.get_body_element().querySelector("[name=data-categories]");
 
     // show the details in this.#study_phase_data

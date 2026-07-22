@@ -18,7 +18,7 @@ export class CN_model_participant_data_template extends CN_base_model {
         participant_data_name: {
           title: "Participant Data",
           type: "string",
-          is_hidden: (model) => "add" == model.get_action_name(),
+          is_hidden: () => "add" == this.get_action_name(),
           is_constant: () => true,
         },
         rank: { title: "Rank", type: "rank" },
@@ -41,7 +41,7 @@ export class CN_model_participant_data_template extends CN_base_model {
           title: "File",
           type: "base64",
           mime_type: "application/pdf",
-          get_filename: async (action) => action.get_property_value("opal_view") + ".pdf",
+          get_filename: async () => this.get_action().get_property_value("opal_view") + ".pdf",
         },
       },
     });
