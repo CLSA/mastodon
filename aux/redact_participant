@@ -1,0 +1,434 @@
+#!/usr/bin/php
+<?php
+/**
+ * This is a script that removes a participant's identifying information from the database
+ * 
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+ini_set( 'display_errors', '1' );
+error_reporting( E_ALL | E_STRICT );
+ini_set( 'date.timezone', 'US/Eastern' );
+define( 'DEBUG', false );
+
+// utility functions
+function out( $msg ) { print( $msg."\n" ); }
+function error( $msg ) { out( sprintf( 'ERROR: %s', $msg ) ); die(); }
+
+class redact
+{
+  /**
+   * Reads the framework and application settings
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   */
+  public function read_settings()
+  {
+    // include the initialization settings
+    global $SETTINGS;
+    $base_dir = getcwd();
+    require_once $base_dir.'/settings.ini.php';
+    require_once $base_dir.'/settings.local.ini.php';
+    require_once $SETTINGS['path']['CENOZO'].'/src/initial.class.php';
+    $initial = new \cenozo\initial( true );
+    $this->settings = $initial->get_settings();
+  }
+
+  public function connect_database()
+  {
+    $server = $this->settings['db']['server'];
+    $username = $this->settings['db']['username'];
+    $password = $this->settings['db']['password'];
+    $name = $this->settings['db']['database_prefix'] . $this->settings['general']['instance_name'];
+    $this->db = new \mysqli( $server, $username, $password, $name );
+    if( $this->db->connect_error ) error( $this->db->connect_error );
+  }
+
+  public function query( $sql )
+  {
+    if( DEBUG && preg_match( '/DELETE|UPDATE/', $sql ) )
+    {
+      out( sprintf( "\n%s;\n", $sql ) );
+      return NULL;
+    }
+    else
+    {
+      $result = $this->db->query( $sql );
+      if( false === $result ) error( $this->db->error );
+      return $result;
+    }
+  }
+
+  public function execute( $uid, $remove_postal_code )
+  {
+    out( 'Reading configuration parameters' );
+    $this->read_settings();
+
+    out( 'Connecting to database' );
+    $this->connect_database();
+
+    $cenozo_db = sprintf(
+      '%s%s',
+      $this->settings['db']['database_prefix'],
+      $this->settings['general']['framework_name']
+    );
+
+    $participant_result = $this->query( "SELECT id FROM {$cenozo_db}.participant WHERE uid = '{$uid}'" );
+
+    $participant_row = $participant_result->fetch_assoc();
+    if( is_null( $participant_row ) ) error( sprintf( 'Participant UID "%s" not found', $uid ) );
+    $participant_id = $participant_row["id"];
+    out( sprintf( "Redacting participant UID %s:", $uid ) );
+
+    $this->query( <<<SQL
+      UPDATE {$cenozo_db}.participant SET
+        honorific = "(redacted)",
+        first_name = "(redacted)",
+        other_name = "(redacted)",
+        last_name = "(redacted)",
+        gender_identity = IF( "male" = sex, "man", "woman" ),
+        pronouns = NULL,
+        date_of_birth = NULL,
+        date_of_death_accuracy = NULL,
+        date_of_death_ministry = NULL,
+        date_of_death = NULL,
+        callback = NULL,
+        email = NULL,
+        email_datetime = NULL,
+        email_old = NULL,
+        email2 = NULL,
+        email2_datetime = NULL,
+        email2_old = NULL,
+        low_education = 0,
+        global_note = NULL
+      WHERE id = $participant_id
+    SQL );
+    out( '  ...participant record redacted' );
+
+    $this->query( <<<SQL
+      UPDATE {$cenozo_db}.address SET
+        address1 = "(redacted)",
+        address2 = "(redacted)",
+        city = "(redacted)",
+        note = NULL
+      WHERE participant_id = $participant_id
+    SQL );
+
+    if( $remove_postal_code )
+    {
+      $this->query( <<<SQL
+        UPDATE {$cenozo_db}.address SET
+          region_id = NULL,
+          postcode = NULL,
+          international_region = NULL,
+          international_country_id = NULL
+        WHERE participant_id = $participant_id
+      SQL );
+    }
+    out( '  ...address records redacted' );
+
+    $this->query( <<<SQL
+      UPDATE {$cenozo_db}.phone SET
+        number = "(redacted)",
+        note = NULL
+      WHERE participant_id = $participant_id
+    SQL );
+    out( '  ...phone records redacted' );
+
+    $this->query( "DELETE FROM {$cenozo_db}.mail WHERE participant_id = $participant_id" );
+    out( '  ...email records deleted' );
+
+    $this->query( "DELETE FROM {$cenozo_db}.search_result WHERE participant_id = $participant_id" );
+    out( '  ...search_result records deleted' );
+
+    $this->query( "UPDATE {$cenozo_db}.consent SET note = NULL WHERE participant_id = $participant_id" );
+    $this->query( "UPDATE {$cenozo_db}.hold SET note = NULL WHERE participant_id = $participant_id" );
+    $this->query( "UPDATE {$cenozo_db}.proxy SET note = NULL WHERE participant_id = $participant_id" );
+    $this->query( "UPDATE {$cenozo_db}.trace SET note = NULL WHERE participant_id = $participant_id" );
+    $this->query( "UPDATE {$cenozo_db}.equipment_loan SET note = NULL WHERE participant_id = $participant_id" );
+    $this->query( "DELETE FROM {$cenozo_db}.note WHERE participant_id = $participant_id" );
+    out( '  ...notes and note records deleted' );
+
+    $this->query( "DELETE FROM {$cenozo_db}.hin WHERE participant_id = $participant_id" );
+    out( '  ...HIN records deleted' );
+
+    $this->query( <<<SQL
+      DELETE FROM {$cenozo_db}.event_address WHERE event_id IN (
+        SELECT id FROM {$cenozo_db}.event WHERE participant_id = $participant_id
+      )
+    SQL );
+    out( '  ...event-address records deleted' );
+
+    $form_number = 1;
+    $form_result = $this->query( "SELECT id FROM {$cenozo_db}.form WHERE participant_id = $participant_id" );
+    while( $form_row = $form_result->fetch_assoc() )
+    {
+      $form_id = $form_row['id'];
+
+      $form_type_list = [
+        'consent',
+        'contact',
+        'dm_consent',
+        'extended_hin',
+        'general_proxy',
+        'hin',
+        'ip_consent',
+        'proxy'
+      ];
+      foreach( $form_type_list as $form_type )
+      {
+        $this->query( <<<SQL
+          UPDATE {$form_type}_form
+          SET validated_{$form_type}_form_entry_id = NULL
+          WHERE form_id = $form_id
+        SQL );
+        $this->query( <<<SQL
+          DELETE FROM {$form_type}_form_entry
+          WHERE {$form_type}_form_id IN ( SELECT id FROM {$form_type}_form WHERE form_id = $form_id )
+        SQL );
+        $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
+        $this->query( "DELETE FROM {$cenozo_db}.form WHERE id = $form_id" );
+      }
+
+      out( sprintf( '  ...form #%d deleted', $form_number ) );
+      $form_number++;
+    }
+
+    $orphan_form_number = 1;
+    $form_type_list = [
+      'consent',
+      'dm_consent',
+      'extended_hin',
+      'general_proxy',
+      'hin',
+      'ip_consent',
+      'proxy'
+    ];
+    foreach( $form_type_list as $form_type )
+    {
+      $form_result = $this->query( <<<SQL
+        SELECT DISTINCT {$form_type}_form_id AS id
+        FROM {$form_type}_form_entry
+        WHERE {$form_type}_form_entry.participant_id = $participant_id
+      SQL );
+      while( $form_row = $form_result->fetch_assoc() )
+      {
+        $form_id = $form_row['id'];
+
+        $this->query( <<<SQL
+          UPDATE {$form_type}_form
+          SET validated_{$form_type}_form_entry_id = NULL
+          WHERE id = $form_id
+        SQL );
+        $this->query( "DELETE FROM {$form_type}_form_entry WHERE {$form_type}_form_id = $form_id" );
+        $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
+
+        out( sprintf( '  ...orphan form #%d deleted', $orphan_form_number ) );
+        $orphan_form_number++; 
+      }
+    }
+
+    $application_result = $this->query( <<<SQL
+      SELECT application.name
+      FROM {$cenozo_db}.application
+      JOIN {$cenozo_db}.application_type ON application.application_type_id = application_type.id
+      WHERE application_type.name = "beartooth"
+    SQL );
+    while( $application_row = $application_result->fetch_assoc() )
+    {
+      $app_name = $application_row['name'];
+      $beartooth_db = sprintf(
+        '%s%s',
+        $this->settings['db']['database_prefix'],
+        $app_name
+      );
+
+      $this->query( "UPDATE {$beartooth_db}.interview SET note = NULL WHERE participant_id = $participant_id" );
+    }
+    out( "  ...Beartooth interview notes deleted" );
+
+    $application_result = $this->query( <<<SQL
+      SELECT application.name
+      FROM {$cenozo_db}.application
+      JOIN {$cenozo_db}.application_type ON application.application_type_id = application_type.id
+      WHERE application_type.name = "sabretooth"
+    SQL );
+    while( $application_row = $application_result->fetch_assoc() )
+    {
+      $app_name = $application_row['name'];
+      $sabretooth_db = sprintf(
+        '%s%s',
+        $this->settings['db']['database_prefix'],
+        $app_name
+      );
+
+      $this->query( "UPDATE {$sabretooth_db}.interview SET note = NULL WHERE participant_id = $participant_id" );
+    }
+    out( "  ...Sabretooth interview notes deleted" );
+
+    $application_result = $this->query( <<<SQL
+      SELECT application.name
+      FROM {$cenozo_db}.application
+      JOIN {$cenozo_db}.application_type ON application.application_type_id = application_type.id
+      WHERE application_type.name = "pine"
+    SQL );
+    while( $application_row = $application_result->fetch_assoc() )
+    {
+      $app_name = $application_row['name'];
+      $pine_db = sprintf(
+        '%s%s',
+        $this->settings['db']['database_prefix'],
+        $app_name
+      );
+
+      $this->query( <<<SQL
+        UPDATE {$pine_db}.response_attribute
+        JOIN {$pine_db}.attribute ON response_attribute.attribute_id = attribute.id
+        JOIN {$pine_db}.response ON response_attribute.response_id = response.id
+        JOIN {$pine_db}.respondent on response.respondent_id = respondent.id
+        SET value = "(redacted)"
+        WHERE (
+          attribute.code LIKE "%honorific%" OR
+          attribute.code LIKE "%first_name%" OR
+          attribute.code LIKE "%other_name%" OR
+          attribute.code LIKE "%last_name%" OR
+          attribute.code LIKE "%gender_identity%" OR
+          attribute.code LIKE "%pronouns%" OR
+          attribute.code LIKE "%date_of_birth%" OR
+          attribute.code LIKE "%date_of_death%" OR
+          attribute.code LIKE "%callback%" OR
+          attribute.code LIKE "%email%" OR
+          attribute.code LIKE "%low_education%" OR
+          attribute.code LIKE "%note%" OR
+          attribute.code LIKE "%address1%" OR
+          attribute.code LIKE "%address2%" OR
+          attribute.code LIKE "%city%" OR
+          attribute.code LIKE "%region%" OR
+          attribute.code LIKE "%postcode%" OR
+          attribute.code LIKE "%number%" OR
+          attribute.code LIKE "%association%"
+        )
+        AND respondent.participant_id = $participant_id
+      SQL );
+    }
+    out( "  ...Pine identifying attributes redacted" );
+
+    $alternate_number = 1;
+    $alternate_result = $this->query( <<<SQL
+      SELECT id FROM {$cenozo_db}.alternate
+      WHERE participant_id = $participant_id
+    SQL );
+    while( $alternate_row = $alternate_result->fetch_assoc() )
+    {
+      $alternate_id = $alternate_row['id'];
+      out( sprintf( 'Redacting alternate #%d:', $alternate_number ) );
+
+      $this->query( <<<SQL
+        UPDATE {$cenozo_db}.alternate SET
+          first_name = "(redacted)",
+          last_name = "(redacted)",
+          association = NULL,
+          email = NULL,
+          email_datetime = NULL,
+          email_old = NULL,
+          email2 = NULL,
+          email2_datetime = NULL,
+          email2_old = NULL,
+          global_note = NULL
+        WHERE id = $alternate_id
+      SQL );
+      
+      out( '  ...alternate record redacted' );
+
+      $this->query( <<<SQL
+        DELETE FROM {$cenozo_db}.alternate_has_alternate_type
+        WHERE alternate_id = $alternate_id
+      SQL );
+      
+      out( '  ...alternate relationships deleted' );
+
+      $this->query( <<<SQL
+        UPDATE {$cenozo_db}.address SET
+          address1 = "(redacted)",
+          address2 = "(redacted)",
+          city = "(redacted)",
+          region_id = NULL,
+          postcode = NULL,
+          international_region = NULL,
+          international_country_id = NULL,
+          note = NULL
+        WHERE alternate_id = $alternate_id
+      SQL );
+
+      out( '  ...address records redacted' );
+
+      $this->query( <<<SQL
+        UPDATE {$cenozo_db}.phone SET
+          number = "(redacted)",
+          note = NULL
+        WHERE alternate_id = $alternate_id
+      SQL );
+
+      out( '  ...phone records redacted' );
+
+      $this->query( "UPDATE {$cenozo_db}.alternate_consent SET note = NULL WHERE alternate_id = $alternate_id" );
+      $this->query( "DELETE FROM {$cenozo_db}.note WHERE alternate_id = $alternate_id" );
+
+      out( '  ...notes and note records deleted' );
+
+      $orphan_form_number = 1;
+      $form_type_list = ['dm_consent', 'ip_consent'];
+      foreach( $form_type_list as $form_type )
+      {
+        $form_result = $this->query( <<<SQL
+          SELECT DISTINCT {$form_type}_form_id AS id
+          FROM {$form_type}_form_entry
+          WHERE {$form_type}_form_entry.alternate_id = $alternate_id
+        SQL );
+
+        while( $form_row = $form_result->fetch_assoc() )
+        {
+          $form_id = $form_row['id'];
+
+          $this->query( <<<SQL
+            UPDATE {$form_type}_form
+            SET validated_{$form_type}_form_entry_id = NULL
+            WHERE id = $form_id
+          SQL );
+          $this->query( "DELETE FROM {$form_type}_form_entry WHERE {$form_type}_form_id = $form_id" );
+          $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
+
+          out( sprintf( '  ...orphan form #%d deleted', $orphan_form_number ) );
+          $orphan_form_number++; 
+        }
+      }
+
+      $alternate_number++;
+    }
+
+    out( 'Done' );
+  }
+
+  /**
+   * Contains all initialization parameters.
+   * @var array
+   * @access private
+   */
+  private $settings = [];
+}
+
+// get the UID of the participant to redact
+if( 2 > $_SERVER['argc'] )
+{
+  out(
+    "Usage: redact_participant UID [REMOVE_POSTAL_CODE]\n" .
+    "  UID: the participant to redact (mandatory)\n" .
+    "  REMOVE_POSTAL_CODE: set to 1 if postal codes should be deleted (default is no)"
+  );
+  die();
+}
+
+if( '/aux' == substr( getcwd(), -4 ) ) chdir( '..' );
+$redact = new redact();
+$redact->execute( $argv[1], 2 < $argc && "1" == $argv[2] );
