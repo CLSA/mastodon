@@ -15,7 +15,7 @@ define( 'DEBUG', false );
 function out( $msg ) { print( $msg."\n" ); }
 function error( $msg ) { out( sprintf( 'ERROR: %s', $msg ) ); die(); }
 
-class redact
+class censor
 {
   /**
    * Reads the framework and application settings
@@ -79,14 +79,14 @@ class redact
     $participant_row = $participant_result->fetch_assoc();
     if( is_null( $participant_row ) ) error( sprintf( 'Participant UID "%s" not found', $uid ) );
     $participant_id = $participant_row["id"];
-    out( sprintf( "Redacting participant UID %s:", $uid ) );
+    out( sprintf( "Censoring participant UID %s:", $uid ) );
 
     $this->query( <<<SQL
       UPDATE {$cenozo_db}.participant SET
-        honorific = "(redacted)",
-        first_name = "(redacted)",
-        other_name = "(redacted)",
-        last_name = "(redacted)",
+        honorific = "(censored)",
+        first_name = "(censored)",
+        other_name = "(censored)",
+        last_name = "(censored)",
         gender_identity = IF( "male" = sex, "man", "woman" ),
         pronouns = NULL,
         date_of_birth = NULL,
@@ -104,13 +104,13 @@ class redact
         global_note = NULL
       WHERE id = $participant_id
     SQL );
-    out( '  ...participant record redacted' );
+    out( '  ...participant record censored' );
 
     $this->query( <<<SQL
       UPDATE {$cenozo_db}.address SET
-        address1 = "(redacted)",
-        address2 = "(redacted)",
-        city = "(redacted)",
+        address1 = "(censored)",
+        address2 = "(censored)",
+        city = "(censored)",
         note = NULL
       WHERE participant_id = $participant_id
     SQL );
@@ -126,15 +126,15 @@ class redact
         WHERE participant_id = $participant_id
       SQL );
     }
-    out( '  ...address records redacted' );
+    out( '  ...address records censored' );
 
     $this->query( <<<SQL
       UPDATE {$cenozo_db}.phone SET
-        number = "(redacted)",
+        number = "(censored)",
         note = NULL
       WHERE participant_id = $participant_id
     SQL );
-    out( '  ...phone records redacted' );
+    out( '  ...phone records censored' );
 
     $this->query( "DELETE FROM {$cenozo_db}.mail WHERE participant_id = $participant_id" );
     out( '  ...email records deleted' );
@@ -287,7 +287,7 @@ class redact
         JOIN {$pine_db}.attribute ON response_attribute.attribute_id = attribute.id
         JOIN {$pine_db}.response ON response_attribute.response_id = response.id
         JOIN {$pine_db}.respondent on response.respondent_id = respondent.id
-        SET value = "(redacted)"
+        SET value = "(censored)"
         WHERE (
           attribute.code LIKE "%honorific%" OR
           attribute.code LIKE "%first_name%" OR
@@ -312,7 +312,7 @@ class redact
         AND respondent.participant_id = $participant_id
       SQL );
     }
-    out( "  ...Pine identifying attributes redacted" );
+    out( "  ...Pine identifying attributes censored" );
 
     $alternate_number = 1;
     $alternate_result = $this->query( <<<SQL
@@ -322,12 +322,12 @@ class redact
     while( $alternate_row = $alternate_result->fetch_assoc() )
     {
       $alternate_id = $alternate_row['id'];
-      out( sprintf( 'Redacting alternate #%d:', $alternate_number ) );
+      out( sprintf( 'Censoring alternate #%d:', $alternate_number ) );
 
       $this->query( <<<SQL
         UPDATE {$cenozo_db}.alternate SET
-          first_name = "(redacted)",
-          last_name = "(redacted)",
+          first_name = "(censored)",
+          last_name = "(censored)",
           association = NULL,
           email = NULL,
           email_datetime = NULL,
@@ -339,7 +339,7 @@ class redact
         WHERE id = $alternate_id
       SQL );
       
-      out( '  ...alternate record redacted' );
+      out( '  ...alternate record censored' );
 
       $this->query( <<<SQL
         DELETE FROM {$cenozo_db}.alternate_has_alternate_type
@@ -350,9 +350,9 @@ class redact
 
       $this->query( <<<SQL
         UPDATE {$cenozo_db}.address SET
-          address1 = "(redacted)",
-          address2 = "(redacted)",
-          city = "(redacted)",
+          address1 = "(censored)",
+          address2 = "(censored)",
+          city = "(censored)",
           region_id = NULL,
           postcode = NULL,
           international_region = NULL,
@@ -361,16 +361,16 @@ class redact
         WHERE alternate_id = $alternate_id
       SQL );
 
-      out( '  ...address records redacted' );
+      out( '  ...address records censored' );
 
       $this->query( <<<SQL
         UPDATE {$cenozo_db}.phone SET
-          number = "(redacted)",
+          number = "(censored)",
           note = NULL
         WHERE alternate_id = $alternate_id
       SQL );
 
-      out( '  ...phone records redacted' );
+      out( '  ...phone records censored' );
 
       $this->query( "UPDATE {$cenozo_db}.alternate_consent SET note = NULL WHERE alternate_id = $alternate_id" );
       $this->query( "DELETE FROM {$cenozo_db}.note WHERE alternate_id = $alternate_id" );
@@ -418,17 +418,17 @@ class redact
   private $settings = [];
 }
 
-// get the UID of the participant to redact
+// get the UID of the participant to censor
 if( 2 > $_SERVER['argc'] )
 {
   out(
-    "Usage: redact_participant UID [REMOVE_POSTAL_CODE]\n" .
-    "  UID: the participant to redact (mandatory)\n" .
+    "Usage: censor_participant UID [REMOVE_POSTAL_CODE]\n" .
+    "  UID: the participant to censor (mandatory)\n" .
     "  REMOVE_POSTAL_CODE: set to 1 if postal codes should be deleted (default is no)"
   );
   die();
 }
 
 if( '/aux' == substr( getcwd(), -4 ) ) chdir( '..' );
-$redact = new redact();
-$redact->execute( $argv[1], 2 < $argc && "1" == $argv[2] );
+$censor = new censor();
+$censor->execute( $argv[1], 2 < $argc && "1" == $argv[2] );
