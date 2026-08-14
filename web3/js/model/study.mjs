@@ -6,8 +6,8 @@ export class CN_model_study extends classes.CN_model_study {
   /**
    * Extend parent method
    */
-  clone_columns() {
-    const columns = super.clone_columns();
+  async clone_columns() {
+    const columns = await super.clone_columns();
     CN_common.insert_property(columns, "after", "completed_event_type", "enable_status", {
       title: "Status Enabled",
       type: "boolean",
@@ -18,8 +18,8 @@ export class CN_model_study extends classes.CN_model_study {
   /**
    * Extend parent method
    */
-  clone_properties() {
-    const properties = super.clone_properties();
+  async clone_properties() {
+    const properties = await super.clone_properties();
     CN_common.insert_property(properties, "after", "completed_event_type_id", "enable_status", {
       title: "Enable Study Phase Status",
       type: "boolean",

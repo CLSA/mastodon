@@ -5,8 +5,8 @@ export class CN_model_export_column extends classes.CN_model_export_column {
   /**
    * Extends parent method
    */
-  clone_columns() {
-    const columns = super.clone_columns();
+  async clone_columns() {
+    const columns = await super.clone_columns();
     const filter_fn = columns.subtype.filter
     columns.subtype.filter = async (model, record) => {
       if ("site" == record.table_name) {
@@ -24,8 +24,8 @@ export class CN_model_export_column extends classes.CN_model_export_column {
   /**
    * Extends parent method
    */
-  clone_properties() {
-    const properties = super.clone_properties();
+  async clone_properties() {
+    const properties = await super.clone_properties();
     const get_enums_fn = properties.subtype.enum.get_enums;
     properties.subtype.enum.get_enums = async (form_input) => {
       const table_name = form_input.get_action().get_property_value("table_name");

@@ -4,20 +4,20 @@ export class CN_model_log_entry extends classes.CN_model_log_entry {
   /**
    * Extend parent method to add application column
    */
-  clone_properties() {
+  async clone_properties() {
     return {
       application: { meta: { table: "application", column: "title" }, title: "Application" },
-      ...super.clone_properties()
+      ...await super.clone_properties()
     };
   }
 
   /**
    * Extend parent method to add application column
    */
-  clone_columns() {
+  async clone_columns() {
     return {
       application: { column: "application.title", title: "Application" },
-      ...super.clone_columns()
+      ...await super.clone_columns()
     };
   }
 }

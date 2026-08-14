@@ -32,8 +32,8 @@ export class CN_model_participant_data extends CN_base_model {
   /**
    * Extend parent method
    */
-  configure_child(name) {
-    const child_model = super.configure_child(name);
+  async configure_child(name) {
+    const child_model = await super.configure_child(name);
     if ("cohort" == name) child_model.allow_choose = () => true; // allow choosing
     return child_model;
   }

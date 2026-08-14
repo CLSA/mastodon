@@ -122,10 +122,15 @@ export class CN_adjudicate_base_form extends CN_base_action {
   constructor(parent_el, model) {
     super("adjudicate", parent_el, model);
     this.set_footer_at_top(true);
+  }
 
+  /**
+   * Extend parent method
+   */
+  async configure() {
     // add all form groups from the entry model
     this.#property_groups = { "$main": { title: null, properties: {} } };
-    const properties = this.get_model().get_entry_model().clone_properties();
+    const properties = await this.get_model().get_entry_model().clone_properties();
     for (var prop_name in properties) {
       if ("user_id" == prop_name) continue;
       if (properties[prop_name].hasOwnProperty("properties")) {
