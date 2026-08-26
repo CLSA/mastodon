@@ -416,6 +416,12 @@ class censor
    * @access private
    */
   private $settings = [];
+
+  /**
+   * The mysqli object used to communicate with the database
+   * @var mysqli
+   */
+  private $db = NULL;
 }
 
 // get the UID of the participant to censor
