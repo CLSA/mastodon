@@ -187,7 +187,7 @@ class censor
           DELETE FROM {$form_type}_form_entry
           WHERE {$form_type}_form_id IN ( SELECT id FROM {$form_type}_form WHERE form_id = $form_id )
         SQL );
-        $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
+        $this->query( "DELETE FROM {$form_type}_form WHERE form_id = $form_id" );
         $this->query( "DELETE FROM {$cenozo_db}.form WHERE id = $form_id" );
       }
 
@@ -225,7 +225,7 @@ class censor
         $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
 
         out( sprintf( '  ...orphan form #%d deleted', $orphan_form_number ) );
-        $orphan_form_number++; 
+        $orphan_form_number++;
       }
     }
 
@@ -338,14 +338,14 @@ class censor
           global_note = NULL
         WHERE id = $alternate_id
       SQL );
-      
+
       out( '  ...alternate record censored' );
 
       $this->query( <<<SQL
         DELETE FROM {$cenozo_db}.alternate_has_alternate_type
         WHERE alternate_id = $alternate_id
       SQL );
-      
+
       out( '  ...alternate relationships deleted' );
 
       $this->query( <<<SQL
@@ -400,7 +400,7 @@ class censor
           $this->query( "DELETE FROM {$form_type}_form WHERE id = $form_id" );
 
           out( sprintf( '  ...orphan form #%d deleted', $orphan_form_number ) );
-          $orphan_form_number++; 
+          $orphan_form_number++;
         }
       }
 
