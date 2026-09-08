@@ -114,6 +114,7 @@ class censor
         note = NULL
       WHERE participant_id = $participant_id
     SQL );
+    out( '  ...address records censored' );
 
     if( $remove_postal_code )
     {
@@ -125,8 +126,8 @@ class censor
           international_country_id = NULL
         WHERE participant_id = $participant_id
       SQL );
+      out( '  ...postal codes censored' );
     }
-    out( '  ...address records censored' );
 
     $this->query( <<<SQL
       UPDATE {$cenozo_db}.phone SET
