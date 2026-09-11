@@ -2,33 +2,30 @@ const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/export_column.mjs`);
 
 export class CN_model_export_column extends classes.CN_model_export_column {
-  /**
-   * Extends parent method
-   */
+  /*
+  TODO: re-implement
+
   async clone_columns() {
     const columns = await super.clone_columns();
     const filter_fn = columns.subtype.filter
-    columns.subtype.filter = async (model, record) => {
+    columns.subtype.filter = async (value, record) => {
       if ("site" == record.table_name) {
         // the site will include the site type and application ID separated by an underscore
-        const [type, id] = record.subtype.split("_");
+        const [type, id] = value.split("_");
         const application = (await CN_api.get(`application/${id}`, { select: { column: "title" } })).title;
         return `${application} (${type})`;
       }
 
-      return await filter_fn(model, record);
+      return await filter_fn(value, record);
     };
     return columns;
   }
 
-  /**
-   * Extends parent method
-   */
   async clone_properties() {
     const properties = await super.clone_properties();
     const get_enums_fn = properties.subtype.enum.get_enums;
-    properties.subtype.enum.get_enums = async (form_input) => {
-      const table_name = form_input.get_action().get_property_value("table_name");
+    properties.subtype.enum.get_enums = async () => {
+      const table_name = this.get_action().get_property_value("table_name");
       if ("site" == table_name) {
         // the site must include the site type and application ID separated by an underscore
         const types = ["default", "effective", "preferred"];
@@ -44,8 +41,9 @@ export class CN_model_export_column extends classes.CN_model_export_column {
         }, []);
       }
 
-      return await get_enums_fn(form_input);
+      return await get_enums_fn();
     };
     return properties;
   }
+  */
 }
