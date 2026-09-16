@@ -7,7 +7,7 @@ export class CN_list_export_column extends classes.CN_list_export_column {
 
     // add the application datetime as a possible export column
     this.add_table("application", {
-      column_enum_list: [{ key: "datetime", value: "Release Datetime" }],
+      column_enum_list: [{ key: "datetime", value: "Release Datetime", type: "datetime" }],
       subtype_promise: CN_api.get("application", {
         select: { column: { column: "title", alias: "value" } },
         modifier: { order: "title" },
