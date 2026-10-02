@@ -85,7 +85,7 @@ class ui3 extends \cenozo\ui\ui3
     foreach( $this->form_type_list as $form_type )
     {
       $title = sprintf(
-        '%s Form',
+        '%s Forms',
         ucWords(
           str_replace(
             ['hin', 'dm', 'ip'],
