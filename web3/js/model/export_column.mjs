@@ -3,7 +3,7 @@ const classes = await import(`${CENOZO_URL}/js/model/export_column.mjs`);
 
 export class CN_list_export_column extends classes.CN_list_export_column {
   constructor(parent_el, model) {
-    super(parent_el, model);
+    super("list", parent_el, model);
 
     // add the application datetime as a possible export column
     this.add_table("application", {
