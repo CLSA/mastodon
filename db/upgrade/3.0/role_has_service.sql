@@ -25,6 +25,22 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SELECT "Removing DELETE/PATCH note services from helpline roles" AS "";
+
+    SET @sql = CONCAT(
+      "DELETE FROM role_has_service ",
+      "WHERE role_id = (SELECT id FROM ", @cenozo, ".role WHERE name = 'helpline') ",
+      "AND service_id IN ( ",
+        "SELECT id ",
+        "FROM service ",
+        "WHERE service.subject = 'note' ",
+        "AND service.method IN ('DELETE', 'PATCH') ",
+      ")"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 
