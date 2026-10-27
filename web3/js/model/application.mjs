@@ -71,11 +71,11 @@ export class CN_release_application extends CN_base_action {
    */
   async get_text(type) {
     if ("crumb" == type) {
-      return `${this.#application.title} Release`;
+      return `${this.#application} Release`;
     }
 
     if ("header" == type) {
-      return `Participant Management for ${this.#application.title}`;
+      return `Participant Management for ${this.#application}`;
     }
 
     return super.get_text(type);
@@ -108,7 +108,7 @@ export class CN_release_application extends CN_base_action {
       this.get_body_element().querySelector("div[name=instructions]").replaceChildren(this.constructor.html(`
         <div class="pb-2">
           This utility allows you to release a batch of participants to, or update their preferred site for
-          ${this.#application.title}.  In order to do either you must first select which participants to affect.
+          ${this.#application}.  In order to do either you must first select which participants to affect.
           This can be done typing the unique identifiers (eg: A123456) of all participants you wish to have
           included in the operation, then confirm that list to ensure each of the identifiers can be linked
           to a participant.
@@ -136,7 +136,7 @@ export class CN_release_application extends CN_base_action {
       ),
     ]);
 
-    this.#application = application_response;
+    this.#application = application_response.title;
     this.#site_list = site_list_response;
   }
 
