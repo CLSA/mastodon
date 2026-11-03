@@ -78,7 +78,7 @@ export class CN_release_application extends CN_base_action {
       return `Participant Management for ${this.#application}`;
     }
 
-    return super.get_text(type);
+    return await super.get_text(type);
   }
 
   /**

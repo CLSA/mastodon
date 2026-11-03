@@ -131,7 +131,7 @@ export class CN_data_participant extends CN_base_action {
       return `Participant data for ${data.first_name} ${data.last_name} (${data.uid})`;
     }
 
-    return super.get_text(type);
+    return await super.get_text(type);
   }
 
   /**
@@ -399,7 +399,7 @@ export class CN_import_participant extends CN_base_action {
       return "Participant Import";
     }
 
-    return super.get_text(type);
+    return await super.get_text(type);
   }
 
   /**
@@ -902,7 +902,7 @@ export class CN_release_participant extends CN_base_action {
       return `Application Management for ${data.first_name} ${data.last_name} (${data.uid})`;
     }
 
-    return super.get_text(type);
+    return await super.get_text(type);
   }
 
   /**

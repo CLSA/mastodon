@@ -155,7 +155,7 @@ export class CN_adjudicate_base_form extends CN_base_action {
       return `Adjudication for ${CN_common.uc_words(model.get_singular())} #${model.get_identifier()}`;
     }
 
-    return super.get_text(type);
+    return await super.get_text(type);
   }
 
   /**
