@@ -18,14 +18,10 @@ export class CN_view_application extends base_view_class {
   update_element() {
     super.update_element();
 
-    if (
-      this.get_model().get_module().action_allowed("release") &&
-      this.get_property_value("release_based")
-    ) {
-      this.get_footer_element().querySelector("button[name=release]").classList.remove("d-none");
-    } else {
-      this.get_footer_element().querySelector("button[name=release]").classList.add("d-none");
-    }
+    this.constructor.set_hidden(
+      this.get_footer_element().querySelector("button[name=release]"),
+      !(this.get_model().get_module().action_allowed("release") && this.get_property_value("release_based"))
+    )
   }
 
   /**
@@ -35,10 +31,11 @@ export class CN_view_application extends base_view_class {
     const footer_el = super._create_footer_element();
 
     const release_btn_el = this.constructor.html(`
-      <button name="release" type="button" class="btn btn-light btn-outline-primary d-none">
+      <button name="release" type="button" class="btn btn-light btn-outline-primary">
         Manage Participants
       </button>
     `);
+    this.constructor.hide(release_btn_el);
     release_btn_el.addEventListener("click", async () => {
       await CN_session.navigate_to(`application/release/${this.get_model().get_identifier()}`);
     });
@@ -173,7 +170,7 @@ export class CN_release_application extends CN_base_action {
       const summary_el = confirm_el.querySelector("div.card-body");
       summary_el.innerHTML = "";
       if (this.#participant_selection.get_identifier_list().length) {
-        confirm_el.classList.remove("d-none");
+        this.constructor.show(confirm_el);
 
         let first = true;
         const site_list = this.#participant_selection.get_site_list();
@@ -194,7 +191,7 @@ export class CN_release_application extends CN_base_action {
           first = false;
         }
       } else {
-        confirm_el.classList.add("d-none");
+        this.constructor.hide(confirm_el);
       }
     });
 

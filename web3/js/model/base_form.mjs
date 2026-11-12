@@ -405,7 +405,7 @@ export class CN_adjudicate_base_form extends CN_base_action {
    */
   async _adjudicate_entry(index) {
     const btn_el_list = Array.from(this.get_body_element().querySelectorAll("button"));
-    btn_el_list.forEach(el => this.constructor.set_disabled(el, true));
+    btn_el_list.forEach(el => this.constructor.disable(el));
     try {
       await this.constructor.wait_for(CN_api.patch(
         this.get_model().get_view_url(null, "api"),
@@ -416,7 +416,7 @@ export class CN_adjudicate_base_form extends CN_base_action {
       error.message = CN_common.nl_to_br(error.message);
       throw error;
     } finally {
-      btn_el_list.forEach(el => this.constructor.set_disabled(el, false));
+      btn_el_list.forEach(el => this.constructor.enable(el));
     }
     await this.on_navigate_to_parent();
   }
@@ -474,7 +474,7 @@ export class CN_view_base_form extends CN_action_view {
         class="btn btn-light btn-outline-primary"
       >Adjudicate</button>
     `);
-    this.constructor.set_disabled(adjudicate_btn_el, true);
+    this.constructor.disable(adjudicate_btn_el);
     adjudicate_btn_el.addEventListener("click", async () => {
       await CN_session.navigate_to([model.get_base_path("url"), "adjudicate", model.get_identifier()].join("/"));
     });

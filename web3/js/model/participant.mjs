@@ -77,7 +77,7 @@ export class CN_view_participant extends base_view_class {
       const data_btn_el = this.constructor.html(
         '<button name="data" type="button" class="btn btn-light btn-outline-primary">Data</button>'
       );
-      this.constructor.set_disabled(data_btn_el, true);
+      this.constructor.disable(data_btn_el);
       data_btn_el.addEventListener("click", async () => {
         await CN_session.navigate_to(
           this.get_model().get_view_url().replace(/participant\/view/, "participant/data")
@@ -265,7 +265,7 @@ export class CN_data_participant extends CN_base_action {
               });
             });
           } else {
-            this.constructor.set_disabled(item_el, true);
+            this.constructor.disable(item_el);
           }
 
           category_el.querySelector("div.btn-group-vertical").append(item_el);
@@ -455,7 +455,7 @@ export class CN_import_participant extends CN_base_action {
     body_el.querySelector("td[name=grouping]").innerHTML =
       `Can be empty or any text up to ${this.#data.grouping} characters long.`;
     if (CN_session.get("application", "use_relation")) {
-      body_el.querySelectorAll("tr[name=relation]").forEach(e => e.classList.remove("d-none"));
+      body_el.querySelectorAll("tr[name=relation]").forEach(e => this.constructor.show(e));
       body_el.querySelector("td[name=relation-type]").innerHTML = `
         Must be one of the following: <span class="fst-italic">${this.#data.relation_type}</span><br\>
         Can only be left blank if the relationship_index column is also blank.
@@ -963,7 +963,7 @@ export class CN_release_participant extends CN_base_action {
             '<button type="button" class="btn btn-outline-primary w-75">Release Now</button>'
           );
           release_btn_el.addEventListener("click", async () => {
-            this.constructor.set_disabled(release_btn_el, true);
+            this.constructor.disable(release_btn_el);
             try {
               await this.constructor.wait_for(CN_api.post(
                 `application/${application.id}/participant`,
@@ -973,7 +973,7 @@ export class CN_release_participant extends CN_base_action {
               application.datetime = CN_common.format_datetime(CN_common.get_date(), "record");
               released_el.innerHTML = CN_common.format_datetime(CN_common.get_date(), "datetime");
             } finally {
-              this.constructor.set_disabled(release_btn_el, false);
+              this.constructor.enable(release_btn_el);
             }
           });
           released_el.append(release_btn_el);
