@@ -1,5 +1,5 @@
-const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 const classes = await import(`${CENOZO_URL}/js/model/export_restriction.mjs`);
+const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
 
 export class CN_list_export_restriction extends classes.CN_list_export_restriction {
   constructor(parent_el, model) {

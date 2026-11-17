@@ -1,7 +1,7 @@
+const classes = await import(`${CENOZO_URL}/js/model/study.mjs`);
 const { CN_common } = await import(`${CENOZO_URL}/js/common.mjs`);
 const { CN_modal_confirm } = await import(`${CENOZO_URL}/js/modal/confirm.mjs`);
 
-const classes = await import(`${CENOZO_URL}/js/model/study.mjs`);
 export class CN_model_study extends classes.CN_model_study {
   /**
    * Extend parent method

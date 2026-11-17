@@ -1,3 +1,4 @@
+const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 const { CN_action_list } = await import(`${CENOZO_URL}/js/action/list.mjs`);
 const { CN_action_view } = await import(`${CENOZO_URL}/js/action/view.mjs`);
 const { CN_api } = await import(`${CENOZO_URL}/js/api.mjs`);
@@ -9,10 +10,7 @@ const { CN_input_file } = await import(`${CENOZO_URL}/js/input/file.mjs`);
 const { CN_modal_message } = await import(`${CENOZO_URL}/js/modal/message.mjs`);
 const { CN_session } = await import(`${CENOZO_URL}/js/session.mjs`);
 
-const classes = await import(`${CENOZO_URL}/js/model/participant.mjs`);
 const base_list_class = classes.CN_list_participant ? classes.CN_list_participant : CN_action_list;
-const base_view_class = classes.CN_view_participant ? classes.CN_view_participant : CN_action_view;
-
 export class CN_list_participant extends base_list_class {
   /**
    * Extends the parent method
@@ -52,6 +50,7 @@ export class CN_list_participant extends base_list_class {
   }
 }
 
+const base_view_class = classes.CN_view_participant ? classes.CN_view_participant : CN_action_view;
 export class CN_view_participant extends base_view_class {
   /**
    * Extend parent method
