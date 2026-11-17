@@ -22,8 +22,8 @@ export class CN_model_participant_data extends CN_base_model {
           typeahead: CN_model_study_phase.get_typeahead(),
           is_constant: () => true,
         },
-        category: { title: "Category", format: "identifier" },
-        name: { title: "Name", format: "identifier" },
+        category: { title: "Category" },
+        name: { title: "Name" },
         filetype: { title: "File Type", help: "The type of file (as a file extension) this data provides." },
       },
     });
