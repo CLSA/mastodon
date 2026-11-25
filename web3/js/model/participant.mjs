@@ -18,7 +18,7 @@ export class CN_list_participant extends base_list_class {
   _create_footer_element() {
     const footer_el = super._create_footer_element();
 
-    if ("participant" == CN_session.get_leaf_model().get_name()) {
+    if ("participant" == CN_session.get_leaf_name()) {
       const multiedit_btn_el = this.constructor.html(
         '<button type="button" name="multiedit" class="btn btn-light btn-outline-primary">Multi-Edit</button>'
       );
